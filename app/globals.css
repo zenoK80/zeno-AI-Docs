@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: rgb(var(--nextra-bg));
+  --foreground: var(--x-color-slate-700);
+  --docs-border: var(--x-color-gray-200);
 }
 
 @theme inline {
@@ -12,11 +13,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.dark {
+  --foreground: var(--x-color-slate-200);
+  --docs-border: var(--x-color-gray-800);
 }
 
 body {
@@ -38,7 +37,7 @@ body > div {
 }
 
 body > div > aside {
- border-right:1px solid var(--x-color-gray-200); 
+ border-right:1px solid var(--docs-border); 
 }
 
 body > div > aside > div {
@@ -60,13 +59,12 @@ body > div > article .nextra-breadcrumb {
 }
 
 .nextra-toc {
- border-left:1px solid var(--x-color-gray-200); 
+ border-left:1px solid var(--docs-border); 
 }
 
 .nextra-toc .nextra-scrollbar {
   padding:16px 10px;
 }
-
 
 
 
