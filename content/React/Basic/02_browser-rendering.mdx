@@ -1,0 +1,237 @@
+---
+title: 브라우저는 화면을 어떻게 그릴까
+description: 렌더링 엔진이 HTML/CSS를 픽셀로 바꾸는 과정 — DOM, CSSOM, 렌더 트리, 그리고 Reflow/Repaint의 원리
+---
+
+## 왜 이걸 먼저 배우나
+
+React의 핵심 개념인 **Virtual DOM**, **재조정(Reconciliation)**, **렌더링 최적화**는 전부 "브라우저가 화면을 그리는 비용이 비싸다"는 전제에서 출발합니다. 그 비용이 왜 비싼지 모르면 React가 왜 그렇게 설계됐는지도 이해할 수 없습니다.
+
+이번 챕터에서는 브라우저가 HTML과 CSS를 받아 실제 픽셀로 바꾸는 전체 과정을 따라갑니다.
+
+## 브라우저의 구조
+
+브라우저는 하나의 프로그램이 아니라 여러 엔진의 조합입니다.
+
+| 구성 요소 | 역할 | 대표 구현체 |
+| --- | --- | --- |
+| 렌더링 엔진 | HTML/CSS를 화면에 그림 | Blink(Chrome, Edge), WebKit(Safari), Gecko(Firefox) |
+| JavaScript 엔진 | JS 코드 실행 | V8(Chrome), JavaScriptCore(Safari), SpiderMonkey(Firefox) |
+| 네트워크 계층 | HTTP 요청/응답 처리 | — |
+
+<Callout type="info">
+JavaScript 엔진(V8)의 동작 원리는 다음 챕터에서 다룹니다. 이번 챕터의 주인공은 **렌더링 엔진**입니다.
+</Callout>
+
+## 렌더링 파이프라인 — 전체 흐름
+
+브라우저가 HTML 문서를 받아서 화면에 그리기까지의 과정을 **Critical Rendering Path(중요 렌더링 경로)**라고 부릅니다.
+
+<Steps>
+### HTML 파싱 → DOM 생성
+
+HTML 문자열을 파싱해서 **DOM(Document Object Model)** 트리를 만듭니다.
+
+### CSS 파싱 → CSSOM 생성
+
+`<style>`, `<link>`로 불러온 CSS를 파싱해서 **CSSOM(CSS Object Model)** 트리를 만듭니다.
+
+### 렌더 트리(Render Tree) 생성
+
+DOM과 CSSOM을 합쳐서 **화면에 실제로 보이는 요소만** 담은 렌더 트리를 만듭니다.
+
+### 레이아웃(Layout)
+
+각 요소의 **정확한 위치와 크기**를 계산합니다. (Reflow라고도 부름)
+
+### 페인트(Paint)
+
+계산된 위치에 텍스트, 색, 그림자 등을 **실제 픽셀로** 그립니다.
+
+### 합성(Composite)
+
+여러 레이어를 합쳐 최종 화면을 만듭니다.
+</Steps>
+
+## 1단계 — DOM: HTML이 객체 트리가 되다
+
+브라우저는 HTML 문자열을 한 줄씩 읽으며 토큰화하고, 이를 노드로 만들어 트리 구조로 연결합니다.
+
+```html
+<html>
+  <body>
+    <h1>제목</h1>
+    <ul>
+      <li>항목 1</li>
+      <li>항목 2</li>
+    </ul>
+  </body>
+</html>
+```
+
+위 HTML은 아래와 같은 트리가 됩니다.
+
+```
+html
+└── body
+    ├── h1
+    │   └── "제목"
+    └── ul
+        ├── li ── "항목 1"
+        └── li ── "항목 2"
+```
+
+<Callout>
+JavaScript에서 `document.querySelector('h1')`으로 접근하는 것이 바로 이 DOM 트리의 노드입니다. **DOM은 HTML 파일 자체가 아니라, 브라우저가 메모리에 만든 객체 구조**입니다.
+</Callout>
+
+### 파싱은 중단될 수 있다
+
+HTML 파싱 중 `<script>` 태그를 만나면 브라우저는 **파싱을 멈추고** 스크립트를 다운로드/실행합니다. JavaScript가 `document.write()` 같은 코드로 DOM을 바꿀 수 있기 때문입니다.
+
+```html
+<!-- 구버전 방식: body 맨 아래에 script 배치 -->
+<body>
+  <div id="root"></div>
+  <script src="app.js"></script>
+</body>
+
+<!-- 현대 방식: defer 속성 사용 -->
+<head>
+  <script src="app.js" defer></script>
+</head>
+```
+
+<Callout type="info">
+과거에는 파싱 차단을 피하려고 `<script>`를 `</body>` 직전에 두는 것이 관례였습니다. 지금은 `defer`(파싱 완료 후 순서대로 실행)나 `type="module"`(자동으로 defer 동작)을 쓰는 것이 표준입니다. Vite로 만든 React 프로젝트의 `index.html`을 열어보면 `<script type="module">`이 head에 있는 이유가 이것입니다.
+</Callout>
+
+## 2단계 — CSSOM: CSS도 트리가 된다
+
+CSS 역시 파싱을 거쳐 트리 구조가 됩니다. 중요한 특징은 **캐스케이드(cascade)** — 부모의 스타일이 자식에게 상속되고, 여러 규칙이 우선순위에 따라 병합된다는 점입니다.
+
+```css
+body { font-size: 16px; color: #333; }
+h1 { font-size: 2em; }   /* body의 16px 기준으로 계산 → 32px */
+```
+
+<Callout type="warning">
+CSS는 **렌더링 차단 리소스**입니다. CSSOM이 완성되기 전에는 렌더 트리를 만들 수 없어서, CSS 파일이 클수록 첫 화면이 늦게 뜹니다. "CSS는 head에, JS는 defer로"라는 규칙이 여기서 나옵니다.
+</Callout>
+
+## 3단계 — 렌더 트리: 보이는 것만 남긴다
+
+DOM + CSSOM = 렌더 트리. 단, **화면에 보이지 않는 노드는 제외**됩니다.
+
+- `<head>`, `<meta>`, `<script>` — 애초에 시각적 요소가 아님
+- `display: none` — 렌더 트리에서 **제외**
+- `visibility: hidden` — 보이지 않지만 자리를 차지하므로 렌더 트리에 **포함**
+
+<Callout>
+`display: none`과 `visibility: hidden`의 차이가 면접 단골 질문인 이유가 바로 이것입니다. 렌더 트리 포함 여부가 다르고, 따라서 레이아웃 비용도 다릅니다.
+</Callout>
+
+## 4단계 — 레이아웃(Reflow): 위치와 크기 계산
+
+렌더 트리의 각 노드가 **뷰포트 안에서 정확히 어디에, 얼마만한 크기로** 놓일지 계산합니다.
+
+- `width: 50%` → 부모 너비 기준으로 픽셀 값 계산
+- 요소 하나의 크기가 바뀌면 **주변 요소 전체가 다시 계산**될 수 있음
+
+이 재계산을 **Reflow(리플로우)**라고 부르며, 렌더링 파이프라인에서 가장 비싼 작업 중 하나입니다.
+
+## 5단계 — 페인트(Repaint): 픽셀 그리기
+
+레이아웃에서 계산된 위치에 실제 픽셀을 채웁니다. 색상, 배경, 그림자, 텍스트가 여기서 그려집니다.
+
+## 어떤 속성이 어떤 단계를 다시 실행시키나
+
+CSS 속성을 바꾸면 **바꾼 속성에 따라 파이프라인의 재시작 지점이 달라집니다.**
+
+<Tabs items={['Layout부터 (가장 비쌈)', 'Paint부터', 'Composite만 (가장 쌈)']}>
+<Tabs.Tab>
+위치·크기에 영향을 주는 속성. Layout → Paint → Composite 전부 다시 실행.
+
+```css
+width, height, margin, padding, top, left, font-size, ...
+```
+</Tabs.Tab>
+<Tabs.Tab>
+모양만 바뀌는 속성. Layout은 건너뛰고 Paint → Composite 실행.
+
+```css
+color, background-color, box-shadow, border-radius, ...
+```
+</Tabs.Tab>
+<Tabs.Tab>
+GPU가 처리하는 속성. Layout, Paint 모두 건너뜀. **애니메이션은 가능하면 이 속성으로.**
+
+```css
+transform, opacity
+```
+</Tabs.Tab>
+</Tabs>
+
+```css
+/* ❌ 매 프레임 Reflow 발생 */
+.box { animation: move-bad 1s; }
+@keyframes move-bad {
+  to { left: 300px; }
+}
+
+/* ✅ Composite만 발생 — GPU 가속 */
+.box { animation: move-good 1s; }
+@keyframes move-good {
+  to { transform: translateX(300px); }
+}
+```
+
+## Reflow가 왜 문제인가 — React의 탄생 배경
+
+JavaScript로 DOM을 직접 조작하면 조작할 때마다 Reflow/Repaint가 발생할 수 있습니다.
+
+```js
+// 항목 100개를 하나씩 추가 — 최악의 경우 100번의 Reflow
+const ul = document.querySelector('ul');
+for (let i = 0; i < 100; i++) {
+  const li = document.createElement('li');
+  li.textContent = `항목 ${i}`;
+  ul.appendChild(li);   // 매번 DOM 변경
+}
+```
+
+특히 아래처럼 **DOM 읽기와 쓰기를 번갈아** 하면, 브라우저가 정확한 값을 주기 위해 강제로 Reflow를 실행합니다. 이를 **강제 동기 레이아웃(Forced Synchronous Layout)**이라고 합니다.
+
+```js
+// ❌ 읽기 → 쓰기 → 읽기 → 쓰기 반복 = Layout Thrashing
+boxes.forEach((box) => {
+  const width = box.offsetWidth;   // 읽기 (Reflow 강제 실행)
+  box.style.width = width / 2 + 'px'; // 쓰기 (Reflow 예약)
+});
+```
+
+<Callout type="info">
+React는 이 문제를 다음과 같이 해결합니다 — **변경 사항을 메모리 위의 가상 트리(Virtual DOM)에서 먼저 계산하고, 실제 DOM에는 최소한의 변경만 한 번에 반영**합니다. 이 원리는 6장(Virtual DOM)에서 자세히 다룹니다.
+</Callout>
+
+## 정리
+
+- 브라우저는 HTML → **DOM**, CSS → **CSSOM**을 만들고, 둘을 합쳐 **렌더 트리**를 만든다
+- 렌더 트리를 기반으로 **Layout(위치·크기) → Paint(픽셀) → Composite(합성)** 순서로 그린다
+- 위치·크기가 바뀌면 **Reflow**, 모양만 바뀌면 **Repaint** — Reflow가 훨씬 비싸다
+- `transform`과 `opacity`는 Composite 단계만 실행하므로 애니메이션에 최적
+- 잦은 DOM 조작 = 잦은 Reflow. **React의 Virtual DOM은 이 비용을 줄이기 위한 설계**다
+
+## 직접 확인해보기
+
+Chrome DevTools에서 렌더링 과정을 눈으로 볼 수 있습니다.
+
+<Steps>
+### Performance 패널
+
+`F12` → Performance 탭 → 녹화 버튼을 누르고 페이지와 상호작용하면 Layout(보라색), Paint(초록색) 이벤트가 타임라인에 표시됩니다.
+
+### Rendering 패널
+
+`F12` → `Esc` → 하단 메뉴에서 Rendering 선택 → **Paint flashing**을 켜면 Repaint가 일어나는 영역이 초록색으로 깜빡입니다.
+</Steps>

@@ -1,0 +1,820 @@
+---
+title: "2. ECMAScript와 Web API의 경계"
+description: "언어 표준과 브라우저 기능을 구분하는 기준"
+---
+
+브라우저에서 실행되는 코드는
+모두 JavaScript 문법으로 작성됩니다.
+
+하지만 코드에서 사용하는 모든 기능이
+ECMAScript에 포함되는 것은 아닙니다.
+
+<Callout>
+  **ECMAScript는 언어를 정의하고,**
+  **Web API는 실행 환경의 기능을 제공합니다.**
+
+  가장 정확한 구분 기준은
+  기능을 어느 명세에서 정의하는지 확인하는 것입니다.
+</Callout>
+
+이 문서에서는 처음 보는 기능이
+ECMAScript인지 Web API인지 판별하는 기준을 설명합니다.
+
+## 먼저 코드에서 경계를 찾아보기
+
+다음 코드는
+버튼을 클릭하면 서버에서 데이터를 가져와
+화면에 결과를 표시합니다.
+
+```js
+const button = document.querySelector("#loadButton");
+const output = document.querySelector("#output");
+
+button.addEventListener("click", async () => {
+  const response = await fetch("/api/message");
+  const data = await response.json();
+
+  output.textContent = data.message;
+});
+```
+
+코드는 하나로 이어져 있지만
+내부에서는 여러 표준이 함께 사용됩니다.
+
+<Table>
+  <thead>
+    <Table.Tr>
+      <Table.Th>코드</Table.Th>
+      <Table.Th>분류</Table.Th>
+      <Table.Th>주된 정의 위치</Table.Th>
+    </Table.Tr>
+  </thead>
+  <tbody>
+    <Table.Tr>
+      <Table.Td><code>const</code></Table.Td>
+      <Table.Td>ECMAScript</Table.Td>
+      <Table.Td>ECMA-262</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>async</code>, <code>await</code></Table.Td>
+      <Table.Td>ECMAScript</Table.Td>
+      <Table.Td>ECMA-262</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>document</code>, <code>querySelector()</code></Table.Td>
+      <Table.Td>DOM API</Table.Td>
+      <Table.Td>DOM·HTML Standard</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>addEventListener()</code></Table.Td>
+      <Table.Td>DOM 이벤트 API</Table.Td>
+      <Table.Td>DOM Standard</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>fetch()</code>, <code>Response</code></Table.Td>
+      <Table.Td>Fetch API</Table.Td>
+      <Table.Td>Fetch Standard</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>textContent</code></Table.Td>
+      <Table.Td>DOM API</Table.Td>
+      <Table.Td>DOM Standard</Table.Td>
+    </Table.Tr>
+  </tbody>
+</Table>
+
+ECMAScript가 코드의 문법과 값의 동작을 만들고,
+Web API가 문서·이벤트·네트워크 기능을 제공합니다.
+
+## ECMAScript가 정의하는 범위
+
+ECMAScript는
+JavaScript 언어의 공식 표준입니다.
+
+공식 명세인 ECMA-262는
+특정 브라우저나 서버에 종속되지 않는
+언어의 공통 규칙을 정의합니다.
+
+### 문법과 제어 구조
+
+```js
+const count = 3;
+
+if (count > 0) {
+  console.log("항목이 있습니다.");
+}
+```
+
+`const`, `if`, 비교 연산자,
+중괄호와 함수 호출 문법은
+ECMAScript 영역에 속합니다.
+
+단, 위 코드의 `console`은
+ECMA-262의 표준 내장 객체가 아닙니다.
+
+브라우저와 Node.js 같은 실행 환경이
+로그 출력을 위해 별도로 제공하는 기능입니다.
+
+### 값과 타입
+
+```js
+const title = "Browser JavaScript";
+const page = 2;
+const enabled = true;
+const selected = null;
+```
+
+문자열, 숫자, 불리언,
+`null`, `undefined`, 객체 같은 값과 타입을
+ECMAScript가 정의합니다.
+
+### 표준 내장 객체
+
+```js
+const items = new Map();
+const tags = new Set();
+const task = Promise.resolve("완료");
+```
+
+다음 기능은
+ECMAScript 표준 내장 객체입니다.
+
+- `Array`
+- `Object`
+- `Map`
+- `Set`
+- `Promise`
+- `Math`
+- `JSON`
+- `RegExp`
+- `Date`
+- `Proxy`
+- `Reflect`
+
+### 함수와 객체의 동작
+
+```js
+const prices = [1000, 2000, 3000];
+
+const total = prices.reduce((sum, price) => {
+  return sum + price;
+}, 0);
+```
+
+배열, 함수, 객체,
+`map()`, `filter()`, `reduce()` 같은 동작도
+ECMAScript가 정의합니다.
+
+## Web API가 정의하는 범위
+
+Web API는
+브라우저와 웹 플랫폼이 가진 기능을
+JavaScript에서 사용할 수 있도록 제공합니다.
+
+### HTML 문서와 DOM
+
+```js
+const heading = document.querySelector("h1");
+
+heading.textContent = "새 제목";
+```
+
+`document`, `Element`, `querySelector()`,
+`textContent` 같은 기능은
+DOM과 HTML 관련 명세에서 정의합니다.
+
+### 사용자 입력과 이벤트
+
+```js
+const button = document.querySelector("button");
+
+button.addEventListener("click", () => {
+  console.log("버튼을 클릭했습니다.");
+});
+```
+
+이벤트 객체와 이벤트 전달 방식,
+`addEventListener()` 같은 기능은
+DOM과 관련 웹 표준에서 정의합니다.
+
+### 네트워크
+
+```js
+const response = await fetch("/api/posts");
+const posts = await response.json();
+```
+
+`fetch()`, `Request`, `Response`, `Headers`는
+Fetch Standard에서 정의하는 Web API입니다.
+
+### 브라우저 저장소
+
+```js
+localStorage.setItem("theme", "dark");
+
+const theme = localStorage.getItem("theme");
+```
+
+`localStorage`와 `sessionStorage`는
+HTML Standard의 Web Storage 영역에서 정의합니다.
+
+### 타이머와 화면 갱신
+
+```js
+setTimeout(() => {
+  console.log("1초 후 실행");
+}, 1000);
+
+requestAnimationFrame(() => {
+  console.log("다음 화면 갱신 전에 실행");
+});
+```
+
+브라우저의 `setTimeout()`과
+`requestAnimationFrame()`은
+ECMAScript가 아니라 HTML Standard에서 정의합니다.
+
+## 호스트 환경이란?
+
+ECMAScript 명세만으로는
+HTML 문서를 읽거나,
+화면에 내용을 표시하거나,
+네트워크에 요청을 보낼 수 없습니다.
+
+JavaScript 코드를 실제로 실행하면서
+입력과 출력에 필요한 기능을 추가하는 환경을
+**호스트 환경(host environment)**이라고 합니다.
+
+```text
+JavaScript 실행 환경
+├─ ECMAScript
+│  ├─ 문법
+│  ├─ 타입
+│  ├─ 함수와 객체
+│  └─ 표준 내장 객체
+│
+└─ 호스트가 제공하는 기능
+   ├─ 브라우저: document, history, localStorage
+   ├─ Web Worker: self, postMessage, importScripts
+   └─ Node.js: process, Buffer, 파일 시스템 기능
+```
+
+브라우저는
+ECMAScript를 실행하는 호스트 환경 중 하나입니다.
+
+브라우저는 JavaScript 엔진에
+DOM, 이벤트, 네트워크, 저장소,
+그래픽과 미디어 기능을 추가합니다.
+
+## 같은 이름이 여러 환경에 존재할 수 있다
+
+기능의 출처를 판단할 때
+“Node.js에서 실행되는가?”만 확인하면
+잘못 분류할 수 있습니다.
+
+최근의 JavaScript 실행 환경은
+웹 표준 API를 함께 구현하기도 합니다.
+
+### `fetch()`
+
+`fetch()`는
+Fetch Standard에서 정의하는 Web API입니다.
+
+브라우저뿐 아니라
+Node.js 같은 다른 실행 환경도
+호환되는 `fetch()`를 제공할 수 있습니다.
+
+```js
+const response = await fetch("https://example.com/data.json");
+```
+
+다른 환경에서 실행된다고 해서
+`fetch()`가 ECMAScript 기능으로 바뀌는 것은 아닙니다.
+
+### `setTimeout()`
+
+브라우저의 `setTimeout()`은
+HTML Standard의 타이머 기능입니다.
+
+Node.js도 같은 이름과
+비슷한 사용법의 타이머를 제공합니다.
+
+```js
+setTimeout(() => {
+  console.log("작업 실행");
+}, 1000);
+```
+
+이름이 같아도
+각 실행 환경의 구현과 세부 동작은
+완전히 같다고 가정하면 안 됩니다.
+
+### `URL`
+
+`URL`은
+ECMA-262가 아니라 URL Standard에서 정의합니다.
+
+```js
+const url = new URL("/posts?page=2", "https://example.com");
+
+console.log(url.searchParams.get("page"));
+```
+
+브라우저와 서버 런타임 모두에서
+자주 사용할 수 있지만,
+분류상으로는 웹 표준 API입니다.
+
+<Callout type="warning">
+  **실행되는 환경**과
+  **기능을 정의한 표준**은 서로 다른 기준입니다.
+
+  최종 분류는 이름이나 실행 결과가 아니라
+  명세의 출처를 기준으로 판단합니다.
+</Callout>
+
+## `fetch()`와 `Promise`는 같은 영역일까?
+
+`fetch()`는 호출 결과로
+`Promise`를 반환합니다.
+
+```js
+const request = fetch("/api/posts");
+
+request.then((response) => {
+  console.log(response.status);
+});
+```
+
+이 코드에는
+ECMAScript와 Web API가 함께 사용됩니다.
+
+<Table>
+  <thead>
+    <Table.Tr>
+      <Table.Th>기능</Table.Th>
+      <Table.Th>분류</Table.Th>
+    </Table.Tr>
+  </thead>
+  <tbody>
+    <Table.Tr>
+      <Table.Td><code>fetch()</code></Table.Td>
+      <Table.Td>Fetch API</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>Promise</code></Table.Td>
+      <Table.Td>ECMAScript 표준 내장 객체</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>then()</code></Table.Td>
+      <Table.Td>ECMAScript의 <code>Promise</code> 메서드</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>Response</code></Table.Td>
+      <Table.Td>Fetch API 인터페이스</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>status</code></Table.Td>
+      <Table.Td><code>Response</code>의 Web API 프로퍼티</Table.Td>
+    </Table.Tr>
+  </tbody>
+</Table>
+
+Web API가 `Promise`를 사용한다고 해서
+`Promise`까지 Web API가 되는 것은 아닙니다.
+
+반대로 `Promise`를 반환한다고 해서
+그 기능이 ECMAScript에 포함되는 것도 아닙니다.
+
+> **전제 지식**
+>
+> `Promise`, `async`, `await`의 문법과 동작은
+> ECMAScript 학습 문서에서 별도로 다룹니다.
+>
+> 이 시리즈에서는 Web API가 비동기 결과를
+> 어떻게 제공하는지에 필요한 범위에서만 사용합니다.
+
+## 전역에 있다고 모두 ECMAScript는 아니다
+
+브라우저 개발자 도구에서 다음 값을 입력하면
+대부분 바로 접근할 수 있습니다.
+
+```js
+Array;
+Promise;
+document;
+fetch;
+setTimeout;
+localStorage;
+```
+
+모두 전역에서 접근할 수 있지만
+출처는 서로 다릅니다.
+
+<Table>
+  <thead>
+    <Table.Tr>
+      <Table.Th>전역 이름</Table.Th>
+      <Table.Th>출처</Table.Th>
+    </Table.Tr>
+  </thead>
+  <tbody>
+    <Table.Tr>
+      <Table.Td><code>Array</code>, <code>Promise</code></Table.Td>
+      <Table.Td>ECMAScript</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>document</code>, <code>localStorage</code></Table.Td>
+      <Table.Td>브라우저 Web API</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>fetch</code></Table.Td>
+      <Table.Td>Fetch API</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>setTimeout</code></Table.Td>
+      <Table.Td>HTML 타이머 API</Table.Td>
+    </Table.Tr>
+  </tbody>
+</Table>
+
+ECMAScript는
+환경에 관계없이 전역 객체에 접근할 수 있도록
+`globalThis`를 정의합니다.
+
+```js
+console.log(globalThis.Array === Array);
+// true
+```
+
+브라우저는 자신의 전역 환경에
+`document`, `fetch`, `localStorage` 같은
+Web API를 추가합니다.
+
+따라서 전역에서 이름을 바로 사용할 수 있다는 사실만으로
+ECMAScript 기능이라고 판단할 수 없습니다.
+
+## 처음 보는 기능을 구분하는 순서
+
+처음 보는 객체나 메서드를 만났다면
+다음 순서로 확인합니다.
+
+<Steps>
+
+### 기능이 언어 문법인지 확인한다
+
+변수 선언, 연산자, 함수,
+클래스, 배열과 객체의 동작이라면
+ECMAScript 영역일 가능성이 높습니다.
+
+```text
+const
+class
+Array
+Map
+Promise
+Object.keys()
+```
+
+### 브라우저 기능과 연결되는지 확인한다
+
+다음 작업과 관련되어 있다면
+Web API일 가능성이 높습니다.
+
+- HTML 문서 제어
+- 사용자 클릭과 입력
+- 주소와 방문 기록
+- 네트워크 요청
+- 브라우저 저장소
+- 화면 그리기와 애니메이션
+- 카메라, 마이크, 위치 정보
+- Worker와 Service Worker
+
+### MDN 문서의 분류를 확인한다
+
+MDN에서 JavaScript Reference에 있으면
+ECMAScript 기능일 가능성이 높습니다.
+
+Web APIs 영역에 있으면
+웹 플랫폼이 제공하는 기능입니다.
+
+### Specifications 항목을 확인한다
+
+MDN 문서 하단의 Specifications에서
+기능의 공식 정의 위치를 확인합니다.
+
+- ECMAScript Language Specification → ECMAScript
+- DOM Standard → DOM API
+- HTML Standard → HTML 관련 Web API
+- Fetch Standard → Fetch API
+- URL Standard → URL API
+
+### 실행 환경과 지원 조건을 확인한다
+
+분류를 마친 뒤에는
+현재 환경에서 실제로 사용할 수 있는지 확인합니다.
+
+브라우저 지원 여부뿐 아니라
+HTTPS, 사용자 권한, 사용자 동작 같은 조건도
+함께 확인해야 합니다.
+
+</Steps>
+
+## 빠른 판별표
+
+<Table>
+  <thead>
+    <Table.Tr>
+      <Table.Th>기능</Table.Th>
+      <Table.Th>분류</Table.Th>
+      <Table.Th>판단 근거</Table.Th>
+    </Table.Tr>
+  </thead>
+  <tbody>
+    <Table.Tr>
+      <Table.Td><code>Array.prototype.map()</code></Table.Td>
+      <Table.Td>ECMAScript</Table.Td>
+      <Table.Td>ECMA-262의 배열 메서드입니다.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>Promise</code></Table.Td>
+      <Table.Td>ECMAScript</Table.Td>
+      <Table.Td>ECMA-262의 표준 내장 객체입니다.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>document.querySelector()</code></Table.Td>
+      <Table.Td>Web API</Table.Td>
+      <Table.Td>현재 문서의 DOM을 탐색합니다.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>fetch()</code></Table.Td>
+      <Table.Td>Web API</Table.Td>
+      <Table.Td>Fetch Standard에서 정의합니다.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>setTimeout()</code></Table.Td>
+      <Table.Td>Web API</Table.Td>
+      <Table.Td>브라우저에서는 HTML Standard가 정의합니다.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>URL</code></Table.Td>
+      <Table.Td>Web API</Table.Td>
+      <Table.Td>URL Standard에서 정의합니다.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>console.log()</code></Table.Td>
+      <Table.Td>환경 제공 API</Table.Td>
+      <Table.Td>ECMA-262의 표준 내장 기능이 아닙니다.</Table.Td>
+    </Table.Tr>
+    <Table.Tr>
+      <Table.Td><code>process.cwd()</code></Table.Td>
+      <Table.Td>Node.js API</Table.Td>
+      <Table.Td>Node.js 실행 환경이 제공합니다.</Table.Td>
+    </Table.Tr>
+  </tbody>
+</Table>
+
+## 브라우저 지원과 Baseline
+
+ECMAScript와 Web API의 경계는
+특정 기능 하나가 아니므로
+문서 전체에 하나의 Baseline 상태를 붙일 수는 없습니다.
+
+이 문서의 예제에서 사용한
+`Document`, `localStorage`, `setTimeout()`은
+MDN에서 **Baseline Widely available**로 표시되며,
+주요 브라우저에서 2015년 7월부터 널리 사용할 수 있습니다.
+
+`fetch()`도
+**Baseline Widely available**로 표시되며,
+주요 브라우저에서 2017년 3월부터 널리 사용할 수 있습니다.
+
+하지만 새로운 Web API는
+기능마다 지원 상태가 다릅니다.
+
+### 기능 감지
+
+브라우저 이름을 확인하는 대신
+사용하려는 기능이 실제로 존재하는지 검사합니다.
+
+```js
+if (typeof globalThis.fetch === "function") {
+  console.log("fetch()를 사용할 수 있습니다.");
+} else {
+  console.log("다른 요청 방식이 필요합니다.");
+}
+```
+
+객체 안의 기능을 확인할 때는
+`in` 연산자를 사용할 수 있습니다.
+
+```js
+if ("geolocation" in navigator) {
+  console.log("Geolocation API가 존재합니다.");
+}
+```
+
+기능이 존재해도
+권한 거부, 네트워크 오류,
+보안 컨텍스트 제한으로 실패할 수 있습니다.
+
+지원 여부 확인과 오류 처리는
+별도로 준비해야 합니다.
+
+## 실행 가능한 전체 예제
+
+다음 파일을 `index.html`로 저장한 뒤
+브라우저에서 열면
+ECMAScript와 Web API가 한 코드에서
+어떻게 섞여 사용되는지 확인할 수 있습니다.
+
+```html
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ECMAScript와 Web API의 경계</title>
+  </head>
+
+  <body>
+    <h1>기능의 출처 확인</h1>
+    <button id="showButton" type="button">목록 표시</button>
+    <ul id="result"></ul>
+
+    <script>
+      const features = [
+        { name: "Array", source: "ECMAScript" },
+        { name: "Promise", source: "ECMAScript" },
+        { name: "document", source: "DOM API" },
+        { name: "fetch", source: "Fetch API" },
+        { name: "setTimeout", source: "HTML 타이머 API" },
+        { name: "localStorage", source: "Web Storage API" },
+      ];
+
+      const button = document.querySelector("#showButton");
+      const result = document.querySelector("#result");
+
+      if (!button || !result) {
+        throw new Error("필요한 HTML 요소를 찾지 못했습니다.");
+      }
+
+      button.addEventListener("click", () => {
+        result.textContent = "";
+
+        features.forEach((feature) => {
+          const item = document.createElement("li");
+          item.textContent = `${feature.name} — ${feature.source}`;
+          result.append(item);
+        });
+      });
+    </script>
+  </body>
+</html>
+```
+
+### 예제의 ECMAScript 영역
+
+```js
+const features = [
+  { name: "Array", source: "ECMAScript" },
+];
+
+features.forEach((feature) => {
+  console.log(feature.name);
+});
+```
+
+배열, 객체 리터럴,
+화살표 함수, 템플릿 리터럴,
+`forEach()`는 ECMAScript 영역입니다.
+
+### 예제의 Web API 영역
+
+```js
+const button = document.querySelector("#showButton");
+const item = document.createElement("li");
+
+button.addEventListener("click", () => {
+  item.textContent = "항목";
+});
+```
+
+`document`, `querySelector()`,
+`createElement()`, `addEventListener()`,
+`textContent`는 Web API 영역입니다.
+
+## 흔한 실수
+
+### JavaScript로 호출하면 모두 ECMAScript라고 생각한다
+
+다음 코드는 JavaScript 문법으로 작성하지만
+`document`는 브라우저가 제공하는 객체입니다.
+
+```js
+document.querySelector("h1");
+```
+
+**코드를 작성하는 언어**와
+**호출하는 기능의 출처**를 구분해야 합니다.
+
+### `Promise`를 Web API라고 생각한다
+
+`fetch()`가 `Promise`를 반환하기 때문에
+둘을 같은 영역으로 생각하기 쉽습니다.
+
+- `fetch()` → Fetch API
+- `Promise` → ECMAScript
+
+서로 다른 표준의 기능이
+하나의 코드에서 함께 사용되는 것입니다.
+
+### Node.js에서 실행되면 ECMAScript라고 생각한다
+
+Node.js가 `fetch()`, `URL`, `setTimeout()` 같은 기능을
+제공할 수 있어도
+해당 기능의 표준 출처까지 바뀌는 것은 아닙니다.
+
+항상 명세의 정의 위치를 확인합니다.
+
+### 전역에 있으면 언어 기본 기능이라고 생각한다
+
+브라우저 전역에는
+ECMAScript 기능과 Web API가 함께 존재합니다.
+
+```js
+Array;
+document;
+fetch;
+```
+
+전역에서 바로 접근된다는 사실만으로
+기능의 출처를 판단할 수 없습니다.
+
+### API가 존재하면 언제나 사용할 수 있다고 생각한다
+
+기능 감지에 성공해도
+실제 호출은 실패할 수 있습니다.
+
+예를 들어 일부 API는
+다음 조건을 요구합니다.
+
+- HTTPS 환경
+- 사용자의 권한 허용
+- 버튼 클릭 같은 사용자 동작
+- 특정 브라우저나 기기
+- 올바른 출처와 보안 정책
+
+## 확인 문제
+
+### 1. `Promise`는 ECMAScript일까, Web API일까?
+
+<details>
+  <summary>정답 보기</summary>
+
+  `Promise`는 ECMA-262에서 정의하는
+  ECMAScript 표준 내장 객체입니다.
+
+</details>
+
+### 2. Node.js에서 `fetch()`가 실행되면 ECMAScript 기능일까?
+
+<details>
+  <summary>정답 보기</summary>
+
+  아닙니다.
+  `fetch()`는 Fetch Standard에서 정의하는 Web API입니다.
+  다른 실행 환경이 웹 표준과 호환되는 기능을 구현한 것입니다.
+
+</details>
+
+### 3. `document.querySelector()`에서 ECMAScript 부분은 무엇일까?
+
+<details>
+  <summary>정답 보기</summary>
+
+  프로퍼티 접근과 함수 호출 문법은 ECMAScript입니다.
+  `document` 객체와 `querySelector()` 메서드의 기능은
+  DOM 관련 Web API가 제공합니다.
+
+</details>
+
+## 요약
+
+- ECMAScript는 JavaScript의 문법, 타입, 객체와 표준 내장 기능을 정의합니다.
+- Web API는 문서, 이벤트, 네트워크, 저장소 같은 웹 플랫폼 기능을 제공합니다.
+- 가장 정확한 구분 기준은 기능을 정의한 명세입니다.
+- `Promise`는 ECMAScript이고 `fetch()`는 Web API입니다.
+- `fetch()`, `setTimeout()`, `URL`이 다른 환경에 존재해도 ECMAScript가 되는 것은 아닙니다.
+- 전역에서 바로 접근할 수 있다는 사실만으로 기능의 출처를 판단할 수 없습니다.
+- 기능의 분류와 브라우저 지원 여부는 각각 따로 확인해야 합니다.
+
+## 참고 자료
+
+- [MDN — JavaScript technologies overview](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/JavaScript_technologies_overview)
+- [MDN — Web APIs](https://developer.mozilla.org/en-US/docs/Web/API)
+- [ECMAScript Language Specification](https://tc39.es/ecma262/)
+- [WHATWG HTML — Web application APIs](https://html.spec.whatwg.org/multipage/webappapis.html)
+- [WHATWG DOM Standard](https://dom.spec.whatwg.org/)
+- [WHATWG Fetch Standard](https://fetch.spec.whatwg.org/)
+- [WHATWG URL Standard](https://url.spec.whatwg.org/)
+- [Web IDL Standard](https://webidl.spec.whatwg.org/)
