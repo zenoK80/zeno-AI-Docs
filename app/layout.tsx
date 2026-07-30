@@ -49,13 +49,15 @@ export default async function RootLayout({
 }: {
   children: ReactNode
 }) {
+  const pageMap = await getPageMap()
+
   return (
     <html lang="ko" dir="ltr" suppressHydrationWarning>
       <Head />
       <body>
         <Layout
-          navbar={<DocsNavbar key="docs-navbar" />}
-          pageMap={await getPageMap()}
+          navbar={<DocsNavbar key="docs-navbar" pageMap={pageMap} />}
+          pageMap={pageMap}
           sidebar={{ autoCollapse: true, defaultMenuCollapseLevel: 1 }}
         >
           {children}

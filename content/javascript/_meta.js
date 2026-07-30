@@ -1,4 +1,4 @@
-export default {
+const meta = {
   Browser: {
     title: 'Browser',
     type: 'page',
@@ -8,3 +8,5 @@ export default {
     type: 'page',
   },
 }
+
+export default meta

@@ -2,63 +2,125 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import type { Folder, MdxFile, PageMapItem } from 'nextra'
 import { Search } from 'nextra/components'
 import { ThemeSwitch, setMenu, useMenu } from 'nextra-theme-docs'
-import { FocusEvent, MouseEvent, useEffect, useState } from 'react'
+import { FocusEvent, MouseEvent, useEffect, useMemo, useState } from 'react'
 
-const navGroups = [
-  {
-    title: 'Javascript',
-    href: '/javascript/Browser/01_browser-javascript-soft-final',
-    section: '/javascript',
-    items: [
-      {
-        title: 'Browser',
-        href: '/javascript/Browser/01_browser-javascript-soft-final',
-      },
-      {
-        title: 'ECMAScript',
-        href: '/javascript/ECMAscript/01_the-javascript-language',
-      },
-    ],
-  },
-  {
-    title: 'React',
-    href: '/React/Basic/01_react-intro',
-    section: '/React',
-    items: [
-      {
-        title: 'Basic',
-        href: '/React/Basic/01_react-intro',
-      },
-    ],
-  },
-  {
-    title: 'CSS',
-    href: '/css/01_what-is-css',
-    section: '/css',
-    items: [
-      {
-        title: 'css',
-        href: '/css/01_what-is-css',
-      },
-    ],
-  },
-  {
-    title: 'HTML',
-    href: '/html/01_introduction-to-modern-html',
-    section: '/html',
-    items: [
-      {
-        title: 'html',
-        href: '/html/01_introduction-to-modern-html',
-      },
-    ],
-  },
-]
+interface NavItem {
+  title: string
+  href: string
+}
 
-export function DocsNavbar() {
+interface NavGroup extends NavItem {
+  section: string
+  items: NavItem[]
+}
+
+function isFolder(item: PageMapItem): item is Folder {
+  return 'children' in item
+}
+
+function isPage(item: PageMapItem): item is MdxFile {
+  return 'route' in item && !('children' in item)
+}
+
+/** 폴더 children 중 _meta 데이터({ data }) 항목을 찾는다. */
+function metaOf(children: PageMapItem[]): Record<string, unknown> {
+  for (const child of children) {
+    if ('data' in child) return child.data as Record<string, unknown>
+  }
+  return {}
+}
+
+/** _meta 제목 → frontMatter 제목 → 이름 순으로 표시 제목을 정한다. */
+function titleOf(
+  item: Folder | MdxFile,
+  parentMeta: Record<string, unknown>,
+): string {
+  const metaValue = parentMeta[item.name]
+  if (typeof metaValue === 'string') return metaValue
+  if (
+    metaValue &&
+    typeof metaValue === 'object' &&
+    'title' in metaValue &&
+    typeof metaValue.title === 'string'
+  ) {
+    return metaValue.title
+  }
+  if ('frontMatter' in item) {
+    const { sidebarTitle, title } = item.frontMatter ?? {}
+    if (typeof sidebarTitle === 'string') return sidebarTitle
+    if (typeof title === 'string') return title
+  }
+  if ('title' in item && typeof item.title === 'string') return item.title
+  return item.name
+}
+
+function isHidden(name: string, parentMeta: Record<string, unknown>): boolean {
+  const metaValue = parentMeta[name]
+  return (
+    !!metaValue &&
+    typeof metaValue === 'object' &&
+    'display' in metaValue &&
+    metaValue.display === 'hidden'
+  )
+}
+
+/** 폴더를 따라 내려가며 첫 번째 실제 페이지 route를 찾는다. */
+function firstPageRoute(item: PageMapItem): string | undefined {
+  if (isPage(item)) return item.route
+  if (isFolder(item)) {
+    for (const child of item.children) {
+      const route = firstPageRoute(child)
+      if (route) return route
+    }
+  }
+  return undefined
+}
+
+/**
+ * 사이드바처럼 pageMap(content 폴더 구조)에서 헤더 메뉴를 만든다.
+ * 최상위 폴더 = 메뉴, 하위 폴더(없으면 페이지들) = 드롭다운 항목.
+ */
+function getNavGroups(pageMap: PageMapItem[]): NavGroup[] {
+  const rootMeta = metaOf(pageMap)
+  const groups: NavGroup[] = []
+
+  for (const item of pageMap) {
+    if (!isFolder(item) || isHidden(item.name, rootMeta)) continue
+
+    const href = firstPageRoute(item)
+    if (!href) continue
+
+    const folderMeta = metaOf(item.children)
+    const subFolders = item.children.filter(isFolder)
+    const children: (Folder | MdxFile)[] =
+      subFolders.length > 0 ? subFolders : item.children.filter(isPage)
+
+    const items: NavItem[] = []
+    for (const child of children) {
+      if (isHidden(child.name, folderMeta)) continue
+      const childHref = firstPageRoute(child)
+      if (childHref) {
+        items.push({ title: titleOf(child, folderMeta), href: childHref })
+      }
+    }
+
+    groups.push({
+      title: titleOf(item, rootMeta),
+      href,
+      section: item.route,
+      items,
+    })
+  }
+
+  return groups
+}
+
+export function DocsNavbar({ pageMap }: { pageMap: PageMapItem[] }) {
   const pathname = usePathname()
+  const navGroups = useMemo(() => getNavGroups(pageMap), [pageMap])
   const mobileMenuOpen = useMenu()
   const [openMenu, setOpenMenu] = useState<string | null>(null)
 
@@ -92,9 +154,12 @@ export function DocsNavbar() {
 
     handleDesktopChange()
     mediaQuery.addEventListener('change', handleDesktopChange)
+    // 일부 환경에서는 matchMedia change가 누락될 수 있어 resize도 함께 감지한다.
+    window.addEventListener('resize', handleDesktopChange)
 
     return () => {
       mediaQuery.removeEventListener('change', handleDesktopChange)
+      window.removeEventListener('resize', handleDesktopChange)
     }
   }, [])
 

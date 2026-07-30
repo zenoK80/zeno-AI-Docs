@@ -1,4 +1,5 @@
-export default {
+const meta = {
+  index: '홈',
   javascript: {
     title: 'Javascript',
     type: 'menu',
@@ -23,13 +24,43 @@ export default {
       },
     },
   },
+  NextJs: {
+    title: 'NextJS',
+    type: 'menu',
+    items: {
+      Basic: {
+        title: 'Basic',
+        href: '/NextJs/Basic/01_nextjs-intro',
+      },
+    },
+  },
+  Typescript: {
+    title: 'TypeScript',
+    type: 'menu',
+    items: {
+      Basic: {
+        title: 'Basic',
+        href: '/Typescript/Basic/01_typescript-intro',
+      },
+    },
+  },
+  NodeJs: {
+    title: 'NodeJS',
+    type: 'menu',
+    items: {
+      Basic: {
+        title: 'Basic',
+        href: '/NodeJs/Basic/01_nodejs-intro',
+      },
+    },
+  },
   html: {
     title: 'Html',
     type: 'menu',
     items: {
       Basic: {
-        title: 'css',
-        href: '/css/01_what-is-css',
+        title: 'Basic',
+        href: '/html/Basic/01_introduction-to-modern-html',
       },
     },
   },
@@ -38,9 +69,11 @@ export default {
     type: 'menu',
     items: {
       Basic: {
-        title: 'html',
-        href: '/html/01_introduction-to-modern-html',
+        title: 'Basic',
+        href: '/css/Basic/01_what-is-css',
       },
     },
   },
 }
+
+export default meta
