@@ -61,6 +61,10 @@ body {
   opacity: 0.75;
 }
 
+.docs-navbar-mobile-menu-button {
+  display: none;
+}
+
 .docs-navbar-menu {
   display: flex;
   align-items: stretch;
@@ -315,9 +319,34 @@ html.dark .docs-navbar-panel-inner {
     min-width: max-content;
   }
 
+  .docs-navbar-mobile-menu-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 34px;
+    height: 34px;
+    margin-left: auto;
+    border-radius: 6px;
+    color: var(--foreground);
+  }
+
+  .docs-navbar-mobile-menu-button:hover,
+  .docs-navbar-mobile-menu-button[aria-expanded='true'] {
+    background: color-mix(in srgb, var(--foreground) 10%, transparent);
+  }
+
+  .docs-navbar-mobile-menu-button span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
   .docs-navbar-menu {
-    margin-left: 8px;
-    overflow-x: auto;
+    display: none;
   }
 
   .docs-navbar-trigger {

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Search } from 'nextra/components'
-import { ThemeSwitch } from 'nextra-theme-docs'
+import { ThemeSwitch, setMenu, useMenu } from 'nextra-theme-docs'
 import { FocusEvent, MouseEvent, useState } from 'react'
 
 const navGroups = [
@@ -59,6 +59,7 @@ const navGroups = [
 
 export function DocsNavbar() {
   const pathname = usePathname()
+  const mobileMenuOpen = useMenu()
   const [openMenu, setOpenMenu] = useState<string | null>(null)
 
   function closeMenu(event?: MouseEvent<HTMLAnchorElement>) {
@@ -79,6 +80,18 @@ export function DocsNavbar() {
           <img src="/zenoLogo.svg" alt="" width="24" height="24" />
           <b>Zeno Docs</b>
         </Link>
+
+        <button
+          aria-label="Menu"
+          aria-expanded={mobileMenuOpen}
+          className="docs-navbar-mobile-menu-button"
+          onClick={() => setMenu((open) => !open)}
+          type="button"
+        >
+          <span />
+          <span />
+          <span />
+        </button>
 
         <div className="docs-navbar-menu">
           {navGroups.map((group) => {
