@@ -1,0 +1,133 @@
+---
+title: 모던 HTML 시작하기
+description: HTML의 역사, HTML Living Standard(모던 HTML)의 개념, 그리고 브라우저가 HTML을 화면에 그리는 흐름을 살펴봅니다.
+---
+
+## HTML이란 무엇인가
+
+HTML은 **HyperText Markup Language**의 약자로, 웹 페이지의 **구조와 의미**를 정의하는 마크업 언어입니다. 프로그래밍 언어처럼 로직을 계산하는 것이 아니라, "이 부분은 제목이고, 저 부분은 문단이며, 이건 링크다" 하는 식으로 **콘텐츠에 의미를 부여하는** 역할을 합니다.
+
+웹 프론트엔드는 흔히 세 가지 언어의 협업으로 설명됩니다.
+
+- **HTML** — 구조(뼈대). 무엇이 있는가
+- **CSS** — 표현(스타일). 어떻게 보이는가
+- **JavaScript** — 동작(행위). 어떻게 반응하는가
+
+<Callout type="info">
+  "HyperText"의 하이퍼텍스트는 문서와 문서를 링크로 연결한다는 뜻입니다. 이 단순한 아이디어(하이퍼링크)가 오늘날 웹 전체를 하나로 묶는 근간이 되었습니다.
+</Callout>
+
+## HTML의 역사
+
+HTML은 30년이 넘는 세월 동안 여러 단체를 거치며 진화해 왔습니다. 큰 흐름만 짚어보겠습니다.
+
+| 시기 | 사건 |
+| --- | --- |
+| 1991 | 팀 버너스리(Tim Berners-Lee)가 최초의 HTML을 공개 |
+| 1997 | HTML 3.2, 뒤이어 HTML 4.0 발표 (W3C) |
+| 2000 | XML 기반의 엄격한 문법인 XHTML 1.0 등장 |
+| 2004 | 브라우저 제조사 중심의 **WHATWG** 결성 |
+| 2014 | W3C가 **HTML5**를 공식 권고안(Recommendation)으로 발표 |
+| 2019 | W3C와 WHATWG가 **단일 표준**에 합의 (MOU 체결) |
+| 현재 | **HTML Living Standard**가 유일한 공식 표준 |
+
+### XHTML이라는 우회로
+
+2000년대 초, W3C는 HTML을 더 이상 발전시키지 않고 XML 기반의 엄격한 **XHTML**로 방향을 틀려고 했습니다. XHTML은 태그를 반드시 닫아야 하고 대소문자를 구분하는 등 규칙이 까다로웠고, 작은 문법 오류 하나에도 페이지 전체가 깨질 수 있었습니다. 이 접근은 실제 웹의 유연한 현실과 잘 맞지 않았습니다.
+
+### WHATWG의 등장
+
+이런 방향에 반발해 2004년 애플·모질라·오페라 등 브라우저 진영이 모여 **WHATWG**(Web Hypertext Application Technology Working Group)를 결성했습니다. 이들은 XML 기반 노선 대신, 실제 브라우저에 구현 가능하고 기존 웹과 호환되는 실용적인 HTML을 계속 발전시키자는 목표를 세웠습니다. 이 작업이 오늘날 우리가 아는 **HTML5**의 씨앗이 되었습니다.
+
+### 두 개의 표준, 그리고 통합
+
+한동안 W3C와 WHATWG는 함께 작업했지만 목표가 갈렸습니다. W3C는 "완성된 버전"의 HTML5를 특정 시점에 고정해 발표하고 싶어 했고, WHATWG는 명세를 얼리지 않고 **계속 유지·보수하며 필요한 기능을 추가하는 살아있는 표준(Living Standard)**을 원했습니다. 두 개의 규범 명세가 공존하는 상황은 개발자에게 혼란을 주었고, 결국 **2019년 두 단체는 단일 HTML 표준에 협력하기로 합의**했습니다.
+
+<Callout type="info">
+  2019년 합의(MOU)의 핵심: **HTML과 DOM 표준은 WHATWG가 Living Standard로 유지·관리**하고, W3C는 독자적인 HTML 명세 발행을 중단하고 이에 협력합니다. 즉 오늘날 HTML의 단일 공식 출처는 WHATWG의 HTML Living Standard입니다.
+</Callout>
+
+## 모던 HTML = HTML Living Standard
+
+그래서 "모던 HTML"이란 정확히 무엇일까요? 특정 버전 번호가 아니라, **현재 WHATWG가 유지하는 HTML Living Standard 그 자체**를 가리킵니다.
+
+<Cards>
+  <Cards.Card title="버전 번호가 없다" href="https://html.spec.whatwg.org/multipage/">
+    HTML5, HTML5.1 같은 표기는 이제 과거 스냅샷일 뿐입니다. 현재 표준에는 버전이 없고, 오늘의 명세가 곧 최신 명세입니다.
+  </Cards.Card>
+  <Cards.Card title="계속 살아있다" href="https://html.spec.whatwg.org/">
+    명세는 얼려지지 않고 지속적으로 갱신됩니다. 새 기능이 추가되고, 오래된 내용은 다듬어집니다.
+  </Cards.Card>
+</Cards>
+
+<Callout type="warning">
+  실무에서 여전히 "HTML5"라는 말을 자주 쓰지만, 엄밀히 말하면 오늘날 그것은 특정 버전이라기보다 **"모던 HTML을 통칭하는 마케팅성 용어"**에 가깝습니다. 이 커리큘럼에서 "모던 HTML"은 곧 최신 Living Standard를 뜻합니다.
+</Callout>
+
+이 "살아있는 표준" 덕분에 최근 몇 년 사이 자바스크립트 없이도 쓸 수 있는 강력한 네이티브 기능들이 계속 들어왔습니다. 이 커리큘럼 후반부에서 다룰 `dialog`(네이티브 모달), Popover API, 커스터마이즈 가능한 `select` 같은 것들이 그 예입니다.
+
+## 브라우저는 HTML을 어떻게 그리는가
+
+HTML 파일은 그저 텍스트일 뿐입니다. 이 텍스트가 화면의 픽셀이 되기까지, 브라우저는 여러 단계를 거칩니다. 이 흐름을 **렌더링 파이프라인**이라고 부릅니다. 전체 그림을 미리 알아두면 이후 챕터들이 훨씬 잘 이해됩니다.
+
+<Steps>
+
+### HTML 파싱 → DOM 트리
+
+브라우저가 HTML 텍스트를 위에서부터 읽으며 토큰으로 분해하고, 요소들의 부모-자식 관계를 담은 **DOM(Document Object Model) 트리**를 만듭니다. DOM은 문서를 프로그램이 다룰 수 있는 객체 트리로 표현한 것입니다.
+
+### CSS 파싱 → CSSOM 트리
+
+`<style>`이나 외부 스타일시트의 CSS를 해석해 **CSSOM(CSS Object Model) 트리**를 만듭니다. 어떤 요소에 어떤 스타일이 적용되는지에 대한 규칙 모음입니다.
+
+### 렌더 트리(Render Tree) 구성
+
+DOM과 CSSOM을 결합해, **실제로 화면에 그려질 요소들**만 모은 렌더 트리를 만듭니다. `display: none`처럼 화면에 나타나지 않는 요소는 여기서 제외됩니다.
+
+### 레이아웃(Layout / Reflow)
+
+각 요소가 화면의 **어디에, 얼마만 한 크기로** 놓일지 위치와 치수를 계산합니다. 이 단계를 리플로우(reflow)라고도 부릅니다.
+
+### 페인트(Paint)
+
+계산된 정보를 바탕으로 텍스트·색·테두리·이미지 등을 실제 **픽셀로 칠합니다**.
+
+### 컴포지트(Composite)
+
+여러 겹(레이어)으로 그려진 결과를 순서에 맞게 **합성**해 최종 화면을 만듭니다.
+
+</Steps>
+
+<Callout type="info">
+  왜 이걸 알아야 할까요? 예를 들어 `<script>`를 문서 어디에 두느냐가 파싱 속도에 영향을 주고, 레이아웃을 자주 다시 계산하게 만드는 코드는 성능을 떨어뜨립니다. 지금은 "이런 단계가 있구나" 정도만 기억해도 충분합니다. 성능 최적화는 뒤쪽 챕터에서 자세히 다룹니다.
+</Callout>
+
+## 개발 환경 준비하기
+
+모던 HTML을 배우는 데 거창한 도구는 필요 없습니다.
+
+- **텍스트 에디터** — VS Code 등. 문법 강조와 자동완성이 되면 충분합니다.
+- **최신 브라우저** — 이 커리큘럼의 모던 기능들을 확인하려면 Chrome, Edge, Firefox, Safari 등 최신 버전을 권장합니다.
+- **개발자 도구(DevTools)** — 브라우저에서 `F12`(또는 우클릭 → 검사)로 열 수 있습니다. Elements 탭에서 방금 배운 DOM 트리를 눈으로 직접 확인할 수 있습니다.
+
+<Callout type="tip">
+  지금 아무 웹사이트에서나 `F12`를 눌러 Elements(요소) 탭을 열어보세요. 트리 구조로 펼쳐지는 태그들이 바로 이 챕터에서 이야기한 **DOM**입니다. 앞으로 우리가 작성할 모든 HTML은 결국 이 트리로 변환됩니다.
+</Callout>
+
+## 정리
+
+- HTML은 웹 콘텐츠에 **구조와 의미**를 부여하는 마크업 언어다.
+- HTML은 팀 버너스리의 발명 이후 여러 단체를 거쳐 진화했고, 한때 XHTML·복수 표준의 혼란기를 겪었다.
+- **2019년 이후 유일한 공식 표준은 WHATWG의 HTML Living Standard**이며, "모던 HTML"은 곧 이 살아있는 표준을 뜻한다.
+- 브라우저는 HTML을 **파싱 → DOM → (CSSOM 결합) 렌더 트리 → 레이아웃 → 페인트 → 컴포지트** 순서로 화면에 그린다.
+
+다음 챕터에서는 실제로 HTML 문서를 이루는 최소 뼈대 — `<!DOCTYPE>`, `<html>`, `<head>`, `<body>` — 를 직접 작성해 봅니다.
+
+## 참고 자료
+
+- [MDN — HTML 개요](https://developer.mozilla.org/ko/docs/Web/HTML)
+- [WHATWG — HTML Living Standard](https://html.spec.whatwg.org/multipage/)
+- [WHATWG — HTML 표준의 역사(Introduction)](https://html.spec.whatwg.org/multipage/introduction.html#history-2)
+- [W3C · WHATWG 단일 표준 합의(2019)](https://www.w3.org/news/2019/w3c-and-the-whatwg-have-just-signed-an-agreement-to-collaborate-on-the-development-of-a-single-version-of-the-html-and-dom-specifications/)
+- [MDN — 브라우저는 어떻게 작동하는가(렌더링)](https://developer.mozilla.org/ko/docs/Web/Performance/How_browsers_work)
+- [web.dev — Rendering performance](https://web.dev/articles/rendering-performance)

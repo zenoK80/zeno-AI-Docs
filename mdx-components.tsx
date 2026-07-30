@@ -14,10 +14,15 @@ import {
   Select,
   Steps,
   Table,
-  Tabs,
 } from 'nextra/components'
+import { DocsTab, DocsTabs } from './app/components/docs-tabs'
 
 const themeComponents = getThemeComponents()
+const Tabs = Object.assign((props: Parameters<typeof DocsTabs>[0]) => {
+  return <DocsTabs {...props} />
+}, {
+  Tab: DocsTab,
+})
 
 export function useMDXComponents(components = {}) {
   return {
@@ -38,6 +43,7 @@ export function useMDXComponents(components = {}) {
     Steps,
     Table,
     Tabs,
+    'Tabs.Tab': Tabs.Tab,
 
     ...components,
   }
