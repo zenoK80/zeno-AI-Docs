@@ -309,7 +309,8 @@ html.dark .docs-navbar-panel-inner {
   box-shadow: 0 18px 42px rgb(0 0 0 / 36%);
 }
 
-@media (max-width: 768px) {
+/* Nextra의 모바일 구간(< md, 768px 미만)과 동일한 범위 */
+@media (max-width: 767.98px) {
   .docs-navbar-inner {
     padding-inline: 12px;
   }
