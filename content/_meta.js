@@ -1,7 +1,7 @@
 const meta = {
   index: '홈',
   javascript: {
-    title: 'Javascript',
+    title: 'JS',
     type: 'menu',
     items: {
       Browser: {
@@ -25,7 +25,7 @@ const meta = {
     },
   },
   NextJs: {
-    title: 'NextJS',
+    title: 'Next',
     type: 'menu',
     items: {
       Basic: {
@@ -35,7 +35,7 @@ const meta = {
     },
   },
   Typescript: {
-    title: 'TypeScript',
+    title: 'TS',
     type: 'menu',
     items: {
       Basic: {
@@ -45,7 +45,7 @@ const meta = {
     },
   },
   NodeJs: {
-    title: 'NodeJS',
+    title: 'Node',
     type: 'menu',
     items: {
       Basic: {
@@ -55,7 +55,7 @@ const meta = {
     },
   },
   html: {
-    title: 'Html',
+    title: 'HTML',
     type: 'menu',
     items: {
       Basic: {
@@ -65,12 +65,52 @@ const meta = {
     },
   },
   css: {
-    title: 'Css',
+    title: 'CSS',
     type: 'menu',
     items: {
       Basic: {
         title: 'Basic',
         href: '/css/Basic/01_what-is-css',
+      },
+    },
+  },
+  자격증: {
+    title: '자격증',
+    type: 'menu',
+    items: {
+      SQLD: {
+        title: 'SQLD',
+        href: '/자격증/SQLD/01_',
+      },
+      Linux1: {
+        title: '리눅스 1급 1차',
+        href: '/자격증/Linux1/01_',
+      },
+      Bigdata: {
+        title: '빅데이터 필기',
+        href: '/자격증/Bigdata/01_text',
+      },
+      pc2: {
+        title: 'PC 정비사 2급 실기',
+        href: '/자격증/pc2/01_',
+      },
+      network2: {
+        title: '네관사 2급 실기',
+        href: '/자격증/network2/01_',
+      },
+    },
+  },
+  독학사: {
+    title: '독학사',
+    type: 'menu',
+    items: {
+      basic_statics: {
+        title: '1단계: 기초통계학',
+        href: '/독학사/basic_statics/01_introduction-to-statistics',
+      },
+      basic_math: {
+        title: '1단계: 일반수학',
+        href: '/독학사/basic_math/01_sets-and-functions',
       },
     },
   },

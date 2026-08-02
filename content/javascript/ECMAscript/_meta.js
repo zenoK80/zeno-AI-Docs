@@ -3,6 +3,7 @@ const meta = {
   '02_dev-environment-and-first-run': '02. 개발 환경과 첫 실행',
   '03_variables-and-constants': '03. 변수와 상수',
   '04_expressions-and-statements': '04. 표현식과 문',
+  '05_data-types': '05. 데이터 타입',
 }
 
 export default meta
