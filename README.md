@@ -30,3 +30,9 @@ npm run dev
 - `content/`: 실제 학습 문서(MDX)와 Nextra 메뉴 설정
 - `plan-codex/`, `plan-claude/`: AI별 문서 작성 계획
 - `AGENTS.md`, `CLAUDE.md`: 작업 규칙과 문서 구조 가이드
+
+## Navigation
+
+- **Header**: `app/components/docs-navbar.tsx`가 `content/`의 폴더 구조를 읽어 상단 메뉴와 드롭다운을 만듭니다. 폴더명 표시는 각 `_meta.js`에서 정합니다.
+- **Sidebar**: Nextra 기본 사이드바입니다. 현재 문서 경로만 펼치고, 다른 과목은 자동으로 접힙니다.
+- 새 문서나 폴더를 추가할 때는 해당 폴더의 `_meta.js`도 함께 수정합니다.
