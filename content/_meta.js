@@ -74,6 +74,14 @@ const meta = {
         title: '빅데이터분석기사 필기',
         href: '/자격증/Bigdata/01_bigdata-exam-overview',
       },
+      Network2: {
+        title: '네트워크관리사 2급 실기',
+        href: '/자격증/Network2/01_network-manager-practical-overview',
+      },
+      PC2: {
+        title: 'PC정비사 2급 실기',
+        href: '/자격증/PC2/01_pc-maintenance-practical-overview',
+      },
     },
   },
 }
