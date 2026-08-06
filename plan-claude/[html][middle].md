@@ -1,0 +1,42 @@
+# HTML — 중급 (Middle)
+
+- 담당: Claude
+- 콘텐츠 폴더: `content/html/Middle/`
+- 공통 작성 규칙은 `CLAUDE.md`를 따른다.
+
+## 이 단계의 목표
+
+**미디어와 폼**을 다룬다. 이미지·영상을 반응형으로 넣고,
+사용자 입력을 받는 폼을 제대로 만들고, JS 없이도 동작하는 모던 인터랙티브 요소를 쓸 수 있게 된다.
+
+## 과목 지침
+
+- 폼 편은 **접근성(label 연결, 에러 안내)** 을 반드시 함께 다룬다.
+- `dialog`, `popover`, invoker commands, customizable select 등 모던 요소는 **Baseline 표기와 폴백**을 명시한다.
+- iframe·embed는 **sandbox·allow 등 보안 속성**을 반드시 함께 설명한다.
+- 참고: MDN HTML, WHATWG HTML Living Standard, [Open UI](https://open-ui.org/), web.dev(Learn Forms)
+
+## 목차 (14편)
+
+### Part 3. 이미지 · 미디어
+
+- `01_images-and-responsive-images.mdx` — img·alt, srcset/sizes/picture, `loading="lazy"`
+- `02_audio-and-video.mdx` — audio·video, track(자막), 미디어 속성과 제어
+- `03_svg-in-html.mdx` — 인라인 SVG 기초, 아이콘·도형
+- `04_embedding-content.mdx` — iframe·embed·object, sandbox·allow 보안 속성
+
+### Part 4. 폼
+
+- `05_forms-basics.mdx` — form·input·label, method/action, 제출 흐름
+- `06_input-types.mdx` — text·email·number·date·range·color·file 등 input 타입 총정리
+- `07_form-validation.mdx` — 제약 검증(required·pattern·min/max), Constraint Validation API
+- `08_advanced-form-controls.mdx` — textarea·select·optgroup·datalist·fieldset·output
+- `09_customizable-select.mdx` — `appearance: base-select`, `::picker(select)`, selectedcontent
+
+### Part 5. 인터랙티브 · 모던 컴포넌트
+
+- `10_details-and-summary.mdx` — 네이티브 디스클로저·아코디언
+- `11_dialog-element.mdx` — 네이티브 모달, `showModal()`, light dismiss
+- `12_popover-api.mdx` — popover 속성, popovertarget, top layer
+- `13_invoker-commands.mdx` — command/commandfor로 만드는 선언적 액션(JS 없는 UI)
+- `14_tooltips-and-interest-invokers.mdx` — `popover="hint"`, interest invokers로 툴팁·하버카드

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Layout } from 'nextra-theme-docs'
 import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
+import type { PageMapItem } from 'nextra'
 import { DocsNavbar } from './components/docs-navbar'
 import 'nextra-theme-docs/style.css'
 import './globals.css'
@@ -44,12 +45,31 @@ export const metadata: Metadata = {
   },
 }
 
+function encodePageMapRoutes(pageMap: PageMapItem[]): PageMapItem[] {
+  return pageMap.map((item) => {
+    const route =
+      'route' in item && typeof item.route === 'string'
+        ? encodeURI(item.route)
+        : undefined
+
+    if ('children' in item) {
+      return {
+        ...item,
+        ...(route && { route }),
+        children: encodePageMapRoutes(item.children),
+      }
+    }
+
+    return route ? { ...item, route } : item
+  })
+}
+
 export default async function RootLayout({
   children,
 }: {
   children: ReactNode
 }) {
-  const pageMap = await getPageMap()
+  const pageMap = encodePageMapRoutes(await getPageMap())
 
   return (
     <html lang="ko" dir="ltr" suppressHydrationWarning>

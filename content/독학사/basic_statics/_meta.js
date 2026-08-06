@@ -1,5 +1,5 @@
 const meta = {
-  '01_introduction-to-statistics': '01. 통계와 통계방법 - 통계학의 개요',
+  '01_statistics-and-statistical-methods': '01. 통계와 통계방법',
 }
 
 export default meta

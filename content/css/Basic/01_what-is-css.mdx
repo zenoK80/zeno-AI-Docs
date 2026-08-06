@@ -1,106 +1,191 @@
 ---
-title: CSS란 무엇인가
-description: CSS의 정의와 역할, 짧은 역사, 그리고 브라우저가 CSS를 화면에 그려내는 렌더링 원리를 알아봅니다.
+title: '01. CSS란 무엇인가'
+description: 'CSS가 무엇이고 왜 필요한지, 브라우저가 CSS를 어떻게 읽어 화면을 그리는지 이해한다.'
 ---
 
 ## CSS란 무엇인가
 
-CSS는 **Cascading Style Sheets**(캐스케이딩 스타일 시트)의 약자로, 웹 페이지의 **표현(presentation)** 을 담당하는 언어입니다. HTML이 문서의 구조와 의미를 정의한다면, CSS는 그 구조 위에 색상·여백·글꼴·레이아웃·애니메이션 같은 시각적 스타일을 입힙니다.
+HTML만으로 만든 페이지를 본 적이 있는가?
+검은 글씨, 파란 링크, 위에서 아래로 쭉 쌓인 문단. 정보는 다 있지만 아무도 읽고 싶어 하지 않는다.
 
-웹을 이루는 세 가지 핵심 기술은 보통 다음과 같이 역할이 나뉩니다.
+**CSS**<sup>Cascading Style Sheets</sup>는 그 문서에 **생김새를 입히는 언어**다.
 
-- **HTML** — 구조와 의미 (무엇인가)
-- **CSS** — 표현과 스타일 (어떻게 보이는가)
-- **JavaScript** — 동작과 상호작용 (어떻게 반응하는가)
+## 역할 분담 — 왜 따로 있나
 
-이렇게 역할을 분리하는 것을 **관심사의 분리(separation of concerns)** 라고 합니다. 마크업과 스타일을 떼어 두면 같은 HTML에 다른 스타일을 입히거나, 스타일 하나만 고쳐 사이트 전체 디자인을 바꾸는 일이 쉬워집니다.
+웹 페이지는 세 가지 언어가 역할을 나눠 만든다.
+
+| 언어 | 담당 | 비유 |
+| --- | --- | --- |
+| HTML | 구조와 의미 | 집의 뼈대 |
+| **CSS** | **모양과 배치** | **인테리어** |
+| JavaScript | 동작 | 전기 배선 |
+
+이렇게 나누는 이유는 **바꿀 때 따로 바꾸기 위해서**다.
+
+사이트 전체의 링크 색을 바꾼다고 하자. CSS가 없다면 HTML 파일을 전부 열어 태그마다 색을 고쳐야 한다.
+CSS가 있으면 스타일 파일 **한 줄**만 고치면 끝난다.
+
+```css
+a {
+  color: crimson;
+}
+```
+
+이 한 줄이 사이트의 모든 링크에 적용된다.
 
 <Callout type="info">
-  CSS의 첫 글자 **C(Cascading, 캐스케이딩)** 는 "여러 스타일 규칙이 충돌할 때 우선순위 규칙(폭포처럼 위에서 아래로 흐르는)에 따라 최종 값이 결정된다"는 CSS의 핵심 원리를 가리킵니다. 이 캐스케이드는 03장에서 자세히 다룹니다.
+이 분리를 **관심사의 분리**<sup>Separation of Concerns</sup>라 부른다. 웹 개발 전반을 관통하는 원칙이라 앞으로 계속 만나게 된다.
 </Callout>
 
-## CSS는 선언형 언어다
+## CSS는 어떻게 생겼나
 
-CSS는 "이걸 이렇게 해라"라고 단계를 지시하는 **명령형(imperative)** 이 아니라, "이 요소는 이런 모습이어야 한다"고 상태를 기술하는 **선언형(declarative)** 언어입니다. 개발자는 원하는 결과를 규칙으로 선언하고, 그 규칙을 실제 픽셀로 그려내는 일은 브라우저가 맡습니다.
+CSS의 기본 단위는 **규칙**<sup>Rule</sup>이다. 딱 두 부분으로 되어 있다.
 
 ```css
-/* "모든 h1은 파란색이고, 아래쪽에 여백을 둔다"고 선언 */
 h1 {
-  color: royalblue;
-  margin-block-end: 1rem;
+  color: navy;
+  font-size: 32px;
 }
 ```
 
-가장 작은 단위인 **규칙(rule set)** 은 다음과 같은 구조를 가집니다. 자세한 문법은 다음 장에서 다룹니다.
+- `h1` — **선택자**<sup>Selector</sup>. "누구에게 적용할지"
+- `{ ... }` 안 — **선언 블록**<sup>Declaration Block</sup>. "무엇을 어떻게 바꿀지"
 
-```css
-selector {        /* 선택자: 어떤 요소에 적용할지 */
-  property: value; /* 선언: 무엇을 어떤 값으로 */
-}
+선언 하나는 `속성: 값;` 형태다.
+
+```
+color : navy ;
+  ↑      ↑    ↑
+ 속성    값   세미콜론
 ```
 
-## CSS의 짧은 역사
+문법은 이게 전부다. **CSS의 어려움은 문법이 아니라 "왜 내 스타일이 적용 안 되는가"에 있다.**
+그 답이 다음 편들의 주제다.
 
-CSS는 웹이 문서 위주였던 시절, "구조와 표현을 분리하자"는 문제의식에서 출발해 지금의 강력한 레이아웃·모션 언어로 성장했습니다.
-
-| 시기 | 사건 |
-| --- | --- |
-| 1994 | Håkon Wium Lie가 CSS를 처음 제안 |
-| 1996 | **CSS1** W3C 권고안(Recommendation) 확정 |
-| 1998 | **CSS2** 발표 (positioning, z-index 등 도입) |
-| 2011 | **CSS2.1** 정식 권고안 |
-| 2010년대~ | **CSS3**부터 하나의 거대 명세 대신 **모듈(Module)** 단위로 분리 개발 |
-| 현재 | Flexbox·Grid·Container Queries·`:has()` 등 모듈별로 계속 진화 |
-
-<Callout type="warning">
-  흔히 "CSS3", "CSS4"라고 부르지만, 사실 **공식적인 "CSS4"는 없습니다.** CSS3 이후로는 Selectors, Grid, Color 같은 **모듈마다 독립적으로 레벨(Level 4, 5 …)** 을 매기며 발전합니다. 그래서 "이 기능은 CSS 몇이냐"보다 "어느 모듈의 몇 레벨이고, 브라우저가 지원하느냐(Baseline)"가 더 중요합니다.
+<Callout type="info">
+문법의 자세한 내용과 HTML에 연결하는 세 가지 방법은 다음 편에서 다룬다.
 </Callout>
 
-## 브라우저는 CSS를 어떻게 렌더링하는가
+## 브라우저는 CSS를 어떻게 처리하나
 
-브라우저가 HTML과 CSS를 받아 화면에 그리기까지의 과정을 **핵심 렌더링 경로(Critical Rendering Path)** 라고 합니다. CSS가 성능과 어떤 관계인지 이해하려면 이 흐름을 알아두는 것이 좋습니다.
+"스타일이 적용되지 않는" 문제를 스스로 풀려면 이 흐름을 알아야 한다.
+브라우저가 페이지를 그리는 과정은 대략 이렇다.
 
 <Steps>
 
-### HTML 파싱 → DOM 생성
+### HTML을 읽어 DOM을 만든다
 
-브라우저는 HTML을 위에서부터 읽어 **DOM(Document Object Model)** 트리를 만듭니다. DOM은 문서의 구조(요소들의 부모–자식 관계)를 담은 객체 트리입니다.
+태그를 파싱해 **DOM 트리**(문서의 구조를 나타내는 객체 트리)를 만든다.
 
-### CSS 파싱 → CSSOM 생성
+### CSS를 읽어 CSSOM을 만든다
 
-`<style>`, 외부 `.css`, 인라인 스타일을 읽어 **CSSOM(CSS Object Model)** 트리를 만듭니다. 이때 캐스케이드·상속 규칙이 계산되어 각 요소가 어떤 스타일 값을 가질지 결정됩니다.
+스타일시트를 파싱해 **CSSOM 트리**(스타일 규칙의 트리)를 만든다.
 
-### 렌더 트리(Render Tree) 구성
+### 둘을 합쳐 렌더 트리를 만든다
 
-DOM과 CSSOM을 결합해 **실제로 화면에 그려질 요소만** 모은 렌더 트리를 만듭니다. `display: none` 인 요소나 `<head>` 처럼 시각적으로 표시되지 않는 부분은 여기서 제외됩니다.
+각 요소에 최종 스타일을 계산해 붙인다. 이때 `display: none`인 요소는 빠진다.
 
-### 레이아웃(Layout / Reflow)
+### 레이아웃 — 위치와 크기를 계산한다
 
-각 요소가 화면의 **어디에, 얼마만한 크기로** 놓일지 위치와 크기를 계산합니다. 뷰포트 크기가 바뀌거나 요소의 크기·위치에 영향을 주는 변경이 생기면 이 과정이 다시 일어나는데, 이를 **리플로우(reflow)** 라고 합니다.
+각 요소가 화면 어디에 얼마만 한 크기로 놓일지 계산한다. **리플로우**<sup>Reflow</sup>라고도 한다.
 
-### 페인트(Paint)
+### 페인트 — 픽셀을 칠한다
 
-계산된 결과를 바탕으로 색상, 테두리, 그림자, 텍스트 등 실제 픽셀을 칠합니다. 크기·위치는 그대로인데 색상 같은 시각 속성만 바뀌면 레이아웃 없이 다시 칠하는 **리페인트(repaint)** 만 발생합니다.
-
-### 컴포지트(Composite)
-
-페인트된 여러 레이어를 순서에 맞게 합성해 최종 화면을 출력합니다. `transform`, `opacity` 같은 속성은 레이아웃·페인트를 건드리지 않고 이 합성 단계에서 처리될 수 있어 애니메이션 성능이 좋습니다.
+색, 배경, 그림자, 텍스트를 실제로 그린다.
 
 </Steps>
 
-## 성능 관점에서 기억할 점
+여기서 알아둘 게 두 가지 있다.
 
-- **CSS는 렌더링 차단 리소스(render-blocking resource)** 입니다. 브라우저는 CSSOM이 완성되기 전에는 페이지를 그리지 않으므로, 스타일을 늦게·크게 불러오면 첫 화면 표시가 늦어집니다.
-- **리플로우 > 리페인트 > 컴포지트** 순으로 비용이 큽니다. 애니메이션에 `top`/`left`/`width` 대신 `transform`/`opacity`를 쓰라고 하는 이유가 여기에 있습니다. (자세한 내용은 45장 성능 편에서 다룹니다.)
+<Callout type="warning">
+**CSS는 렌더링을 막는다**
+
+브라우저는 CSSOM이 완성될 때까지 화면을 그리지 않는다. 스타일이 반쯤 적용된 화면이 번쩍이는 걸 막기 위해서다.
+그래서 CSS 파일이 크거나 느리면 **페이지 전체가 늦게 뜬다.** CSS를 `head`에 넣고 용량을 줄이라는 조언이 여기서 나온다.
+</Callout>
+
+<Callout type="info">
+**모든 속성의 비용이 같지 않다**
+
+`width`를 바꾸면 주변 요소 위치가 다 흔들리므로 레이아웃부터 다시 한다. 반면 `color`만 바꾸면 페인트만 하면 된다.
+애니메이션이 버벅일 때 `transform`과 `opacity`를 쓰라는 이유가 이것이다. 자세한 건 고급 단계의 성능 편에서 다룬다.
+</Callout>
+
+## Cascading — 이름의 절반이 여기 있다
+
+CSS의 C는 **Cascading(폭포처럼 흘러내리는)** 이다.
+같은 요소에 여러 규칙이 적용될 수 있고, 그중 무엇이 이길지 정하는 규칙이 있다는 뜻이다.
+
+```css
+p { color: black; }
+p { color: red; }   /* 나중 것이 이긴다 → 빨강 */
+```
+
+그런데 항상 "나중 것"이 이기는 건 아니다.
+
+```css
+#intro { color: blue; }
+p      { color: red; }   /* 나중이지만 진다 → 파랑 */
+```
+
+`#intro`가 더 **구체적**이기 때문이다.
+
+<Callout type="important">
+스타일이 적용되지 않을 때 초보가 가장 먼저 하는 일이 `!important`를 붙이는 것이다.
+당장은 되지만 나중에 손댈 수 없는 코드가 된다.
+
+**왜 졌는지를 이해하는 게 먼저다.** 이 원리는 기초 단계의 캐스케이드·명시도 편에서 제대로 다룬다.
+</Callout>
+
+## CSS는 지금도 자라고 있다
+
+CSS를 "다 배웠다"고 말하기 어려운 이유는 **계속 커지기 때문**이다.
+
+| 시기 | 등장한 것 |
+| --- | --- |
+| 1996 | CSS1 — 색, 폰트, 여백 |
+| 1998 | CSS2 — 위치 지정, 미디어 타입 |
+| 2011~ | CSS3 — 모듈 단위로 쪼개져 각자 발전 |
+| 최근 | 중첩, 컨테이너 쿼리, `:has()`, `oklch()`, 앵커 포지셔닝 … |
+
+<Callout type="info">
+**"CSS4"는 없다**
+
+CSS3 이후로는 버전 번호를 붙이지 않는다. 대신 Selectors, Grid, Color처럼 **모듈별로 따로 버전을 매기고 따로 발전한다.**
+그래서 "CSS 몇 버전을 배워야 하나요?"라는 질문은 성립하지 않는다.
+</Callout>
+
+이 시리즈는 **지금 쓸 수 있는 최신 CSS**를 기준으로 쓴다.
+새 기능마다 브라우저 지원 현황을 함께 표기하니 실무에 바로 쓸지 판단할 수 있다.
 
 <Callout type="default">
-  지금은 "CSS가 DOM과 만나 렌더 트리를 만들고 → 배치하고 → 칠한다"는 큰 그림만 기억하면 충분합니다. 이 흐름은 이후 레이아웃·모션·성능 챕터를 이해하는 밑바탕이 됩니다.
+**Baseline이란?**
+
+주요 브라우저(Chrome · Edge · Firefox · Safari)에서 그 기능을 언제부터 쓸 수 있게 됐는지 알려주는 지표다.
+
+- **Widely available** — 30개월 이상 지나 안정적. 마음 놓고 써도 된다
+- **Newly available** — 방금 전 브라우저에 들어옴. 구형 기기는 확인 필요
+- **Limited** — 일부 브라우저만. 폴백 필수
 </Callout>
+
+## 정리
+
+<Callout type="default">
+- CSS는 HTML 문서에 **모양과 배치**를 입히는 언어다
+- 구조(HTML) · 표현(CSS) · 동작(JS)을 나누면 **고칠 때 한 곳만 고치면 된다**
+- 문법은 `선택자 { 속성: 값; }` 이 전부다
+- 브라우저는 **DOM + CSSOM → 렌더 트리 → 레이아웃 → 페인트** 순으로 그린다
+- CSS는 렌더링을 막으므로 **크기와 위치가 성능에 직결**된다
+- 여러 규칙이 충돌하면 **캐스케이드**가 승자를 정한다. `!important`가 아니라 원리를 이해해야 한다
+- CSS3 이후 버전 번호는 없다. **모듈별로 발전**하며 지금도 커지고 있다
+</Callout>
+
+다음 편에서는 CSS 문법을 자세히 보고, HTML에 연결하는 세 가지 방법을 비교한다.
 
 ## 참고 자료
 
-- [MDN — CSS](https://developer.mozilla.org/ko/docs/Web/CSS)
-- [MDN — Critical rendering path](https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path)
-- [web.dev — Learn CSS](https://web.dev/learn/css/welcome?hl=ko)
-- [Chrome for Developers](https://developer.chrome.com/?hl=ko)
-- [W3Schools — CSS Reference](https://www.w3schools.com/cssref/index.php)
+- [MDN — CSS 첫걸음](https://developer.mozilla.org/ko/docs/Learn_web_development/Core/Styling_basics)
+- [MDN — CSS 참고서](https://developer.mozilla.org/ko/docs/Web/CSS/Reference)
+- [web.dev — Learn CSS](https://web.dev/learn/css)
+- [W3C — CSS 현황](https://www.w3.org/Style/CSS/current-work)
+- [Web Platform Baseline](https://web.dev/baseline)

@@ -1,5 +1,103 @@
 <!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# 이 프로젝트의 Next.js는 익숙한 버전과 다를 수 있다
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+Next.js 코드 또는 설정을 수정하기 전에는 `node_modules/next/dist/docs/`에서 해당 기능의 현재 문서를 확인한다. 사용 중단 안내와 현재 파일 구조를 우선한다.
 <!-- END:nextjs-agent-rules -->
+
+# Codex 작업 지침
+
+이 저장소는 Nextra 4 + Next.js 기반의 개인 학습 문서 사이트다. Codex는 구현 작업과 `plan-codex/`에 있는 과목 문서 작성을 담당한다.
+
+## 역할 분리
+
+- Codex 담당 계획: `plan-codex/`
+- Claude 담당 계획: `plan-claude/`
+- Codex는 사용자가 별도로 요청하지 않는 한 `plan-claude/` 과목의 문서를 작성하거나 구조를 바꾸지 않는다.
+- 문서 파일을 추가, 삭제, 이동, 이름 변경하면 관련 폴더의 `_meta.js`도 같은 작업에서 반드시 갱신한다.
+
+## 반드시 유지할 문서 내비게이션 구조
+
+이 사이트의 내비게이션은 **헤더에서 과목을 고르고, 사이드바에서는 그 과목의 선택된 하위 자료만 보는 구조**다. 전체 문서 트리를 한 번에 사이드바에 표시하는 사이트가 아니다.
+
+### 1. 헤더
+
+- 헤더의 최상위 메뉴는 `content/` 바로 아래의 과목 폴더다. 예: `javascript`, `React`, `css`, `독학사`, `자격증`.
+- 헤더 메뉴에 마우스를 올리면 해당 과목의 **직접 하위 분류만** 드롭다운으로 표시한다.
+  - JavaScript: `Browser`, `ECMAscript`
+  - React: `Basic`, `Middle`, `Advanced`
+  - CSS: `Basic`, `Middle`, `Advanced`
+  - 독학사: 과목별 폴더 (`basic_statics`, `basic_math` 등)
+  - 자격증: 시험별 폴더 (`SQLD`, `Linux1`, `Bigdata` 등)
+- 드롭다운 항목을 클릭하면 그 하위 분류의 첫 번째 문서로 이동한다.
+- 최상위 과목의 비어 있는 `index.mdx`는 만들지 않는다. 헤더 항목은 과목 소개 페이지가 아니라 하위 분류 선택을 위한 메뉴다.
+- Nextra 기본 검색(`Search`)과 테마 전환(`ThemeSwitch`)은 헤더에서 제거하지 않는다.
+
+### 2. 사이드바
+
+- 현재 URL이 속한 **하위 분류 하나만** 사이드바에 표시한다.
+  - `/javascript/Browser/...`에서는 Browser 문서 목록만 표시한다.
+  - `/React/Basic/...`에서는 React Basic 문서 목록만 표시한다.
+  - `/독학사/basic_math/...`에서는 일반수학 문서 목록만 표시한다.
+  - `/자격증/SQLD/...`에서는 SQLD 문서 목록만 표시한다.
+- 다른 최상위 과목이나 형제 분류의 문서는 사이드바에 같이 나오면 안 된다.
+- 사이드바 문서 순서와 표시 이름은 해당 폴더의 `_meta.js`가 단일 기준이다.
+- 문서가 많아져도 전체 트리를 펼쳐 길게 만들지 않는다. 헤더에서 분류를 바꿔서 사이드바 범위를 바꾸는 방식으로 유지한다.
+
+### 2-1. 이 구조를 만드는 Nextra 규칙
+
+- `app/layout.tsx`의 `<Layout>`에는 전체 `getPageMap()` 구조를 넘긴다. 한글 폴더 경로는 브라우저 URL과 맞추기 위해 route만 `encodeURI`로 정규화할 수 있지만, URL마다 `pageMap`을 잘라 넘기는 별도 필터 코드를 만들지 않는다.
+- `content/_meta.js`의 최상위 과목은 반드시 `type: 'menu'`와 `items`를 사용한다.
+- 각 과목의 `_meta.js`에서 실제 사이드바 범위가 되는 하위 분류(`Browser`, `Basic`, `SQLD` 등)는 반드시 `type: 'page'`로 선언한다.
+- 이 `menu -> page -> 문서` 계층이 Nextra 기본 사이드바를 현재 분류의 문서 목록으로 자동 제한한다. 배포된 `https://zeno.it.kr/`의 헤더/사이드바 방식이 이 기준이다.
+- 이 동작을 CSS 숨김, DOM 조작, 별도 라우트별 사이드바 데이터로 대체하지 않는다.
+- `app/[[...mdxPath]]/page.tsx`의 `generateStaticParams()`는 홈을 `[]`로, 한글을 포함한 각 경로 조각은 `encodeURIComponent(decodeURIComponent(segment))`으로 반환한다. `output: 'export'`에서 한글 과목 경로가 누락됐다고 판단되는 오류를 막기 위한 규칙이다.
+
+### 3. 모바일과 화면 전환
+
+- 모바일(768px 미만)에서는 헤더의 과목 드롭다운과 검색/테마 도구를 숨기고, Nextra 기본 햄버거 메뉴로 사이드바를 연다.
+- 햄버거 메뉴에서 문서를 연 뒤 데스크톱 폭으로 돌아와도 사이드바와 본문은 정상 너비로 복구되어야 한다.
+- Nextra 사이드바의 inline `width`, `transform`, `height`를 고정값으로 덮어써서 해결하지 않는다. 이런 방식은 모바일에서 열고 닫은 뒤 데스크톱 레이아웃을 깨뜨릴 수 있다.
+- 내비게이션이나 CSS를 바꾸면 최소한 모바일 폭 -> 메뉴 열기 -> 문서 이동 -> 데스크톱 폭 복귀 흐름을 직접 확인한다.
+
+### 4. UI 수정 범위
+
+- 헤더, 사이드바, 모바일 메뉴는 Nextra 기본 동작을 우선 보존하고 필요한 부분만 덧씌운다.
+- `body > div`, `aside`, `article`처럼 너무 넓은 전역 선택자로 레이아웃을 강제하지 않는다. Nextra 내부 구조가 바뀌면 쉽게 깨진다.
+- 기존 동작을 교체하거나 제거하기 전에는 사용자에게 무엇을 바꾸는지와 이유를 먼저 설명한다.
+
+## 폴더와 파일 규칙
+
+- 문서는 `content/<최상위 과목>/<하위 분류>/NN_slug.mdx`에 둔다.
+- 예시: `content/자격증/SQLD/01_database-overview.mdx`
+- 번호는 하위 분류 폴더마다 `01`부터 다시 시작한다.
+- 계획 문서는 `plan-codex/[최상위 과목][하위 분류].md` 형식으로 둔다.
+- 새 폴더에는 `_meta.js`를 만든다. 존재하지 않는 파일을 `_meta.js`에 먼저 적지 않는다.
+- 점(`.`)으로 시작하는 폴더나 파일은 일반 콘텐츠 경로로 쓰지 않는다. 도구나 배포 환경에서 숨김 또는 설정 파일로 취급될 수 있다.
+
+## 문서 작성 규칙
+
+- 대상은 초보 학습자다. 처음 나오는 용어는 짧게 정의하고, 바로 따라 할 수 있는 작은 예제를 준다.
+- 한 문서는 대략 30~50분 안에 읽고 실습할 수 있는 분량을 목표로 한다. 반복 설명으로 길게 늘이지 않는다.
+- MDX frontmatter에는 `title`, `description`만 넣는다.
+- 본문 제목은 `##`부터 시작하고 `#`은 쓰지 않는다. 페이지 제목은 frontmatter의 `title`을 사용한다.
+- 모든 문서는 마지막에 `## 참고 자료`를 두고 공식 문서나 신뢰 가능한 자료를 링크한다.
+- 다른 사이트의 문장을 길게 복사하지 않는다. 이해 경로와 예시는 새로 작성한다.
+
+## Nextra 컴포넌트
+
+전역 등록된 Nextra 컴포넌트는 import 없이 쓴다. 필요한 경우에만 사용한다.
+
+- `Callout`: 핵심 개념, 주의점
+- `Steps`: 설치와 실습 순서
+- `Tabs`: 환경별 예시 또는 비교
+- `FileTree`: 파일/폴더 구조
+- `Table`: 용어와 선택지 비교
+- `Collapse`: 본문 흐름을 방해하는 보조 설명
+- `Cards`: 다음 문서나 관련 문서 연결
+
+## 정확성과 검증
+
+- 최신 API, 브라우저 지원, 시험 일정/출제 기준처럼 바뀔 수 있는 정보는 공식 문서로 확인한 뒤 작성한다.
+- 문서 구조나 Nextra 라우팅을 크게 바꾼 경우에만 `npm.cmd run build`를 한 번 실행한다.
+- 일반적인 문서 추가나 스타일 미세 조정에는 매번 build를 돌리지 않는다. 기본 확인은 `npm.cmd run lint`로 충분하다.
+- 커밋과 push는 사용자가 명시적으로 요청했을 때만 한다.

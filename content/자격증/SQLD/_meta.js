@@ -1,5 +1,5 @@
 const meta = {
-  '01_': '01. 데이터 모델링의 이해',
+  '01_database-overview': '01. 데이터베이스 개요',
 }
 
 export default meta

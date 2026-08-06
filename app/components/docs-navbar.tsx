@@ -180,7 +180,7 @@ export function DocsNavbar({ pageMap }: { pageMap: PageMapItem[] }) {
       <nav className="docs-navbar-inner" aria-label="Main navigation">
         <Link className="docs-navbar-logo" href="/" aria-label="Home page">
           <img src="/zenoLogo.svg" alt="" width="24" height="24" />
-          <b>Zeno Docs</b>
+          <b>Zeno AI Docs</b>
         </Link>
 
         <button

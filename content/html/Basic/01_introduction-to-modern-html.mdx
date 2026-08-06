@@ -1,133 +1,199 @@
 ---
-title: 모던 HTML 시작하기
-description: HTML의 역사, HTML Living Standard(모던 HTML)의 개념, 그리고 브라우저가 HTML을 화면에 그리는 흐름을 살펴봅니다.
+title: '01. 모던 HTML 시작하기'
+description: 'HTML이 어떤 언어이고, "HTML5 다음 버전"이 없는 이유와 브라우저가 HTML을 화면으로 바꾸는 흐름을 이해한다.'
 ---
 
-## HTML이란 무엇인가
+## 모던 HTML 시작하기
 
-HTML은 **HyperText Markup Language**의 약자로, 웹 페이지의 **구조와 의미**를 정의하는 마크업 언어입니다. 프로그래밍 언어처럼 로직을 계산하는 것이 아니라, "이 부분은 제목이고, 저 부분은 문단이며, 이건 링크다" 하는 식으로 **콘텐츠에 의미를 부여하는** 역할을 합니다.
+"HTML은 쉽다"는 말을 자주 듣는다. 절반만 맞다.
 
-웹 프론트엔드는 흔히 세 가지 언어의 협업으로 설명됩니다.
+태그를 외워 화면에 글자를 띄우는 건 하루면 된다.
+하지만 **어떤 태그를 왜 골라야 하는지**는 그렇지 않다. 그게 이 시리즈의 주제다.
 
-- **HTML** — 구조(뼈대). 무엇이 있는가
-- **CSS** — 표현(스타일). 어떻게 보이는가
-- **JavaScript** — 동작(행위). 어떻게 반응하는가
+## HTML은 프로그래밍 언어가 아니다
+
+**HTML**<sup>HyperText Markup Language</sup>은 **마크업 언어**다.
+계산도 판단도 반복도 하지 않는다. 오직 **"이 내용이 무엇인지 표시"** 할 뿐이다.
+
+```html
+<h1>오늘의 뉴스</h1>
+<p>비가 온다.</p>
+```
+
+여기서 `<h1>`은 "글자를 크게 하라"는 명령이 아니다.
+**"이건 제목이다"** 라는 의미 표시다. 크게 보이는 건 브라우저가 그렇게 그리기로 한 결과일 뿐이다.
+
+<Callout type="important">
+**의미와 모양은 다르다.**
+
+제목처럼 보이게 하고 싶다고 `<p>`에 큰 글씨를 주면, 화면상으로는 같아 보여도 **기계에게는 그냥 문단**이다.
+
+```html
+<p style="font-size: 32px; font-weight: bold;">오늘의 뉴스</p>  <!-- 나쁨 -->
+<h1>오늘의 뉴스</h1>                                              <!-- 좋음 -->
+```
+
+이 차이가 만드는 결과가 뒤에 나온다.
+</Callout>
+
+## 태그의 생김새
+
+```
+<a href="https://example.com">링크</a>
+ ↑   ↑         ↑                ↑    ↑
+시작 속성명    속성값           내용  종료 태그
+```
+
+- **요소**<sup>Element</sup> — 시작 태그부터 종료 태그까지 전체
+- **속성**<sup>Attribute</sup> — 요소에 주는 추가 정보. 시작 태그 안에만 쓴다
+
+내용이 없어 종료 태그가 없는 것들도 있다. **빈 요소**<sup>Void Element</sup>라 부른다.
+
+```html
+<img src="cat.png" alt="고양이">
+<br>
+<input type="text">
+```
 
 <Callout type="info">
-  "HyperText"의 하이퍼텍스트는 문서와 문서를 링크로 연결한다는 뜻입니다. 이 단순한 아이디어(하이퍼링크)가 오늘날 웹 전체를 하나로 묶는 근간이 되었습니다.
+`<br />`처럼 슬래시를 붙인 걸 본 적 있을 것이다. XHTML 시절의 흔적이고, 지금 HTML에서는 **있어도 없어도 똑같이 동작한다.** 팀에서 쓰는 스타일을 따르면 된다.
 </Callout>
 
-## HTML의 역사
+## "HTML5 다음 버전"은 없다
 
-HTML은 30년이 넘는 세월 동안 여러 단체를 거치며 진화해 왔습니다. 큰 흐름만 짚어보겠습니다.
+HTML을 검색하면 "HTML5"라는 말이 계속 나온다. 그럼 HTML6은 언제 나오나?
 
-| 시기 | 사건 |
-| --- | --- |
-| 1991 | 팀 버너스리(Tim Berners-Lee)가 최초의 HTML을 공개 |
-| 1997 | HTML 3.2, 뒤이어 HTML 4.0 발표 (W3C) |
-| 2000 | XML 기반의 엄격한 문법인 XHTML 1.0 등장 |
-| 2004 | 브라우저 제조사 중심의 **WHATWG** 결성 |
-| 2014 | W3C가 **HTML5**를 공식 권고안(Recommendation)으로 발표 |
-| 2019 | W3C와 WHATWG가 **단일 표준**에 합의 (MOU 체결) |
-| 현재 | **HTML Living Standard**가 유일한 공식 표준 |
+**나오지 않는다.** 버전 개념이 사라졌기 때문이다.
 
-### XHTML이라는 우회로
-
-2000년대 초, W3C는 HTML을 더 이상 발전시키지 않고 XML 기반의 엄격한 **XHTML**로 방향을 틀려고 했습니다. XHTML은 태그를 반드시 닫아야 하고 대소문자를 구분하는 등 규칙이 까다로웠고, 작은 문법 오류 하나에도 페이지 전체가 깨질 수 있었습니다. 이 접근은 실제 웹의 유연한 현실과 잘 맞지 않았습니다.
-
-### WHATWG의 등장
-
-이런 방향에 반발해 2004년 애플·모질라·오페라 등 브라우저 진영이 모여 **WHATWG**(Web Hypertext Application Technology Working Group)를 결성했습니다. 이들은 XML 기반 노선 대신, 실제 브라우저에 구현 가능하고 기존 웹과 호환되는 실용적인 HTML을 계속 발전시키자는 목표를 세웠습니다. 이 작업이 오늘날 우리가 아는 **HTML5**의 씨앗이 되었습니다.
-
-### 두 개의 표준, 그리고 통합
-
-한동안 W3C와 WHATWG는 함께 작업했지만 목표가 갈렸습니다. W3C는 "완성된 버전"의 HTML5를 특정 시점에 고정해 발표하고 싶어 했고, WHATWG는 명세를 얼리지 않고 **계속 유지·보수하며 필요한 기능을 추가하는 살아있는 표준(Living Standard)**을 원했습니다. 두 개의 규범 명세가 공존하는 상황은 개발자에게 혼란을 주었고, 결국 **2019년 두 단체는 단일 HTML 표준에 협력하기로 합의**했습니다.
-
-<Callout type="info">
-  2019년 합의(MOU)의 핵심: **HTML과 DOM 표준은 WHATWG가 Living Standard로 유지·관리**하고, W3C는 독자적인 HTML 명세 발행을 중단하고 이에 협력합니다. 즉 오늘날 HTML의 단일 공식 출처는 WHATWG의 HTML Living Standard입니다.
-</Callout>
-
-## 모던 HTML = HTML Living Standard
-
-그래서 "모던 HTML"이란 정확히 무엇일까요? 특정 버전 번호가 아니라, **현재 WHATWG가 유지하는 HTML Living Standard 그 자체**를 가리킵니다.
-
-<Cards>
-  <Cards.Card title="버전 번호가 없다" href="https://html.spec.whatwg.org/multipage/">
-    HTML5, HTML5.1 같은 표기는 이제 과거 스냅샷일 뿐입니다. 현재 표준에는 버전이 없고, 오늘의 명세가 곧 최신 명세입니다.
-  </Cards.Card>
-  <Cards.Card title="계속 살아있다" href="https://html.spec.whatwg.org/">
-    명세는 얼려지지 않고 지속적으로 갱신됩니다. 새 기능이 추가되고, 오래된 내용은 다듬어집니다.
-  </Cards.Card>
-</Cards>
-
-<Callout type="warning">
-  실무에서 여전히 "HTML5"라는 말을 자주 쓰지만, 엄밀히 말하면 오늘날 그것은 특정 버전이라기보다 **"모던 HTML을 통칭하는 마케팅성 용어"**에 가깝습니다. 이 커리큘럼에서 "모던 HTML"은 곧 최신 Living Standard를 뜻합니다.
-</Callout>
-
-이 "살아있는 표준" 덕분에 최근 몇 년 사이 자바스크립트 없이도 쓸 수 있는 강력한 네이티브 기능들이 계속 들어왔습니다. 이 커리큘럼 후반부에서 다룰 `dialog`(네이티브 모달), Popover API, 커스터마이즈 가능한 `select` 같은 것들이 그 예입니다.
-
-## 브라우저는 HTML을 어떻게 그리는가
-
-HTML 파일은 그저 텍스트일 뿐입니다. 이 텍스트가 화면의 픽셀이 되기까지, 브라우저는 여러 단계를 거칩니다. 이 흐름을 **렌더링 파이프라인**이라고 부릅니다. 전체 그림을 미리 알아두면 이후 챕터들이 훨씬 잘 이해됩니다.
+### 어쩌다 이렇게 됐나
 
 <Steps>
 
-### HTML 파싱 → DOM 트리
+### 1990년대 — 브라우저 전쟁
 
-브라우저가 HTML 텍스트를 위에서부터 읽으며 토큰으로 분해하고, 요소들의 부모-자식 관계를 담은 **DOM(Document Object Model) 트리**를 만듭니다. DOM은 문서를 프로그램이 다룰 수 있는 객체 트리로 표현한 것입니다.
+넷스케이프와 인터넷 익스플로러가 서로 다른 태그를 마음대로 만들었다. 같은 페이지가 브라우저마다 다르게 보였다.
 
-### CSS 파싱 → CSSOM 트리
+### 2000년대 초 — XHTML의 실패
 
-`<style>`이나 외부 스타일시트의 CSS를 해석해 **CSSOM(CSS Object Model) 트리**를 만듭니다. 어떤 요소에 어떤 스타일이 적용되는지에 대한 규칙 모음입니다.
+W3C는 문법을 엄격하게 조이는 XHTML을 밀었다. 문법 오류 하나면 페이지 전체가 안 뜨는 방식이었고, 현실의 웹과 맞지 않아 외면당했다.
 
-### 렌더 트리(Render Tree) 구성
+### 2004년 — WHATWG의 등장
 
-DOM과 CSSOM을 결합해, **실제로 화면에 그려질 요소들**만 모은 렌더 트리를 만듭니다. `display: none`처럼 화면에 나타나지 않는 요소는 여기서 제외됩니다.
+브라우저 제조사들이 모여 WHATWG를 만들고, 현실적인 방향의 명세를 따로 쓰기 시작했다.
 
-### 레이아웃(Layout / Reflow)
+### 2019년 — 정리
 
-각 요소가 화면의 **어디에, 얼마만 한 크기로** 놓일지 위치와 치수를 계산합니다. 이 단계를 리플로우(reflow)라고도 부릅니다.
-
-### 페인트(Paint)
-
-계산된 정보를 바탕으로 텍스트·색·테두리·이미지 등을 실제 **픽셀로 칠합니다**.
-
-### 컴포지트(Composite)
-
-여러 겹(레이어)으로 그려진 결과를 순서에 맞게 **합성**해 최종 화면을 만듭니다.
+W3C가 WHATWG의 명세를 공식 표준으로 인정했다. 이제 HTML 표준은 하나다.
 
 </Steps>
 
+### 지금의 HTML — Living Standard
+
+현재 HTML 표준의 이름은 **HTML Living Standard**다. "살아있는 표준"이라는 뜻 그대로,
+버전을 끊지 않고 **필요할 때마다 계속 갱신된다.**
+
 <Callout type="info">
-  왜 이걸 알아야 할까요? 예를 들어 `<script>`를 문서 어디에 두느냐가 파싱 속도에 영향을 주고, 레이아웃을 자주 다시 계산하게 만드는 코드는 성능을 떨어뜨립니다. 지금은 "이런 단계가 있구나" 정도만 기억해도 충분합니다. 성능 최적화는 뒤쪽 챕터에서 자세히 다룹니다.
+그래서 이 시리즈는 "HTML5를 배운다"고 하지 않고 **"모던 HTML을 배운다"** 고 한다.
+`dialog`, `popover` 같은 최신 요소도 "HTML5에 없던 것"이 아니라 **그냥 HTML의 일부**다.
 </Callout>
 
-## 개발 환경 준비하기
+## 시맨틱 — 이 시리즈를 관통하는 원칙
 
-모던 HTML을 배우는 데 거창한 도구는 필요 없습니다.
+**시맨틱**<sup>Semantic, 의미론적</sup> HTML이란 **내용의 의미에 맞는 태그를 쓰는 것**이다.
 
-- **텍스트 에디터** — VS Code 등. 문법 강조와 자동완성이 되면 충분합니다.
-- **최신 브라우저** — 이 커리큘럼의 모던 기능들을 확인하려면 Chrome, Edge, Firefox, Safari 등 최신 버전을 권장합니다.
-- **개발자 도구(DevTools)** — 브라우저에서 `F12`(또는 우클릭 → 검사)로 열 수 있습니다. Elements 탭에서 방금 배운 DOM 트리를 눈으로 직접 확인할 수 있습니다.
+```html
+<!-- 의미 없음 -->
+<div class="header">
+  <div class="nav">...</div>
+</div>
 
-<Callout type="tip">
-  지금 아무 웹사이트에서나 `F12`를 눌러 Elements(요소) 탭을 열어보세요. 트리 구조로 펼쳐지는 태그들이 바로 이 챕터에서 이야기한 **DOM**입니다. 앞으로 우리가 작성할 모든 HTML은 결국 이 트리로 변환됩니다.
+<!-- 시맨틱 -->
+<header>
+  <nav>...</nav>
+</header>
+```
+
+둘은 화면에서 똑같이 보인다. 그런데 왜 아래가 나은가?
+
+| 이유 | 설명 |
+| --- | --- |
+| **접근성** | 스크린 리더가 "탐색 영역"이라고 안내한다. `div`는 아무 정보도 못 준다 |
+| **SEO** | 검색 엔진이 문서 구조를 이해한다 |
+| **협업** | `<article>`은 누가 봐도 본문이다. `<div class="art">`는 물어봐야 안다 |
+| **기본 기능** | `<button>`은 키보드로 눌리고 포커스도 받는다. `<div>`는 전부 직접 만들어야 한다 |
+
+<Callout type="important">
+마지막 항목이 특히 중요하다. `<div onclick="...">`으로 버튼을 만들면 마우스로는 되지만
+**Tab 키로 접근할 수 없고, Enter로 눌리지 않고, 스크린 리더가 버튼이라고 알려주지 않는다.**
+
+`<button>`을 쓰면 이 전부가 공짜다. **"직접 만들지 말고 있는 걸 쓴다"** 가 모던 HTML의 첫 번째 원칙이다.
+</Callout>
+
+## 브라우저는 HTML을 어떻게 화면으로 바꾸나
+
+전체 흐름을 미리 봐 두면 이후 편들이 잘 이어진다.
+
+<Steps>
+
+### 파싱 — HTML을 읽어 DOM을 만든다
+
+태그를 순서대로 읽어 **DOM 트리**(문서 구조를 나타내는 객체 트리)를 만든다.
+
+### 스타일 계산 — CSS를 붙인다
+
+CSS를 읽어 각 요소의 최종 스타일을 계산한다.
+
+### 레이아웃 — 위치와 크기를 정한다
+
+각 요소가 어디에 얼마만 한 크기로 놓일지 계산한다.
+
+### 페인트 — 픽셀을 칠한다
+
+색, 텍스트, 이미지를 실제로 그린다.
+
+</Steps>
+
+<Callout type="warning">
+**HTML은 문법이 틀려도 에러를 내지 않는다**
+
+닫는 태그를 빼먹어도 브라우저는 알아서 고쳐서 렌더링한다. XHTML의 실패에서 배운 관용성이다.
+
+편해 보이지만 함정이다. **브라우저가 짐작한 구조가 내 의도와 다를 수 있다.**
+"분명 닫았는데 레이아웃이 이상하다" 싶으면 개발자 도구의 Elements 탭에서 **실제 DOM 구조**를 확인하는 습관을 들이자.
+</Callout>
+
+## HTML · CSS · JavaScript의 역할
+
+| 언어 | 담당 | 없으면 |
+| --- | --- | --- |
+| **HTML** | 구조와 의미 | 아무것도 없다 |
+| CSS | 모양과 배치 | 못생겼지만 읽을 수는 있다 |
+| JavaScript | 동작 | 정적이지만 볼 수는 있다 |
+
+HTML만 없으면 **아무것도 남지 않는다.** 그래서 HTML이 토대다.
+
+<Callout type="info">
+이 순서로 만드는 방식을 **점진적 향상**<sup>Progressive Enhancement</sup>이라 한다.
+의미 있는 HTML을 먼저 갖추고, 그 위에 CSS와 JS를 얹는다. 그러면 JS가 실패해도 페이지는 최소한 읽을 수 있다.
 </Callout>
 
 ## 정리
 
-- HTML은 웹 콘텐츠에 **구조와 의미**를 부여하는 마크업 언어다.
-- HTML은 팀 버너스리의 발명 이후 여러 단체를 거쳐 진화했고, 한때 XHTML·복수 표준의 혼란기를 겪었다.
-- **2019년 이후 유일한 공식 표준은 WHATWG의 HTML Living Standard**이며, "모던 HTML"은 곧 이 살아있는 표준을 뜻한다.
-- 브라우저는 HTML을 **파싱 → DOM → (CSSOM 결합) 렌더 트리 → 레이아웃 → 페인트 → 컴포지트** 순서로 화면에 그린다.
+<Callout type="default">
+- HTML은 프로그래밍 언어가 아니라 **의미를 표시하는 마크업 언어**다
+- **모양이 아니라 의미로 태그를 고른다**
+- "HTML5 다음 버전"은 없다. 지금은 **HTML Living Standard**로 계속 갱신된다
+- 시맨틱 태그는 접근성·SEO·협업·기본 기능을 공짜로 준다
+- **직접 만들지 말고 있는 요소를 쓴다** — `<div>` 버튼 대신 `<button>`
+- HTML은 문법 오류를 관용한다. 그래서 **실제 DOM을 확인하는 습관**이 필요하다
+</Callout>
 
-다음 챕터에서는 실제로 HTML 문서를 이루는 최소 뼈대 — `<!DOCTYPE>`, `<html>`, `<head>`, `<body>` — 를 직접 작성해 봅니다.
+다음 편에서는 HTML 문서의 뼈대를 직접 만들어 본다.
 
 ## 참고 자료
 
-- [MDN — HTML 개요](https://developer.mozilla.org/ko/docs/Web/HTML)
-- [WHATWG — HTML Living Standard](https://html.spec.whatwg.org/multipage/)
-- [WHATWG — HTML 표준의 역사(Introduction)](https://html.spec.whatwg.org/multipage/introduction.html#history-2)
-- [W3C · WHATWG 단일 표준 합의(2019)](https://www.w3.org/news/2019/w3c-and-the-whatwg-have-just-signed-an-agreement-to-collaborate-on-the-development-of-a-single-version-of-the-html-and-dom-specifications/)
-- [MDN — 브라우저는 어떻게 작동하는가(렌더링)](https://developer.mozilla.org/ko/docs/Web/Performance/How_browsers_work)
-- [web.dev — Rendering performance](https://web.dev/articles/rendering-performance)
+- [MDN — HTML 첫걸음](https://developer.mozilla.org/ko/docs/Learn_web_development/Core/Structuring_content)
+- [MDN — HTML 요소 참고서](https://developer.mozilla.org/ko/docs/Web/HTML/Reference/Elements)
+- [WHATWG — HTML Living Standard](https://html.spec.whatwg.org/)
+- [web.dev — Learn HTML](https://web.dev/learn/html)
+- [MDN — 시맨틱이란](https://developer.mozilla.org/ko/docs/Glossary/Semantics)

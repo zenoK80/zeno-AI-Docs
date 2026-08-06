@@ -1,6 +1,6 @@
 const meta = {
   Basic: {
-    title: 'Basic',
+    title: '기초',
     type: 'page',
   },
 }
