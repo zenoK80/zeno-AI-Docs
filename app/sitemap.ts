@@ -2,6 +2,8 @@ import type { MetadataRoute } from 'next'
 import type { PageMapItem } from 'nextra'
 import { getPageMap } from 'nextra/page-map'
 
+export const dynamic = 'force-static'
+
 const SITE_URL = 'https://zeno.it.kr'
 
 function collectRoutes(items: PageMapItem[]): string[] {
