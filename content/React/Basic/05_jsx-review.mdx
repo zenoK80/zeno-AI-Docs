@@ -1,0 +1,72 @@
+---
+title: '05-복습. JSX 완전 정복'
+description: 'JSX 문법 규칙을 퀴즈로 점검하고, 틀린 JSX 코드를 찾아 고치는 실습을 한다.'
+---
+
+## 05편 복습
+
+## 핵심 퀴즈
+
+**Q1. `class` 대신 `className`을 쓰는 이유는?**
+
+<Collapse title="정답 보기">
+`class`는 자바스크립트에서 클래스를 선언하는 예약어라서, JSX가 변환되는 자바스크립트 코드와 충돌하기 때문이다.
+</Collapse>
+
+**Q2. JSX의 `{ }` 안에는 무엇이 들어갈 수 있나?**
+
+<Collapse title="정답 보기">
+표현식만 들어갈 수 있다. `if문` 같은 문은 들어갈 수 없어서 삼항 연산자나 `&&`를 대신 쓴다.
+</Collapse>
+
+**Q3. 최상위 요소가 여러 개일 때 감싸는 특수 문법은?**
+
+<Collapse title="정답 보기">
+Fragment, `<>...</>`. DOM에 별도 요소를 만들지 않으면서 여러 요소를 하나로 묶는다.
+</Collapse>
+
+## 실습 — 틀린 JSX 찾아 고치기
+
+아래 코드에는 문법 오류가 4개 숨어 있다. 하나씩 찾아 고쳐보자.
+
+```jsx
+function Profile() {
+  return (
+    <h1>내 프로필</h1>
+    <img src="me.png">
+    <div class="info" onclick="handleClick()">
+      <p>안녕하세요</p>
+    </div>
+  )
+}
+```
+
+<Collapse title="정답 보기">
+
+```jsx
+function Profile() {
+  return (
+    <>
+      <h1>내 프로필</h1>
+      <img src="me.png" />
+      <div className="info" onClick={handleClick}>
+        <p>안녕하세요</p>
+      </div>
+    </>
+  )
+}
+```
+
+고친 것: ① 최상위 요소 두 개 → Fragment로 감쌈 ② `<img>` 셀프 클로징 안 함 → `/>` 추가
+③ `class` → `className` ④ `onclick="..."` (문자열 호출) → `onClick={handleClick}` (함수 참조)
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] JSX와 HTML의 차이 4가지(최상위 하나, 태그 닫기, className, 중괄호)를 안다
+- [ ] 틀린 JSX를 보고 스스로 고칠 수 있다
+- [ ] JSX가 결국 함수 호출로 변환된다는 걸 기억한다
+</Callout>
+
+이걸로 "왜 React이고 어떻게 동작하나" 파트를 마쳤다. 다음 편부터 컴포넌트와 Props를 다룬다.

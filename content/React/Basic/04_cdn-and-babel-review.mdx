@@ -1,0 +1,60 @@
+---
+title: '04-복습. React 개발 환경 이해하기'
+description: 'CDN과 Babel만으로 React를 직접 띄워보고, JSX가 어떤 코드로 변환되는지 실습으로 확인한다.'
+---
+
+## 04편 복습
+
+이번 편은 원래도 실습 중심이었다. 여기서는 그걸 **직접 손으로** 완성해 본다.
+
+## 실습 — 나만의 React 페이지 만들기
+
+<Steps>
+
+### HTML 파일을 만든다
+
+`practice.html` 파일을 만들고 본문의 예제 코드(React + ReactDOM CDN)를 그대로 붙여넣는다.
+
+### 브라우저로 열어 확인한다
+
+"안녕, React"가 뜨는지 확인한다.
+
+### 내용을 바꿔본다
+
+`React.createElement('h1', null, '안녕, React')`를 `React.createElement('h1', { style: { color: 'crimson' } }, '내가 만든 첫 화면')`으로 바꿔보고 결과를 확인한다.
+
+### Babel과 JSX를 추가한다
+
+`@babel/standalone` 스크립트를 추가하고, `type="text/babel"` 스크립트 안에서 `createElement` 대신 JSX로 같은 화면을 만들어본다.
+
+</Steps>
+
+## 핵심 퀴즈
+
+**Q1. `React.createElement(...)`가 반환하는 건 실제 DOM 요소인가?**
+
+<Collapse title="정답 보기">
+아니다. 평범한 자바스크립트 객체(`{ type, props, ... }`)다. "이런 모습을 그리고 싶다"는 설계도일 뿐이다.
+</Collapse>
+
+**Q2. `type="text/babel"`이 붙은 스크립트는 브라우저가 바로 실행하나?**
+
+<Collapse title="정답 보기">
+아니다. Babel 라이브러리가 먼저 JSX를 `React.createElement` 호출로 변환한 뒤에야 실행된다.
+</Collapse>
+
+**Q3. 이 CDN+Babel 방식을 실무에서 쓰지 않는 이유 하나는?**
+
+<Collapse title="정답 보기">
+매번 브라우저에서 JSX → JS 변환이 일어나 코드가 커질수록 느려진다. (그 외에 개발용 라이브러리 사용, 파일 분리의 어려움도 있다.)
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] HTML 파일 하나로 React를 직접 띄워봤다
+- [ ] `createElement`와 JSX 버전을 둘 다 써봤다
+- [ ] Babel이 무슨 일을 하는지 실습으로 확인했다
+</Callout>
+
+다음 편에서는 JSX 문법 규칙을 하나씩 제대로 파헤친다.

@@ -1,0 +1,62 @@
+---
+title: '02-복습. ECMAScript와 Web API의 경계 — 실전 편'
+description: 'setTimeout 반환값 사례와 환경 판별 패턴을 퀴즈와 실습으로 점검한다.'
+---
+
+## 02편 복습
+
+## 핵심 퀴즈
+
+**Q1. 브라우저와 Node.js에서 `setTimeout`의 반환값 타입이 다른 이유는?**
+
+<Collapse title="정답 보기">
+`setTimeout` 자체가 ECMAScript 명세에 없는 호스트 API라서, 각 실행 환경이 반환값을 어떻게 표현할지는 각자 자유이기 때문이다.
+</Collapse>
+
+**Q2. 여러 환경에서 동작해야 하는 코드를 뭐라고 부르나?**
+
+<Collapse title="정답 보기">
+유니버설 코드(Universal Code) 또는 아이소몰픽 코드(Isomorphic Code).
+</Collapse>
+
+**Q3. 지금 실행 중인 코드가 브라우저인지 확인하는 흔한 패턴은?**
+
+<Collapse title="정답 보기">
+`typeof window !== 'undefined'` — window는 브라우저에만 있는 이름이므로, 이 존재 여부로 환경을 판별한다.
+</Collapse>
+
+## 실습 — 환경 판별 코드 짜보기
+
+아래 함수를 완성해 보자. 브라우저면 `'브라우저'`를, 아니면 `'브라우저 아님'`을 반환해야 한다.
+
+```js
+function whichEnvironment() {
+  // 여기를 채워보자
+}
+
+console.log(whichEnvironment())
+```
+
+<Collapse title="정답 예시">
+
+```js
+function whichEnvironment() {
+  if (typeof window !== 'undefined') {
+    return '브라우저'
+  }
+  return '브라우저 아님'
+}
+```
+
+브라우저 콘솔에서 실행하면 `'브라우저'`, Node.js에서 실행하면 `'브라우저 아님'`이 나오는지 두 곳 다 직접 확인해 보자.
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] 같은 이름의 API가 환경마다 다르게 동작할 수 있는 이유를 설명할 수 있다
+- [ ] `typeof window !== 'undefined'` 패턴을 직접 쓸 수 있다
+- [ ] "언어 에러"와 "호스트 API 부재 에러"를 구별할 수 있다
+</Callout>
+
+다음 편에서는 브라우저의 내부 구조(프로세스 모델)로 들어간다.

@@ -1,0 +1,60 @@
+---
+title: '01-복습. 왜 React인가'
+description: '선언형과 명령형의 차이를 퀴즈로 점검하고, jQuery 방식 코드를 선언형으로 직접 바꿔 본다.'
+---
+
+## 01편 복습
+
+## 핵심 퀴즈
+
+**Q1. 직접 DOM을 조작하는 방식의 근본적인 문제는?**
+
+<Collapse title="정답 보기">
+데이터가 바뀔 때마다 화면 곳곳을 손으로 맞춰야 한다는 것. 반영할 곳을 하나라도 빠뜨리면 화면과 데이터가 어긋난다.
+</Collapse>
+
+**Q2. 명령형과 선언형의 차이를 한 문장씩 말하면?**
+
+<Collapse title="정답 보기">
+명령형: "숫자를 바꾸고, 배지를 켜라"처럼 과정을 하나하나 지시한다. 선언형: "count가 100 초과면 배지가 있는 화면"처럼 결과만 선언한다.
+</Collapse>
+
+**Q3. React는 프레임워크인가 라이브러리인가? 차이는?**
+
+<Collapse title="정답 보기">
+라이브러리다. 라이브러리는 필요한 기능만 가져다 쓰고 나머지는 개발자가 선택하지만, 프레임워크는 전체 구조를 정해두고 그 안에서 개발하게 한다.
+</Collapse>
+
+## 실습 — 명령형 코드를 선언형으로 바꿔보기
+
+아래는 "좋아요 수가 100 넘으면 배지를 보여주는" 명령형 코드다.
+
+```js
+function increaseLike() {
+  const countEl = document.querySelector('#count')
+  let count = Number(countEl.textContent) + 1
+  countEl.textContent = count
+
+  if (count > 100) {
+    document.querySelector('#badge').style.display = 'block'
+  }
+}
+```
+
+이걸 "count가 이 값이면 화면은 이렇다"는 선언형 문장으로 말로 풀어써 보자. (코드로 짤 필요는 없다 — 5편에서 JSX로 직접 짜본다.)
+
+<Collapse title="예시 답안">
+"좋아요 개수를 화면에 보여준다. count가 100보다 크면, 배지도 함께 보여준다."
+
+이렇게 **"어떻게 바꿀지"가 아니라 "지금 상태에서 화면이 어떤 모습인지"** 로 표현하는 게 선언형 사고다. 10편(컴포넌트)부터 이걸 실제 코드로 만든다.
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] 직접 DOM 조작 방식의 문제를 설명할 수 있다
+- [ ] 명령형과 선언형을 예시로 구별할 수 있다
+- [ ] React가 라이브러리인 이유를 안다
+</Callout>
+
+다음 편에서는 React가 최적화하는 대상, 브라우저 렌더링 원리를 본다.

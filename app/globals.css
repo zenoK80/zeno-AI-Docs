@@ -225,8 +225,50 @@ body > div > article {
   max-width:960px;
 }
 
-body > div > article .nextra-breadcrumb {
-  margin-bottom:24px;
+article > .nextra-breadcrumb {
+  display: none;
+}
+
+.docs-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin-top: 6px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  color: var(--x-color-gray-600);
+  font-size: 14px;
+}
+
+.docs-breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.docs-breadcrumb-item a {
+  overflow: hidden;
+  color: inherit;
+  text-overflow: ellipsis;
+  transition: color 150ms ease;
+}
+
+.docs-breadcrumb-item a:hover {
+  color: var(--foreground);
+}
+
+.docs-breadcrumb-item [aria-current='page'] {
+  overflow: hidden;
+  color: var(--foreground);
+  font-weight: 500;
+  text-overflow: ellipsis;
+}
+
+.docs-breadcrumb-separator {
+  flex: none;
 }
 
 .nextra-toc {

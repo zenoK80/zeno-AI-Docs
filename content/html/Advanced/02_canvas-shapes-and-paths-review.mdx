@@ -1,0 +1,73 @@
+---
+title: '02-복습. Canvas 도형과 경로'
+description: '경로 그리기 순서를 퀴즈로 점검하고, 삼각형과 원을 조합해 간단한 그림을 만들어 본다.'
+---
+
+## 02편 복습
+
+## 핵심 퀴즈
+
+**Q1. `moveTo`/`lineTo`만 호출하고 `fill()`이나 `stroke()`를 안 부르면?**
+
+<Collapse title="정답 보기">
+아무것도 그려지지 않는다. `moveTo`/`lineTo`는 경로를 설계만 할 뿐, 실제로 그리는 건 `fill()`/`stroke()`다.
+</Collapse>
+
+**Q2. `arc()`의 각도 단위는 도(degree)인가 라디안인가?**
+
+<Collapse title="정답 보기">
+라디안이다. 완전한 원은 `Math.PI * 2`로 표현한다.
+</Collapse>
+
+**Q3. `beginPath()`는 왜 필요한가?**
+
+<Collapse title="정답 보기">
+이전에 그리던 경로와 지금 그릴 경로를 분리하기 위해서다. 없으면 이전 경로에 계속 이어 붙게 된다.
+</Collapse>
+
+## 실습 — 집 모양 그려보기
+
+삼각형(지붕)과 사각형(몸통), 원(창문)을 조합해서 간단한 집 모양을 그려보자.
+
+```js
+const ctx = document.querySelector('#stage').getContext('2d')
+
+// 1. 몸통: fillRect로 사각형 하나
+// 2. 지붕: beginPath → moveTo/lineTo 세 번 → closePath → fill로 삼각형
+// 3. 창문: beginPath → arc → fill로 원 하나
+```
+
+<Collapse title="정답 예시">
+
+```js
+// 몸통
+ctx.fillStyle = 'peru'
+ctx.fillRect(50, 100, 120, 100)
+
+// 지붕
+ctx.beginPath()
+ctx.moveTo(40, 100)
+ctx.lineTo(110, 40)
+ctx.lineTo(180, 100)
+ctx.closePath()
+ctx.fillStyle = 'firebrick'
+ctx.fill()
+
+// 창문
+ctx.beginPath()
+ctx.arc(110, 150, 20, 0, Math.PI * 2)
+ctx.fillStyle = 'skyblue'
+ctx.fill()
+```
+
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] 경로 그리기 순서(beginPath → moveTo/lineTo/arc → fill/stroke)를 안다
+- [ ] `arc()`로 원을 그릴 수 있다
+- [ ] 도형 여러 개를 조합해 그림을 만들어봤다
+</Callout>
+
+다음 편에서는 텍스트와 이미지를 캔버스에 그린다.

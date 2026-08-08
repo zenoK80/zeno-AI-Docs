@@ -1,0 +1,60 @@
+---
+title: '05-복습. WebGL과 3D 그래픽 개요'
+description: 'Canvas 2D와 WebGL의 차이를 퀴즈로 점검하고, 실제 Three.js 예제를 둘러보는 탐구 과제를 진행한다.'
+---
+
+## 05편 복습
+
+이번 편은 코딩 실습 대신 **개념 정리와 탐구 과제**로 마무리한다.
+
+## 핵심 퀴즈
+
+**Q1. Canvas 2D는 CPU와 GPU 중 무엇으로 계산하나? WebGL은?**
+
+<Collapse title="정답 보기">
+Canvas 2D는 CPU가, WebGL은 GPU가 대규모 병렬로 계산한다.
+</Collapse>
+
+**Q2. WebGL의 그리기 로직은 어떤 언어로 짜나?**
+
+<Collapse title="정답 보기">
+GLSL(OpenGL Shading Language). 자바스크립트가 아닌 별도의 언어다.
+</Collapse>
+
+**Q3. 실무에서 WebGL을 직접 짜지 않고 주로 쓰는 방법은?**
+
+<Collapse title="정답 보기">
+Three.js, PixiJS, Babylon.js 같은 라이브러리를 쓴다.
+</Collapse>
+
+## 탐구 과제 — 실제 WebGL 사례 둘러보기
+
+<Steps>
+
+### Three.js 공식 예제 페이지를 방문한다
+
+[threejs.org/examples](https://threejs.org/examples/)에 들어가 아무 예제나 하나 열어본다.
+
+### 개발자 도구로 `<canvas>` 요소를 찾아본다
+
+Elements 탭에서 페이지 안에 `<canvas>` 태그가 있는지 확인한다. 지금까지 배운 그 `<canvas>`가 맞는지 확인해 보자.
+
+### 마우스로 장면을 움직여 본다
+
+3D 회전·확대가 매끄럽게 동작하는지 느껴본다. 이게 GPU 가속 덕분이라는 걸 떠올려 보자.
+
+### 스스로 정리해 본다
+
+"이 예제를 Canvas 2D로 만들었다면 왜 힘들었을지" 한두 문장으로 적어보자.
+
+</Steps>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] Canvas 2D와 WebGL의 근본적인 차이(CPU vs GPU)를 안다
+- [ ] WebGL이 브라우저용 OpenGL ES라는 걸 안다
+- [ ] 실무에서 왜 라이브러리를 거쳐 쓰는지 이해했다
+</Callout>
+
+이걸로 Canvas·그래픽 파트를 마쳤다. 다음 파트부터는 접근성·성능·SEO를 다룬다.

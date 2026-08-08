@@ -1,0 +1,63 @@
+---
+title: '01-복습. 네이티브 CSS 중첩'
+description: 'Sass와 네이티브 중첩의 차이를 퀴즈로 점검하고, 중첩되지 않은 CSS를 직접 리팩터링해 본다.'
+---
+
+## 01편 복습
+
+## 핵심 퀴즈
+
+**Q1. 네이티브 CSS 중첩에서 `&__title`처럼 문자열을 이어 붙일 수 있나?**
+
+<Collapse title="정답 보기">
+안 된다. `&`는 문자열이 아니라 선택자 자체를 가리키는 값이라, Sass의 `&__title` 같은 결합은 동작하지 않는다.
+</Collapse>
+
+**Q2. `.card { .active { ... } }`와 `.card { &.active { ... } }`의 차이는?**
+
+<Collapse title="정답 보기">
+`.active`(공백)는 `.card .active`(자손)를, `&.active`는 `.card.active`(같은 요소)를 가리킨다. 공백 하나로 의미가 완전히 달라진다.
+</Collapse>
+
+**Q3. 실무 기준으로 중첩은 몇 단계까지 권장하나?**
+
+<Collapse title="정답 보기">
+2단계까지. 더 깊어지면 명시도가 계속 오르고 HTML 구조에 종속되므로, 클래스를 새로 만드는 게 낫다.
+</Collapse>
+
+## 실습 — 반복되는 CSS를 중첩으로 리팩터링하기
+
+아래 CSS를 네이티브 중첩을 써서 다시 써보자.
+
+```css
+.card { padding: 1rem; border: 1px solid #ddd; }
+.card h2 { font-size: 1.5rem; }
+.card p { color: gray; }
+.card:hover { box-shadow: 0 2px 8px rgb(0 0 0 / 0.15); }
+```
+
+<Collapse title="정답 보기">
+
+```css
+.card {
+  padding: 1rem;
+  border: 1px solid #ddd;
+
+  h2 { font-size: 1.5rem; }
+  p  { color: gray; }
+
+  &:hover { box-shadow: 0 2px 8px rgb(0 0 0 / 0.15); }
+}
+```
+
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] `&`가 부모 선택자 자리에 대입된다는 걸 안다
+- [ ] Sass와 다른 점(문자열 결합 불가)을 설명할 수 있다
+- [ ] 반복되는 CSS를 중첩으로 리팩터링할 수 있다
+</Callout>
+
+다음 편에서는 `@scope`로 스타일 범위를 제한하는 법을 본다.

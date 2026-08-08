@@ -1,0 +1,75 @@
+---
+title: '03-복습. 변수와 상수'
+description: 'let과 const의 차이, var를 쓰지 않는 이유를 퀴즈와 코드 실습으로 점검한다.'
+---
+
+## 03편 복습
+
+## 핵심 퀴즈
+
+**Q1. 기본적으로 `let`과 `const` 중 무엇을 먼저 고려해야 하나?**
+
+<Collapse title="정답 보기">
+`const`. 값이 바뀌어야 할 필요가 생겼을 때만 `let`으로 바꾼다.
+</Collapse>
+
+**Q2. 아래 코드는 에러가 날까?**
+
+```js
+const user = { name: '지민' }
+user.name = '민준'
+```
+
+<Collapse title="정답 보기">
+에러 안 난다. `const`는 재할당(`user = ...`)만 막을 뿐, 객체 내부 값 변경은 막지 않는다.
+</Collapse>
+
+**Q3. `var`가 가진 문제 두 가지는?**
+
+<Collapse title="정답 보기">
+① 같은 이름으로 여러 번 선언해도 에러가 안 난다. ② 블록(`{ }`) 안에서 선언해도 밖에서 접근된다(스코프가 안 지켜짐).
+</Collapse>
+
+## 실습 — 직접 에러를 내보기
+
+콘솔에서 아래를 순서대로 실행하며 결과를 예상해 보고, 실제 결과와 비교한다.
+
+```js
+const MAX = 10
+MAX = 20   // ① 예상 결과는?
+```
+
+```js
+let score
+console.log(score)   // ② 예상 결과는?
+score = 100
+```
+
+```js
+if (true) {
+  var leaked = 'var는 샌다'
+}
+console.log(leaked)   // ③ 예상 결과는?
+
+if (true) {
+  let safe = 'let은 안 샌다'
+}
+console.log(safe)   // ④ 예상 결과는?
+```
+
+<Collapse title="정답 확인">
+① `TypeError: Assignment to constant variable.`
+② `undefined` (선언만 하고 값을 안 넣었다)
+③ `'var는 샌다'` — 블록 밖인데도 접근된다
+④ `ReferenceError: safe is not defined` — 블록 밖에서는 접근 안 된다
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] "기본은 const, 필요할 때만 let" 원칙을 설명할 수 있다
+- [ ] `var`를 쓰지 않는 이유 두 가지를 안다
+- [ ] `const`가 막는 것과 안 막는 것을 구별할 수 있다
+</Callout>
+
+다음은 표현식과 문의 차이다.

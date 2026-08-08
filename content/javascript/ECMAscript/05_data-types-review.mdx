@@ -1,0 +1,74 @@
+---
+title: '05-복습. 데이터 타입'
+description: '일곱 가지 원시 타입과 typeof 결과를 퀴즈로 점검하고, undefined와 null의 차이를 실습으로 확인한다.'
+---
+
+## 05편 복습
+
+## 핵심 퀴즈
+
+**Q1. 원시 타입 일곱 가지를 말할 수 있는가?**
+
+<Collapse title="정답 보기">
+Number, String, Boolean, undefined, null, BigInt, Symbol
+</Collapse>
+
+**Q2. `undefined`와 `null`의 뉘앙스 차이는?**
+
+<Collapse title="정답 보기">
+`undefined`는 시스템이 "아직 값이 없다"고 자동으로 붙이는 것. `null`은 개발자가 "값이 없음"을 의도적으로 명시한 것이다.
+</Collapse>
+
+**Q3. `typeof`의 결과가 실제 타입과 다르게 나오는 유명한 버그는?**
+
+<Collapse title="정답 보기">
+`typeof null`이 `'null'`이 아니라 `'object'`로 나오는 것. 1995년부터 이어진 고쳐지지 않는 버그다.
+</Collapse>
+
+## 실습 — typeof 예측 게임
+
+아래 결과를 실행 전에 먼저 예측해서 종이나 메모장에 적어보고, 실제로 콘솔에서 실행해 맞혔는지 확인하자.
+
+```js
+typeof 3.14
+typeof 'hello'
+typeof true
+typeof undefined
+typeof null
+typeof 10n
+typeof Symbol('x')
+typeof {}
+typeof []
+typeof function(){}
+typeof NaN
+```
+
+<Collapse title="정답 보기">
+
+```
+'number'
+'string'
+'boolean'
+'undefined'
+'object'   ← 버그!
+'bigint'
+'symbol'
+'object'
+'object'   ← 배열도 typeof로는 object다
+'function'
+'number'   ← NaN도 Number 타입에 속한다
+```
+
+</Collapse>
+
+전부 맞혔다면 데이터 타입 감각이 잡힌 것이다. `[]`와 `function(){}`가 예상과 다르게 나왔다면, 12편(객체 리터럴)과 13편(원시 값 vs 객체)에서 왜 그런지 더 자세히 배운다.
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] 원시 타입 7가지를 말할 수 있다
+- [ ] `undefined`와 `null`을 구별해서 쓸 수 있다
+- [ ] `typeof`로 값의 타입을 확인할 수 있다
+</Callout>
+
+다음 편에서는 이 값들을 조합하는 연산자를 배운다.

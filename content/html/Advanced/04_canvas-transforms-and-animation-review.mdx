@@ -1,0 +1,80 @@
+---
+title: '04-복습. Canvas 변형과 애니메이션'
+description: 'save/restore와 requestAnimationFrame을 퀴즈로 점검하고, 좌우로 튕기는 공 애니메이션을 직접 만들어 본다.'
+---
+
+## 04편 복습
+
+## 핵심 퀴즈
+
+**Q1. `save()`와 `restore()`를 안 쓰면 무슨 문제가 생기나?**
+
+<Collapse title="정답 보기">
+`translate`/`rotate` 등 변형이 계속 누적돼서, 다음에 그리는 도형들의 위치가 의도치 않게 어긋난다.
+</Collapse>
+
+**Q2. `setInterval` 대신 `requestAnimationFrame`을 쓰는 이유는?**
+
+<Collapse title="정답 보기">
+브라우저의 화면 주사율에 맞춰 정확한 타이밍에 실행되고, 탭이 백그라운드에 있으면 자동으로 멈춰 배터리를 아낀다.
+</Collapse>
+
+**Q3. 회전은 항상 무엇을 기준으로 일어나나?**
+
+<Collapse title="정답 보기">
+현재 원점(translate로 옮긴 그 지점). 그래서 도형 중심으로 돌리려면 먼저 그 중심으로 translate해야 한다.
+</Collapse>
+
+## 실습 — 좌우로 튕기는 공 만들기
+
+아래 뼈대를 완성해서, 원이 캔버스 좌우 벽에 부딪히면 방향을 바꾸는 애니메이션을 만들어보자.
+
+```html
+<canvas id="stage" width="300" height="150"></canvas>
+```
+
+```js
+const canvas = document.querySelector('#stage')
+const ctx = canvas.getContext('2d')
+
+let x = 50
+let dx = 2   // 이동 방향과 속도
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+  ctx.beginPath()
+  ctx.arc(x, 75, 20, 0, Math.PI * 2)
+  ctx.fillStyle = 'crimson'
+  ctx.fill()
+
+  x += dx
+
+  // 여기에: x가 캔버스 경계에 닿으면 dx의 부호를 바꾸는 코드를 추가해 보자
+
+  requestAnimationFrame(draw)
+}
+
+requestAnimationFrame(draw)
+```
+
+<Collapse title="정답 보기">
+
+```js
+if (x + 20 > canvas.width || x - 20 < 0) {
+  dx = -dx
+}
+```
+
+`draw()` 함수 안, `x += dx` 다음 줄에 넣으면 된다.
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] `save()`/`restore()`로 변형을 격리할 수 있다
+- [ ] `requestAnimationFrame` 애니메이션 루프 패턴을 안다
+- [ ] 경계에 닿으면 방향을 바꾸는 로직을 직접 짜봤다
+</Callout>
+
+다음 편에서는 Canvas 2D를 넘어 WebGL을 개념적으로 살펴본다.

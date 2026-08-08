@@ -1,0 +1,91 @@
+---
+title: '02-복습. 개발 환경 준비와 첫 실행'
+description: 'Node.js 설치와 REPL·파일 실행을 직접 손으로 따라 하며 개발 환경을 점검한다.'
+---
+
+## 02편 복습
+
+이번 편은 순수 지식보다 **손으로 직접 해보는 것**이 중요하다. 아래 체크리스트를 하나씩 따라가 보자.
+
+## 실습 — 환경을 직접 갖추기
+
+<Steps>
+
+### Node.js 설치 확인
+
+터미널을 열고 아래를 입력한다.
+
+```bash
+node --version
+```
+
+버전이 안 나온다면 [nodejs.org](https://nodejs.org)에서 LTS 버전을 설치하고 다시 시도한다.
+
+### REPL에서 계산기 놀이
+
+```bash
+node
+```
+
+REPL이 뜨면 아래를 순서대로 쳐본다.
+
+```js
+1 + 1
+console.log('안녕')
+typeof undefined
+```
+
+`.exit`으로 빠져나온다.
+
+### 첫 파일 만들고 실행하기
+
+편집기(VS Code 등)로 `practice.js` 파일을 만들고 아래를 저장한다.
+
+```js filename="practice.js"
+const name = '나'
+console.log(`안녕, ${name}!`)
+```
+
+터미널에서 실행한다.
+
+```bash
+node practice.js
+```
+
+터미널에 인사말이 뜨면 성공이다.
+
+### 브라우저 콘솔과 비교하기
+
+같은 코드를 브라우저 콘솔에도 쳐보자. 똑같이 동작하는가? (템플릿 리터럴은 24편에서 다루니 지금은 결과만 확인하면 된다.)
+
+</Steps>
+
+## 핵심 퀴즈
+
+**Q1. REPL이 무엇의 줄임말이고, 무슨 뜻인가?**
+
+<Collapse title="정답 보기">
+Read-Eval-Print Loop. 한 줄씩 읽고, 실행하고, 결과를 출력하고, 반복하는 환경이라는 뜻이다.
+</Collapse>
+
+**Q2. Node.js는 "언어"인가, "프로그램"인가?**
+
+<Collapse title="정답 보기">
+프로그램(런타임)이다. 자바스크립트라는 언어를 브라우저 없이 실행시켜 주는 도구이지, 언어 자체가 아니다.
+</Collapse>
+
+**Q3. LTS 버전을 권장하는 이유는?**
+
+<Collapse title="정답 보기">
+최신 실험 버전보다 안정적이라 학습·실무 모두에 적합하기 때문이다. Long Term Support의 줄임말이다.
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] `node --version`으로 설치를 확인할 수 있다
+- [ ] Node REPL을 켜고 끌 수 있다
+- [ ] `.js` 파일을 만들어 `node 파일명.js`로 실행할 수 있다
+</Callout>
+
+준비가 끝났다면 3편, 변수와 상수로 넘어가자.

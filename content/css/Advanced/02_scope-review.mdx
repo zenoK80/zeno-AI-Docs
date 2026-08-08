@@ -1,0 +1,65 @@
+---
+title: '02-복습. @scope로 스타일 범위 제한'
+description: '@scope의 범위 지정 방식을 퀴즈로 점검하고, to로 하한선을 지정하는 연습을 한다.'
+---
+
+## 02편 복습
+
+## 핵심 퀴즈
+
+**Q1. `@scope (.card) to (.card-footer)`에서 `.card-footer` 자신은 범위에 포함되나?**
+
+<Collapse title="정답 보기">
+포함되지 않는다. "여기서부터는 제외"라는 경계선이다.
+</Collapse>
+
+**Q2. `@scope` 블록 안에서 `:scope`는 무엇을 가리키나?**
+
+<Collapse title="정답 보기">
+범위를 연 그 요소 자신. `@scope (.card)`라면 `.card` 자신을 가리킨다.
+</Collapse>
+
+**Q3. 같은 명시도일 때, 범위가 다른 두 `@scope` 규칙 중 무엇이 이기나?**
+
+<Collapse title="정답 보기">
+범위가 더 좁게(더 가깝게) 선언된 규칙이 이긴다.
+</Collapse>
+
+## 실습 — 범위에 하한선 추가하기
+
+아래는 `.widget` 안의 모든 `p`에 회색을 주는 규칙이다. 그런데 `.widget` 안에 중첩된 `.nested-card`의 `p`에는 영향을 주면 안 된다고 하자. `to`를 추가해서 고쳐보자.
+
+```css
+@scope (.widget) {
+  p { color: gray; }
+}
+```
+
+```html
+<div class="widget">
+  <p>회색이어야 함</p>
+  <div class="nested-card">
+    <p>회색이면 안 됨</p>
+  </div>
+</div>
+```
+
+<Collapse title="정답 보기">
+
+```css
+@scope (.widget) to (.nested-card) {
+  p { color: gray; }
+}
+```
+
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] `@scope (시작) to (끝)` 문법을 쓸 수 있다
+- [ ] `:scope`의 의미를 안다
+- [ ] 언제 `@scope`를 쓰는 게 유리한지 설명할 수 있다
+</Callout>
+
+다음 편에서는 CSS 안에서 직접 계산하는 수학 함수들을 본다.

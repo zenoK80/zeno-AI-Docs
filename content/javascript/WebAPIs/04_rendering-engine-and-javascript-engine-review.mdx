@@ -1,0 +1,69 @@
+---
+title: '04-복습. 렌더링 엔진과 JavaScript 엔진'
+description: '메인 스레드 블로킹을 퀴즈로 점검하고, 무거운 반복문으로 화면이 멈추는 현상을 직접 재현해 본다.'
+---
+
+## 04편 복습
+
+## 핵심 퀴즈
+
+**Q1. 렌더링 엔진과 JavaScript 엔진은 기본적으로 무엇을 공유하나?**
+
+<Collapse title="정답 보기">
+메인 스레드. 그래서 JS 실행 중에는 화면을 다시 그릴 수 없고, 반대도 마찬가지다.
+</Collapse>
+
+**Q2. 왜 처음부터 JS용 스레드와 렌더링용 스레드를 나누지 않았나?**
+
+<Collapse title="정답 보기">
+둘 다 DOM을 직접 건드리는데, 스레드가 나뉘면 동시에 DOM을 바꾸려는 경쟁 상태(Race Condition)가 계속 발생하기 때문이다. 이를 조율하는 비용이 더 크다.
+</Collapse>
+
+**Q3. 메인 스레드가 바빠도 끊기지 않을 수 있는 애니메이션 속성 두 가지는?**
+
+<Collapse title="정답 보기">
+`transform`과 `opacity`. 컴포지터 스레드가 별도로 처리할 수 있다.
+</Collapse>
+
+## 실습 — 메인 스레드 블로킹 재현하기
+
+```html
+<button id="btn">3초 멈추기</button>
+<input placeholder="여기 타이핑 해보세요" />
+```
+
+```js
+document.querySelector('#btn').addEventListener('click', () => {
+  const start = Date.now()
+  while (Date.now() - start < 3000) {}
+  console.log('끝')
+})
+```
+
+<Steps>
+
+### 버튼을 누르기 전에 먼저 입력창에 타이핑해 본다
+
+잘 입력되는 걸 확인한다.
+
+### 버튼을 누르고, 3초 안에 입력창에 다시 타이핑해 본다
+
+무슨 일이 일어나는지 관찰한다.
+
+### 왜 이런 일이 일어나는지 이 편의 내용으로 설명해 본다
+
+</Steps>
+
+<Collapse title="예상 결과">
+3초 동안 입력창이 먹통이 된다. `while` 루프가 메인 스레드를 붙잡고 있어서, 사용자 입력에 반응하는 코드도 순서를 기다려야 하기 때문이다.
+</Collapse>
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] "메인 스레드 블로킹"이 뭔지 직접 겪어봤다
+- [ ] 왜 무거운 계산이 UI를 멈추게 하는지 설명할 수 있다
+- [ ] Web Worker가 왜 필요한지 감이 잡힌다
+</Callout>
+
+다음 편에서는 이 메인 스레드 위에서 우리가 다루게 될 `window` 객체를 본다.

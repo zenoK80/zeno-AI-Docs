@@ -11,17 +11,17 @@ import './globals.css'
 export const metadata: Metadata = {
   metadataBase: new URL('https://zeno.it.kr'),
   title: {
-    default: 'Zeno Docs',
+    default: 'Zeno AI Docs',
     template: '%s | Zeno Docs',
   },
   description:
-    '웹 개발 기술을 공부하며 정리하는 개인 문서입니다. JavaScript와 React를 중심으로 학습 내용을 기록하고, 관심있는 공부 자료도 함께 정리합니다.',
+    '웹 개발 기술을 공부하며 정리하는 개인 아카이브 공간입니다. JavaScript와 React를 중심으로 학습 내용을 기록하고, 관심있는 공부 자료도 함께 정리합니다.',
   openGraph: {
     type: 'website',
     siteName: 'Zeno Docs',
     title: 'Zeno Docs',
     description:
-      '웹 개발 기술을 공부하며 정리하는 개인 문서입니다. JavaScript와 React를 중심으로 학습 내용을 기록하고, 관심있는 공부 자료도 함께 정리합니다.',
+      '웹 개발 기술을 공부하며 정리하는 개인 아카이브 공간입니다. JavaScript와 React를 중심으로 학습 내용을 기록하고, 관심있는 공부 자료도 함께 정리합니다.',
     url: 'https://zeno.it.kr',
     images: [
       {
@@ -34,9 +34,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Zeno Docs',
+    title: 'Zeno AI Docs',
     description:
-      '웹 개발 기술을 공부하며 정리하는 개인 문서입니다. JavaScript와 React를 중심으로 학습 내용을 기록하고, 관심있는 공부 자료도 함께 정리합니다.',
+      '웹 개발 기술을 공부하며 정리하는 개인 아카이브 공간입니다. JavaScript와 React를 중심으로 학습 내용을 기록하고, 관심있는 공부 자료도 함께 정리합니다.',
     images: ['/og-image.png'],
   },
   icons: {

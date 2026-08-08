@@ -16,8 +16,10 @@ import {
   Table,
 } from 'nextra/components'
 import { DocsTab, DocsTabs } from './app/components/docs-tabs'
+import { DocsBreadcrumb } from './app/components/docs-breadcrumb'
 
 const themeComponents = getThemeComponents()
+const ThemeWrapper = themeComponents.wrapper
 const Tabs = Object.assign((props: Parameters<typeof DocsTabs>[0]) => {
   return <DocsTabs {...props} />
 }, {
@@ -44,6 +46,12 @@ export function useMDXComponents(components = {}) {
     Table,
     Tabs,
     'Tabs.Tab': Tabs.Tab,
+    wrapper: (props: Parameters<typeof ThemeWrapper>[0]) => (
+      <ThemeWrapper {...props}>
+        <DocsBreadcrumb />
+        {props.children}
+      </ThemeWrapper>
+    ),
 
     ...components,
   }

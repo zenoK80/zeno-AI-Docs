@@ -1,0 +1,60 @@
+---
+title: '03-복습. Canvas 텍스트와 이미지'
+description: 'drawImage의 세 가지 방식과 이미지 로딩 순서를 퀴즈로 점검하고, 텍스트를 캔버스 중앙에 배치해 본다.'
+---
+
+## 03편 복습
+
+## 핵심 퀴즈
+
+**Q1. 이미지를 `drawImage`로 그리기 전에 반드시 기다려야 하는 것은?**
+
+<Collapse title="정답 보기">
+이미지 로딩 완료(`img.onload`). `img.src`를 설정한 직후 바로 그리면 아직 로드가 안 됐을 수 있다.
+</Collapse>
+
+**Q2. `drawImage`로 스프라이트 시트에서 일부만 잘라 그리려면 인자를 몇 개 넘겨야 하나?**
+
+<Collapse title="정답 보기">
+9개 — `drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)`. 원본에서 자를 영역(s로 시작) + 캔버스에 그릴 위치·크기(d로 시작).
+</Collapse>
+
+**Q3. `getImageData`의 `data` 배열은 어떤 순서로 값이 반복되나?**
+
+<Collapse title="정답 보기">
+R, G, B, A(빨강, 초록, 파랑, 알파) 네 개가 픽셀마다 반복된다.
+</Collapse>
+
+## 실습 — 텍스트를 캔버스 정중앙에 배치하기
+
+```html
+<canvas id="stage" width="300" height="150"></canvas>
+```
+
+`textAlign`, `textBaseline`을 이용해서 "완료!"라는 텍스트를 캔버스 정중앙에 배치해 보자.
+
+<Collapse title="정답 보기">
+
+```js
+const canvas = document.querySelector('#stage')
+const ctx = canvas.getContext('2d')
+
+ctx.font = '32px sans-serif'
+ctx.textAlign = 'center'
+ctx.textBaseline = 'middle'
+ctx.fillText('완료!', canvas.width / 2, canvas.height / 2)
+```
+
+</Collapse>
+
+`textAlign`/`textBaseline`을 지우고 다시 그려서, 위치가 어떻게 달라지는지도 비교해 보자.
+
+## 정리 체크리스트
+
+<Callout type="default">
+- [ ] 이미지는 로드 완료 후 그려야 한다는 걸 안다
+- [ ] `drawImage`의 세 가지 호출 방식을 구별할 수 있다
+- [ ] 텍스트를 원하는 위치에 정렬할 수 있다
+</Callout>
+
+다음 편에서는 도형을 회전·확대하고 움직여서 애니메이션을 만든다.
