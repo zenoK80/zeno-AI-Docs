@@ -1,11 +1,60 @@
 ---
 title: '04-복습. React 개발 환경 이해하기'
-description: 'CDN과 Babel만으로 React를 직접 띄워보고, JSX가 어떤 코드로 변환되는지 실습으로 확인한다.'
+description: 'CDN과 Babel만으로 React를 직접 띄워보고, JSX가 어떤 코드로 변환되는지 4지선다 퀴즈와 실습으로 확인한다.'
 ---
 
 ## 04편 복습
 
-이번 편은 원래도 실습 중심이었다. 여기서는 그걸 **직접 손으로** 완성해 본다.
+## 문제 1
+
+`React.createElement(...)`가 반환하는 값의 정체는?
+
+- A. 실제 DOM 요소(화면에 바로 나타나는 진짜 태그)
+- B. 평범한 자바스크립트 객체 (`{ type, props, ... }` 형태의 "설계도")
+- C. HTML 문자열
+- D. 이미지 파일
+
+<Collapse title="정답 보기">
+정답: **B**
+</Collapse>
+
+<Collapse title="해설 보기">
+`React.createElement`가 만드는 건 진짜 화면 요소가 아니라, "이런 모습을 그리고 싶다"는 정보를 담은 **평범한 객체**다. 이 객체를 콘솔에 찍어보면 `{ type: 'h1', props: {...} }` 같은 모습이 보인다. 이게 1편에서 예고했던 Virtual DOM의 가장 작은 단위다. 실제 화면 반영은 `ReactDOM.createRoot(...).render(...)`가 담당한다.
+</Collapse>
+
+## 문제 2
+
+`type="text/babel"`이 붙은 `<script>` 태그의 내용은 브라우저가 바로 실행하나?
+
+- A. 그렇다. 브라우저가 알아서 JSX도 이해한다
+- B. 아니다. Babel 라이브러리가 먼저 JSX를 `React.createElement` 호출로 변환한 뒤에야 실행된다
+- C. 실행하지 않고 그냥 무시한다
+- D. 서버로 보내서 처리한 뒤 다시 받아온다
+
+<Collapse title="정답 보기">
+정답: **B**
+</Collapse>
+
+<Collapse title="해설 보기">
+브라우저는 JSX 문법을 원래 모른다. `type="text/babel"`이라는 표시가 붙은 스크립트를 보면, 함께 불러온 **Babel**(최신·특수 문법을 브라우저가 이해할 수 있는 코드로 바꿔주는 도구) 라이브러리가 먼저 그 내용을 읽어서 JSX를 `React.createElement` 호출로 바꾼다. 그 변환이 끝난 뒤에야 실제로 실행된다.
+</Collapse>
+
+## 문제 3
+
+CDN + Babel 방식을 실무 프로젝트에서 그대로 쓰지 않는 이유로 가장 적절한 것은?
+
+- A. 저작권 문제가 있어서
+- B. 페이지를 열 때마다 브라우저에서 JSX → JS 변환이 반복돼서 코드가 커질수록 느려지기 때문에
+- C. React 팀이 공식적으로 금지해서
+- D. 모바일에서는 아예 작동하지 않기 때문에
+
+<Collapse title="정답 보기">
+정답: **B**
+</Collapse>
+
+<Collapse title="해설 보기">
+CDN + Babel 방식은 **매번 브라우저 안에서** 변환 작업이 일어난다. 코드가 커질수록 이 변환에 걸리는 시간도 늘어나 느려진다. 그 외에도 개발용 라이브러리(`react.development.js`)를 그대로 쓰고 있다는 점, 파일을 여러 개로 나누기 어렵다는 점도 실무에 부적합한 이유다. 실무에서는 이 변환을 미리 처리해두는 **번들러**를 쓴다 (8~9편에서 다룬다).
+</Collapse>
 
 ## 실습 — 나만의 React 페이지 만들기
 
@@ -28,26 +77,6 @@ description: 'CDN과 Babel만으로 React를 직접 띄워보고, JSX가 어떤 
 `@babel/standalone` 스크립트를 추가하고, `type="text/babel"` 스크립트 안에서 `createElement` 대신 JSX로 같은 화면을 만들어본다.
 
 </Steps>
-
-## 핵심 퀴즈
-
-**Q1. `React.createElement(...)`가 반환하는 건 실제 DOM 요소인가?**
-
-<Collapse title="정답 보기">
-아니다. 평범한 자바스크립트 객체(`{ type, props, ... }`)다. "이런 모습을 그리고 싶다"는 설계도일 뿐이다.
-</Collapse>
-
-**Q2. `type="text/babel"`이 붙은 스크립트는 브라우저가 바로 실행하나?**
-
-<Collapse title="정답 보기">
-아니다. Babel 라이브러리가 먼저 JSX를 `React.createElement` 호출로 변환한 뒤에야 실행된다.
-</Collapse>
-
-**Q3. 이 CDN+Babel 방식을 실무에서 쓰지 않는 이유 하나는?**
-
-<Collapse title="정답 보기">
-매번 브라우저에서 JSX → JS 변환이 일어나 코드가 커질수록 느려진다. (그 외에 개발용 라이브러리 사용, 파일 분리의 어려움도 있다.)
-</Collapse>
 
 ## 정리 체크리스트
 

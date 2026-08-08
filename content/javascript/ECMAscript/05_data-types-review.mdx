@@ -1,33 +1,64 @@
 ---
 title: '05-복습. 데이터 타입'
-description: '일곱 가지 원시 타입과 typeof 결과를 퀴즈로 점검하고, undefined와 null의 차이를 실습으로 확인한다.'
+description: '일곱 가지 원시 타입과 typeof 결과를 4지선다 퀴즈로 점검하고, undefined와 null의 차이를 실습으로 확인한다.'
 ---
 
 ## 05편 복습
 
-## 핵심 퀴즈
+## 문제 1
 
-**Q1. 원시 타입 일곱 가지를 말할 수 있는가?**
+자바스크립트의 원시 타입<sup>Primitive Type, 더 이상 쪼갤 수 없는 가장 단순한 형태의 값</sup>은 모두 몇 가지인가?
+
+- A. 5가지
+- B. 6가지
+- C. 7가지
+- D. 정해진 개수가 없다
 
 <Collapse title="정답 보기">
-Number, String, Boolean, undefined, null, BigInt, Symbol
+정답: **C**
 </Collapse>
 
-**Q2. `undefined`와 `null`의 뉘앙스 차이는?**
-
-<Collapse title="정답 보기">
-`undefined`는 시스템이 "아직 값이 없다"고 자동으로 붙이는 것. `null`은 개발자가 "값이 없음"을 의도적으로 명시한 것이다.
+<Collapse title="해설 보기">
+Number(숫자), String(문자열), Boolean(참/거짓), undefined, null, BigInt(아주 큰 정수), Symbol(유일한 값) — 총 7가지다. 이 7가지 외의 값(객체, 배열, 함수 등)은 전부 **객체 타입**<sup>Object Type, 여러 값을 묶어 담는 복합적인 값</sup>으로 분류된다. 객체 타입은 12편부터 본격적으로 다룬다.
 </Collapse>
 
-**Q3. `typeof`의 결과가 실제 타입과 다르게 나오는 유명한 버그는?**
+## 문제 2
+
+`undefined`와 `null`의 차이를 가장 정확하게 설명한 것은?
+
+- A. 완전히 같은 뜻이라 아무거나 써도 된다
+- B. `undefined`는 시스템이 자동으로 붙이는 "아직 값 없음", `null`은 개발자가 의도적으로 넣는 "값 없음"
+- C. `null`은 숫자 0을, `undefined`는 빈 문자열을 뜻한다
+- D. `undefined`는 옛날 문법이고 `null`이 새 문법이다
 
 <Collapse title="정답 보기">
-`typeof null`이 `'null'`이 아니라 `'object'`로 나오는 것. 1995년부터 이어진 고쳐지지 않는 버그다.
+정답: **B**
+</Collapse>
+
+<Collapse title="해설 보기">
+`undefined`는 변수를 선언만 하고 값을 안 넣었을 때처럼, **자바스크립트 엔진이 알아서** "여기 아직 값이 없다"고 채워 넣는 값이다. 반면 `null`은 개발자가 `const selectedUser = null`처럼 **직접 명시적으로** "지금은 값이 없는 상태다"라고 표시할 때 쓴다. 뉘앙스는 다르지만 둘 다 "값이 없다"는 뜻이라는 공통점이 있다.
+</Collapse>
+
+## 문제 3
+
+`typeof null`의 결과가 `'object'`로 나오는 이유는?
+
+- A. `null`은 사실 객체이기 때문에 정상적인 결과다
+- B. 최근에 새로 추가된 기능이라서 그렇다
+- C. 1995년 최초 구현 당시의 버그인데, 너무 많은 웹사이트가 이 동작에 의존하게 되어 지금도 고치지 못하고 있다
+- D. 브라우저마다 결과가 다르게 나온다
+
+<Collapse title="정답 보기">
+정답: **C**
+</Collapse>
+
+<Collapse title="해설 보기">
+1편에서도 다룬 자바스크립트의 유명한 버그다. `null`은 원래 별도의 타입인데, 초기 구현 실수로 `typeof`가 `'object'`라고 잘못 답하게 만들어졌다. 이후 전 세계 수많은 코드가 이 동작을 전제로 짜여서, 이제 와서 `'null'`로 고치면 그 코드들이 대거 깨진다. 그래서 **알면서도 못 고치는** 상태로 지금까지 남아있다.
 </Collapse>
 
 ## 실습 — typeof 예측 게임
 
-아래 결과를 실행 전에 먼저 예측해서 종이나 메모장에 적어보고, 실제로 콘솔에서 실행해 맞혔는지 확인하자.
+아래 결과를 실행 전에 먼저 예측해서 메모장에 적어보고, 실제로 콘솔에서 실행해 맞혔는지 확인하자.
 
 ```js
 typeof 3.14
@@ -54,14 +85,14 @@ typeof NaN
 'bigint'
 'symbol'
 'object'
-'object'   ← 배열도 typeof로는 object다
+'object'   ← 배열도 typeof로는 그냥 object로 나온다
 'function'
-'number'   ← NaN도 Number 타입에 속한다
+'number'   ← NaN(Not a Number, "숫자가 아님"이라는 뜻의 특수 값)도 Number 타입에 속한다
 ```
 
 </Collapse>
 
-전부 맞혔다면 데이터 타입 감각이 잡힌 것이다. `[]`와 `function(){}`가 예상과 다르게 나왔다면, 12편(객체 리터럴)과 13편(원시 값 vs 객체)에서 왜 그런지 더 자세히 배운다.
+전부 맞혔다면 데이터 타입 감각이 잡힌 것이다. `[]`(배열)와 `function(){}`가 예상과 다르게 나왔다면, 12편(객체 리터럴)과 13편(원시 값 vs 객체)에서 왜 그런지 더 자세히 배운다.
 
 ## 정리 체크리스트
 

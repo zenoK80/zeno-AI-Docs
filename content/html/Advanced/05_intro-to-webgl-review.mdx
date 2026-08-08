@@ -1,30 +1,61 @@
 ---
 title: '05-복습. WebGL과 3D 그래픽 개요'
-description: 'Canvas 2D와 WebGL의 차이를 퀴즈로 점검하고, 실제 Three.js 예제를 둘러보는 탐구 과제를 진행한다.'
+description: 'Canvas 2D와 WebGL의 차이를 4지선다 퀴즈로 점검하고, 실제 Three.js 예제를 둘러보는 탐구 과제를 진행한다.'
 ---
 
 ## 05편 복습
 
 이번 편은 코딩 실습 대신 **개념 정리와 탐구 과제**로 마무리한다.
 
-## 핵심 퀴즈
+## 문제 1
 
-**Q1. Canvas 2D는 CPU와 GPU 중 무엇으로 계산하나? WebGL은?**
+Canvas 2D와 WebGL은 각각 무엇으로 그림을 계산하나?
+
+- A. 둘 다 CPU로 계산한다
+- B. 둘 다 GPU로 계산한다
+- C. Canvas 2D는 CPU, WebGL은 GPU로 계산한다
+- D. Canvas 2D는 GPU, WebGL은 CPU로 계산한다
 
 <Collapse title="정답 보기">
-Canvas 2D는 CPU가, WebGL은 GPU가 대규모 병렬로 계산한다.
+정답: **C**
 </Collapse>
 
-**Q2. WebGL의 그리기 로직은 어떤 언어로 짜나?**
-
-<Collapse title="정답 보기">
-GLSL(OpenGL Shading Language). 자바스크립트가 아닌 별도의 언어다.
+<Collapse title="해설 보기">
+**CPU**(중앙 처리 장치, 일반적인 연산을 순차적으로 처리)는 Canvas 2D의 계산을 담당하고, **GPU**(그래픽 처리 장치, 대량의 계산을 동시에 병렬로 처리하는 데 특화된 하드웨어)는 WebGL의 계산을 담당한다. 3D 그래픽처럼 계산량이 많은 작업은 GPU의 병렬 처리 능력이 필요해서 WebGL이 따로 존재한다.
 </Collapse>
 
-**Q3. 실무에서 WebGL을 직접 짜지 않고 주로 쓰는 방법은?**
+## 문제 2
+
+WebGL에서 그리기 로직(정점·색상 계산)을 짜는 데 쓰는 언어는?
+
+- A. 자바스크립트
+- B. GLSL(OpenGL Shading Language)이라는 별도 언어
+- C. HTML
+- D. Python
 
 <Collapse title="정답 보기">
-Three.js, PixiJS, Babylon.js 같은 라이브러리를 쓴다.
+정답: **B**
+</Collapse>
+
+<Collapse title="해설 보기">
+**셰이더**<sup>Shader, GPU에서 실행되는 작은 프로그램</sup>는 자바스크립트가 아니라 **GLSL**이라는 완전히 별도의 언어로 짠다. 이 코드를 GPU에 업로드해서 정점 하나하나의 위치, 픽셀 하나하나의 색을 어떻게 계산할지 지시한다. 이 과정이 순수 WebGL을 배우기 어렵게 만드는 주된 이유다.
+</Collapse>
+
+## 문제 3
+
+실무에서 WebGL을 다룰 때 보통 어떤 방식을 쓰나?
+
+- A. 항상 순수 WebGL 코드를 처음부터 직접 짠다
+- B. Three.js, PixiJS 같은 라이브러리를 통해 간접적으로 사용한다
+- C. WebGL은 실무에서 거의 쓰이지 않는다
+- D. Photoshop 같은 이미지 편집 프로그램으로 대체한다
+
+<Collapse title="정답 보기">
+정답: **B**
+</Collapse>
+
+<Collapse title="해설 보기">
+순수 WebGL은 삼각형 하나를 그리는 데도 셰이더 작성, 버퍼 생성 등 수십 줄의 준비 코드가 필요할 만큼 복잡하다. 그래서 대부분의 실무 개발자는 이 복잡함을 감춰주는 **Three.js**(3D), **PixiJS**(2D 고성능) 같은 라이브러리를 통해 WebGL의 능력을 간접적으로 활용한다.
 </Collapse>
 
 ## 탐구 과제 — 실제 WebGL 사례 둘러보기
