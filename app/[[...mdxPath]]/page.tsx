@@ -14,13 +14,9 @@ export async function generateStaticParams() {
       return { ...param, mdxPath: [] }
     }
 
-    // Next compares catch-all params with the URL-encoded browser pathname.
-    return {
-      ...param,
-      mdxPath: param.mdxPath.map((segment) =>
-        encodeURIComponent(decodeURIComponent(segment)),
-      ),
-    }
+    // Nextra returns decoded content paths. Next encodes them when exporting
+    // static files, so encoding here would turn Korean paths into %25EC... .
+    return param
   })
 }
 
