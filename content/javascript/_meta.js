@@ -1,6 +1,6 @@
 const meta = {
-  Browser: {
-    title: 'Browser',
+  WebAPIs: {
+    title: 'Web APIs',
     type: 'page',
   },
   ECMAscript: {

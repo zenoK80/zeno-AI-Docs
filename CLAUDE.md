@@ -17,7 +17,7 @@
 
 - 헤더의 최상위 메뉴는 `content/` 바로 아래의 과목 폴더다. 예: JavaScript, React, HTML, CSS.
 - 마우스를 올리면 해당 과목의 직접 하위 분류만 드롭다운으로 보인다.
-  - JavaScript: `Browser`, `ECMAscript`
+  - JavaScript: `WebAPIs`, `ECMAscript`
   - React / Next.js / TypeScript / Node.js / HTML / CSS: `Basic`, `Middle`, `Advanced`
 - 드롭다운에서 하위 분류를 클릭하면 그 분류의 첫 번째 문서로 이동한다.
 - 최상위 과목의 비어 있는 `index.mdx`는 만들지 않는다. 과목은 헤더 메뉴이고, 실제 문서는 하위 분류에서 시작한다.
@@ -26,7 +26,7 @@
 ### 사이드바 규칙
 
 - 현재 URL과 같은 하위 분류의 문서만 사이드바에 표시한다.
-  - `/javascript/Browser/...`: Browser 문서만
+  - `/javascript/WebAPIs/...`: Web APIs 문서만
   - `/javascript/ECMAscript/...`: ECMAScript 문서만
   - `/React/Basic/...`: React Basic 문서만
   - `/css/Middle/...`: CSS Middle 문서만
@@ -38,7 +38,7 @@
 
 - `app/layout.tsx`의 `<Layout>`에는 전체 `getPageMap()` 구조를 넘긴다. 한글 폴더 경로는 브라우저 URL과 맞추기 위해 route만 `encodeURI`로 정규화할 수 있지만, URL마다 `pageMap`을 잘라 넘기는 별도 필터 코드를 만들지 않는다.
 - `content/_meta.js`의 최상위 과목은 반드시 `type: 'menu'`와 `items`를 사용한다.
-- 각 과목의 `_meta.js`에서 실제 사이드바 범위가 되는 하위 분류(`Browser`, `Basic` 등)는 반드시 `type: 'page'`로 선언한다.
+- 각 과목의 `_meta.js`에서 실제 사이드바 범위가 되는 하위 분류(`WebAPIs`, `Basic` 등)는 반드시 `type: 'page'`로 선언한다.
 - 이 `menu -> page -> 문서` 계층이 Nextra 기본 사이드바를 현재 분류의 문서 목록으로 자동 제한한다. 배포된 `https://zeno.it.kr/`의 헤더/사이드바 방식이 이 기준이다.
 - 이 동작을 CSS 숨김, DOM 조작, 별도 라우트별 사이드바 데이터로 대체하지 않는다.
 - `app/[[...mdxPath]]/page.tsx`의 `generateStaticParams()`는 홈을 `[]`로, 한글을 포함한 각 경로 조각은 `encodeURIComponent(decodeURIComponent(segment))`으로 반환한다. `output: 'export'`에서 한글 과목 경로가 누락됐다고 판단되는 오류를 막기 위한 규칙이다.
@@ -55,7 +55,7 @@
 | 계획 파일 | 콘텐츠 폴더 |
 | --- | --- |
 | `[javascript][ecmascript].md` | `content/javascript/ECMAscript/` |
-| `[javascript][browser].md` | `content/javascript/Browser/` |
+| `[javascript][webapis].md` | `content/javascript/WebAPIs/` |
 | `[react][basic].md`, `[middle].md`, `[advanced].md` | `content/React/Basic/`, `Middle/`, `Advanced/` |
 | `[nextjs][basic].md`, `[middle].md`, `[advanced].md` | `content/NextJs/Basic/`, `Middle/`, `Advanced/` |
 | `[typescript][basic].md`, `[middle].md`, `[advanced].md` | `content/Typescript/Basic/`, `Middle/`, `Advanced/` |

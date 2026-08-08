@@ -4,9 +4,9 @@ const meta = {
     title: 'JavaScript',
     type: 'menu',
     items: {
-      Browser: {
-        title: 'Browser',
-        href: '/javascript/Browser/01_what-is-browser-javascript',
+      WebAPIs: {
+        title: 'Web APIs',
+        href: '/javascript/WebAPIs/01_what-is-web-apis',
       },
       ECMAscript: {
         title: 'ECMAScript',

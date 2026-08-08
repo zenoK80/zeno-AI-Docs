@@ -22,7 +22,7 @@ Claude가 담당하는 과목의 **목차와 과목별 작성 지침**이 들어
 | 계획 파일 | 콘텐츠 폴더 | 편 수 |
 | --- | --- | --- |
 | `[javascript][ecmascript].md` | `content/javascript/ECMAscript/` | 47 |
-| `[javascript][browser].md` | `content/javascript/Browser/` | 128 |
+| `[javascript][webapis].md` | `content/javascript/WebAPIs/` | 128 |
 | `[react][basic].md` | `content/React/Basic/` | 20 |
 | `[react][middle].md` | `content/React/Middle/` | 20 |
 | `[react][advanced].md` | `content/React/Advanced/` | 15 |

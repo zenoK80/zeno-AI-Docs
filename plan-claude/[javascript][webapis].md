@@ -1,10 +1,10 @@
-# JavaScript — Browser
+# JavaScript — Web APIs
 
 - 담당: Claude
-- 콘텐츠 폴더: `content/javascript/Browser/`
+- 콘텐츠 폴더: `content/javascript/WebAPIs/`
 - 공통 작성 규칙은 `CLAUDE.md`를 따른다.
 
-> JavaScript는 기초/중급/고급으로 나누지 않고 **ECMAScript**와 **Browser** 둘로만 나눈다.
+> JavaScript는 기초/중급/고급으로 나누지 않고 **ECMAScript**와 **Web APIs** 둘로만 나눈다.
 
 ## 이 시리즈의 정체성 (가장 중요)
 
@@ -47,7 +47,7 @@ ECMAScript 개념이 전제 지식으로 필요한 경우(예: 이벤트 루프�
 
 ### Part 1. 브라우저와 실행 환경
 
-- `01_what-is-browser-javascript.mdx` — Browser JavaScript란?
+- `01_what-is-web-apis.mdx` — Web APIs란?
 - `02_ecmascript-web-api-boundary.mdx` — ECMAScript와 Web API의 경계
 - `03_browser-architecture-process-model.mdx` — 브라우저 구조와 프로세스 모델
 - `04_rendering-engine-and-javascript-engine.mdx` — 렌더링 엔진과 JavaScript 엔진

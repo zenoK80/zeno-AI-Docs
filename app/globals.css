@@ -188,7 +188,8 @@ body {
     color 150ms ease;
 }
 
-.docs-navbar-panel-link:hover {
+.docs-navbar-panel-link:hover,
+.docs-navbar-panel-link[aria-current='page'] {
   background: var(--x-color-primary-100);
   color: var(--x-color-primary-600);
 }
@@ -301,7 +302,8 @@ html.dark .docs-navbar-group[data-open='true'] .docs-navbar-trigger {
   color: var(--x-color-gray-100);
 }
 
-html.dark .docs-navbar-panel-link:hover {
+html.dark .docs-navbar-panel-link:hover,
+html.dark .docs-navbar-panel-link[aria-current='page'] {
   background: color-mix(in srgb, var(--x-color-primary-600) 18%, transparent);
 }
 

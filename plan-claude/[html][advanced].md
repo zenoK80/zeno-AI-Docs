@@ -13,7 +13,7 @@ Web Components 같은 **웹 플랫폼의 고급 기능**까지 다룬다.
 
 - Canvas 편은 코드가 길어지기 쉽다. **한 편에 개념 하나**를 지키고, 예제는 짧게 완결시킨다.
 - 접근성 편은 "ARIA를 쓰지 않는 것이 최선"이라는 원칙(시맨틱 우선)을 분명히 한다.
-- Web Components(33~36편)는 Browser JavaScript 시리즈와 주제가 겹친다. 여기서는 **마크업 관점**으로만 다루고, JS API 심화는 그쪽으로 넘긴다.
+- Web Components(33~36편)는 Web APIs 시리즈와 주제가 겹친다. 여기서는 **마크업 관점**으로만 다루고, JS API 심화는 그쪽으로 넘긴다.
 - 참고: MDN HTML·Canvas API, WHATWG HTML Living Standard, web.dev, [WAI-ARIA 저작 관행](https://www.w3.org/WAI/ARIA/apg/)
 
 ## 목차 (16편)

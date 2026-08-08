@@ -10,6 +10,7 @@ import { FocusEvent, MouseEvent, useEffect, useMemo, useState } from 'react'
 interface NavItem {
   title: string
   href: string
+  section: string
 }
 
 interface NavGroup extends NavItem {
@@ -103,7 +104,8 @@ function getNavGroups(pageMap: PageMapItem[]): NavGroup[] {
       if (isHidden(child.name, folderMeta)) continue
       const childHref = firstPageRoute(child)
       if (childHref) {
-        items.push({ title: titleOf(child, folderMeta), href: childHref })
+        const childSection = isFolder(child) ? child.route : childHref
+        items.push({ title: titleOf(child, folderMeta), href: childHref, section: childSection })
       }
     }
 
@@ -224,6 +226,7 @@ export function DocsNavbar({ pageMap }: { pageMap: PageMapItem[] }) {
                     <div className="docs-navbar-panel-links">
                       {group.items.map((item) => (
                         <Link
+                          aria-current={pathname.startsWith(item.section) ? 'page' : undefined}
                           className="docs-navbar-panel-link"
                           href={item.href}
                           key={item.href}
