@@ -1,0 +1,130 @@
+---
+title: '05. 네이티브 CSS 믹스인 (@mixin/@apply)'
+description: 'Sass 믹스인을 대체하려는 네이티브 CSS 제안의 문법과 현재 진행 상태를 살펴보고, 지금 실무에서 쓸 수 있는 대안을 정리한다.'
+---
+
+## 네이티브 CSS 믹스인 (@mixin/@apply)
+
+1편에서 CSS 중첩이 Sass의 오랜 숙원 하나를 해결했다고 했다. 아직 남은 숙원이 하나 더 있다 —
+**"반복되는 선언 블록을 함수처럼 재사용하는 것"**, 즉 Sass의 `@mixin`이다. 이 편에서 다루는 건
+아직 어느 브라우저에도 정식 탑재되지 않은 **제안(proposal) 단계의 기능**이다.
+
+<Callout type="warning">
+**중요: 2026년 중반 기준, 이 기능은 안정 버전 브라우저에 하나도 탑재되지 않았다.**
+Chrome이 실험적으로 구현을 진행 중이지만 정식 출시 전이다. 이 편은 "이런 게 온다"는 **미리보기**로 읽고,
+실무 코드에는 아직 쓰지 않는다. 문법은 최종 확정 전이라 아래 내용도 바뀔 수 있다.
+</Callout>
+
+## 왜 필요한가 — 커스텀 프로퍼티의 한계
+
+CSS 변수(`--var`)로 값 하나는 재사용할 수 있지만, **여러 선언을 묶음으로 재사용**할 수는 없었다.
+
+```css
+/* 이런 걸 하고 싶은데... */
+.button-base {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+}
+```
+
+이 세 줄을 클래스가 아니라 **"필요한 곳 어디에나 값처럼 끼워 넣고 싶다"** 는 요구가 오랫동안 있었다.
+지금까지는 Sass의 `@mixin`이 이 역할을 대신해 왔다.
+
+```scss
+// Sass (전처리기가 필요하다)
+@mixin button-base {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+}
+
+.btn { @include button-base; }
+```
+
+## 제안된 문법 — @mixin과 @apply
+
+```css
+/* 실험적 문법 — 최종 확정 아님 */
+@mixin --button-base {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+}
+
+.btn {
+  @apply --button-base;
+  background: royalblue;
+}
+```
+
+- `@mixin --이름 { ... }` — 재사용할 선언 묶음을 정의한다 (이름 앞에 `--`가 붙는 게 특징이다)
+- `@apply --이름` — 정의된 묶음을 그 자리에 그대로 펼친다
+
+<Callout type="info">
+이름에 `--`가 붙는 이유는 커스텀 프로퍼티와 같은 네임스페이스를 공유하도록 설계되었기 때문이다.
+실제로 이 제안은 "믹스인은 매개변수를 받는 특수한 커스텀 프로퍼티"에 가깝게 설계되는 중이다.
+</Callout>
+
+## 매개변수가 있는 믹스인 (구상 단계)
+
+제안에는 값을 전달받는 형태도 논의되고 있다.
+
+```css
+/* 구상 단계 문법 — 실제 최종 형태와 다를 수 있다 */
+@mixin --spaced(--gap) {
+  display: flex;
+  gap: var(--gap);
+}
+
+.list {
+  @apply --spaced(1rem);
+}
+```
+
+Sass 믹스인이 매개변수를 받던 것과 같은 방향이지만, **CSS 자체에서 조건문·반복문까지 어디까지 지원할지는 아직 논의 중**이다.
+
+## 지금 실무에서는 무엇을 쓰나
+
+<Callout type="important">
+**실무 판단: 현재 선택지는 세 가지다.**
+
+| 방법 | 특징 |
+| --- | --- |
+| **Sass `@mixin`** | 가장 성숙하고 검증됨. 빌드 도구 필요. 지금은 이게 정답에 가깝다 |
+| **커스텀 프로퍼티 + 유틸리티 클래스** | 순수 CSS. 값 하나짜리 재사용엔 충분하지만 여러 선언 묶음엔 한계 |
+| **네이티브 중첩(1편) + 클래스 조합** | 값 묶음 자체보다 **클래스를 여러 개 조합**하는 유틸리티 퍼스트 방식(Tailwind 등)으로 우회 |
+
+당장 "여러 선언을 재사용"해야 한다면 **Sass가 여전히 가장 실용적인 선택**이다. 네이티브 믹스인은
+브라우저 지원이 갖춰지기 전까지는 개념만 알아두면 충분하다.
+</Callout>
+
+## 왜 이런 기능이 이렇게 늦게 오는가
+
+<Callout type="default">
+CSS 중첩(1편)이나 `@scope`(2편)처럼 "선택자를 어떻게 다룰지"에 관한 기능은 비교적 빨리 합의됐다.
+반면 믹스인은 **"CSS 안에 얼마나 프로그래밍 언어에 가까운 기능(매개변수, 조건, 반복)을 넣을 것인가"** 라는
+근본적인 설계 논쟁과 맞물려 있다. CSS 워킹 그룹이 신중하게 접근하는 영역이라 표준화에 시간이 걸리고 있다.
+</Callout>
+
+## 앞으로 지켜볼 것
+
+이 기능이 실무에 들어오면 CSS 아키텍처(11편, Part 10)에 상당한 영향을 줄 가능성이 크다.
+Sass 없이도 디자인 시스템의 반복 패턴을 순수 CSS로 표현할 수 있게 되기 때문이다.
+지원 현황은 [MDN의 CSS 믹스인 문서](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Custom_functions_and_mixins)에서 계속 갱신되니, 실제 도입 전에 다시 확인하자.
+
+## 정리
+
+<Callout type="default">
+- `@mixin`/`@apply`는 Sass 믹스인을 대체하려는 **네이티브 CSS 제안**이다
+- **2026년 중반 기준 안정 버전 브라우저에 탑재된 곳이 없다** — 실무에 아직 쓸 수 없다
+- 지금 여러 선언을 재사용해야 한다면 **Sass**가 가장 현실적인 선택이다
+- 문법(`@mixin --이름`, `@apply --이름`)은 최종 확정 전이라 바뀔 수 있다
+</Callout>
+
+이걸로 최신 고급 문법 파트를 마친다. 다음 편부터는 시각 효과(`filter`, `clip-path` 등)를 다룬다.
+
+## 참고 자료
+
+- [MDN — CSS 커스텀 함수와 믹스인](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Custom_functions_and_mixins)
+- [W3C — CSS Mixins and Functions 제안 논의](https://github.com/w3c/csswg-drafts/issues/9350)
+- [Sass 공식 문서 — @mixin](https://sass-lang.com/documentation/at-rules/mixin/)

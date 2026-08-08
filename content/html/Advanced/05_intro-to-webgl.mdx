@@ -1,0 +1,118 @@
+---
+title: '05. WebGL과 3D 그래픽 개요'
+description: 'Canvas 2D의 한계를 넘어 GPU를 직접 활용하는 WebGL이 무엇인지, 그리고 실무에서 어떻게 접근하는 게 현실적인지 개관한다.'
+---
+
+## WebGL과 3D 그래픽 개요
+
+지금까지 배운 건 전부 **Canvas 2D 컨텍스트**였다. 이번 편은 같은 `<canvas>` 요소에서 얻을 수 있는
+또 다른 컨텍스트, **WebGL**을 개념 수준에서 소개한다. 이 시리즈는 HTML 시리즈이므로 실전 코딩보다
+**"이게 뭐고, 언제 필요하며, 실무에서는 보통 어떻게 접근하는지"** 에 초점을 맞춘다.
+
+## 같은 canvas, 다른 컨텍스트
+
+1편에서 "한 캔버스는 하나의 컨텍스트 타입에 묶인다"고 했다. `getContext('2d')` 대신 이렇게 요청하면 완전히 다른 도구 세트를 받는다.
+
+```js
+const canvas = document.querySelector('#stage')
+const gl = canvas.getContext('webgl2')   // 또는 'webgl' (구버전)
+```
+
+`ctx`(2D 컨텍스트)가 `fillRect`, `arc` 같은 도형 그리기 메서드를 주는 것과 달리,
+`gl`(WebGL 컨텍스트)은 완전히 다른 성격의 API를 준다.
+
+## Canvas 2D와 무엇이 다른가
+
+| | Canvas 2D | WebGL |
+| --- | --- | --- |
+| **처리 방식** | CPU가 픽셀을 계산 | **GPU**가 대규모 병렬 계산 |
+| **다루는 대상** | 평면 도형·이미지 | 3D 정점·삼각형·텍스처 |
+| **그리기 방식** | `fillRect()`처럼 명령형 메서드 호출 | **셰이더**<sup>Shader</sup>라는 별도 프로그램을 GPU에 업로드 |
+| **학습 난도** | 낮음 | 높음 — 선형대수, GPU 파이프라인 이해 필요 |
+
+<Callout type="important">
+**WebGL의 정체는 브라우저용 OpenGL ES다.** OpenGL은 원래 데스크톱 3D 그래픽 표준이었고,
+WebGL은 그 API를 자바스크립트로 쓸 수 있게 브라우저에 이식한 것이다. **명세도 WHATWG/W3C가 아니라
+Khronos Group**(OpenGL을 관리하는 단체)이 정한다는 점도 다른 Web API와 다르다.
+</Callout>
+
+## 셰이더 — WebGL이 어려운 이유
+
+Canvas 2D는 "사각형을 그려라"처럼 명령을 내리면 브라우저가 알아서 처리한다.
+WebGL은 다르다. **"각 점을 어떻게 계산할지"를 담은 작은 프로그램(셰이더)을 직접 짜서 GPU에 넘겨야 한다.**
+
+```glsl
+// 정점 셰이더 예시 — GLSL이라는 별도 언어로 짠다
+attribute vec4 position;
+void main() {
+  gl_Position = position;
+}
+```
+
+이 코드는 자바스크립트가 아니라 **GLSL**<sup>OpenGL Shading Language</sup>이라는 완전히 다른 언어다.
+정점(꼭짓점) 하나하나의 위치를 어떻게 계산할지, 픽셀 하나하나의 색을 어떻게 정할지를 이 언어로 지시한다.
+
+<Callout type="warning">
+순수 WebGL로 삼각형 하나를 화면에 띄우는 데도 셰이더 작성, 버퍼 생성, GPU 메모리 업로드 등
+수십 줄의 준비 코드가 필요하다. Canvas 2D의 `fillRect` 한 줄과는 학습 곡선이 완전히 다르다.
+</Callout>
+
+## 그래서 실무에서는 어떻게 하나
+
+<Callout type="important">
+**대부분의 실무 개발자는 WebGL을 직접 짜지 않는다.** 그 위에 만들어진 라이브러리를 쓴다.
+
+| 라이브러리 | 용도 |
+| --- | --- |
+| **Three.js** | 가장 널리 쓰이는 3D 라이브러리. 셰이더를 직접 안 짜도 3D 장면을 구성할 수 있다 |
+| **PixiJS** | 2D 그래픽에 특화된 고성능 렌더러 (WebGL을 2D 용도로 활용) |
+| **Babylon.js** | Three.js와 비슷한 3D 엔진, 게임 개발에 특화된 기능이 많다 |
+
+이 시리즈에서 WebGL 문법 자체를 깊게 다루지 않는 이유가 이거다. **"WebGL이 뭘 가능하게 하는지" 이해하고,
+실제로 무언가 만들 때는 이런 라이브러리로 시작하는 게 현실적이다.**
+</Callout>
+
+## WebGPU — 그다음 이야기
+
+<Callout type="info">
+WebGL의 뒤를 잇는 차세대 표준으로 **WebGPU**가 있다. WebGL이 오래된 OpenGL ES 기반이라면,
+WebGPU는 최신 그래픽 API(Vulkan, Metal, Direct3D 12)의 개념을 반영해 설계됐고, 3D 그래픽뿐 아니라
+범용 GPU 연산(머신러닝 등)에도 쓸 수 있게 설계됐다.
+
+주요 브라우저에 순차적으로 도입되는 중이며, 당장 실무에서 WebGL을 대체할 정도는 아니지만
+"다음 세대 웹 그래픽 표준"으로 기억해두면 좋다.
+</Callout>
+
+## 언제 Canvas 2D, 언제 WebGL인가
+
+| 필요한 것 | 선택 |
+| --- | --- |
+| 차트, 그림판, 간단한 이미지 편집 | **Canvas 2D**로 충분하다 |
+| 수백~수천 개 요소를 부드럽게 움직이는 시각화 | WebGL 기반 라이브러리(PixiJS 등) 고려 |
+| 3D 제품 뷰어, 게임, 인터랙티브 3D 웹사이트 | **Three.js** 등 WebGL 라이브러리 |
+
+<Callout type="default">
+판단 기준은 단순하다. **평면적인 작업이면 2D로 시작**하고, 성능이 실제로 부족해지거나 3D가 필요해질 때
+WebGL 기반 도구로 넘어간다. 처음부터 WebGL로 시작할 필요는 거의 없다.
+</Callout>
+
+## 정리
+
+<Callout type="default">
+- WebGL은 같은 `<canvas>`에서 `getContext('webgl2')`로 얻는 **또 다른 컨텍스트**다
+- Canvas 2D는 CPU가, WebGL은 **GPU**가 그림을 계산한다
+- WebGL은 브라우저용 **OpenGL ES**이며, 명세를 Khronos Group이 관리한다
+- 그리기 로직은 GLSL이라는 별도 언어로 짠 **셰이더**로 GPU에 전달한다
+- 실무에서는 WebGL을 직접 짜기보다 **Three.js, PixiJS** 같은 라이브러리를 주로 쓴다
+- 차세대 표준으로 **WebGPU**가 뒤를 잇고 있다
+</Callout>
+
+이걸로 Canvas·그래픽 파트를 마친다. 다음 파트부터는 접근성·성능·SEO처럼 사이트 품질을 챙기는 주제로 넘어간다.
+
+## 참고 자료
+
+- [MDN — WebGL API](https://developer.mozilla.org/ko/docs/Web/API/WebGL_API)
+- [MDN — WebGL 시작하기](https://developer.mozilla.org/ko/docs/Web/API/WebGL_API/Getting_started_with_WebGL)
+- [Three.js 공식 사이트](https://threejs.org/)
+- [MDN — WebGPU API](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API)
+- [Khronos Group — WebGL 명세](https://www.khronos.org/webgl/)

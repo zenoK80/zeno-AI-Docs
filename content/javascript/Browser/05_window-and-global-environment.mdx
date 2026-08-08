@@ -1,0 +1,139 @@
+---
+title: '05. window와 브라우저 전역 환경'
+description: '브라우저 자바스크립트의 최상위 객체 window의 정체와, 최상위 변수 선언이 window와 맺는 관계를 이해한다.'
+---
+
+## window와 브라우저 전역 환경
+
+지금까지 `document.querySelector`, `console.log` 같은 것들을 아무 설명 없이 그냥 썼다.
+사실 이들은 전부 **`window`라는 객체에 속한 것들**이다. 이번 편에서 그 정체를 본다.
+
+## window — 브라우저 자바스크립트의 최상위 객체
+
+브라우저에서 자바스크립트를 실행하면, **`window`라는 전역 객체가 자동으로 만들어져 있다.**
+지금까지 아무렇지 않게 썼던 것들이 사실 전부 이 객체에 매달려 있었다.
+
+```js
+console.log(window.document)    // document — 사실은 window.document
+console.log(window.console)     // console — 사실은 window.console
+console.log(window.location)    // 현재 페이지 주소 정보
+console.log(window.navigator)   // 브라우저 정보
+```
+
+`window.`을 생략해도 동작하는 이유는, **자바스크립트가 이름을 찾을 때 마지막에 항상 전역 객체를 확인**하기 때문이다.
+
+```js
+document.title === window.document.title   // true
+```
+
+<Callout type="important">
+**`document`는 언어 문법이 아니라 `window`의 프로퍼티 중 하나였다.** 1편에서 본 "Web API는 브라우저가 주는 능력"이라는 말이
+구체적으로는 **"`window` 객체에 붙어 있는 것들"** 이라는 뜻이었다.
+</Callout>
+
+## window에는 무엇이 들어있나
+
+크게 네 부류로 나눠볼 수 있다.
+
+| 부류 | 예시 | 비고 |
+| --- | --- | --- |
+| **DOM 진입점** | `window.document` | 문서 조작의 시작점. Part 2에서 집중 학습 |
+| **BOM**<sup>Browser Object Model</sup> | `window.location`, `window.navigator`, `window.history` | 브라우저 자체의 정보·제어. Part 6에서 다룸 |
+| **타이머·대화상자** | `window.setTimeout`, `window.alert` | 시간 지연 실행, 사용자 알림 |
+| **창 정보** | `window.innerWidth`, `window.scrollY` | 뷰포트 크기, 스크롤 위치 |
+
+지금 전부 외울 필요는 없다. **"모르는 이름이 나오면 `window`에 있는 것부터 의심해본다"** 는 감각만 챙기면 된다.
+
+```js
+console.log(Object.keys(window).length)   // 수백 개가 나온다 — 이게 전부 window의 프로퍼티다
+```
+
+## 콘솔에서 window 뜯어보기
+
+<Callout type="default">
+개발자 도구 콘솔에 `window`만 입력하고 Enter를 눌러보자. 펼쳐 보면 지금까지 무심코 썼던 이름들이
+전부 이 객체 안에 있다는 걸 직접 확인할 수 있다.
+</Callout>
+
+## 최상위 변수 선언과 window의 관계
+
+여기서 흥미로운 함정이 하나 있다. **최상위(어떤 함수·블록에도 속하지 않은 곳)에서 `var`로 선언한 변수는 `window`의 프로퍼티가 된다.**
+
+```js
+var siteName = '내 사이트'
+console.log(window.siteName)   // '내 사이트' — var는 window에 등록된다
+```
+
+<Callout type="warning">
+그런데 `let`, `const`는 그렇지 않다.
+
+```js
+let version = 1
+console.log(window.version)   // undefined — let/const는 window에 안 붙는다
+```
+
+`let`/`const`로 선언한 변수도 최상위 스코프에는 존재하지만, `window`의 프로퍼티로 노출되지는 않는다.
+이 차이가 3편에서 "`var`를 쓰지 않는다"고 한 이유 중 하나를 더 보여준다. **의도치 않게 전역 객체를 오염시키는 걸 `let`/`const`가 막아준다.**
+</Callout>
+
+## globalThis — 환경을 가리지 않는 이름
+
+`window`는 **브라우저 전용** 이름이다. 2편에서 본 것처럼, Node.js에는 `window`가 없다.
+
+```js
+// Node.js에서
+console.log(window)   // ReferenceError: window is not defined
+```
+
+그런데 "지금 환경의 전역 객체"를 환경과 무관하게 가리키고 싶을 때가 있다. 이를 위해 ES2020에서 `globalThis`가 추가됐다.
+
+```js
+console.log(globalThis === window)   // 브라우저에서: true
+```
+
+<Tabs items={['브라우저', 'Node.js']}>
+<Tabs.Tab>
+
+```js
+globalThis === window   // true
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```js
+globalThis === window   // ReferenceError (window 자체가 없음)
+globalThis === global   // true — Node.js에서는 global이 전역 객체다
+```
+
+</Tabs.Tab>
+</Tabs>
+
+<Callout type="info">
+환경에 상관없이 동작해야 하는 라이브러리 코드에서는 `window` 대신 `globalThis`를 쓰는 게 안전하다.
+2편에서 본 `typeof window !== 'undefined'` 체크도, `globalThis`를 쓰면 더 간단히 대체할 수 있는 경우가 많다.
+</Callout>
+
+## self — Worker에서 만나는 또 다른 이름
+
+<Callout type="info">
+Web Worker 안에서는 `window`가 없는 대신 `self`가 전역 객체를 가리킨다. 지금은 이런 이름이 있다는 것만 알아두고,
+Worker 자체는 Part 10에서 자세히 다룬다.
+</Callout>
+
+## 정리
+
+<Callout type="default">
+- `window`는 브라우저 자바스크립트의 **전역 객체**다. `document`, `console` 등은 전부 그 프로퍼티다
+- `window.`을 생략해도 동작하는 건 이름 찾기가 결국 전역 객체까지 올라가기 때문이다
+- 최상위에서 **`var`로 선언한 변수는 `window`에 등록**되지만 `let`/`const`는 그렇지 않다
+- `window`는 브라우저 전용 이름이다. 환경을 가리지 않는 전역 객체는 **`globalThis`**로 가리킨다
+</Callout>
+
+다음 편부터는 `window` 안의 여러 갈래 중 하나인 **BOM·DOM·CSSOM**이 서로 어떻게 관계 맺는지 정리한다.
+
+## 참고 자료
+
+- [MDN — Window](https://developer.mozilla.org/ko/docs/Web/API/Window)
+- [MDN — globalThis](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/globalThis)
+- [WHATWG HTML — Window 객체 명세](https://html.spec.whatwg.org/multipage/nav-history-apis.html#window)

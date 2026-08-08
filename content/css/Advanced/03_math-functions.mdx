@@ -1,0 +1,155 @@
+---
+title: '03. calc()·clamp()·min()·max()로 계산하기'
+description: 'CSS 값 안에서 직접 계산하고 범위를 제한하는 수학 함수를 익히고, 유동적인 타이포그래피에 적용해 본다.'
+---
+
+## calc()·clamp()·min()·max()로 계산하기
+
+"패딩은 부모 너비의 절반에서 10px을 뺀 값으로" 같은 요구는 예전엔 자바스크립트가 필요했다.
+지금은 CSS 값 안에서 **직접 계산**할 수 있다.
+
+## calc() — 서로 다른 단위를 섞어 계산하기
+
+```css
+.box {
+  width: calc(100% - 40px);
+}
+```
+
+`calc()`의 진짜 쓸모는 **단위가 다른 값끼리 계산**할 수 있다는 데 있다. `%`와 `px`는 원래 더할 수 없는 값인데,
+`calc()` 안에서는 가능하다.
+
+```css
+.sidebar {
+  width: calc(100vw / 3);         /* 뷰포트 너비의 1/3 */
+}
+
+.content {
+  height: calc(100vh - 60px);     /* 뷰포트 높이에서 헤더 높이만큼 뺀 값 */
+}
+
+.gap-fix {
+  margin-top: calc(-1 * var(--spacing));   /* CSS 변수에 음수를 곱하기 */
+}
+```
+
+<Callout type="info">
+연산자(`+`, `-`, `*`, `/`) 앞뒤에는 **반드시 공백**이 있어야 한다. `calc(100% -40px)`은
+"100%에서 -40px을 뺀다"가 아니라 파싱 에러가 난다. `-40px` 자체가 하나의 값으로 오해되기 때문이다.
+</Callout>
+
+## min() / max() — 둘 중 하나를 고르기
+
+```css
+.box {
+  width: min(90%, 600px);   /* 둘 중 더 작은 값 — 작은 화면에선 90%, 큰 화면에선 600px로 고정 */
+}
+```
+
+```css
+.box {
+  width: max(50%, 300px);   /* 둘 중 더 큰 값 — 최소 300px은 보장 */
+}
+```
+
+<Callout type="default">
+**직관 뒤집기 주의**: "최대 너비를 제한"하고 싶으면 `max-width`가 아니라 **`min()`** 을 쓰는 경우가 많다.
+`min(90%, 600px)`은 "90%와 600px 중 작은 쪽" → 결과적으로 **600px을 넘지 않으면서 작은 화면에선 유동적**이 된다.
+이름과 결과가 반대로 느껴지기 쉬우니 실제 값을 넣어보며 감을 잡자.
+</Callout>
+
+## clamp() — 최솟값과 최댓값 사이에서 유동적으로
+
+`min()`과 `max()`를 조합해서 자주 쓰는 패턴을 하나로 합친 게 `clamp()`다.
+
+```css
+clamp(최솟값, 기본값, 최댓값)
+```
+
+```css
+.title {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+}
+```
+
+이 한 줄의 의미는 이렇다.
+
+- 화면이 작을 때: `4vw`가 `1.5rem`보다 작아지면 → **`1.5rem`으로 고정** (더 작아지지 않음)
+- 화면이 클 때: `4vw`가 `3rem`보다 커지면 → **`3rem`으로 고정** (더 커지지 않음)
+- 그 사이: **`4vw`(뷰포트 너비에 비례)** 로 부드럽게 변한다
+
+<Callout type="important">
+`clamp()`는 **미디어 쿼리 여러 개로 폰트 크기를 단계별로 바꾸던 걸 한 줄로 대체**한다.
+"768px에서 18px, 1024px에서 22px, ..." 처럼 계단식으로 커지는 대신 **화면 크기에 따라 연속적으로** 커진다.
+반응형 타이포그래피(Fluid Typography)의 표준적인 구현 방법이다.
+</Callout>
+
+### 실전 예 — 유동적인 여백
+
+```css
+.section {
+  padding-inline: clamp(1rem, 5vw, 4rem);
+}
+```
+
+작은 화면에서는 여백이 최소 `1rem`, 큰 화면에서는 최대 `4rem`으로 제한되면서, 그 사이는 화면 너비에 비례해 자연스럽게 늘어난다.
+
+## round() — 값을 반올림하기
+
+비교적 최근에 추가된 함수로, 계산 결과를 특정 단위에 맞춰 반올림한다.
+
+```css
+width: round(105px, 10px);    /* 110px — 10px 단위로 가장 가까운 값 */
+width: round(up, 101px, 10px);   /* 110px — 항상 올림 */
+width: round(down, 109px, 10px); /* 100px — 항상 내림 */
+```
+
+<Callout type="info">
+**Baseline 2024 (Newly available)** — 최신 브라우저에서 지원한다. 격자 형태의 레이아웃에서 요소 크기를
+특정 단위(그리드 셀 크기 등)에 맞춰 딱 떨어지게 만들 때 유용하다. 지원이 아직 폭넓지 않으니 실무 도입 전 대상 브라우저를 확인한다.
+</Callout>
+
+## 함수를 중첩해서 쓰기
+
+이 함수들은 서로 안에 넣어 조합할 수 있다.
+
+```css
+.card {
+  width: clamp(300px, calc(50% - 2rem), 500px);
+}
+```
+
+"부모의 절반에서 2rem을 뺀 값을 기본으로 하되, 300px보다 작아지거나 500px보다 커지지는 않게" 라는 뜻이다.
+
+<Callout type="warning">
+**흔한 실수 — 단위 없는 숫자와 섞기**
+
+```css
+/* 에러 — 3은 단위가 없어서 계산이 안 된다 */
+width: calc(100% / 3);   /* 이건 OK. 나눗셈의 오른쪽은 단위 없는 숫자여야 한다 */
+width: calc(3 * 100%);   /* 이것도 OK. 곱셈은 한쪽만 단위가 있으면 된다 */
+width: calc(100px * 100%);   /* 에러 — 곱셈에서 양쪽 다 단위가 있으면 안 된다 */
+```
+
+곱셈·나눗셈은 최소 한쪽이 **단위 없는 순수 숫자**여야 한다. 덧셈·뺄셈은 반대로 **양쪽 다 같은 종류의 단위**(또는 호환되는 단위)여야 한다.
+</Callout>
+
+## 정리
+
+<Callout type="default">
+- `calc()`는 **서로 다른 단위끼리** 계산할 수 있게 해준다 — 연산자 앞뒤 공백 필수
+- `min()`/`max()`는 여러 값 중 하나를 조건에 따라 고른다
+- `clamp(최소, 기본, 최대)`는 **유동적이면서 상하한이 있는 값**을 만든다 — 반응형 타이포그래피의 기본 도구
+- `round()`로 값을 특정 단위에 맞춰 반올림할 수 있다 (지원 확인 필요)
+- 곱셈·나눗셈은 최소 한쪽이 **단위 없는 숫자**여야 한다
+</Callout>
+
+다음 편에서는 값 계산을 넘어, 조건에 따라 다른 스타일 자체를 고르는 `if()` 함수를 다룬다.
+
+## 참고 자료
+
+- [MDN — calc()](https://developer.mozilla.org/ko/docs/Web/CSS/calc)
+- [MDN — clamp()](https://developer.mozilla.org/ko/docs/Web/CSS/clamp)
+- [MDN — min() / max()](https://developer.mozilla.org/ko/docs/Web/CSS/min)
+- [MDN — round()](https://developer.mozilla.org/en-US/docs/Web/CSS/round)
+- [web.dev — Fluid typography with clamp()](https://web.dev/articles/min-max-clamp)

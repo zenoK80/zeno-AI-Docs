@@ -1,0 +1,154 @@
+---
+title: '03. JavaScript 엔진의 동작 원리'
+description: 'V8 같은 JavaScript 엔진이 코드를 어떻게 실행하는지, 콜 스택 개념을 중심으로 이해한다.'
+---
+
+## JavaScript 엔진의 동작 원리
+
+2편에서 **렌더링 엔진**이 화면을 그리는 과정을 봤다. 이번엔 반대쪽, 우리가 짜는 코드를 실제로 실행시키는
+**JavaScript 엔진**을 본다. React 컴포넌트도 결국 함수이고, 함수가 어떻게 호출되고 끝나는지 아는 게
+나중에 렌더링·훅의 동작을 이해하는 바탕이 된다.
+
+## JavaScript 엔진이 하는 일
+
+**JavaScript 엔진**은 `.js` 코드를 읽어 실제로 실행하는 프로그램이다. 크롬·Node.js는 **V8**을,
+사파리는 **JavaScriptCore**를, 파이어폭스는 **SpiderMonkey**를 쓴다. 이름은 달라도 하는 일의 큰 흐름은 비슷하다.
+
+<Steps>
+
+### 코드를 읽는다 (파싱)
+
+`.js` 파일의 텍스트를 읽어 엔진이 이해할 수 있는 구조(추상 구문 트리)로 바꾼다.
+
+### 빠르게 실행 가능한 형태로 바꾼다 (컴파일)
+
+이 구조를 바이트코드로 바꿔 우선 실행하고, **자주 반복 실행되는 부분**은 실행 중에 더 빠른 기계어로 다시 컴파일한다.
+이 방식을 **JIT**<sup>Just-In-Time</sup> 컴파일이라 한다.
+
+### 실행한다
+
+만들어진 코드를 한 줄씩 실행한다.
+
+</Steps>
+
+<Callout type="info">
+"인터프리터 언어라 느리다"는 옛말이다. V8은 처음엔 빠르게 대충 실행하다가, 뜨겁게(자주) 호출되는 함수를 감지하면
+그 부분만 최적화된 기계어로 바꿔치기한다. React 컴포넌트처럼 **같은 함수가 반복 호출**되는 패턴은 이 최적화의 덕을 본다.
+</Callout>
+
+## 콜 스택 — 함수 호출을 기록하는 장부
+
+JavaScript 엔진이 함수 호출을 관리하는 방식을 알아야 하는 이유가 있다.
+React 컴포넌트도 결국 **함수 호출**이고, "지금 어떤 컴포넌트가 실행 중인지"를 추적하는 원리가 바로 이것이기 때문이다.
+
+엔진은 **콜 스택**<sup>Call Stack</sup>이라는 구조로 "지금 실행 중인 함수가 무엇인지"를 기록한다. 이름 그대로 **쌓이는 구조(스택)** 다.
+
+```js
+function greet() {
+  return sayHi()
+}
+
+function sayHi() {
+  return 'hi'
+}
+
+greet()
+```
+
+<Steps>
+
+### greet() 호출
+
+콜 스택: `[greet]`
+
+### greet 안에서 sayHi() 호출
+
+콜 스택: `[greet, sayHi]` — sayHi가 위에 쌓인다
+
+### sayHi가 값을 반환하고 끝난다
+
+콜 스택: `[greet]` — sayHi가 스택에서 빠진다(pop)
+
+### greet도 값을 반환하고 끝난다
+
+콜 스택: `[]` — 비었다
+
+</Steps>
+
+<Callout type="important">
+**핵심 규칙: 스택의 가장 위(마지막에 쌓인 것)가 먼저 끝나야 그 아래가 이어서 끝난다.**
+이걸 **LIFO**<sup>Last In, First Out</sup> 구조라 한다. 나중에 들어온 게 먼저 나간다.
+</Callout>
+
+## 콜 스택으로 에러 메시지 읽기
+
+콘솔에서 흔히 보는 에러의 **스택 트레이스**<sup>Stack Trace</sup>가 바로 이 콜 스택을 보여주는 것이다.
+
+```js
+function level3() {
+  throw new Error('문제 발생')
+}
+function level2() { level3() }
+function level1() { level2() }
+
+level1()
+```
+
+```
+Uncaught Error: 문제 발생
+    at level3 (script.js:2)
+    at level2 (script.js:4)
+    at level1 (script.js:5)
+    at script.js:7
+```
+
+<Callout type="info">
+에러가 난 그 순간의 콜 스택을 위에서부터 읽으면 **"어디서 시작해서 어떻게 여기까지 왔는지"** 호출 경로가 그대로 보인다.
+React 컴포넌트에서 에러가 나면, 이 스택 트레이스에 **어떤 컴포넌트 함수를 거쳐 왔는지**가 그대로 찍힌다. 지금부터 에러 메시지를 무서워하지 말고 위에서부터 읽는 습관을 들이자.
+</Callout>
+
+## 콜 스택이 꽉 차면?
+
+함수가 스스로를 멈추지 않고 계속 호출하면 콜 스택이 무한정 쌓인다.
+
+```js
+function loop() {
+  return loop()   // 끝없이 자기 자신을 호출
+}
+loop()
+// Uncaught RangeError: Maximum call stack size exceeded
+```
+
+콜 스택 크기는 무한하지 않다. 이 한계를 넘으면 **스택 오버플로우**<sup>Stack Overflow</sup> 에러가 난다.
+(개발자들이 즐겨 찾는 질문·답변 사이트 이름이 여기서 왔다.)
+
+## 왜 지금 이 얘기를 하나
+
+React 컴포넌트는 함수다. 컴포넌트 안에서 다른 컴포넌트를 호출하는 게 아니라 **JSX로 그리는** 것이지만,
+"함수가 호출되고 실행되고 반환된다"는 이 기본 원리는 그대로 적용된다.
+
+17편(렌더링 사이클)에서 "React가 컴포넌트 함수를 호출한다"는 표현이 나오는데, 이때 정확히 이 콜 스택 원리가 작동한다.
+지금 이 편의 목적은 **그 표현을 듣고 "아, 그 함수 호출 얘기구나"라고 바로 감이 오게 하는 것**이다.
+
+<Callout type="info">
+V8이 함수 호출을 얼마나 큰 단위(태스크)로 처리하고, 그 사이사이 무엇을 하는지(이벤트 루프)는 훨씬 큰 주제라 여기서 전부 다루지 않는다.
+비동기와 이벤트 루프의 정확한 원리는 33편에서, 언어 차원의 상세한 내용은 ECMAScript 시리즈 21편에서 다룬다.
+</Callout>
+
+## 정리
+
+<Callout type="default">
+- JavaScript 엔진(V8 등)은 **파싱 → 컴파일 → 실행** 순서로 코드를 처리한다
+- 자주 실행되는 코드는 **JIT**로 더 빠른 기계어로 바뀐다
+- **콜 스택**은 지금 실행 중인 함수 호출을 쌓아 관리하는 구조다(LIFO)
+- 에러의 **스택 트레이스**는 콜 스택을 그대로 보여주는 것이다
+- 함수가 멈추지 않고 계속 호출되면 **스택 오버플로우**가 난다
+</Callout>
+
+다음 편에서는 실제로 React를 실행할 환경을 CDN과 Babel로 직접 만들어 보며, 지금까지의 개념을 눈으로 확인한다.
+
+## 참고 자료
+
+- [MDN — 콜 스택](https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Call_stack)
+- [V8 공식 블로그 — Ignition과 TurboFan](https://v8.dev/blog/launching-ignition-and-turbofan)
+- [MDN — 스택 오버플로우](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/InternalError)
