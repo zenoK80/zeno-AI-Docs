@@ -1,0 +1,274 @@
+.quiz {
+  margin: 1.25rem 0 2rem;
+  border: 1px solid var(--docs-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--background) 94%, var(--x-color-gray-100));
+  padding: 1.25rem;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.questionNumber {
+  color: var(--x-color-primary-600);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.questionType {
+  border: 1px solid var(--docs-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  color: var(--x-color-gray-600);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+}
+
+.question {
+  width: 100%;
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.65;
+}
+
+.options {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3rem;
+  cursor: pointer;
+  border: 1px solid var(--docs-border);
+  border-radius: 6px;
+  background: var(--background);
+  padding: 0.7rem 0.8rem;
+  color: var(--foreground);
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.option:hover {
+  border-color: var(--x-color-primary-500);
+  background: color-mix(in srgb, var(--background) 92%, var(--x-color-primary-100));
+}
+
+.option:focus-within {
+  outline: 2px solid var(--x-color-primary-500);
+  outline-offset: 2px;
+}
+
+.option:has(.radio:disabled) {
+  cursor: default;
+}
+
+.option:has(.radio:disabled):hover {
+  border-color: var(--docs-border);
+  background: var(--background);
+}
+
+.radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.marker {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--docs-border);
+  border-radius: 50%;
+  color: var(--x-color-gray-600);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.optionText {
+  min-width: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.selected {
+  border-color: var(--x-color-primary-500);
+  background: color-mix(in srgb, var(--background) 88%, var(--x-color-primary-100));
+}
+
+.selected .marker {
+  border-color: var(--x-color-primary-600);
+  background: var(--x-color-primary-600);
+  color: white;
+}
+
+.correct,
+.option:has(.radio:disabled).correct:hover {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+
+.correct .marker {
+  border-color: #15803d;
+  background: #15803d;
+  color: white;
+}
+
+.incorrect,
+.option:has(.radio:disabled).incorrect:hover {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.incorrect .marker {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: white;
+}
+
+.feedback {
+  margin-top: 1rem;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.feedbackCorrect {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #14532d;
+}
+
+.feedbackIncorrect {
+  border-color: #fca5a5;
+  background: #fef2f2;
+  color: #7f1d1d;
+}
+
+.result {
+  margin: 0;
+  font-weight: 750;
+}
+
+.explanation {
+  margin: 0.55rem 0 0;
+  line-height: 1.65;
+}
+
+.optionReview {
+  margin-top: 0.9rem;
+  border-top: 1px solid currentColor;
+  padding-top: 0.8rem;
+}
+
+.optionReviewTitle {
+  margin: 0 0 0.45rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.optionReview ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.optionReview li {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.retryButton {
+  margin-top: 1rem;
+  cursor: pointer;
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  background: transparent;
+  padding: 0.45rem 0.75rem;
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.retryButton:hover {
+  background: rgb(255 255 255 / 55%);
+}
+
+.retryButton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+:global(html.dark) .quiz {
+  background: color-mix(in srgb, var(--background) 94%, var(--x-color-gray-800));
+}
+
+:global(html.dark) .correct,
+:global(html.dark) .option:has(.radio:disabled).correct:hover {
+  border-color: #22c55e;
+  background: rgb(20 83 45 / 35%);
+}
+
+:global(html.dark) .incorrect,
+:global(html.dark) .option:has(.radio:disabled).incorrect:hover {
+  border-color: #ef4444;
+  background: rgb(127 29 29 / 35%);
+}
+
+:global(html.dark) .feedbackCorrect {
+  border-color: #22c55e;
+  background: rgb(20 83 45 / 42%);
+  color: #dcfce7;
+}
+
+:global(html.dark) .feedbackIncorrect {
+  border-color: #ef4444;
+  background: rgb(127 29 29 / 42%);
+  color: #fee2e2;
+}
+
+:global(html.dark) .retryButton:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+@media (max-width: 640px) {
+  .quiz {
+    padding: 1rem;
+  }
+
+  .option {
+    align-items: start;
+    padding: 0.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option {
+    transition: none;
+  }
+}

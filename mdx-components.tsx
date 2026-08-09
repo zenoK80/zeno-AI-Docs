@@ -17,6 +17,7 @@ import {
 } from 'nextra/components'
 import { DocsTab, DocsTabs } from './app/components/docs-tabs'
 import { DocsBreadcrumb } from './app/components/docs-breadcrumb'
+import { Quiz } from './app/components/quiz'
 
 const themeComponents = getThemeComponents()
 const ThemeWrapper = themeComponents.wrapper
@@ -40,6 +41,7 @@ export function useMDXComponents(components = {}) {
     ImageZoom,
     Playground,
     Popup,
+    Quiz,
     Search,
     Select,
     Steps,
