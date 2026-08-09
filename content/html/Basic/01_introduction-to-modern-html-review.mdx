@@ -11,27 +11,55 @@ description: 'HTML의 역할, 시맨틱 요소, Living Standard와 브라우저 
 
 **Q1. HTML이 프로그래밍 언어가 아니라 마크업 언어인 이유는 무엇인가?**
 
-<Collapse title="정답 보기">
-HTML은 계산이나 조건 판단을 수행하는 대신 콘텐츠의 구조와 의미를 표시하기 때문이다.
-</Collapse>
+<Quiz>
+  <Quiz.Option>문법이 너무 단순해서 프로그래밍 언어로 인정받지 못해서</Quiz.Option>
+  <Quiz.Option correct>계산이나 조건 판단을 수행하는 대신 콘텐츠의 구조와 의미를 표시하기 때문에</Quiz.Option>
+  <Quiz.Option>브라우저에서만 실행되고 서버에서는 실행할 수 없어서</Quiz.Option>
+  <Quiz.Option>변수를 선언할 수 없는 언어는 전부 마크업 언어로 분류되기 때문에</Quiz.Option>
+
+  <Quiz.Explanation>
+  프로그래밍 언어는 조건문·반복문 같은 **로직**을 수행하지만, HTML은 "이 부분은 제목이다, 이 부분은 목록이다"처럼 콘텐츠의 구조와 의미만 표시한다. 그래서 프로그래밍 언어가 아니라 마크업 언어로 분류된다. 문법의 단순함이나 실행 환경은 이 분류 기준과 관계없다.
+  </Quiz.Explanation>
+</Quiz>
 
 **Q2. 제목처럼 크게 보이는 `<p>`와 `<h1>`은 기계에게도 같은 의미인가?**
 
-<Collapse title="정답 보기">
-아니다. `<h1>`은 최상위 제목이라는 의미를 전달하지만, 스타일만 키운 `<p>`는 여전히 일반 문단이다.
-</Collapse>
+<Quiz>
+  <Quiz.Option>그렇다. 화면에 보이는 크기가 같으면 브라우저도 같은 요소로 취급한다</Quiz.Option>
+  <Quiz.Option correct>아니다. `<h1>`은 최상위 제목이라는 의미를 전달하지만, 스타일만 키운 `<p>`는 여전히 일반 문단이다</Quiz.Option>
+  <Quiz.Option>`<h1>`과 `<p>`는 CSS로 크기를 바꾸는 순간 태그 이름도 자동으로 바뀐다</Quiz.Option>
+  <Quiz.Option>스크린 리더는 글자 크기만 보고 제목인지 아닌지 판단한다</Quiz.Option>
+
+  <Quiz.Explanation>
+  CSS는 **겉모습**만 바꾸고, 태그가 가진 **의미**는 그대로 남는다. `font-size`를 아무리 키워도 `<p>`는 여전히 "그냥 문단"이라는 뜻이고, 스크린 리더(화면을 읽어주는 보조 기술) 같은 기계는 글자 크기가 아니라 태그 이름으로 제목 여부를 판단한다.
+  </Quiz.Explanation>
+</Quiz>
 
 **Q3. HTML6이 나오지 않는 이유는 무엇인가?**
 
-<Collapse title="정답 보기">
-현재 HTML은 버전을 끊어 발표하지 않고 WHATWG의 HTML Living Standard로 계속 갱신되기 때문이다.
-</Collapse>
+<Quiz>
+  <Quiz.Option>HTML5 이후로는 더 이상 추가할 기능이 남지 않아서</Quiz.Option>
+  <Quiz.Option>브라우저 제조사들이 새 버전에 합의하지 못해 표준 자체가 폐지돼서</Quiz.Option>
+  <Quiz.Option correct>현재 HTML은 버전을 끊어 발표하지 않고 WHATWG의 HTML Living Standard로 계속 갱신되기 때문에</Quiz.Option>
+  <Quiz.Option>HTML은 프로그래밍 언어가 아니라서 애초에 버전을 매기지 않는 규칙이라서</Quiz.Option>
 
-**Q4. `<div onclick="...">`보다 `<button>`을 우선해야 하는 이유를 두 가지 말해 보자.**
+  <Quiz.Explanation>
+  **HTML Living Standard**<sup>Living Standard, "완성된 버전"을 못 박지 않고 계속 갱신되는 표준 문서</sup>는 HTML5처럼 큰 버전을 딱 끊어서 발표하는 대신, WHATWG(주요 브라우저 제조사들이 모인 표준 단체)가 필요할 때마다 명세를 계속 갱신하는 방식이다. 그래서 "HTML6"이라는 다음 버전 자체가 존재하지 않는다.
+  </Quiz.Explanation>
+</Quiz>
 
-<Collapse title="정답 보기">
-`button`은 기본적으로 키보드 포커스와 활성화 동작을 제공하고, 보조 기술에 버튼이라는 의미를 전달한다.
-</Collapse>
+**Q4. `<div onclick="...">`보다 `<button>`을 우선해야 하는 이유는 무엇인가?**
+
+<Quiz>
+  <Quiz.Option>`<button>`이 `<div>`보다 CSS로 스타일링하기 더 쉬워서</Quiz.Option>
+  <Quiz.Option>`<div>`는 클릭 이벤트를 아예 지원하지 않기 때문에</Quiz.Option>
+  <Quiz.Option correct>`<button>`은 기본적으로 키보드 포커스와 활성화 동작을 제공하고, 보조 기술에 버튼이라는 의미를 전달하기 때문에</Quiz.Option>
+  <Quiz.Option>`<button>`을 쓰면 자바스크립트 없이도 값이 서버로 자동 전송되기 때문에</Quiz.Option>
+
+  <Quiz.Explanation>
+  `<button>`은 별도 코드 없이도 Tab 키로 포커스가 오고, Enter나 Space로 클릭을 실행할 수 있으며, 스크린 리더에 "버튼"이라고 읽힌다. `<div onclick="...">`는 이 접근성 기능을 전부 개발자가 직접 구현해야 한다. `<div>`도 클릭 이벤트 자체는 잘 동작하므로, 문제는 이벤트 지원 여부가 아니라 접근성 기본값의 차이다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 실습 — 의미만 보고 태그 고르기
 

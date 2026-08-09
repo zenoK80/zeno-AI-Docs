@@ -9,52 +9,46 @@ description: 'JSX 문법 규칙을 4지선다 퀴즈로 점검하고, 틀린 JSX
 
 JSX에서 `class` 대신 `className`을 쓰는 이유는?
 
-- A. 그냥 React 팀의 개인적인 취향이라서
-- B. `class`는 자바스크립트에서 클래스를 선언하는 예약어(이미 다른 용도로 정해진 단어)라서
-- C. `className`이 타이핑하기 더 편해서
-- D. HTML에서도 원래 `className`을 쓰기 때문에
+<Quiz>
+  <Quiz.Option>그냥 React 팀의 개인적인 취향이라서</Quiz.Option>
+  <Quiz.Option correct>`class`는 자바스크립트에서 클래스를 선언하는 예약어(이미 다른 용도로 정해진 단어)라서</Quiz.Option>
+  <Quiz.Option>`className`이 타이핑하기 더 편해서</Quiz.Option>
+  <Quiz.Option>HTML에서도 원래 `className`을 쓰기 때문에</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-JSX는 결국 `React.createElement(...)` 같은 **자바스크립트 코드로 변환**된다. 그런데 `class`는 자바스크립트에서 이미 "클래스를 선언한다"는 뜻으로 예약되어 있는 단어(예약어)라서, 속성 이름으로 그대로 쓰면 충돌이 난다. 그래서 DOM의 실제 프로퍼티 이름인 `className`을 대신 쓴다. 같은 이유로 반복문의 `for`도 `htmlFor`로 바뀐다.
-</Collapse>
+  <Quiz.Explanation>
+  JSX는 결국 `React.createElement(...)` 같은 **자바스크립트 코드로 변환**된다. 그런데 `class`는 자바스크립트에서 이미 "클래스를 선언한다"는 뜻으로 예약되어 있는 단어(예약어)라서, 속성 이름으로 그대로 쓰면 충돌이 난다. 그래서 DOM의 실제 프로퍼티 이름인 `className`을 대신 쓴다. 같은 이유로 반복문의 `for`도 `htmlFor`로 바뀐다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 2
 
 JSX의 중괄호(`{ }`) 안에 넣을 수 있는 것은?
 
-- A. `if` 문을 포함한 모든 자바스크립트 코드
-- B. 표현식(값으로 평가되는 코드)만
-- C. 오직 문자열만
-- D. 아무것도 넣을 수 없다
+<Quiz>
+  <Quiz.Option>`if` 문을 포함한 모든 자바스크립트 코드</Quiz.Option>
+  <Quiz.Option correct>표현식(값으로 평가되는 코드)만</Quiz.Option>
+  <Quiz.Option>오직 문자열만</Quiz.Option>
+  <Quiz.Option>아무것도 넣을 수 없다</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-JSX의 `{ }` 안에는 **표현식**<sup>Expression, 평가되어 하나의 값이 되는 코드</sup>만 들어갈 수 있다. `if문`은 값으로 평가되지 않는 **문**이라 그 자리에 들어갈 수 없다. 그래서 조건에 따라 다른 내용을 보여주고 싶을 때는 `if` 대신 삼항 연산자(`? :`)나 `&&`를 쓴다. 이 규칙은 4편(표현식과 문)에서 배운 원칙과 정확히 같다.
-</Collapse>
+  <Quiz.Explanation>
+  JSX의 `{ }` 안에는 **표현식**<sup>Expression, 평가되어 하나의 값이 되는 코드</sup>만 들어갈 수 있다. `if문`은 값으로 평가되지 않는 **문**이라 그 자리에 들어갈 수 없다. 그래서 조건에 따라 다른 내용을 보여주고 싶을 때는 `if` 대신 삼항 연산자(`? :`)나 `&&`를 쓴다. 이 규칙은 4편(표현식과 문)에서 배운 원칙과 정확히 같다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 3
 
 최상위 요소가 여러 개일 때, DOM에 별도 요소를 만들지 않으면서 감싸는 문법은?
 
-- A. `<div>...</div>`
-- B. `<span>...</span>`
-- C. `<>...</>` (Fragment)
-- D. `<group>...</group>`
+<Quiz>
+  <Quiz.Option>`<div>...</div>`</Quiz.Option>
+  <Quiz.Option>`<span>...</span>`</Quiz.Option>
+  <Quiz.Option correct>`<>...</>` (Fragment)</Quiz.Option>
+  <Quiz.Option>`<group>...</group>`</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **C**
-</Collapse>
-
-<Collapse title="해설 보기">
-**Fragment**(`<>...</>`)는 여러 요소를 하나로 묶어주되, 실제 화면의 DOM에는 아무 요소도 추가하지 않는 특수 문법이다. `<div>`로 감싸도 동작은 하지만, 불필요한 `<div>`가 실제 화면 구조에 남는다는 차이가 있다. React 컴포넌트는 최상위 요소를 하나만 반환할 수 있으므로(`React.createElement`가 객체 하나만 반환할 수 있기 때문), 여러 요소를 나란히 두려면 Fragment로 묶어야 한다.
-</Collapse>
+  <Quiz.Explanation>
+  **Fragment**(`<>...</>`)는 여러 요소를 하나로 묶어주되, 실제 화면의 DOM에는 아무 요소도 추가하지 않는 특수 문법이다. `<div>`로 감싸도 동작은 하지만, 불필요한 `<div>`가 실제 화면 구조에 남는다는 차이가 있다. React 컴포넌트는 최상위 요소를 하나만 반환할 수 있으므로(`React.createElement`가 객체 하나만 반환할 수 있기 때문), 여러 요소를 나란히 두려면 Fragment로 묶어야 한다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 실습 — 틀린 JSX 찾아 고치기
 

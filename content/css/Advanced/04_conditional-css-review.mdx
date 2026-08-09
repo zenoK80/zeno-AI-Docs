@@ -11,52 +11,46 @@ description: 'if() 함수의 지원 현황을 4지선다 퀴즈로 점검하고,
 
 2026년 중반 기준 `if()` 함수는 어떤 브라우저에서 지원되나?
 
-- A. 모든 주요 브라우저에서 이미 완전히 지원한다(Baseline)
-- B. Chrome·Edge 등 Chromium 계열만 지원하고, Firefox는 개발 중, Safari는 로드맵 단계다
-- C. Safari에서만 지원한다
-- D. 아직 어느 브라우저도 지원하지 않는다
+<Quiz>
+  <Quiz.Option>모든 주요 브라우저에서 이미 완전히 지원한다(Baseline)</Quiz.Option>
+  <Quiz.Option correct>Chrome·Edge 등 Chromium 계열만 지원하고, Firefox는 개발 중, Safari는 로드맵 단계다</Quiz.Option>
+  <Quiz.Option>Safari에서만 지원한다</Quiz.Option>
+  <Quiz.Option>아직 어느 브라우저도 지원하지 않는다</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-Chromium 계열(Chrome, Edge 등)에서 137 버전부터 지원을 시작했지만, Firefox는 아직 개발 중이고 Safari는 로드맵(향후 계획)에만 올라가 있는 단계다. 주요 브라우저 전부가 지원해야 붙는 **Baseline**(웹 표준 커뮤니티가 정하는 "이제 안심하고 써도 된다"는 지표) 딱지를 아직 받지 못했다.
-</Collapse>
+  <Quiz.Explanation>
+  Chromium 계열(Chrome, Edge 등)에서 137 버전부터 지원을 시작했지만, Firefox는 아직 개발 중이고 Safari는 로드맵(향후 계획)에만 올라가 있는 단계다. 주요 브라우저 전부가 지원해야 붙는 **Baseline**(웹 표준 커뮤니티가 정하는 "이제 안심하고 써도 된다"는 지표) 딱지를 아직 받지 못했다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 2
 
 `if()` 함수가 받을 수 있는 세 가지 조건 함수는?
 
-- A. `check()`, `test()`, `verify()`
-- B. `media()`, `supports()`, `style()`
-- C. `if()`, `else()`, `then()`
-- D. `width()`, `height()`, `color()`
+<Quiz>
+  <Quiz.Option>`check()`, `test()`, `verify()`</Quiz.Option>
+  <Quiz.Option correct>`media()`, `supports()`, `style()`</Quiz.Option>
+  <Quiz.Option>`if()`, `else()`, `then()`</Quiz.Option>
+  <Quiz.Option>`width()`, `height()`, `color()`</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-`media()`(뷰포트 크기 등 미디어 쿼리 조건), `supports()`(브라우저가 특정 기능을 지원하는지), `style()`(CSS 변수 값이나 컨테이너 스타일 조건) — 이 세 가지 조건을 값 하나 안에서 바로 판단할 수 있게 해준다.
-</Collapse>
+  <Quiz.Explanation>
+  `media()`(뷰포트 크기 등 미디어 쿼리 조건), `supports()`(브라우저가 특정 기능을 지원하는지), `style()`(CSS 변수 값이나 컨테이너 스타일 조건) — 이 세 가지 조건을 값 하나 안에서 바로 판단할 수 있게 해준다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 3
 
 지원이 아직 불확실한 CSS 기능을 실무에 도입할 때 지켜야 하는 원칙은?
 
-- A. 무조건 최신 기능을 우선 적용하고 나머지는 신경 쓰지 않는다
-- B. 기본값을 먼저 선언하고, `@supports`로 감싸 지원 브라우저에서만 향상된 스타일을 추가한다
-- C. 지원 브라우저가 100%가 될 때까지 절대 언급도 하지 않는다
-- D. 사용자에게 브라우저를 바꾸라고 안내한다
+<Quiz>
+  <Quiz.Option>무조건 최신 기능을 우선 적용하고 나머지는 신경 쓰지 않는다</Quiz.Option>
+  <Quiz.Option correct>기본값을 먼저 선언하고, `@supports`로 감싸 지원 브라우저에서만 향상된 스타일을 추가한다</Quiz.Option>
+  <Quiz.Option>지원 브라우저가 100%가 될 때까지 절대 언급도 하지 않는다</Quiz.Option>
+  <Quiz.Option>사용자에게 브라우저를 바꾸라고 안내한다</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-**점진적 향상**<sup>Progressive Enhancement, 기본 기능은 누구에게나 보장하고, 지원 브라우저에서는 추가로 더 나은 경험을 주는 설계 방식</sup> 원칙이다. 먼저 모든 브라우저에서 동작하는 기본값을 선언해두고, `@supports`(브라우저가 특정 기능을 지원하는지 확인하는 규칙)로 감싼 블록 안에 새 기능을 넣으면, 지원하지 않는 브라우저는 기본값만 적용받고 지원하는 브라우저는 향상된 스타일까지 받는다.
-</Collapse>
+  <Quiz.Explanation>
+  **점진적 향상**<sup>Progressive Enhancement, 기본 기능은 누구에게나 보장하고, 지원 브라우저에서는 추가로 더 나은 경험을 주는 설계 방식</sup> 원칙이다. 먼저 모든 브라우저에서 동작하는 기본값을 선언해두고, `@supports`(브라우저가 특정 기능을 지원하는지 확인하는 규칙)로 감싼 블록 안에 새 기능을 넣으면, 지원하지 않는 브라우저는 기본값만 적용받고 지원하는 브라우저는 향상된 스타일까지 받는다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 사고 실습 — 지금 당장 뭘 써야 하나
 

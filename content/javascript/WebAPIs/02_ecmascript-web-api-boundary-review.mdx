@@ -9,52 +9,46 @@ description: 'setTimeout 반환값 사례와 환경 판별 패턴을 4지선다 
 
 브라우저와 Node.js에서 `setTimeout`의 반환값 타입이 서로 다른 이유는?
 
-- A. `setTimeout`이 서로 다른 두 개의 언어 문법이기 때문에
-- B. `setTimeout`이 ECMAScript 명세에 없는 호스트 API라서, 각 실행 환경이 반환값을 어떻게 표현할지는 각자 자유이기 때문에
-- C. Node.js 쪽에 버그가 있어서
-- D. 브라우저 쪽에 버그가 있어서
+<Quiz>
+  <Quiz.Option>`setTimeout`이 서로 다른 두 개의 언어 문법이기 때문에</Quiz.Option>
+  <Quiz.Option correct>`setTimeout`이 ECMAScript 명세에 없는 호스트 API라서, 각 실행 환경이 반환값을 어떻게 표현할지는 각자 자유이기 때문에</Quiz.Option>
+  <Quiz.Option>Node.js 쪽에 버그가 있어서</Quiz.Option>
+  <Quiz.Option>브라우저 쪽에 버그가 있어서</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-`setTimeout`은 자바스크립트 "언어" 문법이 아니라, 실행 환경(브라우저나 Node.js)이 추가로 제공하는 **호스트 API**다. 언어 명세에 정해진 게 아니다 보니, 반환값을 어떤 형태로 줄지는 각 환경이 알아서 정한다. 그래서 브라우저는 숫자로, Node.js는 `Timeout`이라는 객체로 준다 — 둘 다 "틀린" 게 아니라 그냥 서로 다르게 설계된 것이다.
-</Collapse>
+  <Quiz.Explanation>
+  `setTimeout`은 자바스크립트 "언어" 문법이 아니라, 실행 환경(브라우저나 Node.js)이 추가로 제공하는 **호스트 API**다. 언어 명세에 정해진 게 아니다 보니, 반환값을 어떤 형태로 줄지는 각 환경이 알아서 정한다. 그래서 브라우저는 숫자로, Node.js는 `Timeout`이라는 객체로 준다 — 둘 다 "틀린" 게 아니라 그냥 서로 다르게 설계된 것이다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 2
 
 여러 실행 환경(브라우저, Node.js 등)에서 모두 동작해야 하는 코드를 부르는 이름은?
 
-- A. 크로스 코드
-- B. 멀티 코드
-- C. 유니버설 코드(또는 아이소몰픽 코드)
-- D. 하이브리드 코드
+<Quiz>
+  <Quiz.Option>크로스 코드</Quiz.Option>
+  <Quiz.Option>멀티 코드</Quiz.Option>
+  <Quiz.Option correct>유니버설 코드(또는 아이소몰픽 코드)</Quiz.Option>
+  <Quiz.Option>하이브리드 코드</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **C**
-</Collapse>
-
-<Collapse title="해설 보기">
-**유니버설 코드**<sup>Universal Code</sup> 또는 **아이소몰픽 코드**<sup>Isomorphic Code</sup>라고 부른다. "어느 환경에서 실행해도 통한다"는 뜻이다. 이런 코드를 짤 때는 특정 환경에만 있는 기능(`window`, `document` 등)을 쓰기 전에 먼저 그게 지금 존재하는지 확인하는 습관이 필요하다.
-</Collapse>
+  <Quiz.Explanation>
+  **유니버설 코드**<sup>Universal Code</sup> 또는 **아이소몰픽 코드**<sup>Isomorphic Code</sup>라고 부른다. "어느 환경에서 실행해도 통한다"는 뜻이다. 이런 코드를 짤 때는 특정 환경에만 있는 기능(`window`, `document` 등)을 쓰기 전에 먼저 그게 지금 존재하는지 확인하는 습관이 필요하다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 3
 
 지금 코드가 브라우저에서 실행 중인지 확인하는 흔한 방법은?
 
-- A. `if (browser === true)`
-- B. `if (typeof window !== 'undefined')`
-- C. `if (navigator.name === 'browser')`
-- D. `if (document)` (조건 없이 바로 씀)
+<Quiz>
+  <Quiz.Option>`if (browser === true)`</Quiz.Option>
+  <Quiz.Option correct>`if (typeof window !== 'undefined')`</Quiz.Option>
+  <Quiz.Option>`if (navigator.name === 'browser')`</Quiz.Option>
+  <Quiz.Option>`if (document)` (조건 없이 바로 씀)</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-`window`는 브라우저에만 있는 이름이다. `typeof window`(window의 타입을 물어보는 것)가 `'undefined'`(존재하지 않음)가 **아니라면** 지금 브라우저에서 실행 중이라고 판단할 수 있다. `typeof`를 쓰는 이유는, 만약 `window`가 아예 없는 환경(Node.js)에서 `typeof` 없이 그냥 `window`라고만 쓰면 그 줄에서 바로 에러가 나기 때문이다. `typeof`는 변수가 없어도 안전하게 "있는지 없는지"만 물어볼 수 있는 방법이다.
-</Collapse>
+  <Quiz.Explanation>
+  `window`는 브라우저에만 있는 이름이다. `typeof window`(window의 타입을 물어보는 것)가 `'undefined'`(존재하지 않음)가 **아니라면** 지금 브라우저에서 실행 중이라고 판단할 수 있다. `typeof`를 쓰는 이유는, 만약 `window`가 아예 없는 환경(Node.js)에서 `typeof` 없이 그냥 `window`라고만 쓰면 그 줄에서 바로 에러가 나기 때문이다. `typeof`는 변수가 없어도 안전하게 "있는지 없는지"만 물어볼 수 있는 방법이다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 실습 — 환경 판별 코드 짜보기
 

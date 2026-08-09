@@ -11,52 +11,46 @@ description: 'Node.js 설치와 REPL·파일 실행을 4지선다 퀴즈와 실�
 
 REPL이 정확히 무엇을 뜻하는 말인가?
 
-- A. Run, Execute, Print, Loop (실행, 처리, 출력, 반복)
-- B. Read, Eval, Print, Loop (읽고, 실행하고, 출력하고, 반복하는 것)
-- C. Real-time Execution Programming Language
-- D. Read-Only Execution Platform
+<Quiz>
+  <Quiz.Option>Run, Execute, Print, Loop (실행, 처리, 출력, 반복)</Quiz.Option>
+  <Quiz.Option correct>Read, Eval, Print, Loop (읽고, 실행하고, 출력하고, 반복하는 것)</Quiz.Option>
+  <Quiz.Option>Real-time Execution Programming Language</Quiz.Option>
+  <Quiz.Option>Read-Only Execution Platform</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-Read(코드를 한 줄 읽고) → Eval(그 자리에서 바로 실행하고, Eval은 Evaluate의 줄임말로 "계산해서 값을 낸다"는 뜻) → Print(결과를 화면에 출력하고) → Loop(이 과정을 계속 반복하는) 환경이라는 뜻이다. 브라우저 콘솔과 `node` 명령으로 여는 창 둘 다 이 방식으로 동작한다. 짧은 코드를 실험해볼 때 파일을 안 만들어도 돼서 편하다.
-</Collapse>
+  <Quiz.Explanation>
+  Read(코드를 한 줄 읽고) → Eval(그 자리에서 바로 실행하고, Eval은 Evaluate의 줄임말로 "계산해서 값을 낸다"는 뜻) → Print(결과를 화면에 출력하고) → Loop(이 과정을 계속 반복하는) 환경이라는 뜻이다. 브라우저 콘솔과 `node` 명령으로 여는 창 둘 다 이 방식으로 동작한다. 짧은 코드를 실험해볼 때 파일을 안 만들어도 돼서 편하다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 2
 
 Node.js를 가장 정확하게 설명한 것은?
 
-- A. 자바스크립트의 새로운 버전(문법이 다른 언어)
-- B. 브라우저 없이 자바스크립트를 실행시켜 주는 프로그램(런타임)
-- C. 자바스크립트 코드를 그림으로 바꿔주는 도구
-- D. 브라우저의 다른 이름
+<Quiz>
+  <Quiz.Option>자바스크립트의 새로운 버전(문법이 다른 언어)</Quiz.Option>
+  <Quiz.Option correct>브라우저 없이 자바스크립트를 실행시켜 주는 프로그램(런타임)</Quiz.Option>
+  <Quiz.Option>자바스크립트 코드를 그림으로 바꿔주는 도구</Quiz.Option>
+  <Quiz.Option>브라우저의 다른 이름</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-**런타임**<sup>Runtime</sup>이란 "프로그램을 실제로 돌아가게 해주는 실행 환경"을 뜻한다. Node.js는 언어가 아니라, 자바스크립트라는 언어를 브라우저 없이도 돌아가게 해주는 프로그램이다. 1편에서 배운 "언어(ECMAScript)와 그걸 실행시켜 주는 호스트 환경은 다르다"는 구분이 여기서도 그대로 적용된다 — 브라우저가 하나의 호스트 환경이었다면, Node.js는 또 다른 호스트 환경이다.
-</Collapse>
+  <Quiz.Explanation>
+  **런타임**<sup>Runtime</sup>이란 "프로그램을 실제로 돌아가게 해주는 실행 환경"을 뜻한다. Node.js는 언어가 아니라, 자바스크립트라는 언어를 브라우저 없이도 돌아가게 해주는 프로그램이다. 1편에서 배운 "언어(ECMAScript)와 그걸 실행시켜 주는 호스트 환경은 다르다"는 구분이 여기서도 그대로 적용된다 — 브라우저가 하나의 호스트 환경이었다면, Node.js는 또 다른 호스트 환경이다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 3
 
 Node.js 설치 시 **LTS 버전**을 권장하는 이유는?
 
-- A. 유일하게 무료로 설치할 수 있는 버전이라서
-- B. Long Term Support(장기 지원)의 줄임말로, 최신 실험 버전보다 안정적이라서
-- C. 한글을 지원하는 유일한 버전이라서
-- D. 용량이 가장 작아서
+<Quiz>
+  <Quiz.Option>유일하게 무료로 설치할 수 있는 버전이라서</Quiz.Option>
+  <Quiz.Option correct>Long Term Support(장기 지원)의 줄임말로, 최신 실험 버전보다 안정적이라서</Quiz.Option>
+  <Quiz.Option>한글을 지원하는 유일한 버전이라서</Quiz.Option>
+  <Quiz.Option>용량이 가장 작아서</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-LTS는 **Long Term Support**(장기 지원)의 줄임말이다. Node.js는 계속 새 버전이 나오는데, 그중 일부를 "당분간 오래 안정적으로 지원하겠다"고 지정한 게 LTS 버전이다. 최신 기능이 빠르게 들어간 버전(Current 버전)은 아직 검증이 덜 됐을 수 있어서, 처음 배우거나 실무에 쓸 때는 LTS가 안전하다.
-</Collapse>
+  <Quiz.Explanation>
+  LTS는 **Long Term Support**(장기 지원)의 줄임말이다. Node.js는 계속 새 버전이 나오는데, 그중 일부를 "당분간 오래 안정적으로 지원하겠다"고 지정한 게 LTS 버전이다. 최신 기능이 빠르게 들어간 버전(Current 버전)은 아직 검증이 덜 됐을 수 있어서, 처음 배우거나 실무에 쓸 때는 LTS가 안전하다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 실습 — 환경을 직접 갖추기
 

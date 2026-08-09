@@ -9,52 +9,46 @@ description: '멀티 프로세스 구조를 4지선다 퀴즈로 점검하고, �
 
 옛날(2008년 이전) 브라우저처럼 **프로세스 하나로 모든 탭을 처리하는 구조**의 가장 큰 문제는?
 
-- A. 속도가 너무 빨라서 오히려 불안정했다
-- B. 탭 하나의 스크립트가 무한 루프에 빠지면 다른 탭까지 전부 멈췄다
-- C. 메모리를 거의 안 써서 컴퓨터가 아까웠다
-- D. 특별한 문제는 없었고 그냥 유행이 지나서 바뀌었다
+<Quiz>
+  <Quiz.Option>속도가 너무 빨라서 오히려 불안정했다</Quiz.Option>
+  <Quiz.Option correct>탭 하나의 스크립트가 무한 루프에 빠지면 다른 탭까지 전부 멈췄다</Quiz.Option>
+  <Quiz.Option>메모리를 거의 안 써서 컴퓨터가 아까웠다</Quiz.Option>
+  <Quiz.Option>특별한 문제는 없었고 그냥 유행이 지나서 바뀌었다</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-**프로세스**<sup>Process, 운영체제가 독립적으로 실행하는 하나의 프로그램 단위</sup>가 하나뿐이면, 그 안의 모든 탭이 같은 메모리 공간을 나눠 쓴다. 탭 A의 코드에 문제가 생기면 격리되지 않고 탭 B, C까지 전부 영향을 받아 브라우저 전체가 멈췄다. 지금의 멀티 프로세스 구조는 바로 이 문제를 해결하려고 나왔다.
-</Collapse>
+  <Quiz.Explanation>
+  **프로세스**<sup>Process, 운영체제가 독립적으로 실행하는 하나의 프로그램 단위</sup>가 하나뿐이면, 그 안의 모든 탭이 같은 메모리 공간을 나눠 쓴다. 탭 A의 코드에 문제가 생기면 격리되지 않고 탭 B, C까지 전부 영향을 받아 브라우저 전체가 멈췄다. 지금의 멀티 프로세스 구조는 바로 이 문제를 해결하려고 나왔다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 2
 
 우리가 짜는 자바스크립트 코드는 어느 프로세스 안에서 실행되나?
 
-- A. 브라우저 프로세스(Browser Process)
-- B. 렌더러 프로세스(Renderer Process)
-- C. GPU 프로세스
-- D. 네트워크 프로세스
+<Quiz>
+  <Quiz.Option>브라우저 프로세스(Browser Process)</Quiz.Option>
+  <Quiz.Option correct>렌더러 프로세스(Renderer Process)</Quiz.Option>
+  <Quiz.Option>GPU 프로세스</Quiz.Option>
+  <Quiz.Option>네트워크 프로세스</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-**렌더러 프로세스**<sup>Renderer Process</sup>가 실제 웹페이지(HTML·CSS·JS)를 처리하는 담당이고, 탭마다 별도로 뜬다. 브라우저 프로세스는 주소창·북마크 등 브라우저 UI 전체를 총괄하는 역할이라 우리 코드와는 별개다. GPU 프로세스와 네트워크 프로세스도 각각 그래픽 처리, 네트워크 요청을 전담하는 다른 프로세스다.
-</Collapse>
+  <Quiz.Explanation>
+  **렌더러 프로세스**<sup>Renderer Process</sup>가 실제 웹페이지(HTML·CSS·JS)를 처리하는 담당이고, 탭마다 별도로 뜬다. 브라우저 프로세스는 주소창·북마크 등 브라우저 UI 전체를 총괄하는 역할이라 우리 코드와는 별개다. GPU 프로세스와 네트워크 프로세스도 각각 그래픽 처리, 네트워크 요청을 전담하는 다른 프로세스다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 3
 
 멀티 프로세스 구조로 안정성과 보안을 얻는 대신 치러야 하는 대가는?
 
-- A. 속도가 항상 느려진다
-- B. 메모리 사용량이 늘어난다
-- C. 인터넷 연결이 더 자주 끊긴다
-- D. 대가가 전혀 없다
+<Quiz>
+  <Quiz.Option>속도가 항상 느려진다</Quiz.Option>
+  <Quiz.Option correct>메모리 사용량이 늘어난다</Quiz.Option>
+  <Quiz.Option>인터넷 연결이 더 자주 끊긴다</Quiz.Option>
+  <Quiz.Option>대가가 전혀 없다</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-프로세스마다 각자 별도의 메모리 공간을 차지하기 때문에, 탭을 많이 열수록 전체 메모리 사용량이 늘어난다. 프로세스 하나짜리 구조보다 메모리는 더 쓰지만, 그 대신 한 탭의 문제가 다른 탭에 번지지 않는 안정성과, 서로의 메모리를 함부로 못 들여다보는 보안을 얻는다. 이런 "무언가를 내주고 무언가를 얻는 관계"를 **트레이드오프**<sup>Trade-off</sup>라고 부른다.
-</Collapse>
+  <Quiz.Explanation>
+  프로세스마다 각자 별도의 메모리 공간을 차지하기 때문에, 탭을 많이 열수록 전체 메모리 사용량이 늘어난다. 프로세스 하나짜리 구조보다 메모리는 더 쓰지만, 그 대신 한 탭의 문제가 다른 탭에 번지지 않는 안정성과, 서로의 메모리를 함부로 못 들여다보는 보안을 얻는다. 이런 "무언가를 내주고 무언가를 얻는 관계"를 **트레이드오프**<sup>Trade-off</sup>라고 부른다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 실습 — 작업 관리자로 직접 확인하기
 

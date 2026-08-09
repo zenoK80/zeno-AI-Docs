@@ -9,52 +9,46 @@ description: 'window와 globalThis의 관계, var와 let의 전역 등록 차이
 
 `document`, `console`은 사실 무엇의 프로퍼티(소속된 값)인가?
 
-- A. `HTML`
-- B. `window`
-- C. `Node.js`
-- D. 독립적인 존재이지 누구의 프로퍼티도 아니다
+<Quiz>
+  <Quiz.Option>`HTML`</Quiz.Option>
+  <Quiz.Option correct>`window`</Quiz.Option>
+  <Quiz.Option>`Node.js`</Quiz.Option>
+  <Quiz.Option>독립적인 존재이지 누구의 프로퍼티도 아니다</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-`window`는 브라우저 자바스크립트의 **전역 객체**<sup>Global Object, 어디서든 이름만으로 바로 접근할 수 있는 최상위 객체</sup>다. `document`, `console` 등은 사실 `window.document`, `window.console`인데, `window.`을 생략해도 되게 만들어져서 짧게 쓸 수 있는 것뿐이다.
-</Collapse>
+  <Quiz.Explanation>
+  `window`는 브라우저 자바스크립트의 **전역 객체**<sup>Global Object, 어디서든 이름만으로 바로 접근할 수 있는 최상위 객체</sup>다. `document`, `console` 등은 사실 `window.document`, `window.console`인데, `window.`을 생략해도 되게 만들어져서 짧게 쓸 수 있는 것뿐이다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 2
 
 최상위(어떤 함수 안도 아닌 곳)에서 `var siteName = 'A'`로 선언했다면, `window.siteName`의 값은?
 
-- A. `undefined`
-- B. `'A'`
-- C. 에러가 난다
-- D. `null`
+<Quiz>
+  <Quiz.Option>`undefined`</Quiz.Option>
+  <Quiz.Option correct>`'A'`</Quiz.Option>
+  <Quiz.Option>에러가 난다</Quiz.Option>
+  <Quiz.Option>`null`</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-`var`로 선언한 **최상위 변수**(함수나 블록 안이 아니라 파일 맨 바깥에서 선언한 변수)는 자동으로 `window`의 프로퍼티로 등록된다. 그래서 `window.siteName`을 확인하면 `'A'`가 그대로 나온다. 다음 문제에서 볼 것처럼 `let`/`const`는 이렇게 동작하지 않는다.
-</Collapse>
+  <Quiz.Explanation>
+  `var`로 선언한 **최상위 변수**(함수나 블록 안이 아니라 파일 맨 바깥에서 선언한 변수)는 자동으로 `window`의 프로퍼티로 등록된다. 그래서 `window.siteName`을 확인하면 `'A'`가 그대로 나온다. 다음 문제에서 볼 것처럼 `let`/`const`는 이렇게 동작하지 않는다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 3
 
 `window`와 `globalThis`의 차이를 가장 정확히 설명한 것은?
 
-- A. 완전히 똑같아서 아무 때나 바꿔 써도 된다
-- B. `window`는 브라우저 전용 이름이라 Node.js에는 없지만, `globalThis`는 환경을 가리지 않고 "지금 환경의 전역 객체"를 가리킨다
-- C. `globalThis`가 옛날 이름이고 `window`가 새로 나온 이름이다
-- D. `globalThis`는 함수에서만 쓸 수 있다
+<Quiz>
+  <Quiz.Option>완전히 똑같아서 아무 때나 바꿔 써도 된다</Quiz.Option>
+  <Quiz.Option correct>`window`는 브라우저 전용 이름이라 Node.js에는 없지만, `globalThis`는 환경을 가리지 않고 "지금 환경의 전역 객체"를 가리킨다</Quiz.Option>
+  <Quiz.Option>`globalThis`가 옛날 이름이고 `window`가 새로 나온 이름이다</Quiz.Option>
+  <Quiz.Option>`globalThis`는 함수에서만 쓸 수 있다</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-`window`는 오직 브라우저에만 존재하는 이름이다. Node.js 같은 다른 환경에는 없다. 반면 `globalThis`는 ES2020(2020년 표준)에서 추가된, **환경에 상관없이 항상 통하는** 전역 객체 이름이다. 브라우저에서는 `globalThis === window`가 `true`이고, Node.js에서는 `globalThis === global`이 `true`다. 여러 환경에서 동작해야 하는 코드(2편에서 배운 유니버설 코드)에서는 `window` 대신 `globalThis`를 쓰는 게 안전하다.
-</Collapse>
+  <Quiz.Explanation>
+  `window`는 오직 브라우저에만 존재하는 이름이다. Node.js 같은 다른 환경에는 없다. 반면 `globalThis`는 ES2020(2020년 표준)에서 추가된, **환경에 상관없이 항상 통하는** 전역 객체 이름이다. 브라우저에서는 `globalThis === window`가 `true`이고, Node.js에서는 `globalThis === global`이 `true`다. 여러 환경에서 동작해야 하는 코드(2편에서 배운 유니버설 코드)에서는 `window` 대신 `globalThis`를 쓰는 게 안전하다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 실습 — window 뜯어보기
 

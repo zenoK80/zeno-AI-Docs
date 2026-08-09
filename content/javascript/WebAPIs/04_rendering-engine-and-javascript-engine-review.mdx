@@ -9,52 +9,46 @@ description: '메인 스레드 블로킹을 4지선다 퀴즈로 점검하고, �
 
 렌더링 엔진과 JavaScript 엔진은 기본적으로 무엇을 공유하나?
 
-- A. 같은 회사가 만든 것이라는 점
-- B. 메인 스레드(Main Thread)
-- C. 같은 프로그래밍 언어로 만들어졌다는 점
-- D. 아무것도 공유하지 않는다
+<Quiz>
+  <Quiz.Option>같은 회사가 만든 것이라는 점</Quiz.Option>
+  <Quiz.Option correct>메인 스레드(Main Thread)</Quiz.Option>
+  <Quiz.Option>같은 프로그래밍 언어로 만들어졌다는 점</Quiz.Option>
+  <Quiz.Option>아무것도 공유하지 않는다</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-**메인 스레드**<sup>Main Thread, 한 번에 한 가지 작업만 순서대로 처리하는 실행 흐름</sup>를 공유한다. 그래서 JS 코드가 실행되는 동안은 화면을 다시 그릴 수 없고, 반대로 화면을 그리는 동안은 JS가 실행되지 않는다. 렌더링 엔진(Blink 등)과 JS 엔진(V8 등)은 서로 다른 소프트웨어지만, 이 스레드 하나를 나눠 쓴다는 점이 이번 편의 핵심이었다.
-</Collapse>
+  <Quiz.Explanation>
+  **메인 스레드**<sup>Main Thread, 한 번에 한 가지 작업만 순서대로 처리하는 실행 흐름</sup>를 공유한다. 그래서 JS 코드가 실행되는 동안은 화면을 다시 그릴 수 없고, 반대로 화면을 그리는 동안은 JS가 실행되지 않는다. 렌더링 엔진(Blink 등)과 JS 엔진(V8 등)은 서로 다른 소프트웨어지만, 이 스레드 하나를 나눠 쓴다는 점이 이번 편의 핵심이었다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 2
 
 렌더링과 JS 실행을 처음부터 서로 다른 스레드로 나누지 않은 이유는?
 
-- A. 기술적으로 불가능해서
-- B. 둘 다 DOM을 직접 건드리는데, 스레드가 나뉘면 동시에 DOM을 바꾸려는 충돌이 계속 발생하기 때문에
-- C. 비용이 너무 비싸서
-- D. 브라우저 회사들이 아직 그 아이디어를 생각해내지 못해서
+<Quiz>
+  <Quiz.Option>기술적으로 불가능해서</Quiz.Option>
+  <Quiz.Option correct>둘 다 DOM을 직접 건드리는데, 스레드가 나뉘면 동시에 DOM을 바꾸려는 충돌이 계속 발생하기 때문에</Quiz.Option>
+  <Quiz.Option>비용이 너무 비싸서</Quiz.Option>
+  <Quiz.Option>브라우저 회사들이 아직 그 아이디어를 생각해내지 못해서</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **B**
-</Collapse>
-
-<Collapse title="해설 보기">
-DOM(문서 구조를 나타내는 객체)을 여러 스레드가 동시에 손대면, 누가 먼저 바꿨는지 꼬여버리는 **경쟁 상태**<sup>Race Condition, 여러 작업이 동시에 같은 데이터를 건드려서 결과가 뒤죽박죽되는 상황</sup>가 계속 발생한다. 이걸 안전하게 조율하는 비용이, 그냥 한 스레드에서 순서대로 처리하는 것보다 훨씬 크다고 판단해서 지금 구조로 설계됐다.
-</Collapse>
+  <Quiz.Explanation>
+  DOM(문서 구조를 나타내는 객체)을 여러 스레드가 동시에 손대면, 누가 먼저 바꿨는지 꼬여버리는 **경쟁 상태**<sup>Race Condition, 여러 작업이 동시에 같은 데이터를 건드려서 결과가 뒤죽박죽되는 상황</sup>가 계속 발생한다. 이걸 안전하게 조율하는 비용이, 그냥 한 스레드에서 순서대로 처리하는 것보다 훨씬 크다고 판단해서 지금 구조로 설계됐다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 문제 3
 
 메인 스레드가 바빠도 애니메이션이 끊기지 않을 수 있는 CSS 속성 두 가지는?
 
-- A. `width`, `height`
-- B. `left`, `top`
-- C. `transform`, `opacity`
-- D. `margin`, `padding`
+<Quiz>
+  <Quiz.Option>`width`, `height`</Quiz.Option>
+  <Quiz.Option>`left`, `top`</Quiz.Option>
+  <Quiz.Option correct>`transform`, `opacity`</Quiz.Option>
+  <Quiz.Option>`margin`, `padding`</Quiz.Option>
 
-<Collapse title="정답 보기">
-정답: **C**
-</Collapse>
-
-<Collapse title="해설 보기">
-`transform`(이동·회전·확대)과 `opacity`(투명도)는 **컴포지터**<sup>Compositor, 화면을 합성하는 별도 스레드</sup>가 처리할 수 있어서, 메인 스레드가 바쁘더라도 영향을 덜 받는다. 반면 `width`, `left`, `margin` 같은 속성은 레이아웃(요소의 위치·크기)을 다시 계산해야 해서 메인 스레드를 거쳐야 한다.
-</Collapse>
+  <Quiz.Explanation>
+  `transform`(이동·회전·확대)과 `opacity`(투명도)는 **컴포지터**<sup>Compositor, 화면을 합성하는 별도 스레드</sup>가 처리할 수 있어서, 메인 스레드가 바쁘더라도 영향을 덜 받는다. 반면 `width`, `left`, `margin` 같은 속성은 레이아웃(요소의 위치·크기)을 다시 계산해야 해서 메인 스레드를 거쳐야 한다.
+  </Quiz.Explanation>
+</Quiz>
 
 ## 실습 — 메인 스레드 블로킹 재현하기
 
