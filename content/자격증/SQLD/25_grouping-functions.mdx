@@ -1,0 +1,250 @@
+---
+title: '25. 그룹 함수'
+description: 'ROLLUP·CUBE·GROUPING SETS가 만드는 소계와 총계를 단계별 결과표로 이해한다.'
+---
+
+## 이번 편의 목표
+
+- 일반 `GROUP BY`와 다차원 그룹 함수의 결과 차이를 설명한다.
+- `ROLLUP`, `CUBE`, `GROUPING SETS`가 만드는 그룹 조합을 직접 나열한다.
+- `GROUPING` 함수로 실제 NULL과 합계 표시용 NULL을 구분한다.
+- 결과 행 수를 그룹 조합별로 예측한다.
+
+## 먼저 알아둘 말
+
+| 용어 | 쉬운 뜻 |
+| --- | --- |
+| 소계(Subtotal) | 큰 분류 안에서 작은 분류를 합한 중간 합계 |
+| 총계(Grand Total) | 모든 행을 하나로 합한 전체 값 |
+| 차원(Dimension) | 지역, 등급, 연도처럼 집계 기준이 되는 분류 열 |
+| `ROLLUP` | 적은 기준부터 차례로 접어 올리며 계층형 소계를 만드는 기능 |
+| `CUBE` | 지정한 기준의 가능한 모든 조합으로 집계하는 기능 |
+| `GROUPING SETS` | 필요한 그룹 조합만 직접 지정하는 기능 |
+| `GROUPING` | 합계 행을 만들기 위해 NULL이 표시됐는지 알려 주는 함수 |
+
+## 선수지식과 핵심 질문
+
+선수지식은 [18. GROUP BY 절](./18_group-by)과 [12. NULL 속성의 이해](./12_null-attributes)다.
+
+핵심 질문은 **상세 그룹, 소계, 총계를 한 결과에서 만들 때 어떤 그룹 조합이 추가되는가**이다.
+
+## 공통 입력 데이터
+
+주문을 지역과 상태별로 집계한다.
+
+| city | status | amount |
+| --- | --- | ---: |
+| 서울 | PAID | 100 |
+| 서울 | PAID | 50 |
+| 서울 | CANCELED | 30 |
+| 부산 | PAID | 200 |
+| 부산 | CANCELED | 20 |
+
+일반 `GROUP BY city, status`는 실제로 존재하는 상세 조합 네 개만 만든다.
+
+```sql
+SELECT city, status, SUM(amount) AS amount_sum
+FROM sales
+GROUP BY city, status;
+```
+
+| city | status | amount_sum |
+| --- | --- | ---: |
+| 서울 | PAID | 150 |
+| 서울 | CANCELED | 30 |
+| 부산 | PAID | 200 |
+| 부산 | CANCELED | 20 |
+
+## ROLLUP: 오른쪽 기준부터 접기
+
+```sql
+SELECT city, status, SUM(amount) AS amount_sum
+FROM sales
+GROUP BY ROLLUP (city, status)
+ORDER BY city, status;
+```
+
+`ROLLUP(city, status)`가 만드는 그룹 조합은 다음 세 단계다.
+
+```mermaid
+flowchart LR
+  A["city + status 상세 그룹"] --> B["status를 접어 city 소계"]
+  B --> C["city도 접어 전체 총계"]
+```
+
+오른쪽에 적은 그룹 기준부터 하나씩 제거되며, 제거된 열은 합계 행에서 `NULL`로 표시된다.
+
+```text
+(city, status)  지역·상태 상세
+(city)          지역별 소계
+()              전체 총계
+```
+
+| city | status | amount_sum | 의미 |
+| --- | --- | ---: | --- |
+| 부산 | CANCELED | 20 | 상세 |
+| 부산 | PAID | 200 | 상세 |
+| 부산 | NULL | 220 | 부산 소계 |
+| 서울 | CANCELED | 30 | 상세 |
+| 서울 | PAID | 150 | 상세 |
+| 서울 | NULL | 180 | 서울 소계 |
+| NULL | NULL | 400 | 전체 총계 |
+
+오른쪽 `status`를 먼저 접어 `city` 소계를 만들고, `city`까지 접어 총계를 만든다. `(status)`만으로 묶은 상태별 소계는 만들지 않는다.
+
+<Callout type="info">
+  ROLLUP의 열 순서는 계층 순서다. `ROLLUP(city, status)`와 `ROLLUP(status, city)`가 만드는 소계는 다르다.
+</Callout>
+
+## CUBE: 가능한 모든 조합
+
+```sql
+SELECT city, status, SUM(amount) AS amount_sum
+FROM sales
+GROUP BY CUBE (city, status);
+```
+
+두 열의 선택 여부는 각각 포함·제외 두 가지이므로 `2² = 4`개 그룹 조합을 만든다.
+
+```text
+(city, status)  상세
+(city)          지역별 소계
+(status)        상태별 소계
+()              전체 총계
+```
+
+ROLLUP 결과에 다음 상태별 소계가 추가된다.
+
+| city | status | amount_sum | 의미 |
+| --- | --- | ---: | --- |
+| NULL | PAID | 350 | 전체 지역의 PAID 합계 |
+| NULL | CANCELED | 50 | 전체 지역의 CANCELED 합계 |
+
+세 열을 CUBE하면 그룹 조합은 `2³ = 8`개다. 실제 결과 행 수는 각 조합에서 존재하는 서로 다른 그룹 수를 모두 더한 값이다.
+
+## GROUPING SETS: 필요한 조합만 고르기
+
+지역별 합계와 상태별 합계만 필요하고 상세·총계는 필요 없다고 하자.
+
+```sql
+SELECT city, status, SUM(amount) AS amount_sum
+FROM sales
+GROUP BY GROUPING SETS (
+  (city),
+  (status)
+);
+```
+
+| city | status | amount_sum |
+| --- | --- | ---: |
+| 서울 | NULL | 180 |
+| 부산 | NULL | 220 |
+| NULL | PAID | 350 |
+| NULL | CANCELED | 50 |
+
+`()`를 목록에 넣으면 총계, `(city, status)`를 넣으면 상세 조합도 추가할 수 있다. 불필요한 모든 조합을 만드는 CUBE보다 의도를 선명하게 표현한다.
+
+## 합계 표시용 NULL과 실제 NULL
+
+입력 데이터의 `city` 자체가 NULL일 수도 있다. 그러면 결과의 `city = NULL`이 미등록 지역인지, 총계 표시인지 눈으로만 구분할 수 없다.
+
+`GROUPING(city)`는 해당 열이 현재 합계 수준에서 접혀 NULL로 표시됐으면 1, 실제 그룹 열로 사용됐으면 0을 반환한다.
+
+```sql
+SELECT city,
+       status,
+       SUM(amount) AS amount_sum,
+       GROUPING(city) AS g_city,
+       GROUPING(status) AS g_status
+FROM sales
+GROUP BY ROLLUP (city, status);
+```
+
+| city | status | g_city | g_status | 의미 |
+| --- | --- | ---: | ---: | --- |
+| 서울 | PAID | 0 | 0 | 상세 |
+| 서울 | NULL | 0 | 1 | 서울 소계 |
+| NULL | NULL | 1 | 1 | 전체 총계 |
+
+실제 데이터의 status가 NULL인 상세 그룹은 `g_status = 0`이다. 이것이 단순 `COALESCE(status, '합계')`만 썼을 때 생길 수 있는 오해를 막아 준다.
+
+### 읽기 좋은 레이블 만들기
+
+```sql
+SELECT CASE WHEN GROUPING(city) = 1 THEN '전체'
+            ELSE COALESCE(city, '미등록')
+       END AS city_label,
+       CASE WHEN GROUPING(status) = 1 THEN '소계'
+            ELSE COALESCE(status, '상태없음')
+       END AS status_label,
+       SUM(amount) AS amount_sum
+FROM sales
+GROUP BY ROLLUP (city, status);
+```
+
+합계 여부를 먼저 확인하고 그다음 실제 NULL의 이름을 붙인다.
+
+## GROUPING_ID
+
+일부 DBMS는 여러 `GROUPING` 값을 비트처럼 합친 `GROUPING_ID`를 제공한다. 예를 들어 Oracle에서 `GROUPING_ID(city, status)`는 상세 0, city 소계 1, 총계 3처럼 집계 수준을 숫자로 구분할 수 있다. 비트 방향과 지원 여부는 DBMS 문서를 확인한다.
+
+## UNION ALL로 풀어 쓴 모습
+
+`ROLLUP(city, status)`는 개념적으로 다음 결과를 합친 것과 비슷하다.
+
+```sql
+SELECT city, status, SUM(amount) FROM sales GROUP BY city, status
+UNION ALL
+SELECT city, NULL, SUM(amount) FROM sales GROUP BY city
+UNION ALL
+SELECT NULL, NULL, SUM(amount) FROM sales;
+```
+
+실제 실행 방식이 반드시 세 쿼리라는 뜻은 아니다. 어떤 집계 수준이 포함되는지 이해하기 위한 전개다.
+
+## 시험에서는 어떻게 묻나
+
+- `ROLLUP(A, B)`가 `(A, B), (A), ()`를 만든다는 점을 묻는다.
+- `CUBE(A, B)`에는 `(B)`도 포함된다는 점을 비교한다.
+- `GROUPING`의 1이 원본 NULL이 아니라 합계용 NULL임을 묻는다.
+- 열 순서를 바꾼 ROLLUP의 소계 차이를 함정으로 낸다.
+
+## 짧은 확인
+
+`ROLLUP(year, quarter, month)`가 만드는 그룹 조합을 적어 보자.
+
+<Collapse title="확인하기">
+
+`(year, quarter, month)`, `(year, quarter)`, `(year)`, `()` 네 조합이다. 오른쪽 열부터 하나씩 제거한다.
+
+</Collapse>
+
+## 흔한 실수와 진단법
+
+| 실수 | 잘못된 해석 | 바로잡기 |
+| --- | --- | --- |
+| ROLLUP을 모든 조합으로 이해 | 상태별 소계도 있다고 생각 | 오른쪽부터 접은 계층만 그린다. |
+| NULL을 모두 총계로 표시 | 실제 NULL 그룹도 총계가 됨 | GROUPING 값부터 검사한다. |
+| CUBE 결과 행 수를 4행으로 고정 | 그룹별 실제 값 수를 무시 | 4는 그룹 조합 수이지 결과 행 수가 아니다. |
+| 열 순서를 무시 | 다른 소계가 생성됨 | 괄호의 왼쪽부터 계층을 적는다. |
+
+## 다음 단계: 복습
+
+[25-복습. 그룹 함수](./25_grouping-functions-review)에서 그룹 조합과 결과 행을 직접 계산하자.
+
+## 정리
+
+<Callout type="default">
+  - ROLLUP은 오른쪽 기준부터 접어 계층형 소계와 총계를 만든다.
+  - CUBE는 지정 열의 가능한 모든 그룹 조합을 만든다.
+  - GROUPING SETS는 필요한 조합만 직접 선택한다.
+  - GROUPING으로 실제 NULL과 합계 표현용 NULL을 구분한다.
+</Callout>
+
+다음 편에서는 원본 행을 유지한 채 순위와 누적 합계를 붙이는 윈도우 함수를 배운다.
+
+## 참고 자료
+
+- [PostgreSQL - GROUP BY and Grouping Operations](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-GROUP)
+- [Oracle Database - GROUPING](https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/GROUPING.html)
+- [Oracle Database - GROUPING_ID](https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/GROUPING_ID.html)

@@ -1,0 +1,145 @@
+---
+title: '15-복습. SELECT 문'
+description: 'SELECT 목록, 표현식, 별칭과 DISTINCT가 만드는 결과 열·행 수를 클릭형 문제로 점검한다.'
+---
+
+## 복습 방법
+
+FROM의 입력 행 수를 먼저 적고 SELECT 목록이 어떤 열을 만들며 DISTINCT가 어느 조합을 비교하는지 순서대로 본다.
+
+<Callout type="info">
+  SELECT에 적었다고 원본 열이 바뀌는 것은 아니다. 이번 조회 결과의 모양만 바뀐다.
+</Callout>
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"SELECT member_name, points FROM members의 결과로 옳은 설명은?"}
+  options={[
+    "members의 모든 열을 삭제하고 두 열만 남긴다.",
+    "회원 테이블에서 두 열을 결과로 보여 주며 원본 구조는 바뀌지 않는다.",
+    "두 행만 반환한다.",
+    "points가 같은 회원은 자동으로 합친다.",
+  ]}
+  correctAnswer={2}
+  explanation={"SELECT 목록은 결과 열을 정할 뿐 테이블 구조나 행을 자동 변경하지 않는다."}
+  optionExplanations={[
+    "조회는 열을 삭제하지 않는다.",
+    "정답이다.",
+    "열이 두 개라는 뜻이지 행이 두 개라는 뜻이 아니다.",
+    "DISTINCT나 GROUP BY가 없으면 같은 값도 각 행에 남는다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"points * 10 AS point_value의 설명으로 가장 적절한 것은?"}
+  options={[
+    "points 원본값을 10배로 영구 수정한다.",
+    "조회할 때 계산한 결과 열에 point_value라는 임시 이름을 붙인다.",
+    "point_value라는 새 테이블을 만든다.",
+    "points가 NULL이어도 결과는 항상 0이다.",
+  ]}
+  correctAnswer={2}
+  explanation={"표현식과 별칭은 현재 SELECT 결과를 만들며 원본 열을 UPDATE하지 않는다."}
+  optionExplanations={[
+    "영구 변경에는 UPDATE가 필요하다.",
+    "정답이다.",
+    "별칭은 테이블 생성이 아니다.",
+    "NULL을 곱한 결과는 일반적으로 NULL이다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"(서울,GOLD), (서울,SILVER), (서울,GOLD) 세 행에 SELECT DISTINCT city, grade를 적용한 결과 행 수는?"}
+  options={[
+    "1행",
+    "2행",
+    "3행",
+    "0행",
+  ]}
+  correctAnswer={2}
+  explanation={"city와 grade 조합이 같은 두 서울·GOLD 행만 합쳐져 서로 다른 조합 두 개가 남는다."}
+  optionExplanations={[
+    "city만 비교하는 것이 아니다.",
+    "정답이다.",
+    "중복 조합 한 건이 제거된다.",
+    "조건으로 행을 제거한 것이 아니다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"열 별칭에 대한 설명으로 옳은 것은?"}
+  options={[
+    "원본 테이블의 열 이름을 영구 변경한다.",
+    "현재 조회 결과에서 열을 읽기 쉽게 표시하는 이름이다.",
+    "WHERE보다 항상 먼저 데이터에 저장된다.",
+    "같은 별칭을 쓰면 모든 행이 하나로 합쳐진다.",
+  ]}
+  correctAnswer={2}
+  explanation={"별칭은 결과의 표시 이름이며 스키마 변경이나 그룹화를 수행하지 않는다."}
+  optionExplanations={[
+    "영구 변경은 ALTER TABLE 등의 작업이다.",
+    "정답이다.",
+    "별칭은 저장되는 데이터가 아니다.",
+    "행 중복 제거와 무관하다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"ORDER BY가 없는 SELECT 결과 순서에 대한 설명으로 옳은 것은?"}
+  options={[
+    "항상 기본키 오름차순이다.",
+    "항상 입력한 순서다.",
+    "DBMS가 반환한 현재 순서를 다음 실행에도 보장한다고 볼 수 없다.",
+    "DISTINCT를 쓰면 날짜순으로 정렬된다.",
+  ]}
+  correctAnswer={3}
+  explanation={"관계형 결과는 본질적인 순서가 없으며 필요한 순서는 ORDER BY로 명시한다."}
+  optionExplanations={[
+    "인덱스와 실행계획에 따라 달라질 수 있다.",
+    "저장 순서가 결과 순서 보장은 아니다.",
+    "정답이다.",
+    "DISTINCT는 중복 제거이지 정렬 요구가 아니다.",
+  ]}
+/>
+
+## 직접 적용하기
+
+다음 데이터에 SQL을 적용한 결과를 적어 보자.
+
+| member_name | city | points |
+| --- | --- | ---: |
+| 민지 | 서울 | 1,200 |
+| 준호 | 부산 | 500 |
+| 소라 | 서울 | 800 |
+
+```sql
+SELECT DISTINCT city,
+       points * 2 AS doubled_points
+FROM members;
+```
+
+<Collapse title="풀이 보기">
+
+| city | doubled_points |
+| --- | ---: |
+| 서울 | 2,400 |
+| 부산 | 1,000 |
+| 서울 | 1,600 |
+
+서울이 두 번이어도 doubled_points가 다르므로 `(city, doubled_points)` 조합은 모두 다르다. 따라서 DISTINCT가 제거하는 행은 없고 결과는 3행 2열이다.
+
+</Collapse>
+
+## 결과 점검
+
+- 5개 정답: SELECT 목록만 보고 결과 열과 별칭을 설명한다.
+- 3~4개 정답: DISTINCT가 열 조합 전체를 비교한다는 점을 다시 확인한다.
+- 0~2개 정답: 입력 한 행마다 표현식을 직접 계산한다.
+
+[본문으로 돌아가기](./15_select-statement)

@@ -1,0 +1,237 @@
+---
+title: '12. NULL 속성의 이해'
+description: 'NULL이 0이나 빈 문자열과 다른 이유, UNKNOWN 논리와 IS NULL·COUNT·연산 결과를 작은 테이블로 이해한다.'
+---
+
+## 이번 편의 목표
+
+- NULL을 0, 공백, 빈 문자열과 구분한다.
+- 비교식에 NULL이 들어갈 때 UNKNOWN이 되는 이유를 설명한다.
+- `IS NULL`, `IS NOT NULL`로 올바르게 조건을 작성한다.
+- NULL이 산술 연산과 `COUNT(*)`, `COUNT(column)` 결과에 미치는 영향을 예측한다.
+
+## 먼저 알아둘 말
+
+| 용어 | 쉬운 뜻 |
+| --- | --- |
+| NULL | 값이 없거나 아직 알 수 없음을 나타내는 특별한 표시 |
+| UNKNOWN | SQL 조건의 결과가 참인지 거짓인지 알 수 없는 상태 |
+| 3값 논리 | TRUE·FALSE·UNKNOWN 세 결과로 조건을 판단하는 방식 |
+| 공백 | 실제로 저장된 한 칸 이상의 문자 |
+| 빈 문자열 | 길이가 0인 문자열. Oracle에서는 NULL처럼 취급될 수 있음 |
+| NULL 확장 | 외부 조인에서 짝 없는 쪽 열을 NULL로 채우는 것 |
+
+## 선수지식과 핵심 질문
+
+10편에서 LEFT JOIN은 짝이 없는 오른쪽 열을 NULL로 채운다고 배웠다.
+
+> 배송일이 NULL인 주문은 배송일이 0이라는 뜻일까, 배송되지 않았다는 뜻일까?
+
+## NULL은 값 하나가 아니다
+
+다음 주문 데이터를 보자.
+
+| order_id | status | shipped_at | discount_amount |
+| ---: | --- | --- | ---: |
+| 1001 | SHIPPED | 2026-08-03 | 0 |
+| 1002 | PAID | NULL | 3,000 |
+| 1003 | PAID | NULL | NULL |
+
+- 주문 1001의 할인금액 `0`은 **할인하지 않았다는 알려진 숫자**다.
+- 주문 1002의 배송일 NULL은 **아직 배송되지 않아 날짜가 없음**을 뜻한다.
+- 주문 1003의 할인금액 NULL은 아직 할인 여부를 정하지 않았거나 값을 모른다는 뜻일 수 있다.
+
+| 표현 | 실제 값인가? | 의미 예 |
+| --- | --- | --- |
+| `0` | 예 | 할인금액이 정확히 0원 |
+| `' '` | 예 | 공백 문자 한 칸 |
+| `''` | DBMS에 따라 다름 | 길이 0 문자열. Oracle은 NULL 취급 |
+| `NULL` | 일반 값이 아님 | 미정·미상·해당 없음 |
+
+<Callout type="warning">
+  NULL의 업무 의미를 하나로 단정하지 않는다. `미정`, `미상`, `해당 없음`이 한 열에 섞이면 해석하기 어려우므로 상태 열이나 별도 규칙이 필요할 수 있다.
+</Callout>
+
+## NULL은 등호로 비교하지 않는다
+
+다음 SQL은 원하는 결과를 내지 못한다.
+
+```sql
+SELECT order_id
+FROM orders
+WHERE shipped_at = NULL;
+```
+
+NULL은 비교할 실제 값이 아니므로 `shipped_at = NULL`은 TRUE가 아니라 UNKNOWN이다. WHERE는 TRUE인 행만 남기므로 결과는 0행이다.
+
+| order_id | `shipped_at = NULL` 평가 | WHERE 통과? |
+| ---: | --- | --- |
+| 1001 | UNKNOWN | 아니오 |
+| 1002 | UNKNOWN | 아니오 |
+| 1003 | UNKNOWN | 아니오 |
+
+NULL 여부는 `IS NULL`로 검사한다.
+
+```sql
+SELECT order_id, status
+FROM orders
+WHERE shipped_at IS NULL;
+```
+
+| order_id | status |
+| ---: | --- |
+| 1002 | PAID |
+| 1003 | PAID |
+
+`IS NOT NULL`은 실제 배송일이 있는 주문 1001을 찾는다.
+
+## SQL의 3값 논리
+
+일반적인 조건은 TRUE 또는 FALSE라고 생각하지만, NULL이 끼면 UNKNOWN이 생긴다.
+
+| 조건 | 결과 | 이유 |
+| --- | --- | --- |
+| `10 = 10` | TRUE | 두 값을 비교할 수 있음 |
+| `10 = 20` | FALSE | 서로 다름을 알 수 있음 |
+| `10 = NULL` | UNKNOWN | NULL이 어떤 값인지 모름 |
+| `NULL = NULL` | UNKNOWN | 두 미지의 값이 같은지 모름 |
+
+논리 연산의 핵심만 기억하자.
+
+| 식 | 결과 | 직관 |
+| --- | --- | --- |
+| `TRUE AND UNKNOWN` | UNKNOWN | 두 조건이 모두 참인지 아직 모름 |
+| `FALSE AND UNKNOWN` | FALSE | 하나가 이미 거짓이라 전체는 거짓 |
+| `TRUE OR UNKNOWN` | TRUE | 하나가 이미 참이라 전체는 참 |
+| `FALSE OR UNKNOWN` | UNKNOWN | 남은 조건을 알 수 없음 |
+| `NOT UNKNOWN` | UNKNOWN | 모름을 뒤집어도 모름 |
+
+## NOT IN과 NULL 함정
+
+`NOT IN` 목록이나 서브쿼리 결과에 NULL이 있으면 비교가 UNKNOWN이 되어 예상과 달리 아무 행도 나오지 않을 수 있다.
+
+```sql
+SELECT member_id
+FROM members
+WHERE member_id NOT IN ('M01', NULL);
+```
+
+M02를 검사하면 `M02 <> M01`은 TRUE지만 `M02 <> NULL`은 UNKNOWN이다. `TRUE AND UNKNOWN`은 UNKNOWN이므로 WHERE를 통과하지 못한다.
+
+| member_id | 예상하기 쉬운 결과 | 실제 필터 결과 |
+| --- | --- | --- |
+| M01 | 제외 | 제외 |
+| M02 | 포함할 것 같음 | 제외됨 |
+| M03 | 포함할 것 같음 | 제외됨 |
+
+NULL 가능성이 있는 서브쿼리에서는 NULL을 먼저 제거하거나 `NOT EXISTS`를 검토한다.
+
+## NULL과 산술 연산
+
+NULL이 포함된 산술 결과는 보통 NULL이다.
+
+```sql
+SELECT order_id,
+       10000 - discount_amount AS payable_amount
+FROM orders;
+```
+
+| order_id | discount_amount | payable_amount |
+| ---: | ---: | ---: |
+| 1001 | 0 | 10,000 |
+| 1002 | 3,000 | 7,000 |
+| 1003 | NULL | NULL |
+
+할인금액 NULL을 0원으로 보아도 된다는 업무 규칙이 있다면 `COALESCE(discount_amount, 0)` 또는 Oracle의 `NVL`을 사용할 수 있다.
+
+```sql
+SELECT order_id,
+       10000 - COALESCE(discount_amount, 0) AS payable_amount
+FROM orders;
+```
+
+| order_id | payable_amount |
+| ---: | ---: |
+| 1001 | 10,000 |
+| 1002 | 7,000 |
+| 1003 | 10,000 |
+
+NULL을 0으로 바꾸기 전에 정말 “할인 없음”과 같은 뜻인지 확인해야 한다. 아직 할인 심사 중이라면 0으로 바꾸는 순간 미정 상태를 잃는다.
+
+## COUNT는 무엇을 세는가
+
+위 주문 표는 3행이고 `discount_amount`에 실제 값은 2개다.
+
+```sql
+SELECT COUNT(*) AS row_count,
+       COUNT(discount_amount) AS discount_value_count
+FROM orders;
+```
+
+| row_count | discount_value_count |
+| ---: | ---: |
+| 3 | 2 |
+
+- `COUNT(*)`는 행을 세므로 NULL과 관계없이 3이다.
+- `COUNT(discount_amount)`는 그 열에서 NULL이 아닌 값만 세므로 2다.
+- 0은 실제 숫자이므로 개수에 포함된다.
+
+## NULL 허용 여부도 모델의 업무 규칙이다
+
+| 속성 | NULL 허용 판단 | 이유 |
+| --- | --- | --- |
+| 주문번호 | 허용하지 않음 | 주문을 식별해야 함 |
+| 주문일시 | 허용하지 않음 | 주문 생성 시 반드시 발생 |
+| 배송일시 | 허용 가능 | 배송 전에는 값이 없음 |
+| 취소사유 | 조건부 허용 | 취소 주문에는 필요, 정상 주문에는 해당 없음 |
+
+무조건 NOT NULL로 만들거나 모두 NULL을 허용하는 것이 답이 아니다. 값이 언제 생기고 어떤 상태에서 필수인지 생명주기를 확인한다.
+
+## 흔한 실수와 진단법
+
+| 실수 | 결과 | 고치는 법 |
+| --- | --- | --- |
+| `column = NULL` | 모든 비교가 UNKNOWN | `IS NULL` 사용 |
+| NULL을 0과 동일시 | 미정과 할인 없음이 섞임 | 업무 의미 확인 후 변환 |
+| `COUNT(column)`을 전체 행 수로 해석 | NULL 행을 놓침 | 전체는 `COUNT(*)` |
+| NULL 포함 `NOT IN` | 예상치 못한 0행 | NULL 제거 또는 `NOT EXISTS` 검토 |
+| 외부 조인 후 NULL 조건을 잘못 둠 | 보존 행이 사라짐 | ON·WHERE 순서 확인 |
+
+## 시험 연결
+
+1. NULL은 0, 공백, 빈 문자열과 같은 일반 값이 아니다.
+2. NULL 비교는 `IS NULL`, `IS NOT NULL`을 사용한다.
+3. WHERE는 TRUE인 행만 남기며 FALSE와 UNKNOWN은 제거한다.
+4. NULL이 포함된 산술 결과는 NULL이고, 집계함수는 종류에 따라 NULL 처리 방식이 다르다.
+5. Oracle은 길이 0인 문자열을 NULL처럼 처리한다는 제품 차이를 주의한다.
+
+## 짧은 확인
+
+`WHERE discount_amount <> 0`을 실행하면 discount_amount가 NULL인 주문은 나올까?
+
+<Collapse title="확인하기">
+
+나오지 않는다. `NULL <> 0`은 TRUE가 아니라 UNKNOWN이며 WHERE는 UNKNOWN 행을 제거한다. NULL도 별도 포함하려면 `discount_amount <> 0 OR discount_amount IS NULL`처럼 의도를 명시한다.
+
+</Collapse>
+
+## 다음 단계: 복습
+
+[12편 복습 문제와 결과 예측](./12_null-attributes-review)에서 NULL 조건과 집계 결과를 직접 계산하자.
+
+## 정리
+
+<Callout type="default">
+  - NULL은 값이 없거나 알 수 없음을 나타내며 0과 다르다.
+  - NULL 비교는 UNKNOWN을 만들므로 IS NULL을 사용한다.
+  - WHERE는 TRUE만 통과시킨다.
+  - 산술 연산과 COUNT에서 NULL 처리 결과를 따로 확인한다.
+</Callout>
+
+다음 편에서는 업무에서 원래 존재하는 본질식별자와 시스템이 만든 인조식별자를 더 깊게 비교한다.
+
+## 참고 자료
+
+- [PostgreSQL — Comparison Functions and Operators](https://www.postgresql.org/docs/current/functions-comparison.html)
+- [PostgreSQL — Aggregate Functions](https://www.postgresql.org/docs/current/functions-aggregate.html)
+- [Oracle Database — Nulls](https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Nulls.html)

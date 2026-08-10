@@ -1,0 +1,74 @@
+---
+title: '36-복습. DCL'
+description: '시스템·객체 권한, 역할, GRANT OPTION과 최소 권한을 사례 문제로 점검한다.'
+---
+
+## 복습 방법
+
+권한을 `사용자 → 획득 경로 → 객체 → 작업` 네 칸으로 써서 어디서 받은 무엇을 회수하는지 추적한다.
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"GRANT SELECT ON orders TO app_user가 부여하는 것은?"}
+  options={["orders 객체 조회 권한", "모든 테이블 삭제 권한", "DB 접속 시스템 권한만", "운영체제 관리자 권한"]}
+  correctAnswer={1}
+  explanation={"특정 orders 객체에 SELECT 작업을 허용하는 객체 권한이다."}
+  optionExplanations={["정답이다.", "DROP 권한이 아니다.", "CREATE SESSION과 다르다.", "DB 객체 권한이다."]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"역할(Role)을 사용하는 대표 이유는?"}
+  options={["여러 권한을 묶어 사용자 집단에 일관되게 관리", "모든 제약 자동 제거", "데이터를 자동 백업", "SQL 정렬 속도만 향상"]}
+  correctAnswer={1}
+  explanation={"업무별 권한 묶음을 역할로 만들어 여러 사용자에게 배정한다."}
+  optionExplanations={["정답이다.", "제약조건과 무관하다.", "백업 기능이 아니다.", "정렬 튜닝 기능이 아니다."]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"WITH GRANT OPTION을 받은 객체 권한의 특징은?"}
+  options={["다른 사용자에게 같은 객체 권한을 재부여할 수 있다.", "권한이 즉시 만료된다.", "테이블이 자동 복제된다.", "모든 사용자가 관리자 된다."]}
+  correctAnswer={1}
+  explanation={"권한 사용뿐 아니라 재부여 가능성까지 전달한다."}
+  optionExplanations={["정답이다.", "자동 만료 옵션이 아니다.", "데이터 복제와 무관하다.", "해당 권한 범위에 한정된다."]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"역할을 REVOKE했는데도 사용자가 같은 SELECT를 할 수 있는 가능한 이유는?"}
+  options={["직접 권한이나 다른 역할로도 받았다.", "REVOKE는 항상 UPDATE만 제거한다.", "SELECT는 권한이 필요 없다.", "테이블 이름이 짧아서"]}
+  correctAnswer={1}
+  explanation={"권한은 여러 경로로 얻을 수 있으므로 한 역할 회수만으로 모두 사라지지 않을 수 있다."}
+  optionExplanations={["정답이다.", "지정한 권한을 회수한다.", "소유·부여 권한이 필요하다.", "이름 길이와 무관하다."]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"최소 권한 원칙에 가장 맞는 설계는?"}
+  options={["보고서 계정에 필요한 뷰 SELECT만 부여", "모든 앱에 DBA 부여", "PUBLIC에 모든 테이블 UPDATE 부여", "비밀번호 없이 관리자 공유"]}
+  correctAnswer={1}
+  explanation={"업무 수행에 필요한 가장 좁은 객체와 작업만 허용한다."}
+  optionExplanations={["정답이다.", "피해 범위가 과도하다.", "모든 사용자에게 변경 권한을 노출한다.", "책임 추적과 인증을 깨뜨린다."]}
+/>
+
+## 직접 적용하기
+
+report_role은 orders SELECT를 갖고, user_a는 report_role과 orders 직접 UPDATE를 갖는다. 다음 작업 가능 여부를 적자.
+
+1. orders SELECT
+2. orders UPDATE
+3. members SELECT
+4. report_role 회수 후 orders UPDATE
+
+<Collapse title="풀이">
+
+1과 2는 가능하다. 3은 별도 권한이 없어 불가다. 역할을 회수해도 직접 UPDATE는 남으므로 4는 가능하다. SELECT는 역할 외 다른 경로가 없다면 회수 후 불가능해진다.
+
+</Collapse>
+
+## 복습 완료
+
+[36. DCL](./36_dcl)의 권한 경로를 다시 본 뒤 [37. 관리 구문](./37_management-statements)으로 이동하자.

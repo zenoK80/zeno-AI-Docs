@@ -1,0 +1,124 @@
+---
+title: '30-복습. PIVOT 절'
+description: 'PIVOT의 집계 열·피벗 열·암묵적 그룹과 조건부 집계 결과를 문제로 점검한다.'
+---
+
+## 복습 방법
+
+입력 열 옆에 `행`, `새 열`, `값`을 각각 표시하고 같은 교차 칸에 들어갈 숫자를 먼저 모은다.
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"지역별 행에 분기 값을 Q1·Q2 열로 펼치고 매출 합계를 넣을 때 피벗 열은?"}
+  options={["지역", "분기", "매출액", "합계 함수"]}
+  correctAnswer={2}
+  explanation={"분기 열의 값 Q1, Q2가 새 열 머리글이 된다."}
+  optionExplanations={[
+    "결과 행의 그룹 기준이다.",
+    "정답이다.",
+    "각 칸에서 집계할 값이다.",
+    "값을 합치는 방법이지 입력 열이 아니다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"PIVOT 입력에서 집계 열과 피벗 열을 제외한 나머지 열의 일반적인 역할은?"}
+  options={[
+    "모두 자동 삭제된다.",
+    "암묵적인 GROUP BY 기준이 된다.",
+    "항상 새 피벗 열이 된다.",
+    "WHERE 조건으로 바뀐다.",
+  ]}
+  correctAnswer={2}
+  explanation={"나머지 열의 값 조합이 PIVOT 결과의 행을 구분한다."}
+  optionExplanations={[
+    "결과 행 구분에 영향을 준다.",
+    "정답이다.",
+    "FOR에 지정한 열 값만 새 열이 된다.",
+    "자동 필터링되지 않는다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"서울-Q1 입력 금액이 100과 50 두 행이고 SUM PIVOT을 했다. 서울의 Q1 값은?"}
+  options={["50", "100", "150", "두 행이라 오류"]}
+  correctAnswer={3}
+  explanation={"같은 교차 칸의 두 입력 행을 SUM으로 집계해 150이 된다."}
+  optionExplanations={[
+    "한 행만 선택한 값이다.",
+    "다른 한 행만 선택한 값이다.",
+    "정답이다.",
+    "PIVOT은 집계함수로 여러 행을 합친다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"특정 지역-Q3 조합의 입력 행이 하나도 없을 때 SUM PIVOT의 일반적인 결과는?"}
+  options={["0으로 확정", "NULL", "이전 열 값", "문법 오류"]}
+  correctAnswer={2}
+  explanation={"집계할 입력 행 자체가 없는 교차 칸은 NULL로 나타난다."}
+  optionExplanations={[
+    "표시를 0으로 바꾸려면 별도 처리가 필요하다.",
+    "정답이다.",
+    "옆 열 값을 복사하지 않는다.",
+    "누락 조합은 정상적으로 생길 수 있다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"조건부 집계로 Q1 합계를 만드는 식은?"}
+  options={[
+    "SUM(CASE WHEN quarter = 'Q1' THEN amount END)",
+    "ORDER BY quarter = 'Q1'",
+    "COUNT(DISTINCT city, amount)만",
+    "JOIN quarter ON amount",
+  ]}
+  correctAnswer={1}
+  explanation={"CASE가 Q1 행의 amount만 남기고 SUM이 그 값들을 합친다."}
+  optionExplanations={[
+    "정답이다.",
+    "정렬식은 조건별 합계 열을 만들지 않는다.",
+    "Q1 조건과 합계 목적이 없다.",
+    "올바른 연결 관계가 아니다.",
+  ]}
+/>
+
+## 직접 적용하기
+
+다음 입력을 지역별 행, PAID·CANCELED 열의 건수 표로 바꾸자.
+
+| city | status |
+| --- | --- |
+| 서울 | PAID |
+| 서울 | PAID |
+| 서울 | CANCELED |
+| 부산 | PAID |
+
+<Collapse title="풀이">
+
+| city | PAID | CANCELED |
+| --- | ---: | ---: |
+| 서울 | 2 | 1 |
+| 부산 | 1 | 0 또는 NULL |
+
+PIVOT `COUNT(*)`의 구체적인 빈 조합 표시는 DBMS 문법과 변환에 따라 확인한다. 조건부 집계에서 `SUM(CASE ... ELSE 0 END)`를 쓰면 부산 CANCELED가 0이다.
+
+```sql
+SELECT city,
+       SUM(CASE WHEN status = 'PAID' THEN 1 ELSE 0 END) AS paid,
+       SUM(CASE WHEN status = 'CANCELED' THEN 1 ELSE 0 END) AS canceled
+FROM sales
+GROUP BY city;
+```
+
+</Collapse>
+
+## 복습 완료
+
+[30. PIVOT 절](./30_pivot)의 입력·결과 표를 다시 본 뒤 [31. UNPIVOT 절](./31_unpivot)로 이동하자.

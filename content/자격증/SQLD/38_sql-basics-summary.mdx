@@ -1,0 +1,273 @@
+---
+title: '38. SQL 기본'
+description: 'SELECT·함수·WHERE·GROUP BY·HAVING·ORDER BY·조인을 한 주문 보고서에서 통합해 결과를 계산한다.'
+---
+
+## 이번 편의 목표
+
+- SQL 기본 절의 논리적 처리 순서를 한 쿼리에 적용한다.
+- 조인으로 생긴 입력 행이 필터·그룹·HAVING을 거쳐 어떻게 줄어드는지 추적한다.
+- NULL과 외부 조인이 집계 결과에 미치는 영향을 설명한다.
+- 시험의 긴 SQL을 단계별 중간표로 분해한다.
+
+## 먼저 알아둘 말
+
+| 용어 | 쉬운 뜻 |
+| --- | --- |
+| 중간 결과 | SQL 각 논리 단계가 다음 단계에 넘기는 임시 행 집합 |
+| 행 단위 조건 | 그룹을 만들기 전에 개별 행을 거르는 WHERE 조건 |
+| 그룹 단위 조건 | 집계 후 그룹 전체를 거르는 HAVING 조건 |
+| 보존 행 | 외부 조인에서 짝이 없어도 NULL과 함께 남는 기준 행 |
+| 결과의 grain | 결과 한 행이 회원·주문·지역 중 무엇 하나를 뜻하는지 나타내는 단위 |
+
+## 선수지식과 핵심 질문
+
+선수지식은 [14. 관계형 데이터베이스 개요](./14_relational-database-overview)부터 [22. 표준 조인](./22_standard-joins)까지다.
+
+핵심 질문은 **긴 SQL을 한 번에 머리로 실행하지 않고 어느 단계에서 몇 행이 남는지 어떻게 추적하는가**이다.
+
+## SQL 기본 처리 지도
+
+```mermaid
+flowchart LR
+  A["FROM·JOIN: 출발 행 조합"] --> B["ON: 조인 짝 결정"]
+  B --> C["WHERE: 개별 행 제거"]
+  C --> D["GROUP BY: 결과 단위 생성"]
+  D --> E["HAVING: 그룹 제거"]
+  E --> F["SELECT: 열과 집계 계산"]
+  F --> G["ORDER BY: 최종 순서"]
+```
+
+실제 옵티마이저의 물리 실행 순서가 아니라 SQL 결과를 이해하는 논리 지도다.
+
+## 통합 문제의 입력
+
+`members`
+
+| member_id | name | city |
+| --- | --- | --- |
+| M01 | 민지 | 서울 |
+| M02 | 준호 | 부산 |
+| M03 | 소라 | 서울 |
+| M04 | 현우 | 대구 |
+
+`orders`
+
+| order_id | member_id | status | amount |
+| ---: | --- | --- | ---: |
+| 1001 | M01 | PAID | 106000 |
+| 1002 | M01 | SHIPPED | 30000 |
+| 1003 | M02 | PAID | 250000 |
+| 1004 | M03 | CANCELED | 70000 |
+| 1005 | M03 | PAID | 50000 |
+
+요구사항: 취소되지 않은 주문 금액 합계가 10만원 이상인 지역을 합계 내림차순으로 보여 준다.
+
+```sql
+SELECT m.city,
+       COUNT(o.order_id) AS order_count,
+       SUM(o.amount) AS amount_sum
+FROM members m
+JOIN orders o
+  ON m.member_id = o.member_id
+WHERE o.status <> 'CANCELED'
+GROUP BY m.city
+HAVING SUM(o.amount) >= 100000
+ORDER BY amount_sum DESC;
+```
+
+## 1단계: FROM·JOIN
+
+회원과 주문을 `member_id`로 내부 조인한다.
+
+| city | order_id | status | amount |
+| --- | ---: | --- | ---: |
+| 서울 | 1001 | PAID | 106000 |
+| 서울 | 1002 | SHIPPED | 30000 |
+| 부산 | 1003 | PAID | 250000 |
+| 서울 | 1004 | CANCELED | 70000 |
+| 서울 | 1005 | PAID | 50000 |
+
+주문 없는 M04는 내부 조인에서 사라진다. 현재 결과 한 행은 주문 한 건이다.
+
+## 2단계: WHERE
+
+`status <> 'CANCELED'`가 1004 한 행을 제거한다.
+
+| city | order_id | amount |
+| --- | ---: | ---: |
+| 서울 | 1001 | 106000 |
+| 서울 | 1002 | 30000 |
+| 부산 | 1003 | 250000 |
+| 서울 | 1005 | 50000 |
+
+GROUP BY와 SUM은 이 네 행만 입력으로 받는다.
+
+## 3단계: GROUP BY와 집계
+
+```text
+서울: 3건, 106000 + 30000 + 50000 = 186000
+부산: 1건, 250000
+```
+
+| city | order_count | amount_sum |
+| --- | ---: | ---: |
+| 서울 | 3 | 186000 |
+| 부산 | 1 | 250000 |
+
+결과의 grain은 주문 한 건에서 지역 한 곳으로 바뀌었다.
+
+## 4단계: HAVING
+
+두 지역 모두 합계가 10만원 이상이라 남는다. 조건이 20만원 이상이었다면 서울은 제거되고 부산만 남는다.
+
+## 5단계: SELECT와 ORDER BY
+
+별칭 `amount_sum`을 기준으로 내림차순 정렬한다.
+
+| city | order_count | amount_sum |
+| --- | ---: | ---: |
+| 부산 | 1 | 250000 |
+| 서울 | 3 | 186000 |
+
+<Callout type="info">
+  긴 SQL은 각 절 직후의 중간 행 수를 적으면 된다. 이 문제는 `5행 → 4행 → 2그룹 → 2그룹` 순서다.
+</Callout>
+
+## 외부 조인으로 주문 없는 지역까지 보기
+
+회원별 비취소 주문 건수를 모두 표시하려면 조건 위치가 중요하다.
+
+```sql
+SELECT m.member_id, m.name,
+       COUNT(o.order_id) AS order_count
+FROM members m
+LEFT JOIN orders o
+  ON m.member_id = o.member_id
+ AND o.status <> 'CANCELED'
+GROUP BY m.member_id, m.name
+ORDER BY m.member_id;
+```
+
+| member_id | name | order_count |
+| --- | --- | ---: |
+| M01 | 민지 | 2 |
+| M02 | 준호 | 1 |
+| M03 | 소라 | 1 |
+| M04 | 현우 | 0 |
+
+M04의 보존 행에서 `o.order_id`는 NULL이다. `COUNT(o.order_id)`는 NULL을 세지 않아 0이지만 `COUNT(*)`는 보존 행 자체를 세어 1이 될 수 있다.
+
+## WHERE로 옮기면 왜 달라질까
+
+```sql
+FROM members m
+LEFT JOIN orders o ON m.member_id = o.member_id
+WHERE o.status <> 'CANCELED'
+```
+
+M04의 status는 NULL이고 `NULL <> 'CANCELED'`는 참이 아니므로 WHERE에서 사라진다. M03의 취소 주문은 사라지지만 PAID 주문은 남는다. 주문이 전혀 없는 회원을 유지하려는 요구와 맞지 않는다.
+
+## 함수와 NULL 통합 판단
+
+| 값 | `COUNT(*)` | `COUNT(value)` | `SUM(value)` 참여 |
+| --- | --- | --- | --- |
+| 10 | 셈 | 셈 | 더함 |
+| NULL | 셈 | 세지 않음 | 제외 |
+| 0 | 셈 | 셈 | 0을 더함 |
+
+`COALESCE(SUM(amount), 0)`은 입력 행이 없어 SUM이 NULL인 경우 표시를 0으로 바꾼다. 데이터가 없다는 사실과 실제 금액 0의 의미를 업무에서 구분한 뒤 쓴다.
+
+## 별칭과 처리 순서
+
+많은 DBMS에서 ORDER BY는 SELECT 뒤라 결과 별칭을 사용할 수 있다.
+
+```sql
+SELECT amount * 1.1 AS amount_with_tax
+FROM orders
+ORDER BY amount_with_tax;
+```
+
+WHERE는 SELECT보다 먼저라 같은 단계의 별칭을 사용할 수 없는 경우가 일반적이다.
+
+```sql
+-- 일반적으로 잘못된 형태
+SELECT amount * 1.1 AS amount_with_tax
+FROM orders
+WHERE amount_with_tax >= 100000;
+```
+
+원래 식을 반복하거나 서브쿼리로 한 단계 감싼다.
+
+## 시험 SQL을 푸는 순서
+
+<Steps>
+
+### 결과 한 행의 단위를 적는다
+
+GROUP BY가 없다면 입력 행 단위, 있다면 그룹 키 조합이 결과 단위다.
+
+### 조인 결과 행을 만든다
+
+내부·외부 조인과 일대다 반복을 먼저 처리한다.
+
+### WHERE로 개별 행을 지운다
+
+NULL 비교는 참·거짓·UNKNOWN을 구분한다.
+
+### 그룹별로 집계하고 HAVING을 적용한다
+
+COUNT의 대상 열과 SUM의 NULL 제외를 확인한다.
+
+### SELECT 값과 최종 정렬을 계산한다
+
+DISTINCT와 ORDER BY까지 적용해 최종표를 그린다.
+
+</Steps>
+
+## 시험에서는 어떻게 묻나
+
+- 조인·WHERE·GROUP BY를 섞어 중간 행 수를 묻는다.
+- LEFT JOIN 오른쪽 조건의 ON·WHERE 위치 차이를 묻는다.
+- COUNT(*)와 COUNT(column)의 보존 NULL 행 차이를 묻는다.
+- HAVING과 WHERE, 결과 별칭의 사용 가능 위치를 바꿔 낸다.
+
+## 짧은 확인
+
+LEFT JOIN 결과에 주문 없는 회원의 보존 행 한 개가 있다. `COUNT(*)`와 `COUNT(o.order_id)`는 각각 얼마인가?
+
+<Collapse title="확인하기">
+
+COUNT(*)는 보존 결과 행을 세어 1, COUNT(o.order_id)는 NULL 주문 번호를 제외해 0이다.
+
+</Collapse>
+
+## 흔한 실수와 진단법
+
+| 실수 | 진단법 |
+| --- | --- |
+| 원본 행에서 바로 합계 계산 | JOIN·WHERE 뒤 중간표를 먼저 만든다. |
+| 결과 행 단위를 놓침 | GROUP BY 열 조합을 문장으로 읽는다. |
+| 외부 조인 보존 행이 사라짐 | 오른쪽 WHERE 조건과 NULL을 확인한다. |
+| COUNT가 예상보다 1 큼 | COUNT(*)가 NULL 보존 행도 세는지 본다. |
+
+## 다음 단계: 복습
+
+[38-복습. SQL 기본](./38_sql-basics-summary-review)에서 한 SQL의 중간 행을 단계별로 계산하자.
+
+## 정리
+
+<Callout type="default">
+  - 긴 SQL은 FROM·JOIN부터 ORDER BY까지 중간표로 나눈다.
+  - WHERE는 개별 행, HAVING은 집계 그룹을 거른다.
+  - 결과 한 행의 단위는 GROUP BY 키가 결정한다.
+  - 외부 조인의 NULL 보존 행과 COUNT 대상 열을 함께 본다.
+</Callout>
+
+다음 편에서는 서브쿼리·집합·윈도우·Top N·계층·피벗을 한 단계씩 연결한다.
+
+## 참고 자료
+
+- [KDATA - SQL 개발자 시험 주요 내용](https://www.dataq.or.kr/www/sub/a_04.do)
+- [PostgreSQL - SELECT Processing](https://www.postgresql.org/docs/current/sql-select.html)
+- [Oracle Database - SELECT](https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/SELECT.html)

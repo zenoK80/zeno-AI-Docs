@@ -1,0 +1,34 @@
+---
+title: '44-복습. DB 구조와 성능'
+description: '슈퍼·서브타입 물리 구조, 복합키 선두 열과 외래키 접근 경로를 문제로 점검한다.'
+---
+
+## 복습 방법
+
+구조 후보마다 전체 조회, 유형별 조회, 입력, 제약조건 네 줄의 SQL·비용을 비교한다.
+
+## 4지선다 문제
+
+<Quiz questionNumber={1} question={"모든 하위 유형을 항상 함께 조회하고 유형별 열이 적을 때 먼저 검토할 구조는?"} options={["단일 통합 테이블", "하위 유형마다 원격 DB", "모든 열을 문자열 한 칸", "키 없는 파일"]} correctAnswer={1} explanation={"전체 처리 비중이 높으면 단일 테이블이 조인·UNION을 줄일 수 있다."} optionExplanations={["정답이다.", "분산 필요 근거가 없다.", "무결성과 조회를 해친다.", "관계형 식별을 잃는다."]} />
+
+<Quiz questionNumber={2} question={"복합 인덱스 (order_id, product_id)에 가장 잘 맞는 기본 조건은?"} options={["order_id = 1001", "product_id = 'P10'만", "quantity > 0만", "name LIKE '%x%'만"]} correctAnswer={1} explanation={"선두 order_id 조건으로 연속된 인덱스 범위를 찾을 수 있다."} optionExplanations={["정답이다.", "선두 열이 빠졌다.", "인덱스 열이 아니다.", "관련 열이 없다."]} />
+
+<Quiz questionNumber={3} question={"외래키 열에 대한 설명으로 옳은 것은?"} options={["모든 DBMS에서 자동 인덱스 생성이라고 단정할 수 없다.", "인덱스가 절대 필요 없다.", "부모와 타입이 달라야 한다.", "조인에 사용할 수 없다."]} correctAnswer={1} explanation={"FK 제약과 인덱스 생성은 별도이며 업무 접근·부모 변경 비용으로 판단한다."} optionExplanations={["정답이다.", "조회·검사에 유용할 수 있다.", "호환 타입이 필요하다.", "대표 조인 열이다."]} />
+
+<Quiz questionNumber={4} question={"슈퍼·서브를 상위와 하위 테이블로 분리한 구조의 특징은?"} options={["유형별 제약은 명확하지만 완전한 한 건 조회에 조인이 필요", "모든 NULL이 제거되어 조인도 없음", "공통 열이 하위마다 무조건 반복", "전체 조회가 불가능"]} correctAnswer={1} explanation={"공통과 전용 속성을 분리하는 대신 상하 행을 연결한다."} optionExplanations={["정답이다.", "조인이 필요하다.", "공통은 상위에 둔다.", "조인·UNION으로 조회 가능하다."]} />
+
+<Quiz questionNumber={5} question={"부모·자식 연결 키의 타입을 맞추는 이유는?"} options={["제약·비교·조인의 일관성과 암시적 변환 위험 감소", "행 수를 무조건 1로 만듦", "권한 자동 부여", "COMMIT 제거"]} correctAnswer={1} explanation={"같은 식별 의미는 호환되는 타입과 길이로 선언해야 안정적으로 연결된다."} optionExplanations={["정답이다.", "관계 카디널리티와 별개다.", "DCL과 무관하다.", "트랜잭션은 필요하다."]} />
+
+## 직접 적용하기
+
+조회 A는 주문별 상세를 하루 100만 번, 조회 B는 상품별 상세를 하루 50만 번 수행한다. PK가 `(order_id, product_id)`일 때 추가로 검토할 인덱스와 이유를 적자.
+
+<Collapse title="풀이">
+
+상품별 조회는 선두 order_id 없이 product_id를 조건으로 하므로 `(product_id, order_id)` 인덱스를 후보로 검토한다. 실제 선택도·반환 열·쓰기 150만 건의 인덱스 유지 비용과 실행계획을 비교한 뒤 결정한다.
+
+</Collapse>
+
+## 복습 완료
+
+[44. DB 구조와 성능](./44_database-structure-and-performance)의 구조 비교를 다시 본 뒤 [45. 분산 DB에 따른 성능](./45_distributed-database-performance)으로 이동하자.

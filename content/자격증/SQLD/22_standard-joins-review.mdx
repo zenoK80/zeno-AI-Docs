@@ -1,0 +1,148 @@
+---
+title: '22-복습. 표준 조인'
+description: 'INNER·OUTER·CROSS JOIN과 ON·USING·NATURAL JOIN의 차이를 결과 중심으로 점검한다.'
+---
+
+## 복습 방법
+
+외부 조인은 SQL을 읽자마자 **보존되는 쪽에 밑줄**을 긋고, 짝 없는 행의 반대쪽 열에 `NULL`을 적는다.
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"A LEFT JOIN B에서 조인 조건에 맞는 B 행이 없는 A 행은 어떻게 되는가?"}
+  options={[
+    "A 행도 제거된다.",
+    "A 행은 남고 B의 열이 NULL로 채워진다.",
+    "B의 첫 번째 행과 강제로 연결된다.",
+    "모든 숫자 열이 0으로 채워진다.",
+  ]}
+  correctAnswer={2}
+  explanation={"LEFT JOIN은 왼쪽 A를 보존하고 짝이 없는 오른쪽 열에 NULL을 둔다."}
+  optionExplanations={[
+    "내부 조인의 동작에 가깝다.",
+    "정답이다.",
+    "조건을 만족하지 않는 행을 임의로 연결하지 않는다.",
+    "NULL과 숫자 0은 의미가 다르다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"ON 대신 USING (member_id)을 사용할 수 있는 조건은?"}
+  options={[
+    "한쪽 테이블에만 member_id가 있다.",
+    "양쪽 테이블에 이름이 같은 member_id가 있다.",
+    "두 열의 이름이 member_no와 member_id로 다르다.",
+    "범위 조건만 사용한다.",
+  ]}
+  correctAnswer={2}
+  explanation={"USING은 양쪽에 같은 이름으로 존재하는 열을 지정한다."}
+  optionExplanations={[
+    "비교할 반대쪽 열이 없다.",
+    "정답이다.",
+    "이름이 다르면 ON으로 직접 연결한다.",
+    "USING은 같은 이름 열의 등가 연결에 사용한다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"LEFT JOIN 후 WHERE right_table.status = 'PAID'를 적용할 때 주의할 점은?"}
+  options={[
+    "오른쪽 짝이 없는 행의 status는 NULL이어서 WHERE에서 제거될 수 있다.",
+    "LEFT JOIN이 자동으로 FULL JOIN으로 바뀐다.",
+    "모든 status가 PAID로 수정된다.",
+    "조인 조건이 없어도 행 수가 줄지 않는다.",
+  ]}
+  correctAnswer={1}
+  explanation={"짝 없는 행의 오른쪽 값은 NULL이고, NULL = 'PAID'는 참이 아니므로 WHERE를 통과하지 못한다."}
+  optionExplanations={[
+    "정답이다.",
+    "조인 종류가 자동 변경되는 것은 아니다.",
+    "SELECT는 데이터를 수정하지 않는다.",
+    "WHERE 조건에 따라 행은 제거된다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"NATURAL JOIN에 대한 설명으로 옳은 것은?"}
+  options={[
+    "항상 기본키 하나만 비교한다.",
+    "이름이 같은 모든 열을 자동으로 조인 조건에 사용한다.",
+    "조인 조건 없이 무조건 카테시안 곱을 만든다.",
+    "서로 다른 이름의 열을 자동 추론한다.",
+  ]}
+  correctAnswer={2}
+  explanation={"NATURAL JOIN은 양쪽 테이블에서 같은 이름인 열들을 모두 자동 비교한다."}
+  optionExplanations={[
+    "기본키인지 여부가 아니라 열 이름을 본다.",
+    "정답이다.",
+    "공통 이름 열이 조인 조건이 된다.",
+    "이름이 다르면 자동 연결하지 못한다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"양쪽 테이블의 짝 없는 행을 모두 결과에 남기는 표준 조인은?"}
+  options={["INNER JOIN", "LEFT JOIN", "FULL OUTER JOIN", "CROSS JOIN"]}
+  correctAnswer={3}
+  explanation={"FULL OUTER JOIN은 왼쪽과 오른쪽을 모두 보존한다."}
+  optionExplanations={[
+    "짝 있는 조합만 남긴다.",
+    "왼쪽만 보존한다.",
+    "정답이다.",
+    "모든 행 조합을 만들지만 보존 개념의 외부 조인이 아니다.",
+  ]}
+/>
+
+## 직접 적용하기
+
+다음 데이터에서 아래 두 쿼리의 결과 차이를 적어 보자.
+
+`members`: M01 민지, M02 준호, M03 소라
+`orders`: M01 PAID, M02 CANCELED
+
+```sql
+-- A
+SELECT m.name, o.status
+FROM members m
+LEFT JOIN orders o
+  ON m.member_id = o.member_id
+ AND o.status = 'PAID';
+
+-- B
+SELECT m.name, o.status
+FROM members m
+LEFT JOIN orders o
+  ON m.member_id = o.member_id
+WHERE o.status = 'PAID';
+```
+
+<Collapse title="풀이">
+
+A는 세 회원을 모두 보존한다.
+
+| name | status |
+| --- | --- |
+| 민지 | PAID |
+| 준호 | NULL |
+| 소라 | NULL |
+
+B는 조인 후 `status = 'PAID'`가 참인 민지만 남긴다. 준호의 CANCELED와 소라의 NULL은 WHERE를 통과하지 못한다.
+
+</Collapse>
+
+## 오류 진단 체크리스트
+
+- LEFT·RIGHT 방향을 테이블 작성 순서와 함께 읽었는가?
+- 보존해야 할 행을 제거하는 WHERE 조건은 없는가?
+- USING의 열 이름이 양쪽에 실제로 같은가?
+- NATURAL JOIN이 자동 선택한 공통 열을 모두 확인했는가?
+
+## 복습 완료
+
+[22. 표준 조인](./22_standard-joins)의 결과표를 다시 그려 본 뒤 [23. 서브쿼리](./23_subqueries)로 이동하자.

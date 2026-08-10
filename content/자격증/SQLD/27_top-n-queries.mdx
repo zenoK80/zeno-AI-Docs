@@ -1,0 +1,242 @@
+---
+title: '27. Top N 쿼리'
+description: '정렬된 결과에서 상위 N개와 그룹별 상위 N개를 정확하고 안정적으로 선택하는 방법을 익힌다.'
+---
+
+## 이번 편의 목표
+
+- Top N 쿼리에서 정렬과 행 제한의 순서를 설명한다.
+- `FETCH FIRST`, `LIMIT`, Oracle `ROWNUM` 방식의 차이를 구분한다.
+- 윈도우 함수로 전체 및 그룹별 상위 N개를 구한다.
+- 동점 포함 여부와 안정적인 정렬 기준을 설계한다.
+
+## 먼저 알아둘 말
+
+| 용어 | 쉬운 뜻 |
+| --- | --- |
+| Top N | 정해진 정렬 기준에서 앞쪽 N개 행 |
+| 행 제한(Row Limiting) | 전체 결과 중 일정 개수만 반환하는 처리 |
+| 결정적 정렬 | 같은 데이터를 반복 조회해도 순서가 흔들리지 않도록 고유 기준까지 지정한 정렬 |
+| 동점 포함 | N번째 값과 같은 값을 가진 행을 N개를 넘어도 함께 반환하는 방식 |
+| 페이지네이션 | 결과를 일정 크기의 페이지로 나눠 조회하는 방식 |
+
+## 선수지식과 핵심 질문
+
+선수지식은 [20. ORDER BY 절](./20_order-by)과 [26. 윈도우 함수](./26_window-functions)다.
+
+핵심 질문은 **무엇을 기준으로 줄을 세운 뒤 어디까지 자를 것인가**이다. 정렬 기준이 없으면 “상위”라는 말 자체가 정의되지 않는다.
+
+## 공통 입력
+
+| order_id | member_id | total_amount |
+| ---: | --- | ---: |
+| 1001 | M01 | 106000 |
+| 1002 | M01 | 30000 |
+| 1003 | M02 | 250000 |
+| 1004 | M03 | 70000 |
+| 1005 | M03 | 50000 |
+| 1006 | M04 | 70000 |
+
+금액이 큰 주문 세 건을 고르려면 먼저 `total_amount DESC`로 정렬한다.
+
+| 정렬 순서 | order_id | total_amount |
+| ---: | ---: | ---: |
+| 1 | 1003 | 250000 |
+| 2 | 1001 | 106000 |
+| 3 | 1004 | 70000 |
+| 4 | 1006 | 70000 |
+| 5 | 1005 | 50000 |
+| 6 | 1002 | 30000 |
+
+## 표준 행 제한 문법
+
+```sql
+SELECT order_id, total_amount
+FROM orders
+ORDER BY total_amount DESC, order_id
+FETCH FIRST 3 ROWS ONLY;
+```
+
+| order_id | total_amount |
+| ---: | ---: |
+| 1003 | 250000 |
+| 1001 | 106000 |
+| 1004 | 70000 |
+
+`order_id`를 두 번째 기준으로 넣어 같은 70000원 주문의 순서를 확정했다.
+
+PostgreSQL·MySQL에서는 흔히 다음 문법도 사용한다.
+
+```sql
+SELECT order_id, total_amount
+FROM orders
+ORDER BY total_amount DESC, order_id
+LIMIT 3;
+```
+
+DBMS와 버전에 따라 지원 문법이 다르므로 시험에서 지정한 환경을 확인한다.
+
+## 동점을 함께 포함하려면
+
+일부 DBMS는 `WITH TIES`를 지원한다.
+
+```sql
+SELECT order_id, total_amount
+FROM orders
+ORDER BY total_amount DESC
+FETCH FIRST 3 ROWS WITH TIES;
+```
+
+3번째 금액이 70000원이고 1006도 같은 금액이므로 결과는 4행이다.
+
+| order_id | total_amount |
+| ---: | ---: |
+| 1003 | 250000 |
+| 1001 | 106000 |
+| 1004 | 70000 |
+| 1006 | 70000 |
+
+<Callout type="info">
+  `ONLY`는 정확히 N행까지, `WITH TIES`는 N번째 정렬값과 동점인 행까지 포함할 수 있다.
+</Callout>
+
+## ROW_NUMBER로 상위 N개 구하기
+
+```sql
+SELECT order_id, total_amount
+FROM (
+  SELECT o.*,
+         ROW_NUMBER() OVER (
+           ORDER BY total_amount DESC, order_id
+         ) AS rn
+  FROM orders o
+) ranked
+WHERE rn <= 3
+ORDER BY rn;
+```
+
+안쪽 쿼리가 모든 행에 순번을 붙이고, 바깥 WHERE가 1~3번만 남긴다. 윈도우 결과를 같은 SELECT의 WHERE에서 바로 쓸 수 없어 한 단계 감쌌다.
+
+## 동점 정책과 순위 함수
+
+| 원하는 결과 | 적합한 출발점 |
+| --- | --- |
+| 정확히 N행 | `ROW_NUMBER() <= N` |
+| N위 동점 모두 포함, 순위 건너뜀 | `RANK() <= N` |
+| 서로 다른 값 기준 상위 N등급 | `DENSE_RANK() <= N` |
+
+금액 순위가 `250000, 106000, 70000, 70000, 50000`이면 `RANK`는 `1, 2, 3, 3, 5`, `DENSE_RANK`는 `1, 2, 3, 3, 4`다.
+
+## 그룹별 Top N
+
+회원별로 금액이 큰 주문 1건씩 찾는다.
+
+```sql
+SELECT member_id, order_id, total_amount
+FROM (
+  SELECT o.*,
+         ROW_NUMBER() OVER (
+           PARTITION BY member_id
+           ORDER BY total_amount DESC, order_id
+         ) AS rn
+  FROM orders o
+) ranked
+WHERE rn = 1
+ORDER BY member_id;
+```
+
+| member_id | order_id | total_amount |
+| --- | ---: | ---: |
+| M01 | 1001 | 106000 |
+| M02 | 1003 | 250000 |
+| M03 | 1004 | 70000 |
+| M04 | 1006 | 70000 |
+
+`PARTITION BY member_id`가 회원이 바뀔 때마다 순번을 1부터 다시 시작하게 한다.
+
+## Oracle의 ROWNUM 함정
+
+Oracle의 전통적인 `ROWNUM`은 행이 결과로 선택되는 과정에서 번호가 붙는다. 다음처럼 한 SELECT에서 `ORDER BY`와 함께 쓰면 의도한 전체 정렬 상위 3개가 아닐 수 있다.
+
+```sql
+-- 의도와 다를 수 있는 형태
+SELECT order_id, total_amount
+FROM orders
+WHERE ROWNUM <= 3
+ORDER BY total_amount DESC;
+```
+
+먼저 임의의 3행을 고른 뒤 그 3행만 정렬할 수 있기 때문이다. 정렬을 안쪽에서 완료하고 바깥에서 ROWNUM을 제한한다.
+
+```sql
+SELECT order_id, total_amount
+FROM (
+  SELECT order_id, total_amount
+  FROM orders
+  ORDER BY total_amount DESC, order_id
+)
+WHERE ROWNUM <= 3;
+```
+
+<Callout type="warning">
+  Top N의 핵심은 “전체 정렬 후 제한”이다. 문법만 외우지 말고 어느 단계에서 번호와 제한이 적용되는지 본다.
+</Callout>
+
+## 페이지네이션과 OFFSET
+
+```sql
+SELECT order_id, total_amount
+FROM orders
+ORDER BY total_amount DESC, order_id
+OFFSET 3 ROWS
+FETCH NEXT 3 ROWS ONLY;
+```
+
+앞의 3행을 건너뛰고 다음 3행을 가져온다. 데이터가 조회 사이에 추가·삭제되면 페이지가 겹치거나 빠질 수 있고, 큰 OFFSET은 많은 행을 건너뛰는 비용이 들 수 있다. 대규모 서비스에서는 마지막으로 본 정렬 키 이후를 조회하는 키셋 방식도 검토하지만, SQLD에서는 행 제한과 정렬 원리를 우선 이해한다.
+
+## 시험에서는 어떻게 묻나
+
+- ORDER BY보다 행 제한이 먼저 적용된 잘못된 Oracle ROWNUM 쿼리를 찾게 한다.
+- ROW_NUMBER와 RANK의 동점 포함 차이를 묻는다.
+- 그룹별 Top N에서 PARTITION BY의 필요성을 묻는다.
+- 고유한 보조 정렬 기준이 없는 결과의 비결정성을 묻는다.
+
+## 짧은 확인
+
+점수가 `100, 90, 90, 80`일 때 `RANK() <= 2`와 `ROW_NUMBER() <= 2`의 행 수는 각각 몇 개인가?
+
+<Collapse title="확인하기">
+
+RANK는 1위 한 명과 공동 2위 두 명을 포함해 3행이다. ROW_NUMBER는 고유 번호 1, 2만 선택해 정확히 2행이다.
+
+</Collapse>
+
+## 흔한 실수와 진단법
+
+| 증상 | 원인 | 해결 |
+| --- | --- | --- |
+| 상위 결과가 실행마다 바뀜 | 동점 보조 정렬 없음 | 기본키를 마지막 정렬 기준에 추가 |
+| Oracle ROWNUM 결과가 이상함 | 제한 후 정렬 | 정렬 쿼리를 안쪽에 둠 |
+| 전체 Top N만 나옴 | PARTITION BY 누락 | 그룹별 기준 열 추가 |
+| N행보다 많이 나옴 | RANK 또는 WITH TIES 사용 | 동점 포함 정책 확인 |
+
+## 다음 단계: 복습
+
+[27-복습. Top N 쿼리](./27_top-n-queries-review)에서 동점 정책과 결과 행을 계산하자.
+
+## 정리
+
+<Callout type="default">
+  - Top N은 정렬 기준을 확정한 뒤 행을 제한한다.
+  - 정확히 N행은 ROW_NUMBER, 동점 포함은 RANK나 WITH TIES를 검토한다.
+  - 그룹별 Top N은 PARTITION BY로 순위를 다시 시작한다.
+  - Oracle ROWNUM 방식은 정렬을 안쪽 쿼리에서 먼저 끝낸다.
+</Callout>
+
+다음 편에서는 부모와 자식이 같은 테이블에 있는 계층형 데이터를 탐색한다.
+
+## 참고 자료
+
+- [PostgreSQL - LIMIT and OFFSET](https://www.postgresql.org/docs/current/queries-limit.html)
+- [Oracle Database - row_limiting_clause](https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/SELECT.html)
+- [Oracle Database - ROWNUM Pseudocolumn](https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/ROWNUM-Pseudocolumn.html)

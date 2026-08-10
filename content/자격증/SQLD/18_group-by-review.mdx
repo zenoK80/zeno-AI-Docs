@@ -1,0 +1,146 @@
+---
+title: '18-복습. GROUP BY 절'
+description: '그룹 기준, 집계 결과 행 수와 COUNT·SUM·AVG의 NULL 처리를 선택형 문제로 점검한다.'
+---
+
+## 복습 방법
+
+입력 행 옆에 그룹 키를 적어 같은 키끼리 묶은 뒤 각 묶음의 개수·합계·평균을 계산한다.
+
+<Callout type="info">
+  결과 행 수는 원본 행 수가 아니라 서로 다른 그룹 키 조합 수로 예측한다.
+</Callout>
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"GROUP BY 없이 SELECT SUM(total_amount) FROM orders를 실행한 결과 행 수는?"}
+  options={[
+    "주문 행마다 한 행",
+    "전체 주문을 한 그룹으로 요약한 1행",
+    "항상 0행",
+    "서로 다른 금액 수만큼",
+  ]}
+  correctAnswer={2}
+  explanation={"GROUP BY가 없고 집계함수만 있으면 입력 전체가 하나의 그룹으로 처리된다."}
+  optionExplanations={[
+    "SUM은 단일행 함수가 아니다.",
+    "정답이다.",
+    "입력 행이 있으면 합계 한 행이 나온다.",
+    "DISTINCT 금액을 그룹화한 것이 아니다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"SELECT member_id, order_id, SUM(total_amount) FROM orders GROUP BY member_id가 일반적으로 잘못된 이유는?"}
+  options={[
+    "member_id는 GROUP BY에 사용할 수 없어서",
+    "한 회원 그룹에 order_id가 여러 개라 결과 한 행에 어느 값을 표시할지 정할 수 없어서",
+    "SUM은 숫자에 사용할 수 없어서",
+    "SELECT에는 열을 두 개 이상 쓸 수 없어서",
+  ]}
+  correctAnswer={2}
+  explanation={"order_id는 그룹 열도 집계식도 아니며 한 그룹 안에서 여러 값을 가질 수 있다."}
+  optionExplanations={[
+    "회원별 그룹의 정상 기준이다.",
+    "정답이다.",
+    "숫자 합계에 사용하는 함수다.",
+    "여러 열을 선택할 수 있다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"5행 중 coupon_code가 NULL 아닌 행이 3개이고 서로 다른 코드는 2개다. COUNT(*), COUNT(coupon_code), COUNT(DISTINCT coupon_code)는?"}
+  options={[
+    "5, 3, 2",
+    "3, 5, 2",
+    "5, 5, 3",
+    "2, 3, 5",
+  ]}
+  correctAnswer={1}
+  explanation={"전체 행 5, 실제 코드값 3, 중복 제거한 코드 종류 2다."}
+  optionExplanations={[
+    "정답이다.",
+    "전체와 열 값 수가 반대다.",
+    "COUNT(column)은 NULL을 제외한다.",
+    "세 값의 의미 순서가 다르다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"WHERE와 GROUP BY의 논리적 처리 순서로 옳은 것은?"}
+  options={[
+    "GROUP BY로 묶은 뒤 WHERE가 그룹을 거른다.",
+    "WHERE가 입력 행을 거른 뒤 GROUP BY가 남은 행을 묶는다.",
+    "두 절은 언제나 동시에 실행되어 순서가 없다.",
+    "WHERE는 집계 결과에만 적용한다.",
+  ]}
+  correctAnswer={2}
+  explanation={"FROM의 행을 WHERE로 필터링한 다음 남은 행으로 그룹을 만든다."}
+  optionExplanations={[
+    "그룹 필터는 HAVING의 역할이다.",
+    "정답이다.",
+    "결과를 이해하는 논리적 순서가 있다.",
+    "WHERE 시점에는 그룹 집계가 아직 없다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"AVG(value)에서 값이 100, NULL, 300일 때 결과는?"}
+  options={[
+    "약 133.33",
+    "200",
+    "400",
+    "NULL",
+  ]}
+  correctAnswer={2}
+  explanation={"AVG는 NULL을 제외한 두 값의 합 400을 실제 값 개수 2로 나눠 200이다."}
+  optionExplanations={[
+    "NULL을 0으로 보고 3으로 나눈 값이다.",
+    "정답이다.",
+    "합계이지 평균이 아니다.",
+    "NULL 이외의 값이 있으므로 평균을 계산한다.",
+  ]}
+/>
+
+## 직접 적용하기
+
+다음 주문에서 취소를 제외하고 회원별 건수와 합계를 구하자.
+
+| order_id | member_id | status | amount |
+| ---: | --- | --- | ---: |
+| 1 | M01 | PAID | 100 |
+| 2 | M01 | CANCELED | 200 |
+| 3 | M02 | PAID | 300 |
+| 4 | M02 | PAID | 400 |
+
+```sql
+SELECT member_id, COUNT(*) AS cnt, SUM(amount) AS total
+FROM orders
+WHERE status <> 'CANCELED'
+GROUP BY member_id;
+```
+
+<Collapse title="풀이 보기">
+
+WHERE가 주문 2를 먼저 제거한다. 남은 M01 그룹은 1행, M02 그룹은 2행이다.
+
+| member_id | cnt | total |
+| --- | ---: | ---: |
+| M01 | 1 | 100 |
+| M02 | 2 | 700 |
+
+</Collapse>
+
+## 결과 점검
+
+- 5개 정답: 그룹 키와 집계 대상을 구분한다.
+- 3~4개 정답: COUNT 세 종류와 WHERE 순서를 다시 본다.
+- 0~2개 정답: 입력 행을 그룹별로 직접 둘러 묶는다.
+
+[본문으로 돌아가기](./18_group-by)

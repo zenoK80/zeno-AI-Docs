@@ -1,0 +1,115 @@
+---
+title: '25-복습. 그룹 함수'
+description: 'ROLLUP·CUBE·GROUPING SETS의 그룹 조합과 GROUPING 값을 문제로 점검한다.'
+---
+
+## 복습 방법
+
+괄호 안 열을 쓰고, 포함할 열에 체크한다고 생각해 그룹 조합을 먼저 나열한다.
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"ROLLUP(A, B)가 만드는 그룹 조합은?"}
+  options={[
+    "(A, B)만",
+    "(A, B), (A), ()",
+    "(A, B), (A), (B), ()",
+    "(A), (B)만",
+  ]}
+  correctAnswer={2}
+  explanation={"ROLLUP은 오른쪽 B부터 접어 상세, A 소계, 전체 총계를 만든다."}
+  optionExplanations={[
+    "소계와 총계가 빠졌다.",
+    "정답이다.",
+    "(B)까지 포함하는 것은 CUBE의 조합이다.",
+    "상세와 총계가 빠졌다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"CUBE(A, B)가 만드는 그룹 조합 수는?"}
+  options={["2개", "3개", "4개", "6개"]}
+  correctAnswer={3}
+  explanation={"각 열의 포함·제외 조합이므로 2² = 4개다."}
+  optionExplanations={[
+    "열 수만 센 값이다.",
+    "ROLLUP(A, B)의 조합 수다.",
+    "정답이다.",
+    "포함·제외 조합 계산과 맞지 않는다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"GROUPING(status) = 1의 의미는?"}
+  options={[
+    "원본 status 값이 반드시 NULL이었다.",
+    "현재 집계 수준에서 status가 접혀 합계용 NULL로 표시됐다.",
+    "status 그룹에 행이 한 개뿐이다.",
+    "status 열에 중복이 없다.",
+  ]}
+  correctAnswer={2}
+  explanation={"GROUPING은 집계 수준 때문에 생긴 NULL인지 구분한다."}
+  optionExplanations={[
+    "실제 NULL 그룹에서는 GROUPING 값이 0일 수 있다.",
+    "정답이다.",
+    "그룹의 행 수를 세는 함수가 아니다.",
+    "중복 여부를 검사하지 않는다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"지역별 합계와 상태별 합계만 필요하고 상세와 총계는 필요 없을 때 가장 직접적인 표현은?"}
+  options={[
+    "ROLLUP(city, status)",
+    "CUBE(city, status)",
+    "GROUPING SETS ((city), (status))",
+    "GROUP BY city, status",
+  ]}
+  correctAnswer={3}
+  explanation={"GROUPING SETS는 필요한 두 그룹 조합만 명시할 수 있다."}
+  optionExplanations={[
+    "상세, 지역 소계, 총계를 만든다.",
+    "상세와 총계까지 포함한 모든 조합을 만든다.",
+    "정답이다.",
+    "상세 조합만 만든다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"ROLLUP(status, city)에서 만들어지지만 ROLLUP(city, status)에는 없는 소계는?"}
+  options={["(city, status) 상세", "(status) 소계", "전체 총계", "어떤 차이도 없음"]}
+  correctAnswer={2}
+  explanation={"ROLLUP(status, city)는 오른쪽 city를 먼저 접어 status 소계를 만든다."}
+  optionExplanations={[
+    "상세는 둘 다 만든다.",
+    "정답이다.",
+    "총계도 둘 다 만든다.",
+    "열 순서에 따라 중간 소계가 달라진다.",
+  ]}
+/>
+
+## 직접 적용하기
+
+`CUBE(year, region)`의 그룹 조합을 모두 적고, 연도 2개·지역 3개가 모든 조합으로 존재할 때 각 수준의 결과 행 수와 총행 수를 계산하자.
+
+<Collapse title="풀이">
+
+- `(year, region)`: 2 × 3 = 6행
+- `(year)`: 2행
+- `(region)`: 3행
+- `()`: 1행
+- 합계: 12행
+
+그룹 조합 수는 4개지만 실제 결과 행 수는 각 조합이 만드는 서로 다른 그룹 수를 더한 12행이다.
+
+</Collapse>
+
+## 복습 완료
+
+[25. 그룹 함수](./25_grouping-functions)의 ROLLUP·CUBE 도식을 다시 본 뒤 [26. 윈도우 함수](./26_window-functions)로 이동하자.

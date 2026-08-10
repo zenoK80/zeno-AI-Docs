@@ -1,0 +1,151 @@
+---
+title: '17-복습. WHERE 절'
+description: '비교·AND·OR·BETWEEN·IN·LIKE·NULL 조건의 결과 행을 클릭형 문제로 점검한다.'
+---
+
+## 복습 방법
+
+조건 우선순위에 따라 괄호를 다시 그리고 각 입력 행에 TRUE·FALSE·UNKNOWN을 적는다.
+
+<Callout type="info">
+  결과를 감으로 고르지 말고 경계값과 NULL 행을 반드시 따로 검사한다.
+</Callout>
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"points BETWEEN 500 AND 800 조건에 포함되는 값은?"}
+  options={[
+    "500보다 크고 800보다 작은 값만",
+    "500과 800을 포함한 사이 값",
+    "500 이하 또는 800 이상인 값",
+    "NULL만",
+  ]}
+  correctAnswer={2}
+  explanation={"BETWEEN은 시작과 끝 경계를 모두 포함해 >=500 AND <=800과 같다."}
+  optionExplanations={[
+    "경계값도 포함된다.",
+    "정답이다.",
+    "범위 바깥을 고른 설명이다.",
+    "NULL 비교는 UNKNOWN이다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"A OR B AND C의 기본 평가 순서는?"}
+  options={[
+    "(A OR B) AND C",
+    "A OR (B AND C)",
+    "(A AND B) OR C",
+    "항상 왼쪽부터만",
+  ]}
+  correctAnswer={2}
+  explanation={"AND가 OR보다 우선하므로 B AND C를 먼저 평가한다."}
+  optionExplanations={[
+    "이 의미를 원하면 괄호가 필요하다.",
+    "정답이다.",
+    "연산자 위치와 다르다.",
+    "논리 연산자 우선순위가 있다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"LIKE 'A__'가 찾는 문자열 모양은?"}
+  options={[
+    "A로 시작하고 전체 길이가 정확히 3글자",
+    "A를 포함한 길이 제한 없는 문자열",
+    "A로 끝나는 2글자 문자열",
+    "문자 A와 밑줄 두 개 자체",
+  ]}
+  correctAnswer={1}
+  explanation={"각 밑줄은 정확히 한 글자를 뜻하므로 A 뒤에 두 글자가 오는 총 3글자 패턴이다."}
+  optionExplanations={[
+    "정답이다.",
+    "길이 제한 없음은 %에 가깝다.",
+    "A의 위치와 길이가 다르다.",
+    "ESCAPE 없이 밑줄은 와일드카드다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"grade IN ('GOLD','SILVER')와 같은 의미는?"}
+  options={[
+    "grade='GOLD' AND grade='SILVER'",
+    "grade='GOLD' OR grade='SILVER'",
+    "grade<>'GOLD' OR grade<>'SILVER'",
+    "grade IS NULL",
+  ]}
+  correctAnswer={2}
+  explanation={"IN 목록은 같은 표현식이 후보 중 하나와 같은지를 검사한다."}
+  optionExplanations={[
+    "한 값이 동시에 두 문자열일 수 없다.",
+    "정답이다.",
+    "부정 조건이며 대부분의 값에서 참이 된다.",
+    "NULL 여부 검사와 다르다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"WHERE shipped_at = NULL이 배송일 없는 행을 찾지 못하는 이유는?"}
+  options={[
+    "NULL은 날짜 0으로 자동 변환되기 때문이다.",
+    "NULL과 등호 비교 결과가 UNKNOWN이며 WHERE는 TRUE만 남기기 때문이다.",
+    "WHERE에서는 날짜 열을 사용할 수 없기 때문이다.",
+    "NULL 행은 테이블에 저장되지 않기 때문이다.",
+  ]}
+  correctAnswer={2}
+  explanation={"NULL 여부는 IS NULL로 검사하며 등호 비교의 UNKNOWN 행은 필터에서 제외된다."}
+  optionExplanations={[
+    "NULL과 숫자 0은 다르다.",
+    "정답이다.",
+    "날짜 열도 조건에 사용할 수 있다.",
+    "NULL 허용 열에는 저장될 수 있다.",
+  ]}
+/>
+
+## 직접 적용하기
+
+다음 회원 중 SQL 결과에 남는 회원을 찾자.
+
+| 이름 | city | grade | points |
+| --- | --- | --- | ---: |
+| 민지 | 서울 | GOLD | 1,200 |
+| 준호 | 부산 | SILVER | 500 |
+| 소라 | 서울 | GOLD | 800 |
+| 현우 | 대구 | BRONZE | 0 |
+
+```sql
+SELECT member_name
+FROM members
+WHERE (city IN ('서울', '부산') OR grade = 'BRONZE')
+  AND points BETWEEN 500 AND 1000;
+```
+
+<Collapse title="풀이 보기">
+
+| 회원 | 첫 괄호 | 500~1000 | 최종 |
+| --- | --- | --- | --- |
+| 민지 | TRUE | FALSE(1200) | 제외 |
+| 준호 | TRUE | TRUE | 포함 |
+| 소라 | TRUE | TRUE | 포함 |
+| 현우 | TRUE(BRONZE) | FALSE(0) | 제외 |
+
+| member_name |
+| --- |
+| 준호 |
+| 소라 |
+
+</Collapse>
+
+## 결과 점검
+
+- 5개 정답: 복합 조건을 괄호 단위로 나누어 계산한다.
+- 3~4개 정답: BETWEEN 경계와 AND 우선순위를 확인한다.
+- 0~2개 정답: 각 행에 조건을 하나씩 대입한다.
+
+[본문으로 돌아가기](./17_where-clause)

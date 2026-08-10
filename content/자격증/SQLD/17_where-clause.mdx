@@ -1,0 +1,251 @@
+---
+title: '17. WHERE 절'
+description: '비교·논리·범위·목록·패턴·NULL 조건을 각 입력 행에 대입해 WHERE가 남기는 결과를 예측한다.'
+---
+
+## 이번 편의 목표
+
+- 비교 연산자로 필요한 행을 고른다.
+- AND·OR·NOT의 우선순위와 괄호가 결과에 미치는 영향을 설명한다.
+- BETWEEN·IN·LIKE 조건의 포함 범위와 패턴을 읽는다.
+- NULL이 있는 조건에서 TRUE인 행만 남는 이유를 적용한다.
+
+## 먼저 알아둘 말
+
+| 용어 | 쉬운 뜻 |
+| --- | --- |
+| 조건식 | 각 행을 TRUE·FALSE·UNKNOWN으로 평가하는 식 |
+| 비교 연산자 | `=`, `<>`, `>`, `>=`, `<`, `<=`처럼 값을 비교하는 기호 |
+| 논리 연산자 | 여러 조건을 묶는 `AND`, `OR`, `NOT` |
+| 범위 조건 | 시작값과 끝값 사이를 검사하는 `BETWEEN` |
+| 목록 조건 | 여러 후보 중 하나인지 검사하는 `IN` |
+| 패턴 조건 | 문자열 모양을 검사하는 `LIKE` |
+
+## 선수지식과 핵심 질문
+
+15편에서 FROM이 출발 행을 만들고 SELECT가 결과 열을 정한다고 배웠다.
+
+> 회원 4명 중 서울에 살고 포인트가 1000 이상인 회원만 어떻게 남길까?
+
+## 입력 회원 데이터
+
+| member_id | member_name | city | grade | points |
+| --- | --- | --- | --- | ---: |
+| M01 | 민지 | 서울 | GOLD | 1,200 |
+| M02 | 준호 | 부산 | SILVER | 500 |
+| M03 | 소라 | 서울 | GOLD | 800 |
+| M04 | 현우 | 대구 | BRONZE | 0 |
+
+## WHERE는 각 행을 시험한다
+
+```sql
+SELECT member_id, member_name, points
+FROM members
+WHERE points >= 800;
+```
+
+| 회원 | 조건 평가 | 남는가? |
+| --- | --- | --- |
+| 민지 1200 | TRUE | 예 |
+| 준호 500 | FALSE | 아니오 |
+| 소라 800 | TRUE | 예. 경계값 포함 |
+| 현우 0 | FALSE | 아니오 |
+
+| member_id | member_name | points |
+| --- | --- | ---: |
+| M01 | 민지 | 1,200 |
+| M03 | 소라 | 800 |
+
+`>=`는 같은 값도 포함하므로 800점인 소라도 남는다.
+
+## AND와 OR
+
+AND는 모든 조건이 TRUE여야 하고 OR는 하나 이상 TRUE면 된다.
+
+```sql
+SELECT member_name, city, points
+FROM members
+WHERE city = '서울'
+  AND points >= 1000;
+```
+
+| 회원 | 서울인가? | 1000 이상인가? | AND 결과 |
+| --- | --- | --- | --- |
+| 민지 | TRUE | TRUE | TRUE |
+| 소라 | TRUE | FALSE | FALSE |
+
+| member_name | city | points |
+| --- | --- | ---: |
+| 민지 | 서울 | 1,200 |
+
+```sql
+SELECT member_name, city
+FROM members
+WHERE city = '서울'
+   OR city = '부산';
+```
+
+| member_name | city |
+| --- | --- |
+| 민지 | 서울 |
+| 준호 | 부산 |
+| 소라 | 서울 |
+
+## AND가 OR보다 먼저 계산된다
+
+다음 조건을 괄호 없이 읽어 보자.
+
+```sql
+WHERE grade = 'GOLD'
+   OR grade = 'SILVER'
+  AND points >= 800
+```
+
+AND가 먼저이므로 실제 의미는 다음과 같다.
+
+```text
+grade = 'GOLD'
+OR (grade = 'SILVER' AND points >= 800)
+```
+
+GOLD 회원은 포인트와 상관없이 모두 남고 SILVER는 800 이상일 때만 남는다. 원하는 것이 “GOLD 또는 SILVER이면서 800 이상”이라면 괄호가 필요하다.
+
+```sql
+WHERE (grade = 'GOLD' OR grade = 'SILVER')
+  AND points >= 800
+```
+
+| member_name | grade | points |
+| --- | --- | ---: |
+| 민지 | GOLD | 1,200 |
+| 소라 | GOLD | 800 |
+
+<Callout type="important">
+  조건이 섞이면 연산자 우선순위만 외우기보다 의도한 묶음을 괄호로 표시한다. 시험에서는 괄호 유무로 결과 행을 바꾼다.
+</Callout>
+
+## BETWEEN은 양쪽 경계를 포함한다
+
+```sql
+SELECT member_name, points
+FROM members
+WHERE points BETWEEN 500 AND 800;
+```
+
+`BETWEEN 500 AND 800`은 `points >= 500 AND points <= 800`과 같다.
+
+| member_name | points |
+| --- | ---: |
+| 준호 | 500 |
+| 소라 | 800 |
+
+낮은 값과 높은 값의 순서를 바꾸면 일반적인 의미의 범위가 되지 않는다.
+
+## IN은 같은 열의 OR를 줄인다
+
+```sql
+SELECT member_name, grade
+FROM members
+WHERE grade IN ('GOLD', 'SILVER');
+```
+
+| member_name | grade |
+| --- | --- |
+| 민지 | GOLD |
+| 준호 | SILVER |
+| 소라 | GOLD |
+
+이는 `grade = 'GOLD' OR grade = 'SILVER'`와 같은 의미다. 서로 다른 열의 조건을 IN 하나로 묶는 것은 아니다.
+
+## LIKE로 문자열 패턴 찾기
+
+| 기호 | 뜻 | 예 |
+| --- | --- | --- |
+| `%` | 문자 0개 이상 | `'김%'`은 김으로 시작 |
+| `_` | 정확히 문자 1개 | `'_지'`는 두 글자이며 지로 끝남 |
+
+```sql
+SELECT member_name
+FROM members
+WHERE member_name LIKE '%지%';
+```
+
+| member_name |
+| --- |
+| 민지 |
+
+`%지%`는 앞뒤에 문자가 없어도 되며 중간에 지가 포함된 이름을 찾는다. `_`는 한 글자 자리이므로 `%`와 행 수가 다를 수 있다.
+
+문자 `%`나 `_` 자체를 검색할 때는 DBMS의 ESCAPE 구문을 사용한다.
+
+## NULL 조건
+
+```sql
+SELECT order_id
+FROM orders
+WHERE shipped_at IS NULL;
+```
+
+`= NULL`이 아니라 `IS NULL`을 사용한다. WHERE는 조건이 TRUE인 행만 남기므로 NULL 비교에서 나온 UNKNOWN은 제외된다.
+
+## NOT의 범위
+
+```sql
+WHERE NOT (city = '서울' OR grade = 'GOLD')
+```
+
+드모르간 법칙으로 다음과 같다.
+
+```text
+city <> '서울' AND grade <> 'GOLD'
+```
+
+NULL이 있으면 단순한 참·거짓 반전만으로 생각하지 말고 UNKNOWN도 함께 고려한다.
+
+## 흔한 실수와 진단법
+
+| 실수 | 결과 | 고치는 법 |
+| --- | --- | --- |
+| AND·OR 괄호 생략 | 예상보다 많은·적은 행 | 의도한 묶음 표시 |
+| BETWEEN 경계 제외로 착각 | 500·800 행 누락 예측 | 양끝 포함 기억 |
+| `_`를 여러 글자로 해석 | LIKE 결과 오류 | `_`는 정확히 한 글자 |
+| `= NULL` 사용 | 원하는 NULL 행 없음 | IS NULL 사용 |
+| NOT IN의 NULL 무시 | UNKNOWN으로 행 제외 | 목록·서브쿼리 NULL 검사 |
+
+## 시험 연결
+
+1. WHERE는 FALSE와 UNKNOWN을 제거하고 TRUE만 남긴다.
+2. 일반적으로 NOT, AND, OR 순으로 우선하므로 괄호를 확인한다.
+3. BETWEEN은 양쪽 경계를 포함한다.
+4. IN은 같은 표현식의 여러 동등 비교, LIKE의 `%`와 `_`는 길이가 다르다.
+
+## 짧은 확인
+
+`WHERE city='서울' OR city='부산' AND points>=1000`에서 부산 500점 회원은 남을까?
+
+<Collapse title="확인하기">
+
+남지 않는다. AND가 먼저라 `city='서울' OR (city='부산' AND points>=1000)`으로 계산된다. 부산 회원은 두 번째 묶음의 포인트 조건을 통과하지 못한다.
+
+</Collapse>
+
+## 다음 단계: 복습
+
+[17편 복습 문제와 조건 평가](./17_where-clause-review)에서 행마다 조건의 참·거짓을 계산하자.
+
+## 정리
+
+<Callout type="default">
+  - WHERE는 각 행의 조건을 평가해 TRUE만 남긴다.
+  - AND·OR가 섞이면 괄호와 우선순위를 확인한다.
+  - BETWEEN은 경계를 포함하고 IN은 같은 값 비교를 묶는다.
+  - LIKE의 `%`는 0개 이상, `_`는 한 글자다.
+</Callout>
+
+다음 편에서는 여러 주문 행을 회원·상태별 그룹으로 묶어 합계와 평균을 계산한다.
+
+## 참고 자료
+
+- [PostgreSQL — WHERE Clause](https://www.postgresql.org/docs/current/sql-select.html#SQL-WHERE)
+- [PostgreSQL — Pattern Matching](https://www.postgresql.org/docs/current/functions-matching.html)
+- [Oracle Database — Conditions](https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Conditions.html)

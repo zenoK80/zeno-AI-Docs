@@ -1,0 +1,114 @@
+---
+title: '27-복습. Top N 쿼리'
+description: 'Top N의 정렬·제한 순서, 동점 정책, 그룹별 순위와 ROWNUM 함정을 문제로 점검한다.'
+---
+
+## 복습 방법
+
+정렬 결과에 직접 1, 2, 3 번호를 적은 뒤 `ROW_NUMBER`, `RANK`, `DENSE_RANK` 중 어떤 번호를 자르는지 확인한다.
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"Top N 쿼리에서 가장 먼저 논리적으로 확정해야 할 것은?"}
+  options={["열 별칭 길이", "상위를 정의하는 정렬 기준", "테이블의 물리적 저장 순서", "NULL을 모두 0으로 변경"]}
+  correctAnswer={2}
+  explanation={"어떤 기준의 상위인지 정렬을 정의해야 N개를 의미 있게 고를 수 있다."}
+  optionExplanations={[
+    "별칭 길이는 상위 기준이 아니다.",
+    "정답이다.",
+    "물리적 순서는 조회 결과로 보장되지 않는다.",
+    "NULL 정책은 필요할 수 있지만 무조건 0으로 바꾸지 않는다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"점수 100, 90, 90, 80에서 RANK() <= 2가 반환하는 행 수는?"}
+  options={["1행", "2행", "3행", "4행"]}
+  correctAnswer={3}
+  explanation={"순위는 1, 2, 2, 4이므로 1위와 공동 2위까지 세 행이다."}
+  optionExplanations={[
+    "1위만 센 값이다.",
+    "ROW_NUMBER <= 2일 때의 행 수다.",
+    "정답이다.",
+    "4위는 조건을 넘는다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"회원별 상위 주문 1건을 구할 때 ROW_NUMBER의 OVER 절에 필요한 핵심 구문은?"}
+  options={[
+    "PARTITION BY member_id",
+    "GROUP BY order_id만",
+    "CROSS JOIN members",
+    "UNION ALL",
+  ]}
+  correctAnswer={1}
+  explanation={"회원이 바뀔 때마다 순번을 다시 시작하려면 member_id로 파티션을 나눈다."}
+  optionExplanations={[
+    "정답이다.",
+    "주문별 그룹은 각 행을 따로 만들 뿐 회원별 순위를 주지 않는다.",
+    "모든 조합을 만들어 결과를 증폭한다.",
+    "결과를 세로로 결합하는 연산이다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"Oracle 전통 ROWNUM Top N에서 전체 정렬 상위값을 얻는 올바른 생각은?"}
+  options={[
+    "ROWNUM 제한 후 바깥에서 전체를 정렬한다.",
+    "안쪽 쿼리에서 정렬한 뒤 바깥 쿼리에서 ROWNUM을 제한한다.",
+    "ORDER BY는 완전히 제거한다.",
+    "ROWNUM을 음수로 비교한다.",
+  ]}
+  correctAnswer={2}
+  explanation={"정렬된 결과를 먼저 만들고 그 결과의 앞 N행을 바깥에서 선택한다."}
+  optionExplanations={[
+    "임의의 N행만 정렬할 수 있다.",
+    "정답이다.",
+    "상위 기준이 사라진다.",
+    "ROWNUM의 정상적인 상위 제한 방식이 아니다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"정확히 3행만 필요하고 3위 동점은 함께 포함하지 않을 때 알맞은 방식은?"}
+  options={["RANK() <= 3", "DENSE_RANK() <= 3", "ROW_NUMBER() <= 3", "FETCH FIRST 3 ROWS WITH TIES"]}
+  correctAnswer={3}
+  explanation={"ROW_NUMBER는 동점에도 고유 순번을 부여해 정확히 세 행을 선택한다."}
+  optionExplanations={[
+    "3위 동점 때문에 세 행을 넘을 수 있다.",
+    "상위 세 개의 서로 다른 값에 속한 행을 모두 포함할 수 있다.",
+    "정답이다.",
+    "WITH TIES는 동점을 포함한다.",
+  ]}
+/>
+
+## 직접 적용하기
+
+금액이 `500(A), 400(B), 400(C), 300(D), 200(E)`인 데이터에 대해 다음 결과 행의 이름을 적자.
+
+1. `ROW_NUMBER() <= 2`
+2. `RANK() <= 2`
+3. `DENSE_RANK() <= 2`
+
+<Collapse title="풀이">
+
+동점의 ROW_NUMBER 순서는 이름 오름차순을 보조 기준으로 정했다고 하자.
+
+1. ROW_NUMBER: A, B
+2. RANK: A, B, C
+3. DENSE_RANK: A, B, C
+
+데이터에 다음 값 300이 더 있어도 RANK의 다음 순위는 4, DENSE_RANK는 3이 된다.
+
+</Collapse>
+
+## 복습 완료
+
+[27. Top N 쿼리](./27_top-n-queries)의 ROWNUM과 동점 표를 다시 확인한 뒤 [28. 계층형 질의](./28_hierarchical-queries)로 이동하자.

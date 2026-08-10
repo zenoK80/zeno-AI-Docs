@@ -1,0 +1,78 @@
+---
+title: '38-복습. SQL 기본'
+description: '조인·필터·그룹·HAVING·NULL 집계를 섞은 SQL의 중간 행과 최종 결과를 문제로 점검한다.'
+---
+
+## 복습 방법
+
+긴 SQL을 `JOIN 결과 → WHERE 결과 → 그룹표 → HAVING → 정렬표` 다섯 칸으로 나눠 쓴다.
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"SQL 결과를 이해하는 일반적인 논리 순서에서 가장 먼저 보는 절은?"}
+  options={["FROM", "SELECT", "ORDER BY", "HAVING"]}
+  correctAnswer={1}
+  explanation={"FROM과 JOIN이 계산의 출발 행 집합을 만든다."}
+  optionExplanations={["정답이다.", "작성 위치는 앞이지만 논리 계산은 뒤다.", "최종 정렬 단계다.", "그룹 생성 뒤 필터다."]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"LEFT JOIN으로 주문 없는 회원을 남긴 뒤 COUNT(o.order_id)를 계산하면 그 회원의 건수는?"}
+  options={["0", "1", "NULL", "오류"]}
+  correctAnswer={1}
+  explanation={"보존 행의 order_id는 NULL이고 COUNT(column)은 NULL을 세지 않는다."}
+  optionExplanations={["정답이다.", "COUNT(*)와 혼동한 값이다.", "COUNT 결과는 0이다.", "정상 집계다."]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"집계 전 개별 CANCELED 주문을 제거하기 가장 알맞은 절은?"}
+  options={["WHERE", "HAVING", "ORDER BY", "SELECT 별칭"]}
+  correctAnswer={1}
+  explanation={"WHERE는 GROUP BY 전에 개별 입력 행을 거른다."}
+  optionExplanations={["정답이다.", "집계된 그룹 조건에 사용한다.", "순서만 바꾼다.", "필터 절이 아니다."]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"GROUP BY city, grade 결과 한 행이 뜻하는 것은?"}
+  options={["서로 다른 city와 grade 조합 하나", "원본 주문 한 건", "테이블 전체", "열 하나의 문자"]}
+  correctAnswer={1}
+  explanation={"두 그룹 키 값의 고유 조합마다 결과 그룹 한 행이 생긴다."}
+  optionExplanations={["정답이다.", "집계 전 단위다.", "GROUP BY 없는 전체 집계와 다르다.", "행 단위 의미를 묻는 문제다."]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"LEFT JOIN 오른쪽 테이블 조건을 WHERE에 둘 때 생길 수 있는 결과는?"}
+  options={["짝 없는 NULL 보존 행이 제거된다.", "항상 FULL JOIN이 된다.", "모든 금액이 0이 된다.", "GROUP BY가 사라진다."]}
+  correctAnswer={1}
+  explanation={"오른쪽 값이 NULL인 보존 행은 비교가 참이 아니어서 WHERE를 통과하지 못할 수 있다."}
+  optionExplanations={["정답이다.", "조인 종류가 자동 변경되지 않는다.", "값을 자동 변환하지 않는다.", "그룹 절과 별개다."]}
+/>
+
+## 직접 적용하기
+
+주문 행은 서울 PAID 100, 서울 CANCELED 50, 부산 PAID 80, 부산 PAID 40이다.
+
+```sql
+SELECT city, COUNT(*) cnt, SUM(amount) sum_amount
+FROM sales
+WHERE status = 'PAID'
+GROUP BY city
+HAVING SUM(amount) >= 100
+ORDER BY sum_amount DESC;
+```
+
+<Collapse title="풀이">
+
+WHERE 후 서울 100, 부산 80·40 세 행이다. 그룹 결과는 서울 `1건·100`, 부산 `2건·120`이며 둘 다 HAVING을 통과한다. 정렬 후 부산이 첫 행, 서울이 둘째 행이다.
+
+</Collapse>
+
+## 복습 완료
+
+[38. SQL 기본](./38_sql-basics-summary)의 중간표 풀이를 다시 본 뒤 [39. SQL 활용](./39_sql-advanced-summary)으로 이동하자.

@@ -1,0 +1,281 @@
+---
+title: '23. 서브쿼리'
+description: '쿼리 안의 쿼리가 반환하는 행과 열의 모양을 먼저 예측해 단일행·다중행·상관 서브쿼리를 이해한다.'
+---
+
+## 이번 편의 목표
+
+- 서브쿼리의 결과를 `1행 1열`, `여러 행 1열`, `표`로 구분한다.
+- 단일행 연산자와 다중행 연산자를 올바르게 선택한다.
+- 비상관 서브쿼리와 상관 서브쿼리의 실행 관점을 설명한다.
+- `IN`, `EXISTS`, `NOT IN`의 NULL 함정을 판단한다.
+
+## 먼저 알아둘 말
+
+| 용어 | 쉬운 뜻 |
+| --- | --- |
+| 서브쿼리(Subquery) | 다른 SQL 문 안에 괄호로 넣은 SELECT 문 |
+| 메인쿼리 | 서브쿼리의 결과를 받아 최종 결과를 만드는 바깥 쿼리 |
+| 스칼라 서브쿼리 | 한 행, 한 열의 값 하나를 반환해야 하는 서브쿼리 |
+| 다중행 서브쿼리 | 여러 행을 반환할 수 있는 서브쿼리 |
+| 상관 서브쿼리 | 바깥 쿼리의 현재 행 값을 참조하는 서브쿼리 |
+| EXISTS | 서브쿼리 결과에 행이 하나라도 존재하는지 검사하는 연산자 |
+
+## 선수지식과 핵심 질문
+
+선수지식은 [17. WHERE 절](./17_where-clause), [18. GROUP BY 절](./18_group-by), [21. 조인](./21_joins)이다.
+
+핵심 질문은 **안쪽 SELECT가 어떤 모양의 값을 돌려주며, 바깥 조건이 그 모양을 받을 수 있는가**이다.
+
+## 작은 문제를 먼저 풀게 하는 구조
+
+전체 평균 주문 금액보다 큰 주문을 찾는다고 하자.
+
+`orders`
+
+| order_id | member_id | total_amount |
+| ---: | --- | ---: |
+| 1001 | M01 | 106000 |
+| 1002 | M01 | 30000 |
+| 1003 | M02 | 250000 |
+| 1004 | M03 | 70000 |
+| 1005 | M03 | 50000 |
+
+먼저 평균을 계산한다.
+
+```sql
+SELECT AVG(total_amount)
+FROM orders;
+```
+
+합계는 506000원, 행 수는 5이므로 평균은 101200원이다. 이 값 하나를 바깥 쿼리의 비교 기준으로 사용한다.
+
+```mermaid
+flowchart LR
+  A["안쪽 SELECT 실행"] --> B["평균 101200 반환"]
+  B --> C["바깥 WHERE의 비교 기준"]
+  C --> D["101200보다 큰 주문만 결과에 남김"]
+```
+
+서브쿼리를 읽을 때는 안쪽 결과의 행 수와 열 수를 먼저 확정한 다음 바깥 연산자가 그 모양을 받을 수 있는지 확인한다.
+
+```sql
+SELECT order_id, total_amount
+FROM orders
+WHERE total_amount > (
+  SELECT AVG(total_amount)
+  FROM orders
+)
+ORDER BY order_id;
+```
+
+| order_id | total_amount |
+| ---: | ---: |
+| 1001 | 106000 |
+| 1003 | 250000 |
+
+안쪽은 `101200`이라는 1행 1열, 바깥은 그 값보다 큰 행을 반환한다.
+
+## 결과 모양부터 분류하기
+
+| 서브쿼리 결과 | 사용할 수 있는 대표 연산자 | 예시 |
+| --- | --- | --- |
+| 1행 1열 | `=`, `>`, `<`, `>=` | 평균보다 큰 주문 |
+| 여러 행 1열 | `IN`, `ANY`, `ALL` | 서울 회원의 주문 |
+| 행 존재 여부 | `EXISTS`, `NOT EXISTS` | 주문이 있는 회원 |
+| 여러 열의 표 | FROM 절의 인라인 뷰 | 회원별 합계 표를 다시 조회 |
+
+<Callout type="warning">
+  `=` 오른쪽 서브쿼리가 두 행 이상을 반환하면 단일 값으로 비교할 수 없어 오류가 난다. SQL을 보기 전에 안쪽 결과의 행 수부터 예상하자.
+</Callout>
+
+## 다중행 서브쿼리와 IN
+
+서울 회원의 주문을 찾는다.
+
+```sql
+SELECT member_id
+FROM members
+WHERE city = '서울';
+```
+
+안쪽 결과는 M01, M03 두 행이다. 따라서 `=`가 아니라 목록 중 하나와 같은지 검사하는 `IN`이 알맞다.
+
+```sql
+SELECT order_id, member_id, total_amount
+FROM orders
+WHERE member_id IN (
+  SELECT member_id
+  FROM members
+  WHERE city = '서울'
+)
+ORDER BY order_id;
+```
+
+| order_id | member_id | total_amount |
+| ---: | --- | ---: |
+| 1001 | M01 | 106000 |
+| 1002 | M01 | 30000 |
+| 1004 | M03 | 70000 |
+| 1005 | M03 | 50000 |
+
+### ANY와 ALL
+
+- `> ANY (10, 20, 30)`: 셋 중 하나보다만 크면 되므로 사실상 10보다 크면 된다.
+- `> ALL (10, 20, 30)`: 모두보다 커야 하므로 30보다 커야 한다.
+- `= ANY (...)`: 목록 중 하나와 같다는 뜻으로 `IN (...)`과 같은 의미다.
+
+빈 집합과 NULL이 섞이면 결과가 직관과 달라질 수 있으므로 시험에서는 비교 방향과 집합의 최솟값·최댓값을 함께 확인한다.
+
+## 상관 서브쿼리
+
+회원마다 자신의 주문 평균보다 큰 주문을 찾는다고 하자. 기준 평균이 회원별로 달라서 안쪽 쿼리가 바깥 주문 행의 `member_id`를 참조한다.
+
+```sql
+SELECT o.order_id, o.member_id, o.total_amount
+FROM orders o
+WHERE o.total_amount > (
+  SELECT AVG(o2.total_amount)
+  FROM orders o2
+  WHERE o2.member_id = o.member_id
+)
+ORDER BY o.order_id;
+```
+
+| 회원 | 주문 금액 | 회원별 평균 | 평균 초과 결과 |
+| --- | --- | ---: | --- |
+| M01 | 106000, 30000 | 68000 | 1001 |
+| M02 | 250000 | 250000 | 없음 |
+| M03 | 70000, 50000 | 60000 | 1004 |
+
+| order_id | member_id | total_amount |
+| ---: | --- | ---: |
+| 1001 | M01 | 106000 |
+| 1004 | M03 | 70000 |
+
+설명할 때는 바깥 행 하나를 잡고, 그 행의 회원 번호로 안쪽 평균을 구한 뒤 비교한다고 생각하면 된다. 실제 DBMS는 옵티마이저가 같은 의미의 더 효율적인 방식으로 바꿀 수 있다.
+
+## EXISTS: 값보다 존재 여부가 중요할 때
+
+주문이 한 건이라도 있는 회원을 찾는다.
+
+```sql
+SELECT m.member_id, m.name
+FROM members m
+WHERE EXISTS (
+  SELECT 1
+  FROM orders o
+  WHERE o.member_id = m.member_id
+)
+ORDER BY m.member_id;
+```
+
+| member_id | name |
+| --- | --- |
+| M01 | 민지 |
+| M02 | 준호 |
+| M03 | 소라 |
+
+`SELECT 1`의 숫자 1을 결과로 쓰는 것이 아니다. EXISTS는 조건을 만족하는 **행이 있는지**만 본다. 주문 없는 M04는 제외된다.
+
+### NOT EXISTS
+
+`NOT EXISTS`로 바꾸면 주문이 없는 M04 현우만 나온다. 이런 형태는 “관련 데이터가 하나도 없는 대상”을 찾을 때 안전하고 명확하다.
+
+## NOT IN과 NULL 함정
+
+```sql
+WHERE member_id NOT IN ('M01', NULL)
+```
+
+이 조건은 `member_id <> 'M01' AND member_id <> NULL`과 비슷하게 평가된다. 어떤 값도 `NULL`과의 비교가 참으로 확정되지 않으므로 예상과 달리 행이 하나도 나오지 않을 수 있다.
+
+<Callout type="error">
+  NOT IN의 서브쿼리 결과에 NULL이 들어올 수 있으면 먼저 NULL을 제거하거나, 관계 조건을 명시한 NOT EXISTS를 검토한다.
+</Callout>
+
+## SELECT와 FROM 안의 서브쿼리
+
+### SELECT 목록의 스칼라 서브쿼리
+
+```sql
+SELECT m.name,
+       (SELECT COUNT(*)
+        FROM orders o
+        WHERE o.member_id = m.member_id) AS order_count
+FROM members m;
+```
+
+각 회원 행에 주문 건수 값 하나를 붙인다. SELECT 위치의 서브쿼리는 행마다 값 하나, 즉 1행 1열을 반환해야 한다.
+
+### FROM 절의 인라인 뷰
+
+```sql
+SELECT x.member_id, x.total_sum
+FROM (
+  SELECT member_id, SUM(total_amount) AS total_sum
+  FROM orders
+  GROUP BY member_id
+) x
+WHERE x.total_sum >= 100000;
+```
+
+안쪽에서 회원별 합계라는 임시 결과표를 만들고, 바깥에서 10만원 이상인 행을 거른다.
+
+## 조인과 서브쿼리는 언제 선택할까
+
+같은 결과를 여러 방식으로 표현할 수 있다. 조인이 항상 빠르거나 서브쿼리가 항상 느리다고 단정할 수 없다. DBMS의 옵티마이저가 변환하기도 하며 데이터 분포와 인덱스에 따라 달라진다.
+
+| 목적 | 읽기 쉬운 출발점 |
+| --- | --- |
+| 다른 테이블의 열도 함께 출력 | 조인 |
+| 기준값 하나를 먼저 계산 | 스칼라 서브쿼리 |
+| 관련 행의 존재 여부만 확인 | EXISTS |
+| 집계한 중간 표를 다시 필터 | FROM 서브쿼리 또는 CTE |
+
+## 시험에서는 어떻게 묻나
+
+- `=`와 `IN` 중 서브쿼리 행 수에 맞는 연산자를 고르게 한다.
+- `> ANY`, `> ALL`을 최솟값·최댓값 비교로 바꾸어 묻는다.
+- 상관 서브쿼리에서 바깥 별칭을 참조하는 위치를 찾게 한다.
+- `NOT IN` 결과 집합의 NULL 때문에 결과가 사라지는 함정을 낸다.
+
+## 짧은 확인
+
+`WHERE amount > (SELECT amount FROM orders WHERE status = 'PAID')`에서 PAID 주문이 세 건이면 어떤 문제가 생길까?
+
+<Collapse title="확인하기">
+
+`>`는 오른쪽에 단일 값이 필요하지만 서브쿼리가 세 행을 반환하므로 단일행 서브쿼리 관련 오류가 난다. 의도에 따라 `> ALL`, `> ANY`, 집계함수 등을 선택해야 한다.
+
+</Collapse>
+
+## 흔한 실수와 진단법
+
+| 증상 | 원인 | 진단법 |
+| --- | --- | --- |
+| 단일행 서브쿼리 오류 | `=` 오른쪽이 여러 행 | 안쪽 SELECT만 실행해 행 수 확인 |
+| 결과가 0행 | NOT IN 목록에 NULL | NULL 제거 후 비교하거나 NOT EXISTS 검토 |
+| 상관 조건 결과가 이상함 | 안쪽·바깥 별칭 혼동 | 각 열 앞에 별칭을 모두 적기 |
+| 스칼라 서브쿼리 오류 | 한 바깥 행에 안쪽 여러 행 | 집계 또는 고유 조건 보완 |
+
+## 다음 단계: 복습
+
+[23-복습. 서브쿼리](./23_subqueries-review)에서 반환 모양과 연산자를 직접 연결하자.
+
+## 정리
+
+<Callout type="default">
+  - 서브쿼리는 먼저 반환 행 수와 열 수를 예측한다.
+  - 단일 값에는 `=`, `>`, 여러 값에는 `IN`, `ANY`, `ALL`을 사용한다.
+  - 상관 서브쿼리는 바깥의 현재 행 값을 안쪽에서 참조한다.
+  - EXISTS는 행 존재 여부를 보며, NOT IN은 NULL을 특히 조심한다.
+</Callout>
+
+다음 편에서는 두 SELECT 결과를 위아래로 합치는 집합 연산자를 다룬다.
+
+## 참고 자료
+
+- [PostgreSQL - Subquery Expressions](https://www.postgresql.org/docs/current/functions-subquery.html)
+- [Oracle Database - Using Subqueries](https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/Using-Subqueries.html)
+- [PostgreSQL - SELECT](https://www.postgresql.org/docs/current/sql-select.html)
