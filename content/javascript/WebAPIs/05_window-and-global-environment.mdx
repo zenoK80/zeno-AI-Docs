@@ -42,6 +42,16 @@ document.title === window.document.title   // true
 | **타이머·대화상자** | `window.setTimeout`, `window.alert` | 시간 지연 실행, 사용자 알림 |
 | **창 정보** | `window.innerWidth`, `window.scrollY` | 뷰포트 크기, 스크롤 위치 |
 
+네 부류를 트리로 그리면 이렇다.
+
+```mermaid
+flowchart TD
+  A["window (전역 객체)"] --> B["document<br/>(DOM 진입점)"]
+  A --> C["location, navigator, history<br/>(BOM)"]
+  A --> D["setTimeout, alert<br/>(타이머·대화상자)"]
+  A --> E["innerWidth, scrollY<br/>(창 정보)"]
+```
+
 지금 전부 외울 필요는 없다. **"모르는 이름이 나오면 `window`에 있는 것부터 의심해본다"** 는 감각만 챙기면 된다.
 
 ```js

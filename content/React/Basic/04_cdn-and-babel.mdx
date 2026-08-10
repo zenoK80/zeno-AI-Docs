@@ -126,6 +126,17 @@ CDN으로 Babel의 브라우저용 버전(`standalone`)을 가져오면, HTML �
 즉 우리가 위에서 손으로 짰던 코드를, JSX를 쓰면 **Babel이 대신 만들어준다.**
 </Callout>
 
+지금까지 나온 조각을 하나의 흐름으로 이으면 이렇다.
+
+```mermaid
+flowchart LR
+  A["JSX 코드"] --> B["Babel이 변환"]
+  B --> C["React.createElement 호출"]
+  C --> D["설계도 객체<br/>{ type, props, ... }"]
+  D --> E["ReactDOM.render"]
+  E --> F["실제 DOM"]
+```
+
 개발자 도구에서 확인해 볼 수도 있다. [Babel 공식 REPL](https://babeljs.io/repl)에 위 JSX를 붙여넣으면,
 오른쪽에 변환된 `React.createElement(...)` 코드가 그대로 뜬다. JSX 문법 자체는 5편에서 자세히 다룬다.
 

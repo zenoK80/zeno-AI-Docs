@@ -407,3 +407,23 @@ html.dark .docs-navbar-panel-inner {
   }
 }
 
+.mermaid-diagram {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  border: 1px solid var(--docs-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--background) 96%, var(--x-color-gray-100));
+  padding: 1rem;
+}
+
+.mermaid-diagram svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+html.dark .mermaid-diagram {
+  background: color-mix(in srgb, var(--background) 94%, var(--x-color-gray-800));
+}
+

@@ -115,6 +115,16 @@ ECMAScript는 **"콘센트 규격 문서"**, 자바스크립트는 **"그 규격
 `document.querySelector()`, `alert()`, `localStorage` 같은 건 **브라우저가 제공하는 기능**이다. 언어의 일부가 아니다.
 </Callout>
 
+언어 하나에 실행 환경마다 다른 기능이 덧붙는 구조를 그리면 이렇다.
+
+```mermaid
+flowchart TD
+  A["ECMAScript (언어 자체)<br/>const, function, Promise ..."] --> B["브라우저 환경"]
+  A --> C["Node.js 환경"]
+  B --> D["document, alert,<br/>localStorage 등 Web API"]
+  C --> E["fs, process 등<br/>Node.js API"]
+```
+
 같은 코드라도 실행하는 곳에 따라 쓸 수 있는 게 달라진다.
 
 <Tabs items={['브라우저', 'Node.js']}>

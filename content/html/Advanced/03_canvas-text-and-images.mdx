@@ -125,6 +125,15 @@ img.src = 'cat.png'
 ctx.drawImage(img, 0, 0)   // 아무것도 안 그려질 수 있다!
 ```
 
+이미지가 실제로 거치는 상태를 그리면 이렇다. `drawImage`는 반드시 "로딩 완료" 이후에 불러야 한다.
+
+```mermaid
+flowchart LR
+  A["img.src 설정"] --> B["로딩 중 (비동기)"]
+  B -->|onload 이벤트| C["로딩 완료"]
+  C --> D["drawImage() 호출<br/>(안전)"]
+```
+
 <Callout type="warning">
 이미지 파일을 내려받는 데는 시간이 걸린다. `img.src`를 설정한 바로 다음 줄에서 `drawImage`를 호출하면,
 **아직 이미지가 다 로드되지 않은 상태**일 수 있다. 이때는 아무것도 그려지지 않거나 에러가 난다.

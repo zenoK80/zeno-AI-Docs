@@ -37,6 +37,15 @@ ctx.restore()        // 저장해둔 상태로 복귀 — 이동·회전이 취�
 ctx.fillRect(10, 10, 50, 50)   // 영향받지 않고 원래 좌표계에 그려진다
 ```
 
+한 사이클을 그리면 이렇다.
+
+```mermaid
+flowchart LR
+  A["save()<br/>현재 상태 저장"] --> B["translate/rotate<br/>변형 적용"]
+  B --> C["fillRect() 등<br/>그리기"]
+  C --> D["restore()<br/>저장된 상태로 복귀"]
+```
+
 <Callout type="warning">
 `save()`/`restore()` 없이 여러 도형을 변형하면, 앞서 건 `translate`나 `rotate`가 계속 누적되어
 다음 도형의 위치가 예상과 달라진다. **변형이 필요한 도형마다 `save()` → 변형 → 그리기 → `restore()`** 패턴을 습관화하자.
@@ -84,6 +93,15 @@ function draw() {
 }
 
 requestAnimationFrame(draw)   // 첫 실행
+```
+
+`draw` 함수가 스스로를 반복 예약하는 흐름을 그리면 이렇다.
+
+```mermaid
+flowchart LR
+  A["clearRect()<br/>이전 프레임 지우기"] --> B["도형을 새 위치에<br/>다시 그리기"]
+  B --> C["requestAnimationFrame(draw)<br/>다음 프레임 예약"]
+  C -->|다음 화면 준비되면 draw 재호출| A
 ```
 
 <Callout type="important">

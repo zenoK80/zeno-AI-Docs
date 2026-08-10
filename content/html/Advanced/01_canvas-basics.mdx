@@ -75,6 +75,12 @@ const ctx = canvas.getContext('2d')
 
 `getContext()`가 이 시리즈에서 가장 중요한 한 줄이다. **실제로 그림을 그리는 모든 메서드(`fillRect`, `drawImage`, `fillText` …)는 `canvas`가 아니라 이 `ctx` 객체에 들어있다.**
 
+```mermaid
+flowchart LR
+  A["canvas 요소<br/>(빈 도화지)"] -->|getContext('2d')| B["ctx 객체<br/>(그리기 도구 모음)"]
+  B --> C["fillRect(), drawImage(),<br/>fillText() 등"]
+```
+
 <Callout type="info">
 `getContext('2d')`가 실패하면(아주 오래된 환경 등) `null`을 반환한다. 실무 코드에서는 존재를 확인하고 쓴다.
 

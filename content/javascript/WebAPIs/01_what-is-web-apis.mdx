@@ -75,6 +75,16 @@ localStorage                         // ReferenceError
 언어(ECMAScript)가 아니라 **브라우저가 주는 API들**을 다루는 시리즈라는 뜻이다.
 </Callout>
 
+관리 주체를 기준으로 나누면 이렇다.
+
+```mermaid
+flowchart TD
+  A["자바스크립트 코드"] --> B["ECMAScript (언어)<br/>TC39가 관리"]
+  A --> C["Web API (브라우저 제공)<br/>WHATWG · W3C가 관리"]
+  B --> D["Promise, class,<br/>Map, JSON ..."]
+  C --> E["document, fetch,<br/>localStorage ..."]
+```
+
 ## 경계선 긋기 — 이 시리즈가 다루는 것
 
 어떤 주제가 이 시리즈 소관인지 헷갈릴 때 쓸 수 있는 판별법이다.

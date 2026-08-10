@@ -75,6 +75,15 @@ Chrome, Safari, Firefox 146부터 모든 주요 브라우저가 지원한다. �
 `.card-footer`를 만나는 순간 그 **하위는 범위에서 제외**된다. 카드 안에 중첩된 다른 컴포넌트(예: 다른 카드, 푸터)의
 스타일이 실수로 섞이는 걸 막을 때 유용하다.
 
+DOM 트리에서 범위가 어디까지인지 표시하면 이렇다.
+
+```mermaid
+flowchart TD
+  A[".card — 시작 경계"] --> B["p — 범위 안 (회색)"]
+  A --> C[".card-footer — 끝 경계, 제외"]
+  C --> D["p — 범위 밖"]
+```
+
 <Callout type="important">
 `to (.card-footer)` 자체, 즉 `.card-footer` 요소는 범위에 **포함되지 않는다.** "여기서부터는 제외"라는 경계선이라고 생각하면 된다.
 </Callout>

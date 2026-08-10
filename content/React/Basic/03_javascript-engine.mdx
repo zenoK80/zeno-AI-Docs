@@ -75,6 +75,19 @@ greet()
 
 </Steps>
 
+같은 흐름을 호출·반환 순서로 그리면 이렇게 된다. **나중에 호출된 `sayHi`가 먼저 반환**되는 것에 주목하자.
+
+```mermaid
+sequenceDiagram
+  participant M as 전역 코드
+  participant G as greet
+  participant S as sayHi
+  M->>G: greet() 호출
+  G->>S: sayHi() 호출
+  S-->>G: 'hi' 반환
+  G-->>M: 'hi' 반환
+```
+
 <Callout type="important">
 **핵심 규칙: 스택의 가장 위(마지막에 쌓인 것)가 먼저 끝나야 그 아래가 이어서 끝난다.**
 이걸 **LIFO**<sup>Last In, First Out</sup> 구조라 한다. 나중에 들어온 게 먼저 나간다.

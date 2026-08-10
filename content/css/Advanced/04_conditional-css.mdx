@@ -71,6 +71,15 @@ Firefox는 개발 진행 중, Safari는 로드맵에만 있는 단계다. **Base
 
 여러 조건을 세미콜론으로 나열하고, 위에서부터 순서대로 처음 맞는 조건이 적용된다. 마지막 `else`는 아무 조건도 안 맞을 때의 기본값이다.
 
+```mermaid
+flowchart TD
+  A["--variant 값 확인"] --> B{"primary인가?"}
+  B -->|예| C["royalblue"]
+  B -->|아니오| D{"danger인가?"}
+  D -->|예| E["crimson"]
+  D -->|아니오| F["gray (else)"]
+```
+
 <Callout type="info">
 이 패턴은 지금까지 자바스크립트로 클래스를 갈아 끼우거나(`className={variant === 'danger' ? 'btn-danger' : 'btn-primary'}`),
 Sass의 `@if`/`@else`로 처리하던 것과 같은 목적이다. `if()`가 자리 잡으면 **컴포넌트 변형(variant) 스타일을 순수 CSS로만** 표현할 수 있게 된다.
