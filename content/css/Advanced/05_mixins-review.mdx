@@ -5,60 +5,62 @@ description: '네이티브 믹스인의 현재 상태를 4지선다 퀴즈로 �
 
 ## 05편 복습
 
-## 문제 1
+## 문제로 확인하기
 
-`@mixin`/`@apply`는 2026년 중반 기준 안정 버전 브라우저에 탑재됐나?
-
-<Quiz>
-  <Quiz.Option>모든 주요 브라우저에 이미 들어가 있다</Quiz.Option>
-  <Quiz.Option>Chrome에만 정식으로 들어가 있다</Quiz.Option>
-  <Quiz.Option correct>어느 브라우저에도 정식 탑재되지 않았다. Chrome이 실험적으로 구현 중이다</Quiz.Option>
-  <Quiz.Option>Safari와 Firefox에는 있지만 Chrome에는 없다</Quiz.Option>
-
-  <Quiz.Explanation>
-  2026년 중반 기준, `@mixin`/`@apply`는 **어느 브라우저의 안정 버전에도 들어가 있지 않다.** Chrome이 개발자 피드백을 받기 위해 실험적으로 구현을 진행 중인 단계일 뿐이다. 그래서 지금 이 문법을 실제 서비스 코드에 쓸 수는 없다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 2
-
-지금 여러 CSS 선언을 묶어서 재사용해야 한다면 가장 현실적인 선택은?
-
-<Quiz>
-  <Quiz.Option>네이티브 `@mixin`을 미리 써둔다 (곧 지원될 예정이므로)</Quiz.Option>
-  <Quiz.Option correct>Sass의 `@mixin` (빌드 도구가 필요하지만 가장 성숙하고 검증된 방법)</Quiz.Option>
-  <Quiz.Option>방법이 없으니 매번 전부 손으로 복사해서 붙여넣는다</Quiz.Option>
-  <Quiz.Option>`<style>` 태그를 여러 개 만든다</Quiz.Option>
-
-  <Quiz.Explanation>
-  네이티브 믹스인은 아직 브라우저에 없으니 실무에 쓸 수 없다(A는 오답). 지금 실용적인 선택은 **Sass**<sup>CSS를 미리 변환해주는 도구(전처리기)로, `@mixin`으로 재사용 블록을 만들고 `@include`로 가져다 쓸 수 있다</sup>의 `@mixin`이다. 빌드 과정이 하나 더 필요하지만, 오랫동안 검증된 안정적인 방법이다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 3
-
-제안된 믹스인 이름 앞에 `--`가 붙는 이유는?
-
-<Quiz>
-  <Quiz.Option>그냥 보기 좋으라고 붙인 장식이다</Quiz.Option>
-  <Quiz.Option correct>커스텀 프로퍼티(CSS 변수)와 같은 네임스페이스를 공유하도록 설계되었기 때문이다</Quiz.Option>
-  <Quiz.Option>주석 처리를 위한 기호다</Quiz.Option>
-  <Quiz.Option>음수를 나타내기 위해서다</Quiz.Option>
-
-  <Quiz.Explanation>
-  CSS 변수(`--color: blue` 같은 커스텀 프로퍼티)도 이름 앞에 `--`가 붙는다. 믹스인 제안도 같은 방식의 이름을 쓰는 이유는, "매개변수를 받을 수 있는 특수한 커스텀 프로퍼티"에 가깝게 설계되고 있기 때문이다. 즉 완전히 새로운 문법 체계를 만드는 대신, 이미 있는 커스텀 프로퍼티 개념을 확장하는 방향으로 논의되고 있다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 사고 실습 — 지금 프로젝트라면 어떤 선택을 할까
-
-아래 상황을 읽고, 지금 실무라면 어떤 방법을 쓸지 스스로 답해보자.
-
-> 버튼 컴포넌트 5종(primary, danger, ghost 등)에 공통으로 들어가는 `padding`, `border-radius`, `font-weight` 세 줄을 재사용하고 싶다.
-
-<Collapse title="예시 답안">
-지금(2026년 중반) 실무라면 **Sass `@mixin`** 또는 **공통 클래스(`.btn-base`)를 만들어 조합**하는 방식이 현실적이다. 네이티브 `@mixin`/`@apply`는 아직 어느 브라우저에도 없으므로 프로덕션 코드에 쓸 수 없다.
-</Collapse>
+<Quiz
+  questionNumber={1}
+  question={"`@mixin`/`@apply`는 2026년 중반 기준 안정 버전 브라우저에 탑재됐나?"}
+  options={[
+    "모든 주요 브라우저에 이미 들어가 있다",
+    "Chrome에만 정식으로 들어가 있다",
+    "어느 브라우저에도 정식 탑재되지 않았다. Chrome이 실험적으로 구현 중이다",
+    "Safari와 Firefox에는 있지만 Chrome에는 없다",
+  ]}
+  correctAnswer={3}
+  explanation={"2026년 중반 기준, `@mixin`/`@apply`는 어느 브라우저의 안정 버전에도 들어가 있지 않다. Chrome이 개발자 피드백을 받기 위해 실험적으로 구현을 진행 중인 단계일 뿐이다."}
+  optionExplanations={[
+    "아직 어느 브라우저의 안정 버전에도 정식 탑재되지 않았다.",
+    "Chrome조차 \"정식\"이 아니라 실험적 구현 단계다. 정식 탑재로 보기는 이르다.",
+    "정답이다. 아직 정식 탑재된 브라우저는 없고, Chrome만 실험적으로 구현을 진행 중이다.",
+    "Safari와 Firefox에도 정식 탑재되지 않았다. 실험 구현이 진행 중인 쪽은 오히려 Chrome이다.",
+  ]}
+/>
+<Quiz
+  questionNumber={2}
+  question={"지금 여러 CSS 선언을 묶어서 재사용해야 한다면 가장 현실적인 선택은?"}
+  options={[
+    "네이티브 `@mixin`을 미리 써둔다 (곧 지원될 예정이므로)",
+    "Sass의 `@mixin` (빌드 도구가 필요하지만 가장 성숙하고 검증된 방법)",
+    "방법이 없으니 매번 전부 손으로 복사해서 붙여넣는다",
+    "`<style>` 태그를 여러 개 만든다",
+  ]}
+  correctAnswer={2}
+  explanation={"네이티브 믹스인은 아직 브라우저에 없으니 실무에 쓸 수 없다. 지금 실용적인 선택은 Sass의 `@mixin`이다. 빌드 과정이 하나 더 필요하지만, 오랫동안 검증된 안정적인 방법이다."}
+  optionExplanations={[
+    "아직 어느 브라우저에도 정식 탑재되지 않은 문법을 지금 실무 코드에 쓸 수는 없다.",
+    "정답이다. Sass의 `@mixin`은 빌드 도구가 필요하지만 지금 당장 안정적으로 쓸 수 있는 검증된 방법이다.",
+    "복사·붙여넣기는 코드 중복을 만들어 유지보수를 어렵게 한다. Sass 같은 재사용 도구가 이미 있다.",
+    "`<style>` 태그를 여러 개 만드는 것은 재사용이 아니라 오히려 중복을 늘리는 방식이다.",
+  ]}
+/>
+<Quiz
+  questionNumber={3}
+  question={"제안된 믹스인 이름 앞에 `--`가 붙는 이유는?"}
+  options={[
+    "그냥 보기 좋으라고 붙인 장식이다",
+    "커스텀 프로퍼티(CSS 변수)와 같은 네임스페이스를 공유하도록 설계되었기 때문이다",
+    "주석 처리를 위한 기호다",
+    "음수를 나타내기 위해서다",
+  ]}
+  correctAnswer={2}
+  explanation={"CSS 변수(`--color: blue` 같은 커스텀 프로퍼티)도 이름 앞에 `--`가 붙는다. 믹스인 제안도 같은 방식의 이름을 쓰는 이유는, 이미 있는 커스텀 프로퍼티 개념을 확장하는 방향으로 설계되고 있기 때문이다."}
+  optionExplanations={[
+    "단순 장식이 아니라 커스텀 프로퍼티와 네임스페이스를 공유하도록 의도된 설계다.",
+    "정답이다. `--`는 CSS 커스텀 프로퍼티와 같은 네임스페이스를 공유하도록 설계된 표시다.",
+    "CSS에서 주석은 `/* ... */`로 표시한다. `--`는 주석과 관계없다.",
+    "CSS에는 음수를 나타내는 특별한 접두사 표기법이 없다. `-10px`처럼 부호를 값 앞에 바로 쓴다.",
+  ]}
+/>
 
 ## 정리 체크리스트
 

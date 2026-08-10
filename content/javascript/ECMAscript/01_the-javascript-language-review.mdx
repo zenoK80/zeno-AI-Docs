@@ -8,69 +8,80 @@ description: '1편 핵심 개념을 4지선다 퀴즈로 점검하고, 콘솔에
 본문을 다 읽었다면 여기서 잠깐 멈추자. 다음 편으로 넘어가기 전에, 방금 배운 걸 스스로 확인해 보는 시간이다.
 문제를 먼저 풀어보고, **정답을 맞혔는지 스스로 확인한 다음에** 해설을 읽는 순서를 권한다.
 
-## 문제 1
+## 문제로 확인하기
 
-ECMAScript와 자바스크립트의 관계를 가장 정확하게 설명한 것은?
-
-<Quiz>
-  <Quiz.Option>완전히 같은 말이다. 그냥 두 가지 이름이 있을 뿐이다</Quiz.Option>
-  <Quiz.Option correct>ECMAScript는 표준 규격(문서)이고, 자바스크립트는 그 규격을 따르는 실제 언어다</Quiz.Option>
-  <Quiz.Option>자바스크립트가 먼저 있었고, ECMAScript는 그걸 대체하려고 나온 새 언어다</Quiz.Option>
-  <Quiz.Option>ECMAScript는 자바스크립트의 옛날 이름이다</Quiz.Option>
-
-  <Quiz.Explanation>
-  **규격**<sup>Standard, 표준 문서</sup>이란 "이 언어는 이렇게 동작해야 한다"고 글로 정해둔 약속이다. ECMAScript는 그 약속 문서의 이름이고, 자바스크립트는 그 약속을 실제로 구현한 언어다. 본문의 "콘센트 규격 문서(ECMAScript)"와 "그 규격에 맞는 실제 콘센트(자바스크립트)" 비유를 떠올리면 된다.
-
-  - A가 틀린 이유: 이름만 다른 게 아니라 **"약속(문서)"과 "그 약속을 지키는 실체(언어)"라는 역할 자체**가 다르다.
-  - C가 틀린 이유: 시간 순서가 반대다. 자바스크립트가 1995년에 먼저 만들어졌고, 브라우저마다 제각각 동작하는 걸 막으려고 1997년에 ECMAScript라는 표준을 나중에 만들었다.
-  - D가 틀린 이유: "옛날 이름"이 아니라 지금도 계속 쓰이는 **표준의 공식 명칭**이다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 2
-
-다음 중 자바스크립트 **언어 자체**(ECMAScript)에 속하는 것은?
-
-<Quiz>
-  <Quiz.Option>`document.title`</Quiz.Option>
-  <Quiz.Option>`localStorage`</Quiz.Option>
-  <Quiz.Option correct>`Promise`</Quiz.Option>
-  <Quiz.Option>`alert()`</Quiz.Option>
-
-  <Quiz.Explanation>
-  `Promise`는 언어에 내장된 객체다(자세한 건 32편에서 배운다). 반면 `document`, `localStorage`, `alert`는 전부 **브라우저(호스트 환경)가 추가로 얹어주는 기능**, 즉 Web API다. **호스트 환경**<sup>Host Environment</sup>이란 언어를 실제로 돌려주는 바깥 프로그램(여기서는 브라우저)을 말한다. 언어 자체에는 화면에 뭔가 띄우는 기능(A, B, D)이 원래 없다 — 그건 전부 브라우저가 빌려주는 능력이다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 3
-
-"모던 자바스크립트"라고 부를 때 보통 기준으로 삼는 시점은?
-
-<Quiz>
-  <Quiz.Option>1995년 (자바스크립트가 처음 만들어진 해)</Quiz.Option>
-  <Quiz.Option>2009년 (ES5가 나온 해)</Quiz.Option>
-  <Quiz.Option correct>2015년 (ES6/ES2015가 나온 해)</Quiz.Option>
-  <Quiz.Option>2020년</Quiz.Option>
-
-  <Quiz.Explanation>
-  2015년에 나온 **ES6**(ECMAScript 6, ES2015라고도 부른다)에서 `let`/`const`, 화살표 함수, 클래스, `Promise`, 모듈 등 지금 우리가 당연하게 쓰는 문법 대부분이 한꺼번에 추가됐다. 그래서 이 해를 기준으로 "그 이전 문법(옛날 스타일)"과 "그 이후 문법(모던 스타일)"을 나눈다. 2016년부터는 매년 조금씩만 추가되는 정기 업데이트 방식으로 바뀌었다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 4
-
-`typeof null`을 실행하면 어떤 값이 나오나?
-
-<Quiz>
-  <Quiz.Option>`'null'`</Quiz.Option>
-  <Quiz.Option>`'undefined'`</Quiz.Option>
-  <Quiz.Option correct>`'object'`</Quiz.Option>
-  <Quiz.Option>에러가 난다</Quiz.Option>
-
-  <Quiz.Explanation>
-  `'object'`가 나온다. `typeof`는 "이 값이 무슨 타입인지 문자열로 알려줘"라고 물어보는 연산자다. 정상적이라면 `null`은 `'null'`이라고 답해야 자연스러운데, 1995년 최초 구현 당시의 버그로 `'object'`라고 잘못 답하게 만들어졌다. 이미 전 세계 수많은 웹사이트가 이 동작을 전제로 코드를 짜놔서, 지금 와서 고치면 그 사이트들이 다 깨진다. 그래서 **알려진 버그인 걸 알면서도 일부러 고치지 않고 유지**하는, 자바스크립트에서 가장 유명한 사례다.
-  </Quiz.Explanation>
-</Quiz>
+<Quiz
+  questionNumber={1}
+  question={"ECMAScript와 자바스크립트의 관계를 가장 정확하게 설명한 것은?"}
+  options={[
+    "완전히 같은 말이다. 그냥 두 가지 이름이 있을 뿐이다",
+    "ECMAScript는 표준 규격(문서)이고, 자바스크립트는 그 규격을 따르는 실제 언어다",
+    "자바스크립트가 먼저 있었고, ECMAScript는 그걸 대체하려고 나온 새 언어다",
+    "ECMAScript는 자바스크립트의 옛날 이름이다",
+  ]}
+  correctAnswer={2}
+  explanation={"규격(Standard, 표준 문서)이란 \"이 언어는 이렇게 동작해야 한다\"고 글로 정해둔 약속이다. ECMAScript는 그 약속 문서의 이름이고, 자바스크립트는 그 약속을 실제로 구현한 언어다."}
+  optionExplanations={[
+    "이름만 다른 게 아니라 \"약속(문서)\"과 \"그 약속을 지키는 실체(언어)\"라는 역할 자체가 다르다.",
+    "정답이다. ECMAScript는 표준 규격 문서이고, 자바스크립트는 그 규격을 구현한 실제 언어다.",
+    "시간 순서가 반대다. 자바스크립트가 1995년에 먼저 만들어졌고, 브라우저마다 제각각 동작하는 걸 막으려고 1997년에 ECMAScript라는 표준을 나중에 만들었다.",
+    "\"옛날 이름\"이 아니라 지금도 계속 쓰이는 표준의 공식 명칭이다.",
+  ]}
+/>
+<Quiz
+  questionNumber={2}
+  question={"다음 중 자바스크립트 언어 자체(ECMAScript)에 속하는 것은?"}
+  options={[
+    "`document.title`",
+    "`localStorage`",
+    "`Promise`",
+    "`alert()`",
+  ]}
+  correctAnswer={3}
+  explanation={"`Promise`는 언어에 내장된 객체다. 반면 `document`, `localStorage`, `alert`는 전부 브라우저(호스트 환경)가 추가로 얹어주는 기능, 즉 Web API다."}
+  optionExplanations={[
+    "`document`는 브라우저(호스트 환경)가 제공하는 Web API다. 언어 자체에 화면 관련 기능은 없다.",
+    "`localStorage`도 브라우저가 제공하는 저장 기능이지, 언어 자체에 내장된 게 아니다.",
+    "정답이다. `Promise`는 ECMAScript 명세에 정의된, 언어 자체에 내장된 객체다.",
+    "`alert()`도 브라우저가 제공하는 창 띄우기 기능이라 언어 자체 기능이 아니다.",
+  ]}
+/>
+<Quiz
+  questionNumber={3}
+  question={"\"모던 자바스크립트\"라고 부를 때 보통 기준으로 삼는 시점은?"}
+  options={[
+    "1995년 (자바스크립트가 처음 만들어진 해)",
+    "2009년 (ES5가 나온 해)",
+    "2015년 (ES6/ES2015가 나온 해)",
+    "2020년",
+  ]}
+  correctAnswer={3}
+  explanation={"2015년에 나온 ES6(ES2015)에서 `let`/`const`, 화살표 함수, 클래스, `Promise`, 모듈 등 지금 당연하게 쓰는 문법 대부분이 한꺼번에 추가됐다. 그래서 이 해를 기준으로 옛날 스타일과 모던 스타일을 나눈다."}
+  optionExplanations={[
+    "1995년은 자바스크립트가 처음 태어난 해일 뿐, 지금 쓰는 모던 문법과는 거리가 멀다.",
+    "2009년의 ES5는 중요한 개선이었지만, `let`/`const`·클래스·모듈 같은 지금의 핵심 문법은 아직 없었다.",
+    "정답이다. 2015년 ES6에서 지금 쓰는 모던 문법 대부분이 한꺼번에 추가되어 이 해가 기준점이 된다.",
+    "2020년은 특정 문법 하나가 추가된 해일 뿐, \"모던 자바스크립트\"의 기준으로 널리 쓰이는 시점이 아니다.",
+  ]}
+/>
+<Quiz
+  questionNumber={4}
+  question={"`typeof null`을 실행하면 어떤 값이 나오나?"}
+  options={[
+    "`'null'`",
+    "`'undefined'`",
+    "`'object'`",
+    "에러가 난다",
+  ]}
+  correctAnswer={3}
+  explanation={"`'object'`가 나온다. 정상적이라면 `null`은 `'null'`이라고 답해야 자연스러운데, 1995년 최초 구현 당시의 버그로 `'object'`라고 잘못 답하게 만들어졌다. 이미 너무 많은 웹사이트가 이 동작을 전제로 코드를 짜놔서 지금도 고치지 못하고 있다."}
+  optionExplanations={[
+    "직관적으로는 이게 맞아 보이지만, 실제로는 초기 구현 버그 때문에 이 값이 나오지 않는다.",
+    "`undefined`는 값 자체가 아예 없을 때 나오는 다른 결과다. `null`은 \"값이 없음\"을 나타내는 별도의 값이다.",
+    "정답이다. 1995년 초기 구현 버그로 인해 `typeof null`은 `'object'`를 반환하며, 지금도 고치지 못한 채 유지되고 있다.",
+    "`typeof`는 문법적으로 정상 동작하는 연산자라 `null`에 써도 에러 없이 값을 반환한다.",
+  ]}
+/>
 
 ## 실습 — 콘솔에서 직접 구별해 보기
 

@@ -5,50 +5,62 @@ description: 'canvas와 getContext의 관계를 4지선다 퀴즈로 점검하�
 
 ## 01편 복습
 
-## 문제 1
+## 문제로 확인하기
 
-`<canvas>` 태그만 HTML에 써두면 화면에 무엇이 나타나나?
-
-<Quiz>
-  <Quiz.Option>회색 격자무늬</Quiz.Option>
-  <Quiz.Option correct>아무것도 없는 빈 사각형(투명한 도화지)</Quiz.Option>
-  <Quiz.Option>"여기에 그림을 그리세요"라는 안내 문구</Quiz.Option>
-  <Quiz.Option>브라우저마다 기본 그림이 다르게 나타난다</Quiz.Option>
-
-  <Quiz.Explanation>
-  `<canvas>`는 그림을 그릴 수 있는 빈 도화지만 마련해줄 뿐, 무엇을 그릴지는 전부 JavaScript로 지시해야 한다. HTML 요소 중 유일하게 "코드로 그리는" 요소라는 점이 이 편의 핵심이었다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 2
-
-캔버스 크기를 CSS(`width`, `height` 속성이 아니라 CSS 스타일)로만 지정하면 안 되는 이유는?
-
-<Quiz>
-  <Quiz.Option>CSS로는 아예 크기 지정이 안 된다</Quiz.Option>
-  <Quiz.Option correct>CSS로 크기를 주면 내부 좌표계(실제 해상도)는 그대로인 채 화면에서만 늘어나서 그림이 흐릿해진다</Quiz.Option>
-  <Quiz.Option>CSS로 지정하면 캔버스가 사라진다</Quiz.Option>
-  <Quiz.Option>속도가 느려질 뿐 화질에는 문제가 없다</Quiz.Option>
-
-  <Quiz.Explanation>
-  캔버스에는 **두 가지 크기**가 있다 — HTML `width`/`height` 속성이 정하는 "실제 그리기 해상도(좌표계)"와, CSS가 정하는 "화면에 보이는 크기"다. CSS로만 크기를 키우면, 원래 해상도의 그림을 억지로 확대하는 셈이 되어 저해상도 이미지를 확대한 것처럼 흐려진다. 그래서 실제 해상도는 HTML 속성으로 지정해야 한다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 3
-
-실제로 도형을 그리는 메서드(`fillRect` 등)는 어디에 있나?
-
-<Quiz>
-  <Quiz.Option>`canvas` 요소 자신에게 있다</Quiz.Option>
-  <Quiz.Option correct>`canvas.getContext('2d')`로 받은 컨텍스트 객체(`ctx`)에 있다</Quiz.Option>
-  <Quiz.Option>`document` 객체에 있다</Quiz.Option>
-  <Quiz.Option>별도로 설치해야 하는 라이브러리에 있다</Quiz.Option>
-
-  <Quiz.Explanation>
-  `<canvas>` 요소 자체는 그림을 그릴 "도화지"일 뿐이고, 실제로 선을 긋고 색을 칠하는 도구들(`fillRect`, `arc`, `fillText` 등)은 `getContext('2d')`로 요청해서 받은 **렌더링 컨텍스트**<sup>Rendering Context, "어떤 방식으로 그릴지"를 정하는 도구 모음</sup> 객체 안에 들어있다. 이 컨텍스트를 받는 한 줄이 캔버스 작업의 진짜 시작점이다.
-  </Quiz.Explanation>
-</Quiz>
+<Quiz
+  questionNumber={1}
+  question={"`<canvas>` 태그만 HTML에 써두면 화면에 무엇이 나타나나?"}
+  options={[
+    "회색 격자무늬",
+    "아무것도 없는 빈 사각형(투명한 도화지)",
+    "\"여기에 그림을 그리세요\"라는 안내 문구",
+    "브라우저마다 기본 그림이 다르게 나타난다",
+  ]}
+  correctAnswer={2}
+  explanation={"`<canvas>`는 그림을 그릴 수 있는 빈 도화지만 마련해줄 뿐, 무엇을 그릴지는 전부 JavaScript로 지시해야 한다."}
+  optionExplanations={[
+    "격자무늬 같은 기본 표시는 없다. `<canvas>`는 완전히 빈 상태로 시작한다.",
+    "정답이다. `<canvas>`는 아무것도 그려지지 않은 투명한 빈 사각형으로 시작한다.",
+    "안내 문구 같은 기본 텍스트는 표시되지 않는다. 화면에 뭔가 그리려면 JavaScript 코드가 필요하다.",
+    "표준 HTML 요소이므로 브라우저마다 기본 모습이 달라지지 않는다. 항상 빈 사각형이다.",
+  ]}
+/>
+<Quiz
+  questionNumber={2}
+  question={"캔버스 크기를 CSS(`width`, `height` 속성이 아니라 CSS 스타일)로만 지정하면 안 되는 이유는?"}
+  options={[
+    "CSS로는 아예 크기 지정이 안 된다",
+    "CSS로 크기를 주면 내부 좌표계(실제 해상도)는 그대로인 채 화면에서만 늘어나서 그림이 흐릿해진다",
+    "CSS로 지정하면 캔버스가 사라진다",
+    "속도가 느려질 뿐 화질에는 문제가 없다",
+  ]}
+  correctAnswer={2}
+  explanation={"캔버스에는 두 가지 크기가 있다 — HTML `width`/`height` 속성이 정하는 \"실제 그리기 해상도\"와, CSS가 정하는 \"화면에 보이는 크기\"다. CSS로만 키우면 저해상도 이미지를 억지로 확대한 것처럼 흐려진다."}
+  optionExplanations={[
+    "CSS로 크기 지정 자체는 가능하다. 문제는 그 크기가 실제 해상도(좌표계)까지 바꿔주지는 않는다는 점이다.",
+    "정답이다. CSS만으로 크기를 키우면 내부 해상도는 그대로인 채 화면에서만 확대되어 흐려진다.",
+    "캔버스가 사라지는 게 아니라, 화면에 보이는 크기와 내부 해상도가 어긋나서 흐리게 보일 뿐이다.",
+    "단순히 속도 문제가 아니라, 저해상도 그림을 억지로 늘린 것처럼 화질 자체가 흐려지는 문제다.",
+  ]}
+/>
+<Quiz
+  questionNumber={3}
+  question={"실제로 도형을 그리는 메서드(`fillRect` 등)는 어디에 있나?"}
+  options={[
+    "`canvas` 요소 자신에게 있다",
+    "`canvas.getContext('2d')`로 받은 컨텍스트 객체(`ctx`)에 있다",
+    "`document` 객체에 있다",
+    "별도로 설치해야 하는 라이브러리에 있다",
+  ]}
+  correctAnswer={2}
+  explanation={"`<canvas>` 요소 자체는 그림을 그릴 \"도화지\"일 뿐이고, 실제로 선을 긋고 색을 칠하는 도구들은 `getContext('2d')`로 요청해서 받은 렌더링 컨텍스트 객체 안에 들어있다."}
+  optionExplanations={[
+    "`canvas` 요소 자체에는 `fillRect` 같은 그리기 메서드가 없다. 먼저 컨텍스트를 받아야 한다.",
+    "정답이다. `getContext('2d')`로 받은 컨텍스트 객체(`ctx`)가 실제 그리기 메서드를 갖고 있다.",
+    "`document` 객체는 문서 전체를 다루는 객체이지, 캔버스 그리기 메서드를 갖고 있지 않다.",
+    "`fillRect` 같은 2D 그리기 메서드는 브라우저에 내장된 표준 API라 별도 라이브러리 설치가 필요 없다.",
+  ]}
+/>
 
 ## 실습 — 사각형 두 개 나란히 그리기
 

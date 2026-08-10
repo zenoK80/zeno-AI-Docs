@@ -5,50 +5,62 @@ description: 'drawImage의 세 가지 방식과 이미지 로딩 순서를 4지�
 
 ## 03편 복습
 
-## 문제 1
+## 문제로 확인하기
 
-이미지를 `drawImage`로 그리기 전에 반드시 확인해야 하는 것은?
-
-<Quiz>
-  <Quiz.Option>이미지 파일 이름에 한글이 없는지</Quiz.Option>
-  <Quiz.Option correct>이미지 로딩이 완료됐는지(`img.onload`)</Quiz.Option>
-  <Quiz.Option>이미지 크기가 캔버스보다 작은지</Quiz.Option>
-  <Quiz.Option>이미지 형식이 PNG인지</Quiz.Option>
-
-  <Quiz.Explanation>
-  이미지 파일을 내려받는 데는 시간이 걸린다. `img.src`를 설정한 바로 다음 줄에서 `drawImage`를 호출하면 **아직 이미지가 다 로드되지 않은 상태**일 수 있어서 아무것도 그려지지 않을 수 있다. 반드시 `img.onload`(로딩이 끝났을 때 자동으로 실행되는 함수) 안에서 그려야 안전하다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 2
-
-`drawImage`로 스프라이트 시트(여러 이미지가 모인 한 장의 큰 이미지)에서 일부만 잘라 그리려면 인자를 몇 개 넘겨야 하나?
-
-<Quiz>
-  <Quiz.Option>3개</Quiz.Option>
-  <Quiz.Option>5개</Quiz.Option>
-  <Quiz.Option correct>9개</Quiz.Option>
-  <Quiz.Option>몇 개든 상관없다</Quiz.Option>
-
-  <Quiz.Explanation>
-  `drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)` — 이미지 객체(1개) 외에 8개의 숫자, 총 9개의 인자가 필요하다. 앞의 4개(`sx, sy, sw, sh`)는 원본 이미지에서 **잘라낼 영역**(source), 뒤의 4개(`dx, dy, dw, dh`)는 캔버스에서 **그릴 위치와 크기**(destination)를 뜻한다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 3
-
-`getImageData()`로 얻는 `data` 배열은 어떤 순서로 값이 반복되나?
-
-<Quiz>
-  <Quiz.Option>픽셀 번호, 밝기, 투명도</Quiz.Option>
-  <Quiz.Option correct>R, G, B, A(빨강, 초록, 파랑, 알파) 네 개가 픽셀마다 반복</Quiz.Option>
-  <Quiz.Option>가로 좌표, 세로 좌표</Quiz.Option>
-  <Quiz.Option>색상 이름을 문자열로 나열</Quiz.Option>
-
-  <Quiz.Explanation>
-  픽셀 하나마다 **R(빨강), G(초록), B(파랑), A(알파, 즉 투명도)** 네 개의 숫자(0~255)가 순서대로 나오고, 이게 픽셀 개수만큼 반복된다. 예를 들어 완전히 불투명한 빨간 픽셀 하나는 `[255, 0, 0, 255]`로 표현된다. 이 배열을 직접 조작하면 흑백 필터 같은 효과를 만들 수 있다.
-  </Quiz.Explanation>
-</Quiz>
+<Quiz
+  questionNumber={1}
+  question={"이미지를 `drawImage`로 그리기 전에 반드시 확인해야 하는 것은?"}
+  options={[
+    "이미지 파일 이름에 한글이 없는지",
+    "이미지 로딩이 완료됐는지(`img.onload`)",
+    "이미지 크기가 캔버스보다 작은지",
+    "이미지 형식이 PNG인지",
+  ]}
+  correctAnswer={2}
+  explanation={"이미지 파일을 내려받는 데는 시간이 걸린다. `img.src`를 설정한 바로 다음 줄에서 `drawImage`를 호출하면 아직 이미지가 다 로드되지 않은 상태일 수 있다. 반드시 `img.onload` 안에서 그려야 안전하다."}
+  optionExplanations={[
+    "파일 이름의 언어와는 관계없다. 문제의 핵심은 이미지가 로딩을 마쳤는지 여부다.",
+    "정답이다. 이미지가 아직 다 로드되지 않은 상태에서 그리면 아무것도 그려지지 않을 수 있으므로 `img.onload`를 기다려야 한다.",
+    "캔버스보다 큰 이미지도 `drawImage`의 인자로 크기를 조절해서 그릴 수 있다. 크기 자체가 필수 조건은 아니다.",
+    "PNG가 아닌 JPEG, WebP 등 다른 형식의 이미지도 `drawImage`로 문제없이 그릴 수 있다.",
+  ]}
+/>
+<Quiz
+  questionNumber={2}
+  question={"`drawImage`로 스프라이트 시트(여러 이미지가 모인 한 장의 큰 이미지)에서 일부만 잘라 그리려면 인자를 몇 개 넘겨야 하나?"}
+  options={[
+    "3개",
+    "5개",
+    "9개",
+    "몇 개든 상관없다",
+  ]}
+  correctAnswer={3}
+  explanation={"`drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)` — 이미지 객체(1개) 외에 8개의 숫자, 총 9개의 인자가 필요하다."}
+  optionExplanations={[
+    "3개는 이미지 전체를 위치만 지정해서 그릴 때 쓰는 형태(`drawImage(img, dx, dy)`)의 인자 개수다. 잘라 그리기에는 부족하다.",
+    "5개는 이미지를 잘라내지 않고 위치·크기만 지정할 때(`drawImage(img, dx, dy, dw, dh)`)의 인자 개수다.",
+    "정답이다. 원본에서 잘라낼 영역 4개와 캔버스에 그릴 위치·크기 4개, 이미지 객체 1개로 총 9개가 필요하다.",
+    "`drawImage`는 인자 개수에 따라 동작 방식이 정해진 오버로드 함수라, 아무 개수나 쓸 수 없다.",
+  ]}
+/>
+<Quiz
+  questionNumber={3}
+  question={"`getImageData()`로 얻는 `data` 배열은 어떤 순서로 값이 반복되나?"}
+  options={[
+    "픽셀 번호, 밝기, 투명도",
+    "R, G, B, A(빨강, 초록, 파랑, 알파) 네 개가 픽셀마다 반복",
+    "가로 좌표, 세로 좌표",
+    "색상 이름을 문자열로 나열",
+  ]}
+  correctAnswer={2}
+  explanation={"픽셀 하나마다 R(빨강), G(초록), B(파랑), A(알파, 투명도) 네 개의 숫자(0~255)가 순서대로 나오고, 이게 픽셀 개수만큼 반복된다."}
+  optionExplanations={[
+    "픽셀 번호나 밝기 값이 아니라, 색상 채널(R, G, B, A) 네 숫자가 그대로 나열된다.",
+    "정답이다. 픽셀마다 R, G, B, A 네 숫자가 순서대로 반복되어 담긴다.",
+    "좌표 정보는 배열에 포함되지 않는다. 배열 순서 자체가 픽셀 위치를 암묵적으로 나타낼 뿐이다.",
+    "색상은 이름 문자열이 아니라 0~255 사이의 숫자 네 개로 표현된다.",
+  ]}
+/>
 
 ## 실습 — 텍스트를 캔버스 정중앙에 배치하기
 

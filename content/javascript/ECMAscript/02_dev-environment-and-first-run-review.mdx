@@ -7,50 +7,62 @@ description: 'Node.js 설치와 REPL·파일 실행을 4지선다 퀴즈와 실�
 
 이번 편은 지식보다 **손으로 직접 해보는 것**이 중요하다. 퀴즈로 개념을 확인한 뒤, 실습으로 마무리하자.
 
-## 문제 1
+## 문제로 확인하기
 
-REPL이 정확히 무엇을 뜻하는 말인가?
-
-<Quiz>
-  <Quiz.Option>Run, Execute, Print, Loop (실행, 처리, 출력, 반복)</Quiz.Option>
-  <Quiz.Option correct>Read, Eval, Print, Loop (읽고, 실행하고, 출력하고, 반복하는 것)</Quiz.Option>
-  <Quiz.Option>Real-time Execution Programming Language</Quiz.Option>
-  <Quiz.Option>Read-Only Execution Platform</Quiz.Option>
-
-  <Quiz.Explanation>
-  Read(코드를 한 줄 읽고) → Eval(그 자리에서 바로 실행하고, Eval은 Evaluate의 줄임말로 "계산해서 값을 낸다"는 뜻) → Print(결과를 화면에 출력하고) → Loop(이 과정을 계속 반복하는) 환경이라는 뜻이다. 브라우저 콘솔과 `node` 명령으로 여는 창 둘 다 이 방식으로 동작한다. 짧은 코드를 실험해볼 때 파일을 안 만들어도 돼서 편하다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 2
-
-Node.js를 가장 정확하게 설명한 것은?
-
-<Quiz>
-  <Quiz.Option>자바스크립트의 새로운 버전(문법이 다른 언어)</Quiz.Option>
-  <Quiz.Option correct>브라우저 없이 자바스크립트를 실행시켜 주는 프로그램(런타임)</Quiz.Option>
-  <Quiz.Option>자바스크립트 코드를 그림으로 바꿔주는 도구</Quiz.Option>
-  <Quiz.Option>브라우저의 다른 이름</Quiz.Option>
-
-  <Quiz.Explanation>
-  **런타임**<sup>Runtime</sup>이란 "프로그램을 실제로 돌아가게 해주는 실행 환경"을 뜻한다. Node.js는 언어가 아니라, 자바스크립트라는 언어를 브라우저 없이도 돌아가게 해주는 프로그램이다. 1편에서 배운 "언어(ECMAScript)와 그걸 실행시켜 주는 호스트 환경은 다르다"는 구분이 여기서도 그대로 적용된다 — 브라우저가 하나의 호스트 환경이었다면, Node.js는 또 다른 호스트 환경이다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 3
-
-Node.js 설치 시 **LTS 버전**을 권장하는 이유는?
-
-<Quiz>
-  <Quiz.Option>유일하게 무료로 설치할 수 있는 버전이라서</Quiz.Option>
-  <Quiz.Option correct>Long Term Support(장기 지원)의 줄임말로, 최신 실험 버전보다 안정적이라서</Quiz.Option>
-  <Quiz.Option>한글을 지원하는 유일한 버전이라서</Quiz.Option>
-  <Quiz.Option>용량이 가장 작아서</Quiz.Option>
-
-  <Quiz.Explanation>
-  LTS는 **Long Term Support**(장기 지원)의 줄임말이다. Node.js는 계속 새 버전이 나오는데, 그중 일부를 "당분간 오래 안정적으로 지원하겠다"고 지정한 게 LTS 버전이다. 최신 기능이 빠르게 들어간 버전(Current 버전)은 아직 검증이 덜 됐을 수 있어서, 처음 배우거나 실무에 쓸 때는 LTS가 안전하다.
-  </Quiz.Explanation>
-</Quiz>
+<Quiz
+  questionNumber={1}
+  question={"REPL이 정확히 무엇을 뜻하는 말인가?"}
+  options={[
+    "Run, Execute, Print, Loop (실행, 처리, 출력, 반복)",
+    "Read, Eval, Print, Loop (읽고, 실행하고, 출력하고, 반복하는 것)",
+    "Real-time Execution Programming Language",
+    "Read-Only Execution Platform",
+  ]}
+  correctAnswer={2}
+  explanation={"Read(코드를 한 줄 읽고) → Eval(그 자리에서 바로 실행하고) → Print(결과를 화면에 출력하고) → Loop(이 과정을 반복하는) 환경이라는 뜻이다. 브라우저 콘솔과 `node` 명령으로 여는 창 둘 다 이 방식으로 동작한다."}
+  optionExplanations={[
+    "앞 글자가 비슷해 보이지만 정확한 단어가 아니다. 두 번째 글자는 Execute가 아니라 Eval(Evaluate)이다.",
+    "정답이다. Read, Eval, Print, Loop 네 단계를 반복하는 대화형 실행 환경이라는 뜻이다.",
+    "실제 약자와 관련 없는, 그럴듯하게 지어낸 풀네임이다.",
+    "\"읽기 전용\"이 아니라 코드를 실행하고 결과까지 보여주는 대화형 환경이다.",
+  ]}
+/>
+<Quiz
+  questionNumber={2}
+  question={"Node.js를 가장 정확하게 설명한 것은?"}
+  options={[
+    "자바스크립트의 새로운 버전(문법이 다른 언어)",
+    "브라우저 없이 자바스크립트를 실행시켜 주는 프로그램(런타임)",
+    "자바스크립트 코드를 그림으로 바꿔주는 도구",
+    "브라우저의 다른 이름",
+  ]}
+  correctAnswer={2}
+  explanation={"런타임(Runtime)이란 \"프로그램을 실제로 돌아가게 해주는 실행 환경\"을 뜻한다. Node.js는 언어가 아니라, 자바스크립트라는 언어를 브라우저 없이도 돌아가게 해주는 프로그램이다."}
+  optionExplanations={[
+    "Node.js는 새로운 문법을 가진 언어가 아니라, 기존 자바스크립트 언어를 실행시켜주는 프로그램이다.",
+    "정답이다. Node.js는 브라우저 없이도 자바스크립트를 실행시켜 주는 런타임 프로그램이다.",
+    "그림으로 바꿔주는 시각화 도구가 아니라, 코드를 실제로 실행시켜 주는 실행 환경이다.",
+    "Node.js와 브라우저는 서로 다른, 별개의 호스트 환경이다. 브라우저의 다른 이름이 아니다.",
+  ]}
+/>
+<Quiz
+  questionNumber={3}
+  question={"Node.js 설치 시 LTS 버전을 권장하는 이유는?"}
+  options={[
+    "유일하게 무료로 설치할 수 있는 버전이라서",
+    "Long Term Support(장기 지원)의 줄임말로, 최신 실험 버전보다 안정적이라서",
+    "한글을 지원하는 유일한 버전이라서",
+    "용량이 가장 작아서",
+  ]}
+  correctAnswer={2}
+  explanation={"LTS는 Long Term Support(장기 지원)의 줄임말이다. \"당분간 오래 안정적으로 지원하겠다\"고 지정한 버전이라, 최신 기능이 빠르게 들어간 버전보다 검증이 잘 되어 있어 안전하다."}
+  optionExplanations={[
+    "Node.js의 모든 버전(LTS든 Current든)은 전부 무료로 설치할 수 있다. 무료 여부는 LTS를 구분하는 기준이 아니다.",
+    "정답이다. LTS는 장기 지원 버전이라는 뜻이며, 최신 실험 버전보다 안정적으로 검증되어 있다.",
+    "Node.js 버전과 한글 지원 여부는 관계없다. 모든 버전이 유니코드 문자열을 동일하게 다룬다.",
+    "설치 용량은 LTS를 선택하는 기준이 아니다. 기준은 안정성과 지원 기간이다.",
+  ]}
+/>
 
 ## 실습 — 환경을 직접 갖추기
 

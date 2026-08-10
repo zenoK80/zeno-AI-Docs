@@ -5,50 +5,62 @@ description: 'Sass와 네이티브 중첩의 차이를 4지선다 퀴즈로 점�
 
 ## 01편 복습
 
-## 문제 1
+## 문제로 확인하기
 
-네이티브 CSS 중첩에서 `&__title`처럼 문자열을 이어 붙일 수 있나? (Sass에서는 이게 가능했다)
-
-<Quiz>
-  <Quiz.Option>가능하다. Sass와 완전히 똑같이 동작한다</Quiz.Option>
-  <Quiz.Option correct>불가능하다. `&`는 문자열이 아니라 선택자 자체를 가리키는 값이기 때문이다</Quiz.Option>
-  <Quiz.Option>가능은 하지만 별도의 설정이 필요하다</Quiz.Option>
-  <Quiz.Option>브라우저에 따라 되기도 하고 안 되기도 한다</Quiz.Option>
-
-  <Quiz.Explanation>
-  **`&`**는 Sass 전처리기에서는 "문자열처럼" 이어 붙일 수 있었지만, 네이티브 CSS 중첩에서는 **부모 선택자 자리에 그대로 대입되는 값**일 뿐이다. `&__title`처럼 뒤에 글자를 덧붙이는 건 지원하지 않는다. BEM(`card__title`처럼 이름 짓는 방식) 클래스를 쓴다면, 중첩을 포기하고 그냥 풀어서 써야 한다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 2
-
-`.card { .active { ... } }`와 `.card { &.active { ... } }`의 차이는?
-
-<Quiz>
-  <Quiz.Option>완전히 같은 뜻이다</Quiz.Option>
-  <Quiz.Option correct>`.active`(공백)는 `.card .active`(자손 요소)를, `&.active`는 `.card.active`(같은 요소)를 가리킨다</Quiz.Option>
-  <Quiz.Option>`&.active`가 더 최신 문법이라 더 빠르게 동작한다</Quiz.Option>
-  <Quiz.Option>`.active`는 에러가 나는 잘못된 문법이다</Quiz.Option>
-
-  <Quiz.Explanation>
-  공백이 있으면 **자손 선택자**(`.card` 안에 들어있는 `.active` 요소)가 되고, `&`를 붙이면 **같은 요소**(`.card`이면서 동시에 `.active`인 요소)를 가리키는 선택자가 된다. 공백 하나 차이로 완전히 다른 요소를 고르게 되는, 중첩에서 가장 흔한 실수 포인트다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 3
-
-실무에서 권장하는 중첩의 최대 단계는?
-
-<Quiz>
-  <Quiz.Option>제한 없이 필요한 만큼</Quiz.Option>
-  <Quiz.Option correct>2단계까지</Quiz.Option>
-  <Quiz.Option>5단계까지</Quiz.Option>
-  <Quiz.Option>1단계까지(중첩 자체를 쓰지 않는다)</Quiz.Option>
-
-  <Quiz.Explanation>
-  중첩이 깊어질수록 **명시도**(CSS 규칙끼리 충돌했을 때 누가 이길지 정하는 점수)가 계속 올라가서 나중에 덮어쓰기 어려워지고, HTML 구조가 조금만 바뀌어도 CSS가 깨지기 쉬워진다. `.card` 안에 `h2` 정도(2단계)면 충분하고, 그 이상 깊어진다면 새 클래스를 만드는 게 낫다는 신호로 받아들이는 게 좋다.
-  </Quiz.Explanation>
-</Quiz>
+<Quiz
+  questionNumber={1}
+  question={"네이티브 CSS 중첩에서 `&__title`처럼 문자열을 이어 붙일 수 있나? (Sass에서는 이게 가능했다)"}
+  options={[
+    "가능하다. Sass와 완전히 똑같이 동작한다",
+    "불가능하다. `&`는 문자열이 아니라 선택자 자체를 가리키는 값이기 때문이다",
+    "가능은 하지만 별도의 설정이 필요하다",
+    "브라우저에 따라 되기도 하고 안 되기도 한다",
+  ]}
+  correctAnswer={2}
+  explanation={"`&`는 Sass 전처리기에서는 문자열처럼 이어 붙일 수 있었지만, 네이티브 CSS 중첩에서는 부모 선택자 자리에 그대로 대입되는 값일 뿐이다. `&__title`처럼 뒤에 글자를 덧붙이는 건 지원하지 않는다."}
+  optionExplanations={[
+    "Sass의 `&`는 문자열 이어붙이기가 가능했지만, 네이티브 CSS의 `&`는 선택자 자체를 대입하는 값이라 동작이 다르다.",
+    "정답이다. 네이티브 CSS의 `&`는 문자열이 아니라 부모 선택자를 그대로 대입하는 값이라 이어붙이기가 안 된다.",
+    "별도의 설정 옵션으로 켤 수 있는 기능이 아니라, 애초에 명세에 정의되지 않은 문법이다.",
+    "브라우저 구현 차이가 아니라 명세 자체가 이 문법을 지원하지 않는다.",
+  ]}
+/>
+<Quiz
+  questionNumber={2}
+  question={"`.card { .active { ... } }`와 `.card { &.active { ... } }`의 차이는?"}
+  options={[
+    "완전히 같은 뜻이다",
+    "`.active`(공백)는 `.card .active`(자손 요소)를, `&.active`는 `.card.active`(같은 요소)를 가리킨다",
+    "`&.active`가 더 최신 문법이라 더 빠르게 동작한다",
+    "`.active`는 에러가 나는 잘못된 문법이다",
+  ]}
+  correctAnswer={2}
+  explanation={"공백이 있으면 자손 선택자(`.card` 안에 들어있는 `.active` 요소)가 되고, `&`를 붙이면 같은 요소(`.card`이면서 동시에 `.active`인 요소)를 가리키는 선택자가 된다."}
+  optionExplanations={[
+    "공백 유무에 따라 자손 요소를 가리키는지, 같은 요소를 가리키는지가 완전히 달라진다.",
+    "정답이다. 공백은 자손 요소(`.card .active`)를, `&`는 같은 요소(`.card.active`)를 가리킨다.",
+    "실행 속도 차이가 아니라 가리키는 요소 자체가 다른 문제다. \"더 최신이라 빠르다\"는 설명은 근거가 없다.",
+    "`.card { .active { ... } }`는 유효한 CSS 중첩 문법이며 에러가 나지 않는다.",
+  ]}
+/>
+<Quiz
+  questionNumber={3}
+  question={"실무에서 권장하는 중첩의 최대 단계는?"}
+  options={[
+    "제한 없이 필요한 만큼",
+    "2단계까지",
+    "5단계까지",
+    "1단계까지(중첩 자체를 쓰지 않는다)",
+  ]}
+  correctAnswer={2}
+  explanation={"중첩이 깊어질수록 명시도가 계속 올라가서 나중에 덮어쓰기 어려워지고, HTML 구조가 조금만 바뀌어도 CSS가 깨지기 쉬워진다. `.card` 안에 `h2` 정도(2단계)면 충분하다."}
+  optionExplanations={[
+    "제한 없이 깊게 중첩하면 명시도가 계속 올라가 나중에 덮어쓰기 어려운 CSS가 된다.",
+    "정답이다. 2단계 정도가 명시도와 유지보수성의 균형을 지키는 실무 권장 기준이다.",
+    "5단계는 이미 명시도가 지나치게 높아지고 HTML 구조 변경에 취약해지는 깊이다.",
+    "중첩 자체가 나쁜 게 아니라 과도한 깊이가 문제다. 1단계로 제한할 필요까지는 없다.",
+  ]}
+/>
 
 ## 실습 — 반복되는 CSS를 중첩으로 리팩터링하기
 

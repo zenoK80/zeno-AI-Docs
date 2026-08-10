@@ -5,50 +5,62 @@ description: 'ECMAScript와 Web API의 경계를 4지선다 퀴즈로 점검하�
 
 ## 01편 복습
 
-## 문제 1
+## 문제로 확인하기
 
-Web API의 명세(공식 규격 문서)는 누가 관리하나?
-
-<Quiz>
-  <Quiz.Option>TC39</Quiz.Option>
-  <Quiz.Option correct>WHATWG · W3C</Quiz.Option>
-  <Quiz.Option>각 브라우저 회사가 마음대로 정한다</Quiz.Option>
-  <Quiz.Option>정해진 관리 주체가 없다</Quiz.Option>
-
-  <Quiz.Explanation>
-  **WHATWG**와 **W3C**는 웹 표준을 정하는 단체 이름이다. 이들이 DOM, Fetch, HTML 같은 Web API의 규격을 관리한다. 반면 **TC39**는 자바스크립트 언어(ECMAScript) 규격을 관리하는 별도의 단체다. 관리하는 곳 자체가 다르다는 게 이 편의 핵심이었다 — 그래서 "언어인가, 브라우저가 주는 기능인가"를 구별할 때 "이 명세를 누가 관리하나"가 좋은 판별 기준이 된다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 2
-
-다음 중 Web API에 속하는 것을 모두 고른 조합은? (`fetch` / `class` / `localStorage` / `Map` / `addEventListener`)
-
-<Quiz>
-  <Quiz.Option>`fetch`, `class`, `Map`</Quiz.Option>
-  <Quiz.Option correct>`fetch`, `localStorage`, `addEventListener`</Quiz.Option>
-  <Quiz.Option>`class`, `Map`, `addEventListener`</Quiz.Option>
-  <Quiz.Option>전부 다 Web API다</Quiz.Option>
-
-  <Quiz.Explanation>
-  `fetch`(서버에 요청 보내기), `localStorage`(브라우저에 데이터 저장하기), `addEventListener`(클릭 등 사용자 동작 감지하기)는 전부 브라우저가 추가로 얹어주는 Web API다. `class`(클래스 문법)와 `Map`(자료구조)은 언어(ECMAScript) 자체에 내장된 기능이라 Web API가 아니다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 3
-
-`setTimeout`, `fetch`처럼 Node.js에서도 쓸 수 있는 API를 이 시리즈(Web APIs)에서 다루는 이유는?
-
-<Quiz>
-  <Quiz.Option>Node.js에서도 쓸 수 있으니 사실 언어 자체 기능이기 때문에</Quiz.Option>
-  <Quiz.Option correct>이들은 원래 브라우저(WHATWG) 명세의 API이고, Node.js가 나중에 가져다 구현한 것이기 때문에</Quiz.Option>
-  <Quiz.Option>이름이 헷갈려서 그냥 편의상 여기서 다루는 것뿐, 원칙적으로는 언어 소속이 맞다</Quiz.Option>
-  <Quiz.Option>Node.js가 이 API들을 처음 만들었고 브라우저가 나중에 따라 했기 때문에</Quiz.Option>
-
-  <Quiz.Explanation>
-  `fetch`나 `setTimeout`은 **원래 브라우저를 위해 만들어진 WHATWG 명세의 API**다. Node.js가 개발자 편의를 위해 나중에 자기 환경에도 비슷하게 구현해서 넣은 것이지, 그렇다고 해서 이 API들이 ECMAScript(언어) 소속으로 바뀌는 건 아니다. "출신 소속"이 기준이라는 점을 기억하자.
-  </Quiz.Explanation>
-</Quiz>
+<Quiz
+  questionNumber={1}
+  question={"Web API의 명세(공식 규격 문서)는 누가 관리하나?"}
+  options={[
+    "TC39",
+    "WHATWG · W3C",
+    "각 브라우저 회사가 마음대로 정한다",
+    "정해진 관리 주체가 없다",
+  ]}
+  correctAnswer={2}
+  explanation={"WHATWG와 W3C는 웹 표준을 정하는 단체 이름이다. 이들이 DOM, Fetch, HTML 같은 Web API의 규격을 관리한다. 반면 TC39는 자바스크립트 언어(ECMAScript) 규격을 관리하는 별도의 단체다."}
+  optionExplanations={[
+    "TC39는 Web API가 아니라 자바스크립트 언어(ECMAScript) 자체를 관리하는 별도의 단체다.",
+    "정답이다. WHATWG와 W3C가 DOM, Fetch 같은 Web API의 규격을 관리한다.",
+    "브라우저 회사가 마음대로 정하는 게 아니라, 여러 회사가 참여하는 표준 단체가 합의된 규격을 관리한다.",
+    "Web API도 ECMAScript처럼 명확한 관리 주체(WHATWG·W3C)가 있다.",
+  ]}
+/>
+<Quiz
+  questionNumber={2}
+  question={"다음 중 Web API에 속하는 것을 모두 고른 조합은? (`fetch` / `class` / `localStorage` / `Map` / `addEventListener`)"}
+  options={[
+    "`fetch`, `class`, `Map`",
+    "`fetch`, `localStorage`, `addEventListener`",
+    "`class`, `Map`, `addEventListener`",
+    "전부 다 Web API다",
+  ]}
+  correctAnswer={2}
+  explanation={"`fetch`, `localStorage`, `addEventListener`는 전부 브라우저가 추가로 얹어주는 Web API다. `class`와 `Map`은 언어(ECMAScript) 자체에 내장된 기능이라 Web API가 아니다."}
+  optionExplanations={[
+    "`class`와 `Map`은 Web API가 아니라 언어(ECMAScript) 자체에 내장된 기능이다.",
+    "정답이다. `fetch`, `localStorage`, `addEventListener` 세 가지 모두 브라우저가 제공하는 Web API다.",
+    "`class`와 `Map`은 언어 자체 기능이라서 이 조합에 섞이면 안 된다.",
+    "`class`와 `Map`은 언어에 내장된 기능이지 브라우저가 추가한 기능이 아니므로, 전부가 Web API인 건 아니다.",
+  ]}
+/>
+<Quiz
+  questionNumber={3}
+  question={"`setTimeout`, `fetch`처럼 Node.js에서도 쓸 수 있는 API를 이 시리즈(Web APIs)에서 다루는 이유는?"}
+  options={[
+    "Node.js에서도 쓸 수 있으니 사실 언어 자체 기능이기 때문에",
+    "이들은 원래 브라우저(WHATWG) 명세의 API이고, Node.js가 나중에 가져다 구현한 것이기 때문에",
+    "이름이 헷갈려서 그냥 편의상 여기서 다루는 것뿐, 원칙적으로는 언어 소속이 맞다",
+    "Node.js가 이 API들을 처음 만들었고 브라우저가 나중에 따라 했기 때문에",
+  ]}
+  correctAnswer={2}
+  explanation={"`fetch`나 `setTimeout`은 원래 브라우저를 위해 만들어진 WHATWG 명세의 API다. Node.js가 개발자 편의를 위해 나중에 자기 환경에도 비슷하게 구현해서 넣은 것이지, 그렇다고 언어(ECMAScript) 소속으로 바뀌는 건 아니다."}
+  optionExplanations={[
+    "여러 환경에서 쓸 수 있다고 해서 소속이 바뀌지는 않는다. 기준은 \"원래 어느 명세에 정의됐는가\"다.",
+    "정답이다. 원래 브라우저를 위한 WHATWG 명세 API이고, Node.js가 나중에 가져다 구현한 것이다.",
+    "단순한 편의상 분류가 아니라, \"원래 어느 명세 소속인가\"라는 명확한 기준에 따른 분류다.",
+    "시간 순서가 반대다. 브라우저(WHATWG 명세)가 먼저이고, Node.js가 나중에 비슷하게 구현했다.",
+  ]}
+/>
 
 ## 실습 — 판별 기준 적용해 보기
 

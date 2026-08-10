@@ -43,6 +43,40 @@
   line-height: 1.65;
 }
 
+.question code,
+.optionText code,
+.explanation code,
+.optionReview code {
+  border: 1px solid var(--docs-border);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--background) 90%, var(--x-color-gray-200));
+  padding: 0.1em 0.35em;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.question sup,
+.optionText sup,
+.explanation sup,
+.optionReview sup {
+  color: var(--x-color-gray-600);
+  font-size: 0.75em;
+}
+
+:global(html.dark) .question code,
+:global(html.dark) .optionText code,
+:global(html.dark) .explanation code,
+:global(html.dark) .optionReview code {
+  background: color-mix(in srgb, var(--background) 88%, var(--x-color-gray-700));
+}
+
+:global(html.dark) .question sup,
+:global(html.dark) .optionText sup,
+:global(html.dark) .explanation sup,
+:global(html.dark) .optionReview sup {
+  color: var(--x-color-gray-300);
+}
+
 .options {
   display: grid;
   gap: 0.55rem;

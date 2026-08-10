@@ -7,68 +7,62 @@ description: 'if() 함수의 지원 현황을 4지선다 퀴즈로 점검하고,
 
 이 편은 실험적 기능이라 코드 실습보다 **판단력**을 점검하는 데 집중한다.
 
-## 문제 1
+## 문제로 확인하기
 
-2026년 중반 기준 `if()` 함수는 어떤 브라우저에서 지원되나?
-
-<Quiz>
-  <Quiz.Option>모든 주요 브라우저에서 이미 완전히 지원한다(Baseline)</Quiz.Option>
-  <Quiz.Option correct>Chrome·Edge 등 Chromium 계열만 지원하고, Firefox는 개발 중, Safari는 로드맵 단계다</Quiz.Option>
-  <Quiz.Option>Safari에서만 지원한다</Quiz.Option>
-  <Quiz.Option>아직 어느 브라우저도 지원하지 않는다</Quiz.Option>
-
-  <Quiz.Explanation>
-  Chromium 계열(Chrome, Edge 등)에서 137 버전부터 지원을 시작했지만, Firefox는 아직 개발 중이고 Safari는 로드맵(향후 계획)에만 올라가 있는 단계다. 주요 브라우저 전부가 지원해야 붙는 **Baseline**(웹 표준 커뮤니티가 정하는 "이제 안심하고 써도 된다"는 지표) 딱지를 아직 받지 못했다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 2
-
-`if()` 함수가 받을 수 있는 세 가지 조건 함수는?
-
-<Quiz>
-  <Quiz.Option>`check()`, `test()`, `verify()`</Quiz.Option>
-  <Quiz.Option correct>`media()`, `supports()`, `style()`</Quiz.Option>
-  <Quiz.Option>`if()`, `else()`, `then()`</Quiz.Option>
-  <Quiz.Option>`width()`, `height()`, `color()`</Quiz.Option>
-
-  <Quiz.Explanation>
-  `media()`(뷰포트 크기 등 미디어 쿼리 조건), `supports()`(브라우저가 특정 기능을 지원하는지), `style()`(CSS 변수 값이나 컨테이너 스타일 조건) — 이 세 가지 조건을 값 하나 안에서 바로 판단할 수 있게 해준다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 문제 3
-
-지원이 아직 불확실한 CSS 기능을 실무에 도입할 때 지켜야 하는 원칙은?
-
-<Quiz>
-  <Quiz.Option>무조건 최신 기능을 우선 적용하고 나머지는 신경 쓰지 않는다</Quiz.Option>
-  <Quiz.Option correct>기본값을 먼저 선언하고, `@supports`로 감싸 지원 브라우저에서만 향상된 스타일을 추가한다</Quiz.Option>
-  <Quiz.Option>지원 브라우저가 100%가 될 때까지 절대 언급도 하지 않는다</Quiz.Option>
-  <Quiz.Option>사용자에게 브라우저를 바꾸라고 안내한다</Quiz.Option>
-
-  <Quiz.Explanation>
-  **점진적 향상**<sup>Progressive Enhancement, 기본 기능은 누구에게나 보장하고, 지원 브라우저에서는 추가로 더 나은 경험을 주는 설계 방식</sup> 원칙이다. 먼저 모든 브라우저에서 동작하는 기본값을 선언해두고, `@supports`(브라우저가 특정 기능을 지원하는지 확인하는 규칙)로 감싼 블록 안에 새 기능을 넣으면, 지원하지 않는 브라우저는 기본값만 적용받고 지원하는 브라우저는 향상된 스타일까지 받는다.
-  </Quiz.Explanation>
-</Quiz>
-
-## 사고 실습 — 지금 당장 뭘 써야 하나
-
-아래 각 상황에서 `if()` 대신 지금 쓸 수 있는 대안을 짝지어 보자.
-
-```
-① 뷰포트 크기별로 폰트 크기를 바꾸고 싶다
-② 부모 요소 크기에 따라 자식 스타일을 바꾸고 싶다
-③ 브라우저가 특정 기능을 지원하는지에 따라 분기하고 싶다
-```
-
-<Collapse title="정답 보기">
-① `@media` (뷰포트 너비 등을 기준으로 스타일을 다르게 적용하는, 오래전부터 있던 규칙)
-② `@container` (CSS 중급 과정에서 다룸 — 부모 요소 크기를 기준으로 스타일을 다르게 적용)
-③ `@supports` (특정 기능 지원 여부로 분기하는, 오래전부터 있던 규칙)
-
-셋 다 이미 Baseline이고, `if()`가 대체하는 게 아니라 **짧게 줄여 쓰는 문법**이라는 걸 다시 확인하자.
-</Collapse>
+<Quiz
+  questionNumber={1}
+  question={"2026년 중반 기준 `if()` 함수는 어떤 브라우저에서 지원되나?"}
+  options={[
+    "모든 주요 브라우저에서 이미 완전히 지원한다(Baseline)",
+    "Chrome·Edge 등 Chromium 계열만 지원하고, Firefox는 개발 중, Safari는 로드맵 단계다",
+    "Safari에서만 지원한다",
+    "아직 어느 브라우저도 지원하지 않는다",
+  ]}
+  correctAnswer={2}
+  explanation={"Chromium 계열(Chrome, Edge 등)에서 137 버전부터 지원을 시작했지만, Firefox는 아직 개발 중이고 Safari는 로드맵 단계다. 주요 브라우저 전부가 지원해야 붙는 Baseline 딱지를 아직 받지 못했다."}
+  optionExplanations={[
+    "Firefox는 아직 개발 중이고 Safari는 로드맵 단계라서 Baseline(모든 주요 브라우저 지원) 상태가 아니다.",
+    "정답이다. Chromium 계열만 지원을 시작했고, 나머지 브라우저는 아직 지원 전 단계다.",
+    "정반대다. Safari가 아니라 Chromium 계열(Chrome, Edge)이 먼저 지원을 시작했다.",
+    "Chromium 계열은 이미 137 버전부터 지원을 시작했으므로 \"아무도 지원하지 않는다\"는 틀렸다.",
+  ]}
+/>
+<Quiz
+  questionNumber={2}
+  question={"`if()` 함수가 받을 수 있는 세 가지 조건 함수는?"}
+  options={[
+    "`check()`, `test()`, `verify()`",
+    "`media()`, `supports()`, `style()`",
+    "`if()`, `else()`, `then()`",
+    "`width()`, `height()`, `color()`",
+  ]}
+  correctAnswer={2}
+  explanation={"`media()`(미디어 쿼리 조건), `supports()`(기능 지원 여부), `style()`(CSS 변수·스타일 조건) — 이 세 가지 조건을 값 하나 안에서 바로 판단할 수 있게 해준다."}
+  optionExplanations={[
+    "이런 이름의 조건 함수는 `if()` 명세에 존재하지 않는다.",
+    "정답이다. `media()`, `supports()`, `style()` 세 가지가 `if()`가 받는 조건 함수다.",
+    "`if`/`else`/`then`은 프로그래밍 언어의 제어문 이름과 헷갈리기 쉽지만, CSS `if()`의 조건 함수 이름이 아니다.",
+    "이 이름들은 CSS 속성이나 함수와 헷갈리기 쉽지만, `if()`가 받는 조건 함수 이름이 아니다.",
+  ]}
+/>
+<Quiz
+  questionNumber={3}
+  question={"지원이 아직 불확실한 CSS 기능을 실무에 도입할 때 지켜야 하는 원칙은?"}
+  options={[
+    "무조건 최신 기능을 우선 적용하고 나머지는 신경 쓰지 않는다",
+    "기본값을 먼저 선언하고, `@supports`로 감싸 지원 브라우저에서만 향상된 스타일을 추가한다",
+    "지원 브라우저가 100%가 될 때까지 절대 언급도 하지 않는다",
+    "사용자에게 브라우저를 바꾸라고 안내한다",
+  ]}
+  correctAnswer={2}
+  explanation={"점진적 향상(Progressive Enhancement) 원칙이다. 먼저 모든 브라우저에서 동작하는 기본값을 선언해두고, `@supports`로 감싼 블록 안에 새 기능을 넣으면, 지원하지 않는 브라우저는 기본값만, 지원하는 브라우저는 향상된 스타일까지 받는다."}
+  optionExplanations={[
+    "최신 기능만 적용하면 지원하지 않는 브라우저의 사용자는 스타일이 아예 깨진 화면을 보게 된다.",
+    "정답이다. 기본값을 먼저 깔고 `@supports`로 지원 브라우저에서만 향상된 스타일을 얹는 점진적 향상이 정석이다.",
+    "지원율이 낮다고 아예 도입을 미루기보다, `@supports`로 안전하게 실험하며 점진적으로 도입하는 게 실무 관행이다.",
+    "개발자가 사용자의 브라우저 선택에 관여할 수 없다. 코드로 호환성을 처리하는 게 올바른 접근이다.",
+  ]}
+/>
 
 ## 정리 체크리스트
 
