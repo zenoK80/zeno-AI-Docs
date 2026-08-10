@@ -42,8 +42,6 @@ export function useMDXComponents(components = {}) {
     Playground,
     Popup,
     Quiz,
-    'Quiz.Option': Quiz.Option,
-    'Quiz.Explanation': Quiz.Explanation,
     Search,
     Select,
     Steps,
