@@ -1,0 +1,150 @@
+---
+title: '10-복습. 관계와 조인의 이해'
+description: 'PK·FK 조인 조건과 INNER·LEFT JOIN, 1:N 결과 행 수를 클릭형 문제와 SQL 적용으로 점검한다.'
+---
+
+## 복습 방법
+
+각 문제에서 결과 한 행이 무엇을 뜻하는지 먼저 정한 뒤 조인 종류와 조건을 확인한다.
+
+<Callout type="info">
+행이 예상보다 많으면 카디널리티와 조인 조건을, 예상보다 적으면 INNER·OUTER 종류와 WHERE 조건을 먼저 본다.
+</Callout>
+
+## 4지선다 문제
+
+<Quiz
+  questionNumber={1}
+  question={"회원 M01에 주문 두 건이 있을 때 회원과 주문을 INNER JOIN한 결과에서 M01 회원 정보가 두 번 나타나는 이유는?"}
+  options={[
+    "회원 데이터가 테이블에 잘못 두 번 저장되었기 때문이다.",
+    "1:N 관계를 펼치면서 회원 한 행이 연결된 주문 두 행과 각각 결합되기 때문이다.",
+    "INNER JOIN은 항상 모든 행을 두 배로 만들기 때문이다.",
+    "외래키가 없다는 뜻이기 때문이다.",
+  ]}
+  correctAnswer={2}
+  explanation={"결과 한 행이 주문 한 건을 나타내므로 회원 정보가 주문마다 반복되는 정상적인 1:N 조인 결과다."}
+  optionExplanations={[
+    "저장 중복이 아니라 조회 결합 결과의 반복이다.",
+    "정답이다.",
+    "연결 행 수에 따라 결과가 달라진다.",
+    "외래키가 있어도 같은 결과가 나온다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question={"주문하지 않은 회원까지 포함해 회원과 주문을 조회하려면 가장 적절한 쿼리는?"}
+  options={[
+    "members를 왼쪽에 두고 orders를 LEFT JOIN한다.",
+    "orders만 조회한다.",
+    "members와 orders를 조건 없이 CROSS JOIN한다.",
+    "orders를 INNER JOIN한 뒤 주문 없는 회원을 기대한다.",
+  ]}
+  correctAnswer={1}
+  explanation={"보존하려는 전체 회원을 왼쪽 기준으로 두고 LEFT JOIN하면 주문 없는 회원도 NULL과 함께 남는다."}
+  optionExplanations={[
+    "정답이다.",
+    "주문 없는 회원 정보가 orders에 없다.",
+    "모든 조합이 생겨 잘못된 결과가 된다.",
+    "INNER JOIN은 일치하는 주문이 없는 회원을 제외한다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question={"회원 3행과 주문 4행을 조인 조건 없이 결합했을 때 가능한 결과 행 수는?"}
+  options={[
+    "최대 4행",
+    "항상 7행",
+    "3 × 4인 12행",
+    "0행",
+  ]}
+  correctAnswer={3}
+  explanation={"조건 없는 카테시안 곱은 모든 회원 행과 모든 주문 행의 조합을 만들어 12행이 된다."}
+  optionExplanations={[
+    "주문 행만 센 값이다.",
+    "두 테이블 행 수를 더하는 연산이 아니다.",
+    "정답이다.",
+    "두 테이블에 행이 있으므로 모든 조합이 생긴다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question={"회원과 주문의 올바른 조인 조건으로 가장 적절한 것은?"}
+  options={[
+    "members.member_name = orders.order_status",
+    "members.member_id = orders.order_id",
+    "members.member_id = orders.member_id",
+    "members의 모든 행과 orders의 모든 행을 조건 없이 연결",
+  ]}
+  correctAnswer={3}
+  explanation={"회원의 주식별자와 주문에 전파된 같은 의미의 외래키를 비교해야 한다."}
+  optionExplanations={[
+    "이름과 주문상태는 의미와 도메인이 다르다.",
+    "회원번호와 주문번호는 서로 다른 대상을 식별한다.",
+    "정답이다.",
+    "카테시안 곱이 생긴다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question={"LEFT JOIN으로 모든 회원을 남긴 뒤 WHERE orders.order_status = 'SHIPPED'를 적용할 때 생길 수 있는 현상은?"}
+  options={[
+    "오른쪽이 NULL인 주문 없는 회원이 WHERE에서 제외될 수 있다.",
+    "모든 회원이 무조건 두 번씩 나온다.",
+    "외래키가 자동으로 삭제된다.",
+    "JOIN 조건이 자동으로 CROSS JOIN으로 바뀐다.",
+  ]}
+  correctAnswer={1}
+  explanation={"주문 없는 회원의 order_status는 NULL이며 WHERE 비교를 통과하지 못해 외부 조인의 보존 효과가 줄어든다."}
+  optionExplanations={[
+    "정답이다.",
+    "행 수는 연결된 주문 수에 따라 다르다.",
+    "조회 조건이 제약조건을 삭제하지 않는다.",
+    "조인 종류가 자동 변경되는 것은 아니다.",
+  ]}
+/>
+
+## 직접 적용하기
+
+다음 데이터에서 각 쿼리의 결과 행 수와 포함되는 대상을 예측한 뒤 SQL을 작성하자.
+
+```text
+회원: M01 민지, M02 준호, M03 소라
+주문: 1001 M01, 1002 M01, 1003 M02
+주문상세: (1001, P10), (1001, P20), (1002, P20), (1003, P30)
+상품: P10 키보드, P20 마우스, P30 모니터, P40 헤드셋
+
+1. 회원과 주문 INNER JOIN
+2. 회원과 주문 LEFT JOIN
+3. 주문·주문상세·상품 INNER JOIN
+4. 한 번도 주문되지 않은 상품 찾기
+```
+
+<Collapse title="풀이 보기">
+
+1. 회원-주문 INNER JOIN은 주문 3건을 기준으로 3행이다. M01은 두 번, M02는 한 번, M03은 나오지 않는다.
+2. LEFT JOIN은 위 3행에 주문 없는 M03 한 행이 NULL 주문과 함께 추가되어 4행이다.
+3. 주문-주문상세-상품 조인은 주문상세 4건을 기준으로 4행이다.
+4. 상품을 왼쪽에 두고 주문상세를 LEFT JOIN한 뒤 `WHERE oi.order_id IS NULL`을 사용하면 P40 헤드셋이 나온다.
+
+```sql
+SELECT p.product_id, p.product_name
+FROM products AS p
+LEFT JOIN order_items AS oi
+  ON oi.product_id = p.product_id
+WHERE oi.order_id IS NULL;
+```
+
+</Collapse>
+
+## 결과 점검
+
+- 5개 정답: 조인 전에 관계만 보고 결과 행 수와 NULL 보존 여부를 예측한다.
+- 3~4개 정답: 1:N 행 반복과 LEFT JOIN 조건 위치를 다시 확인한다.
+- 0~2개 정답: 본편의 네 테이블 예제를 손으로 연결해 본다.
+
+[본문으로 돌아가기](./10_relationship-and-join)
