@@ -1,0 +1,153 @@
+---
+title: 'JavaScript와 ECMAScript'
+description: 'JavaScript 언어의 규칙과 브라우저·Node.js가 제공하는 기능의 경계를 짧은 코드로 구분합니다.'
+---
+
+아래 코드는 Chrome에서도, Node.js에서도 같은 값 `5000`을 계산합니다.
+
+```js
+const price = 2000
+const count = 2
+
+function total(a, b) {
+  return a + b
+}
+
+console.log(total(price * count, 1000)) // 5000
+```
+
+`const`, 숫자의 곱셈과 덧셈, 함수의 매개변수와 반환값은 **JavaScript 언어 자체의 규칙**입니다. 이 규칙을 표준으로 정리한 문서가 **ECMAScript(ECMA-262)** 입니다.
+
+## JavaScript와 ECMAScript는 무엇이 다를까?
+
+보통 코드를 작성할 때는 언어 이름을 **JavaScript**라고 부릅니다. **ECMAScript**는 여러 프로그램이 JavaScript 코드를 같은 방식으로 처리하도록 정한 표준의 이름입니다.
+
+<Table>
+  <thead>
+    <tr>
+      <th>이름</th>
+      <th>쉽게 말하면</th>
+      <th>예</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>JavaScript</td>
+      <td>우리가 작성하고 실행하는 프로그래밍 언어</td>
+      <td><code>const</code>, 함수, 객체를 사용한 코드</td>
+    </tr>
+    <tr>
+      <td>ECMAScript</td>
+      <td>JavaScript 문법과 동작을 정한 표준</td>
+      <td><code>let</code>, <code>Promise</code>, 배열의 동작 규칙</td>
+    </tr>
+  </tbody>
+</Table>
+
+둘은 경쟁하는 다른 언어가 아닙니다. **JavaScript를 어떻게 해석해야 하는지 적은 규칙서가 ECMAScript**라고 이해하면 충분합니다.
+
+<Callout type="info" emoji="💡">
+  이 시리즈에서는 변수, 타입, 함수, 객체처럼 실행 장소가 달라도 유지되는 언어 규칙을 배웁니다.
+</Callout>
+
+## 언어만으로는 화면을 바꿀 수 없다
+
+다음 코드는 브라우저에서는 제목을 찾지만 일반적인 Node.js 환경에서는 `document is not defined` 오류가 납니다.
+
+```js
+const title = document.querySelector('h1')
+title.textContent = '반가워요!'
+```
+
+이유는 `document`가 ECMAScript에 들어 있는 이름이 아니기 때문입니다. 브라우저가 현재 HTML 문서를 JavaScript로 다룰 수 있게 제공한 **Web API**입니다. 여기서 **API**는 복잡한 기능을 정해진 방법으로 사용할 수 있게 만든 연결 창구를 뜻합니다.
+
+반대로 Node.js의 `process`도 ECMAScript가 아니라 Node.js 실행 환경이 제공하는 기능입니다.
+
+```js
+console.log(process.platform) // 예: win32, linux, darwin
+```
+
+즉, JavaScript 코드는 항상 어떤 **실행 환경** 안에서 움직입니다. 실행 환경은 코드를 실제로 돌리면서 언어 밖의 기능을 더해 주는 프로그램입니다.
+
+| 구분 | 언어 자체 | 실행 환경이 제공 |
+| --- | --- | --- |
+| 계산과 값 | `1 + 2`, 문자열, 배열 | 해당 없음 |
+| 코드 구조 | 변수, 함수, 조건문, 클래스 | 해당 없음 |
+| 브라우저 기능 | 해당 없음 | `document`, `fetch`, `localStorage` |
+| Node.js 기능 | 해당 없음 | `process`, 파일 시스템 API |
+
+## 코드를 볼 때 경계를 찾는 방법
+
+낯선 이름을 만나면 다음 질문을 해보면 됩니다.
+
+1. 이 기능이 값 계산이나 문법 규칙인가?
+2. 브라우저의 화면·주소·저장소·네트워크를 사용하고 있는가?
+3. Node.js처럼 특정 실행 환경에서만 존재하는가?
+
+`Array.prototype.map()`은 배열이라는 언어 내장 객체의 기능이므로 ECMAScript입니다. `document.querySelector()`는 HTML 문서가 있어야 하므로 Web API입니다. `fetch()`는 여러 환경에서 제공될 수 있지만 ECMAScript 문법은 아니며, 각 실행 환경이 제공하는 API입니다.
+
+## 핵심 정리
+
+- JavaScript는 우리가 사용하는 언어이고 ECMAScript는 그 언어의 표준이다.
+- 변수, 타입, 함수, 객체 같은 언어 규칙은 ECMAScript가 정한다.
+- DOM, 네트워크, 저장소 기능은 브라우저 같은 실행 환경이 제공한다.
+- 낯선 기능이 언어 규칙인지 환경 기능인지 구분하면 오류 원인을 찾기 쉬워진다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="JavaScript와 ECMAScript의 관계를 가장 정확하게 설명한 것은?"
+  options={[
+    '서로 전혀 관계없는 두 프로그래밍 언어다.',
+    'ECMAScript는 JavaScript의 문법과 동작을 정한 표준이다.',
+    'JavaScript는 브라우저이고 ECMAScript는 서버다.',
+    'ECMAScript는 HTML을 꾸미는 스타일 규칙이다.',
+  ]}
+  correctAnswer={2}
+  explanation="JavaScript는 사용하는 언어 이름이고, ECMAScript는 그 언어가 어떻게 동작해야 하는지를 정한 표준입니다."
+  optionExplanations={[
+    '둘은 별개의 언어가 아니라 언어와 그 표준의 관계입니다.',
+    '맞습니다. 여러 실행 환경이 같은 언어 규칙을 구현할 기준입니다.',
+    '브라우저와 서버는 실행 환경의 구분이지 두 이름의 뜻이 아닙니다.',
+    'HTML의 모양을 정하는 기술은 CSS입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="다음 중 ECMAScript 언어 자체보다 브라우저가 제공하는 기능은?"
+  options={['Array', 'Promise', 'document', 'const']}
+  correctAnswer={3}
+  explanation="document는 브라우저가 현재 웹 문서를 JavaScript 객체로 제공한 Web API입니다."
+  optionExplanations={[
+    'Array는 ECMAScript의 내장 객체입니다.',
+    'Promise는 ECMAScript가 정한 비동기 결과 객체입니다.',
+    '맞습니다. HTML 문서가 없는 일반적인 실행 환경에는 document가 없습니다.',
+    'const는 ECMAScript가 정한 변수 선언 문법입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Node.js에서 document를 사용했을 때 오류가 나는 가장 알맞은 이유는?"
+  options={[
+    'Node.js는 숫자 계산을 지원하지 않아서',
+    'document는 반드시 먼저 import해야 해서',
+    'document가 ECMAScript의 예약어라서',
+    '일반적인 Node.js 환경은 웹 문서를 나타내는 document를 제공하지 않아서',
+  ]}
+  correctAnswer={4}
+  explanation="코드 문법은 올바르지만 실행 환경에 document라는 이름이 없으므로 오류가 납니다."
+  optionExplanations={[
+    'Node.js도 ECMAScript의 숫자 계산을 지원합니다.',
+    '일반 모듈을 가져오는 문제가 아니라 실행 환경에 해당 API가 없는 문제입니다.',
+    'document는 예약어가 아닙니다.',
+    '맞습니다. document는 브라우저 문서 환경이 제공하는 객체입니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [ECMAScript Language Specification — Overview](https://tc39.es/ecma262/#sec-ecmascript-overview)
+- [MDN — JavaScript 기술 개요](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/JavaScript_technologies_overview)

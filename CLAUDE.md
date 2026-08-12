@@ -1,111 +1,53 @@
-# Claude 작업 지침
+# Zeno Docs 작업 지침
 
-이 저장소는 Nextra 4 + Next.js 기반의 개인 학습 문서 사이트다. Claude는 `plan-claude/`에 있는 웹 개발 과목의 MDX 문서 작성을 담당한다.
+이 저장소는 Nextra 4와 Next.js로 만든 초보자용 학습 문서 사이트다. Claude는 `plan-claude/`의 과목을 담당하며, 현재 범위는 JavaScript의 ECMAScript와 Web APIs다.
 
-## 역할 분리
+## 역할과 변경 범위
 
-- Claude 담당 계획: `plan-claude/`
-- Codex 담당 계획: `plan-codex/`
-- Claude는 사용자가 별도로 요청하지 않는 한 `AGENTS.md`, `plan-codex/`, `content/독학사/`, `content/자격증/`을 수정하지 않는다.
-- 파일을 추가, 삭제, 이동, 이름 변경하면 같은 폴더의 `_meta.js`도 반드시 함께 갱신한다.
+- 작업 전 해당 `plan-claude/*.md`의 범위와 목차를 읽는다.
+- 요청받은 과목의 MDX와 같은 폴더의 `_meta.js`만 수정한다.
+- `plan-codex/`와 독학사 콘텐츠는 별도 요청이 없으면 건드리지 않는다.
+- 커밋과 push는 사용자가 명시적으로 요청했을 때만 한다.
 
-## 절대 잊지 말아야 할 헤더/사이드바 구조
+## 폴더와 Nextra 규칙
 
-이 사이트는 **헤더에서 과목과 하위 분류를 고르고, 사이드바는 선택된 하위 분류의 문서만 보여 주는 구조**다. 모든 문서를 사이드바에 한꺼번에 나열하지 않는다.
+- 문서는 `content/<상위 메뉴>/<하위 분류>/NN_slug.mdx`에 둔다.
+- 헤더는 `app/components/docs-navbar.tsx`가 전체 `pageMap`의 폴더 구조로 만든다. `content/` 바로 아래 폴더가 상위 메뉴이고 그 안의 폴더가 드롭다운 항목이다.
+- `content/_meta.js`의 상위 메뉴는 `type: 'menu'`와 `items`를 사용하고, 항목 링크는 실제 첫 문서를 가리킨다.
+- 과목별 `_meta.js`의 하위 분류는 `type: 'page'`로 둔다. 하위 분류의 `_meta.js`가 사이드바 순서와 이름을 결정한다.
+- `app/layout.tsx`에는 전체 `getPageMap()`을 넘긴다. CSS 숨김이나 별도 필터로 사이드바를 다시 만들지 않는다.
+- 파일을 추가·삭제·이름 변경하면 관련 `_meta.js`를 실제 파일과 함께 갱신한다. 아직 없는 문서는 등록하지 않는다.
 
-### 헤더 규칙
+## 모바일 규칙
 
-- 헤더의 최상위 메뉴는 `content/` 바로 아래의 과목 폴더다. 예: JavaScript, React, HTML, CSS.
-- 마우스를 올리면 해당 과목의 직접 하위 분류만 드롭다운으로 보인다.
-  - JavaScript: `WebAPIs`, `ECMAscript`
-  - React / Next.js / TypeScript / Node.js / HTML / CSS: `Basic`, `Middle`, `Advanced`
-- 드롭다운에서 하위 분류를 클릭하면 그 분류의 첫 번째 문서로 이동한다.
-- 최상위 과목의 비어 있는 `index.mdx`는 만들지 않는다. 과목은 헤더 메뉴이고, 실제 문서는 하위 분류에서 시작한다.
-- Nextra 기본 검색과 테마 전환은 유지한다. 헤더를 수정할 때 제거하거나 대체하지 않는다.
-
-### 사이드바 규칙
-
-- 현재 URL과 같은 하위 분류의 문서만 사이드바에 표시한다.
-  - `/javascript/WebAPIs/...`: Web APIs 문서만
-  - `/javascript/ECMAscript/...`: ECMAScript 문서만
-  - `/React/Basic/...`: React Basic 문서만
-  - `/css/Middle/...`: CSS Middle 문서만
-- 다른 과목이나 형제 분류의 문서는 사이드바에 보이면 안 된다.
-- 사이드바 순서와 표시 이름은 그 하위 분류의 `_meta.js`가 기준이다.
-- 문서가 늘어도 전체 트리를 펼쳐 놓지 않는다. 헤더에서 분류를 고르면 그 분류의 사이드바로 바뀌어야 한다.
-
-### 이 구조를 만드는 Nextra 규칙
-
-- `app/layout.tsx`의 `<Layout>`에는 전체 `getPageMap()` 구조를 넘긴다. 한글 폴더 경로는 브라우저 URL과 맞추기 위해 route만 `encodeURI`로 정규화할 수 있지만, URL마다 `pageMap`을 잘라 넘기는 별도 필터 코드를 만들지 않는다.
-- `content/_meta.js`의 최상위 과목은 반드시 `type: 'menu'`와 `items`를 사용한다.
-- 각 과목의 `_meta.js`에서 실제 사이드바 범위가 되는 하위 분류(`WebAPIs`, `Basic` 등)는 반드시 `type: 'page'`로 선언한다.
-- 이 `menu -> page -> 문서` 계층이 Nextra 기본 사이드바를 현재 분류의 문서 목록으로 자동 제한한다. 배포된 `https://zeno.it.kr/`의 헤더/사이드바 방식이 이 기준이다.
-- 이 동작을 CSS 숨김, DOM 조작, 별도 라우트별 사이드바 데이터로 대체하지 않는다.
-- `app/[[...mdxPath]]/page.tsx`의 `generateStaticParams()`는 홈을 `[]`로, 한글을 포함한 각 경로 조각은 `encodeURIComponent(decodeURIComponent(segment))`으로 반환한다. `output: 'export'`에서 한글 과목 경로가 누락됐다고 판단되는 오류를 막기 위한 규칙이다.
-
-### 모바일 규칙
-
-- 모바일에서는 헤더 드롭다운 대신 Nextra 기본 햄버거 메뉴를 사용한다.
-- 모바일에서 메뉴를 열고 문서를 클릭한 뒤 데스크톱 폭으로 되돌려도, 사이드바와 본문이 정상 폭으로 돌아와야 한다.
-- Nextra 사이드바에 고정 `width`, `transform`, `height` 값을 직접 덮어써서 문제를 해결하지 않는다.
-- 헤더/사이드바/CSS를 수정했다면 모바일 폭 -> 메뉴 열기 -> 문서 이동 -> 데스크톱 폭 복귀를 확인한다.
-
-## Claude 담당 과목과 폴더
-
-| 계획 파일 | 콘텐츠 폴더 |
-| --- | --- |
-| `[javascript][ecmascript].md` | `content/javascript/ECMAscript/` |
-| `[javascript][webapis].md` | `content/javascript/WebAPIs/` |
-| `[react][basic].md`, `[middle].md`, `[advanced].md` | `content/React/Basic/`, `Middle/`, `Advanced/` |
-| `[nextjs][basic].md`, `[middle].md`, `[advanced].md` | `content/NextJs/Basic/`, `Middle/`, `Advanced/` |
-| `[typescript][basic].md`, `[middle].md`, `[advanced].md` | `content/Typescript/Basic/`, `Middle/`, `Advanced/` |
-| `[nodejs][basic].md`, `[middle].md`, `[advanced].md` | `content/NodeJs/Basic/`, `Middle/`, `Advanced/` |
-| `[html][basic].md`, `[middle].md`, `[advanced].md` | `content/html/Basic/`, `Middle/`, `Advanced/` |
-| `[css][basic].md`, `[middle].md`, `[advanced].md` | `content/css/Basic/`, `Middle/`, `Advanced/` |
+- 모바일에서는 Nextra 사이드바를 여는 햄버거 버튼을 사용하고 커스텀 헤더 메뉴는 숨긴다.
+- `모바일 메뉴 열기 -> 문서 이동 -> 데스크톱 폭 복귀` 뒤에도 사이드바와 본문 폭이 정상이어야 한다.
+- Nextra 사이드바의 `width`, `height`, `transform`을 고정값으로 덮어쓰지 않는다.
 
 ## MDX 작성 규칙
 
-- 작성 전에 해당 `plan-claude/[과목][단계].md`에서 목차와 범위를 읽는다.
-- 파일명은 `NN_kebab-case.mdx`다. 번호는 각 하위 분류 폴더에서 `01`부터 시작한다.
-- Frontmatter에는 `title`, `description`만 넣는다.
-- 본문 제목은 `##`부터 시작한다. `#`은 쓰지 않는다.
-- 독자는 프로그래밍 초보다. **낯설 수 있는 용어·개념은 등장하는 바로 그 자리에서** 짧게 풀어 설명한다. "이건 나중에 나온다"며 미루지 말고, 그 문장을 이해하는 데 필요한 최소한은 즉시 준다. 독자가 흐름을 끊고 용어를 따로 검색하러 가야 하는 상황을 만들지 않는다.
-- 핵심 개념뿐 아니라 **주변 개념·비교 대상**도 짧게 짚는다 (예: "리플로우"를 설명하면 "페인트와 뭐가 다른지"도 한 줄 덧붙인다). 완전히 새로운 절을 만들 필요는 없고, 괄호나 한 문장으로 충분하다.
-- 작은 코드 예제를 통해 바로 확인할 수 있게 쓴다.
-- 한 편은 약 30~50분 학습량을 목표로 한다. 설명이 길어지면 다음 편으로 나눈다.
-- 끝에는 항상 `## 참고 자료`를 넣고 공식 문서 중심으로 링크한다.
+- 첫 편부터 실제 개념으로 시작한다. 시리즈 소개만 담은 문서는 만들지 않는다.
+- 파일명은 `NN_kebab-case.mdx`로 하고 frontmatter에는 `title`, `description`만 둔다.
+- frontmatter가 페이지 제목을 만들므로 본문은 `##`부터 시작한다.
+- 본문은 약 5분, 마지막 복습은 2~3분 안에 끝낼 분량으로 쓴다.
+- 한 편에는 직접 연결되는 핵심 개념 2~4개만 담는다. 긴 도입과 반복 요약은 뺀다.
+- 처음 나오는 용어는 그 자리에서 쉬운 말로 설명한다. 따로 검색해야 문장을 이해하는 상태를 만들지 않는다.
+- 설명은 `작은 결과 또는 코드 -> 뜻 -> 동작 과정 -> 헷갈리는 점 -> 핵심 정리` 순서를 우선한다.
+- 예제는 실행 결과를 함께 보여 준다. 비교는 짧은 표, 흐름은 필요한 경우 Mermaid를 사용한다.
+- `Callout`, `Table`, `Collapse`, `Quiz`는 import 없이 사용하며 이해에 도움 될 때만 넣는다.
 
-## 복습 문서 — 본편마다 짝을 붙인다
+## 마무리 복습
 
-**모든 본편(`NN_slug.mdx`) 바로 다음에는 그 편의 복습 문서를 만든다.**
+- 별도 복습 파일을 만들지 않고 같은 문서 끝에 `## 마무리 복습`을 둔다.
+- 전역 `<Quiz>`로 4지선다 3문제를 만든다. 개념 확인, 코드 결과 판단, 흔한 오해를 섞는다.
+- `questionNumber`, `question`, `options`, `correctAnswer`, `explanation`, `optionExplanations`를 모두 작성한다.
+- 해설은 정답 근거와 각 오답이 틀린 이유를 짧고 쉬운 말로 설명한다.
 
-- 파일명: `NN_slug-review.mdx` — 본편과 **같은 번호**, 뒤에 `-review`만 붙인다
-- 본편은 개념·설명·완성된 예제에 집중하고 긴 문제와 전체 정답을 중복해서 넣지 않는다. 본편 끝에서는 다음 진도보다 같은 번호 복습편으로 먼저 연결한다
-- 퀴즈는 **주관식 문답이 아니라 4지선다(보기 4개) 객관식**으로 만든다. 보기는 그럴듯한 오답(흔한 오해)을 섞어서 진짜 이해했는지 가려낼 수 있게 짠다
-- 문제마다 `<Collapse title="정답 보기">`로 정답만 먼저 보여주고, 바로 이어서 `<Collapse title="해설 보기">`로 **왜 그게 답이고 왜 나머지는 틀렸는지**를 초보 눈높이로 설명한다. 정답과 해설을 하나로 합치지 않는다 — 정답만 빨리 확인하고 싶은 사람과 원리까지 알고 싶은 사람을 둘 다 배려한다
-- 해설에서도 어려운 용어가 나오면 그 자리에서 풀어준다. 본편을 다시 읽어야 이해되는 해설은 쓰지 않는다
-- 퀴즈 외에 손으로 직접 해보는 **짧은 실습**도 함께 담는다. 개념 위주 편은 퀴즈 비중을, 실습 위주 편(환경 설정, Canvas 등)은 실습 비중을 높인다
-- 분량은 본편보다 훨씬 짧게 — 10~15분 안에 끝낼 수 있는 정도가 목표다
-- `_meta.js`에는 본편 바로 다음 줄에 등록해 사이드바 순서를 맞춘다
-- 새 본편을 만들 때 복습편을 미루지 않고 두 파일과 `_meta.js`를 같은 작업에서 완성한다
+## JavaScript 경계와 검증
 
-**예외 — 짝을 붙이지 않는 경우**: 기출문제, 실전 모의고사, 종합·미니 프로젝트, 정답·해설 전용 문서, 시험 직전 체크리스트. 그 문서 자체가 이미 평가나 실습 목적이므로 별도 복습 문서를 만들지 않는다.
-
-## Nextra 컴포넌트
-
-전역 등록된 컴포넌트는 import 없이 사용한다. 장식이 아니라 이해에 도움이 될 때만 쓴다.
-
-- `Callout`: 핵심 정의와 주의점
-- `Steps`: 설치/실습 순서
-- `Tabs`: 환경별 코드나 비교
-- `FileTree`: 파일 구조
-- `Table`: 용어와 선택지 비교
-- `Collapse`: 보조 설명
-- `Cards`: 관련 문서 이동
-
-## 확인 규칙
-
-- API, 브라우저 지원 범위, 라이브러리 버전처럼 최신성이 필요한 내용은 공식 문서에서 확인한다.
-- 라우팅 또는 Nextra 문서 구조를 크게 바꾼 경우에만 `npm.cmd run build`를 한 번 실행한다.
-- 일반 문서 작성이나 작은 스타일 변경은 `npm.cmd run lint`로 확인한다.
-- 커밋과 push는 사용자가 요청했을 때만 한다.
+- ECMAScript는 변수, 타입, 함수, 객체처럼 JavaScript 언어 자체의 규칙을 다룬다.
+- Web APIs는 DOM, 이벤트, 네트워크, 저장소처럼 실행 환경이 제공하는 기능을 다룬다.
+- 같은 코드가 브라우저 밖에서도 언어 규칙만으로 동작하면 ECMAScript, 환경이 제공해야 하면 Web APIs로 분류한다.
+- 최신 문법과 브라우저 지원 범위는 ECMA-262, WHATWG, MDN 등 공식 자료로 확인한다.
+- 끝에는 실제 작성에 사용한 공식·신뢰 자료만 `## 참고 자료`에 링크한다.
+- 일반 문서 작업은 `npm.cmd run lint`로 확인한다. 라우팅이나 Nextra 구조를 바꾼 경우에만 전체 빌드를 한 번 실행한다.

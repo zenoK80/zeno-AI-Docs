@@ -1,6 +1,6 @@
 # Zeno AI Docs
 
-AI 에이전트 협업과 명세 주도 문서화(Spec-Driven Documentation)를 적용한 개인 학습 플랫폼입니다.
+AI 에이전트 협업과 명세 주도 문서화(Spec-Driven Documentation)를 적용한 개인 문서입니다.
 
 ## How It Works
 
