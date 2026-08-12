@@ -1,253 +1,82 @@
 ---
 title: '01. Web APIs란?'
-description: '브라우저가 제공하는 Web API의 세계를 이해하고, 언어 자체와 실행 환경의 경계를 그어 본다.'
+description: '브라우저가 추가로 주는 기능인 Web API가 무엇인지, 언어 문법과 어떻게 구별하는지 5분 안에 이해한다.'
 ---
-
-## Web APIs란?
-
-`fetch()`는 자바스크립트 문법일까?
-
-많은 사람이 그렇다고 답한다. 하지만 아니다.
-`fetch()`는 **브라우저가 제공하는 기능**이고, 자바스크립트 언어 명세에는 존재하지 않는다.
-
-이 시리즈는 바로 그 "브라우저가 제공하는 것들"을 다룬다.
 
 ## 자바스크립트만으로는 아무것도 못 한다
 
-의외지만 사실이다. 자바스크립트 언어 명세(ECMA-262)에 들어 있는 건 대략 이 정도다.
+`fetch()`는 자바스크립트 문법일까? 아니다. **브라우저가 제공하는 기능**이고, 언어 명세에는 없다.
 
-- 문법: `if`, `for`, `function`, `class`, `const` …
-- 값과 타입: 숫자, 문자열, 객체, 배열
-- 내장 객체: `Math`, `JSON`, `Promise`, `Map`, `Date` …
+자바스크립트 언어 자체(ECMAScript)에는 `if`, `function`, `Promise` 같은 문법과 계산 규칙만 있다. **화면에 뭔가 띄우기, 클릭 감지하기, 서버에 요청 보내기 — 이런 건 언어에 없다.** 언어를 실행시키는 **호스트 환경**(브라우저, Node.js 등)이 따로 얹어준다.
 
-여기에 없는 것들을 보자.
-
-- 화면에 글자를 띄우기
-- 파일을 읽기
-- 서버에 요청 보내기
-- 사용자의 클릭 감지하기
-
-**언어 명세에는 입력도 출력도 없다.** 심지어 `console.log`조차 명세에 없다.
-
-<Callout type="info">
-이건 결함이 아니라 설계다. 언어는 "계산하는 규칙"만 정의하고, 바깥 세상과 소통하는 방법은
-**그 언어를 실행시키는 환경**이 제공한다. 이 환경을 **호스트 환경**<sup>Host Environment</sup>이라 부른다.
-</Callout>
-
-## 호스트 환경이 능력을 준다
-
-같은 언어라도 어디서 실행하느냐에 따라 할 수 있는 일이 달라진다.
-
-<Tabs items={['브라우저', 'Node.js']}>
-<Tabs.Tab>
-
-```js
-document.body.textContent = '안녕'   // 화면 조작 — 가능
-localStorage.setItem('k', 'v')       // 브라우저 저장소 — 가능
-
-require('node:fs')                   // 파일 시스템 — 없다
-```
-
-</Tabs.Tab>
-<Tabs.Tab>
-
-```js
-const fs = require('node:fs')
-fs.writeFileSync('a.txt', '안녕')    // 파일 쓰기 — 가능
-
-document.body                        // ReferenceError: document is not defined
-localStorage                         // ReferenceError
-```
-
-</Tabs.Tab>
-</Tabs>
-
-브라우저라는 호스트 환경이 자바스크립트에게 주는 능력의 묶음, 그것을 **Web API**라고 부른다.
-이 시리즈의 주제가 바로 Web API다.
-
-<Callout type="important">
-**용어 정리**
-
-- **ECMAScript** — 언어 자체. 명세는 TC39가 관리한다
-- **Web API** — 브라우저가 추가로 제공하는 기능. 명세는 WHATWG · W3C가 관리한다
-
-관리 주체가 아예 다르다는 점이 핵심이다. 이 시리즈의 이름이 **Web APIs**인 이유이기도 하다 —
-언어(ECMAScript)가 아니라 **브라우저가 주는 API들**을 다루는 시리즈라는 뜻이다.
-</Callout>
-
-관리 주체를 기준으로 나누면 이렇다.
+브라우저가 주는 이 기능 묶음을 **Web API**라 부른다. 이 시리즈의 주제다.
 
 ```mermaid
 flowchart TD
   A["자바스크립트 코드"] --> B["ECMAScript (언어)<br/>TC39가 관리"]
   A --> C["Web API (브라우저 제공)<br/>WHATWG · W3C가 관리"]
-  B --> D["Promise, class,<br/>Map, JSON ..."]
+  B --> D["Promise, class, Map ..."]
   C --> E["document, fetch,<br/>localStorage ..."]
 ```
 
-## 경계선 긋기 — 이 시리즈가 다루는 것
-
-어떤 주제가 이 시리즈 소관인지 헷갈릴 때 쓸 수 있는 판별법이다.
+## 어떻게 구별하나
 
 | 질문 | 예 → Web API | 아니오 → 언어 |
 | --- | --- | --- |
-| Node.js에는 기본적으로 없는가? | `document`, `localStorage` | `Promise`, `class`, `Map` |
+| Node.js에 기본적으로 없는가? | `document`, `localStorage` | `Promise`, `class`, `Map` |
 | 명세가 WHATWG/W3C에 있는가? | DOM, Fetch, HTML | ECMA-262 |
-| 렌더링·상호작용·네트워크와 관련 있는가? | 이벤트, 리플로우, CORS | 스코프, 호이스팅 |
-
-실제로 분류해 보면 이렇게 갈린다.
-
-<Tabs items={['Web API (이 시리즈)', 'ECMAScript (다른 시리즈)']}>
-<Tabs.Tab>
-
-```js
-document.querySelector('.btn')   // DOM Standard
-fetch('/api/users')              // Fetch Standard
-localStorage.getItem('token')    // HTML Standard
-new URL('https://example.com')   // URL Standard
-element.addEventListener(...)    // DOM Standard
-new MutationObserver(...)        // DOM Standard
-```
-
-</Tabs.Tab>
-<Tabs.Tab>
-
-```js
-const [a, b] = [1, 2]            // 디스트럭처링
-async function f() {}            // async/await
-class Dog extends Animal {}      // 클래스
-new Map()                        // 내장 객체
-JSON.parse('{}')                 // 내장 객체
-[1, 2, 3].map(x => x * 2)        // 배열 메서드
-```
-
-</Tabs.Tab>
-</Tabs>
-
-<Callout type="warning">
-**헷갈리기 쉬운 것들**
-
-`setTimeout`, `fetch`, `URL`, `structuredClone`은 지금 Node.js에서도 쓸 수 있다.
-하지만 이들은 **원래 브라우저(WHATWG) 명세의 API**이고, Node.js가 나중에 가져다 구현한 것이다. 그래서 이 시리즈에서 다룬다.
-
-반대로 `Promise`는 Node.js에도 있지만 **언어 명세(ECMA-262)** 소속이라 여기서 다루지 않는다.
-</Callout>
-
-## Web API는 자바스크립트로 구현돼 있지 않다
-
-이 사실을 알면 나중에 성능 이야기가 이해되기 시작한다.
-
-`document.querySelector()`를 호출하면 그 안에서 벌어지는 일은 자바스크립트가 아니다.
-브라우저 내부의 **C++로 짜인 코드**가 실행된다. 자바스크립트는 그 기능으로 통하는 **창구**만 제공받는다.
 
 ```js
 console.log(document.querySelector)
-// → ƒ querySelector() { [native code] }
+// ƒ querySelector() { [native code] }
 ```
 
-`[native code]`라고 나온다. 자바스크립트로 짜인 함수가 아니라는 뜻이다.
-
-<Callout type="info">
-자바스크립트 엔진(V8 등)과 브라우저 엔진(Blink 등)은 별개의 소프트웨어이고, 둘 사이를 오갈 때는 값을 변환하는 비용이 든다.
-
-DOM 조작을 반복하면 느려지는 근본 원인이 여기 있다. 자세한 건 39편 리플로우·레이아웃 스래싱에서 다룬다.
-</Callout>
-
-## Web API는 몇 개나 있나
-
-MDN 기준으로 **수백 개**다. 다 외우는 건 불가능하고, 그럴 필요도 없다.
-대신 **큰 덩어리로 지도를 그려두면** 필요할 때 찾아갈 수 있다.
-
-| 영역 | 대표 API | 다루는 편 |
-| --- | --- | --- |
-| 문서 구조 조작 | DOM, Shadow DOM | 13~28, 41~50 |
-| 스타일과 렌더링 | CSSOM, 좌표, 애니메이션 | 29~40 |
-| 사용자 입력 | Event, Pointer, Keyboard | 51~60 |
-| 네트워크 | Fetch, WebSocket, CORS | 66~79 |
-| 저장소 | Storage, IndexedDB, Cookie | 80~90 |
-| 그래픽·미디어 | Canvas, WebGL, Media | 91~100 |
-| 백그라운드 처리 | Worker, Service Worker | 101~110 |
-| 성능·보안 | Performance, CSP | 118~128 |
-
-## 브라우저마다 지원이 다르다
-
-Web API의 골치 아픈 점이다. 언어 문법과 달리 **브라우저마다 지원 여부와 시점이 다르다.**
-
-그래서 이 시리즈에서는 각 API마다 **Baseline** 표기를 붙인다.
-
-<Callout type="important">
-**Baseline이란?**
-
-주요 브라우저(Chrome · Edge · Firefox · Safari)에서 해당 기능을 언제부터 쓸 수 있게 됐는지를 나타내는 웹 표준 커뮤니티의 지표다.
-
-- **Widely available** — 30개월 이상 지나 안정적. 마음 놓고 써도 된다
-- **Newly available** — 방금 모든 브라우저에 들어옴. 구형 기기 고려 필요
-- **Limited availability** — 일부 브라우저만 지원. 폴백 필수
-</Callout>
-
-지원 여부는 코드에서 직접 확인할 수도 있다.
-
-```js
-// 기능이 있는지 먼저 확인하고 쓰는 패턴
-if ('share' in navigator) {
-  navigator.share({ title: '공유' })
-} else {
-  // 지원하지 않는 브라우저용 대체 동작
-}
-```
+`[native code]`는 이 함수가 자바스크립트가 아니라 **브라우저 내부 코드(C++)** 로 짜였다는 뜻이다. Web API는 언어로 구현된 게 아니라, 브라우저가 창구만 열어준 기능이다.
 
 <Callout type="warning">
-**흔한 실수 — 브라우저 이름으로 분기하기**
-
-```js
-// 이렇게 하지 않는다
-if (navigator.userAgent.includes('Chrome')) { ... }
-```
-
-`userAgent` 문자열은 브라우저들이 서로를 흉내 내느라 신뢰할 수 없게 됐다.
-**"어떤 브라우저인가"가 아니라 "그 기능이 있는가"를 확인한다.** 이 방식을 기능 탐지<sup>Feature Detection</sup>라 한다.
+`setTimeout`, `fetch`처럼 **Node.js에도 있는 API**가 있어 헷갈리기 쉽다. 이들은 원래 브라우저(WHATWG) 명세의 API였는데, Node.js가 나중에 가져다 구현한 것이다. "지금 어디서 쓸 수 있나"가 아니라 **"원래 어느 명세 소속인가"** 가 분류 기준이다.
 </Callout>
 
-## 실습 — 지금 바로 확인하기
+## 마무리 복습
 
-브라우저 개발자 도구 콘솔을 열고(<kbd>F12</kbd>) 직접 쳐 보자.
-
-```js
-// 1. 지금 이 페이지의 제목
-document.title
-
-// 2. window에 뭐가 들어있는지 개수 세기
-Object.keys(window).length
-
-// 3. 언어 소속인지 브라우저 소속인지 구별해 보기
-console.log(Math.max)        // ƒ max() { [native code] }  ← 언어
-console.log(document.write)  // ƒ write() { [native code] } ← 브라우저
-
-// 4. Node.js에는 없는 것들
-typeof document      // 'object'
-typeof localStorage  // 'object'
-```
-
-세 번째 예시를 보면 둘 다 `[native code]`로 나온다.
-**출력만으로는 구별되지 않는다.** 그래서 앞의 판별 기준이 필요한 것이다.
-
-## 정리
-
-<Callout type="default">
-- 자바스크립트 언어 자체에는 **입출력이 없다.** 화면도 파일도 네트워크도 없다
-- **호스트 환경**이 능력을 준다. 브라우저가 주는 능력의 묶음이 **Web API**다
-- ECMAScript는 TC39, Web API는 WHATWG/W3C가 관리한다 — **소속이 다르다**
-- Web API는 자바스크립트가 아니라 **브라우저 내부 코드**로 구현돼 있다
-- 지원 여부는 **Baseline**으로 확인하고, 코드에서는 **기능 탐지**로 분기한다
-</Callout>
-
-다음 편에서는 이 경계선을 더 구체적으로 그어 본다.
+<Quiz
+  questionNumber={1}
+  question={"`fetch()`가 자바스크립트 언어 명세(ECMAScript)에 없는 이유는?"}
+  options={[
+    "너무 최신 기능이라서 아직 추가되지 않아서",
+    "언어는 계산 규칙만 정의하고, 화면·네트워크 같은 외부 기능은 호스트 환경이 제공하기 때문에",
+    "fetch는 사실 자바스크립트 문법이 맞아서 — 착각이다",
+    "보안 문제로 언어에서 의도적으로 제외돼서",
+  ]}
+  correctAnswer={2}
+  explanation={"언어(ECMAScript)는 계산 규칙만 정의하고, 화면 조작이나 네트워크 요청처럼 바깥 세상과 소통하는 기능은 브라우저 같은 호스트 환경이 추가로 제공한다."}
+  optionExplanations={[
+    "시간이 지나 추가될 기능이 아니라, 애초에 언어 명세가 다루는 영역 밖이다.",
+    "정답이다. 언어는 계산 규칙만, 외부 소통 기능은 호스트 환경이 담당한다.",
+    "fetch는 WHATWG가 관리하는 Web API이지 ECMAScript 문법이 아니다.",
+    "보안과는 무관하다. 애초에 관리 주체(TC39 vs WHATWG)가 다른 별개의 것이다.",
+  ]}
+/>
+<Quiz
+  questionNumber={2}
+  question={"다음 중 Web API에 속하는 것은?"}
+  options={[
+    "class",
+    "Map",
+    "addEventListener",
+    "Promise",
+  ]}
+  correctAnswer={3}
+  explanation={"addEventListener는 브라우저가 제공하는 Web API다. class, Map, Promise는 언어(ECMAScript) 자체에 내장된 기능이다."}
+  optionExplanations={[
+    "class는 언어 자체의 문법이다. Web API가 아니다.",
+    "Map은 언어에 내장된 자료구조다. Web API가 아니다.",
+    "정답이다. addEventListener는 브라우저가 제공하는 Web API다.",
+    "Promise는 언어에 내장된 객체다. Web API가 아니다.",
+  ]}
+/>
 
 ## 참고 자료
 
 - [MDN — Web API 목록](https://developer.mozilla.org/ko/docs/Web/API)
-- [MDN — Baseline과 호환성](https://developer.mozilla.org/en-US/docs/Glossary/Baseline/Compatibility)
-- [WHATWG — HTML Living Standard](https://html.spec.whatwg.org/)
 - [WHATWG — DOM Standard](https://dom.spec.whatwg.org/)
-- [ECMAScript 명세 (TC39)](https://tc39.es/ecma262/)
-- [Web Platform Baseline](https://web.dev/baseline)

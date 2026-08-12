@@ -14,36 +14,6 @@ const meta = {
       },
     },
   },
-  React: {
-    title: 'React',
-    type: 'menu',
-    items: {
-      Basic: {
-        title: '기초',
-        href: '/React/Basic/01_why-react',
-      },
-    },
-  },
-  html: {
-    title: 'HTML',
-    type: 'menu',
-    items: {
-      Basic: {
-        title: '기초',
-        href: '/html/Basic/01_introduction-to-modern-html',
-      },
-    },
-  },
-  css: {
-    title: 'CSS',
-    type: 'menu',
-    items: {
-      Basic: {
-        title: '기초',
-        href: '/css/Basic/01_what-is-css',
-      },
-    },
-  },
   독학사: {
     title: '독학사',
     type: 'menu',
