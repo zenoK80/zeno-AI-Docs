@@ -62,12 +62,8 @@
 | --- | --- |
 | `[javascript][ecmascript].md` | `content/javascript/ECMAscript/` |
 | `[javascript][webapis].md` | `content/javascript/WebAPIs/` |
-| `[react][basic].md`, `[middle].md`, `[advanced].md` | `content/React/Basic/`, `Middle/`, `Advanced/` |
-| `[nextjs][basic].md`, `[middle].md`, `[advanced].md` | `content/NextJs/Basic/`, `Middle/`, `Advanced/` |
-| `[typescript][basic].md`, `[middle].md`, `[advanced].md` | `content/Typescript/Basic/`, `Middle/`, `Advanced/` |
-| `[nodejs][basic].md`, `[middle].md`, `[advanced].md` | `content/NodeJs/Basic/`, `Middle/`, `Advanced/` |
-| `[html][basic].md`, `[middle].md`, `[advanced].md` | `content/html/Basic/`, `Middle/`, `Advanced/` |
-| `[css][basic].md`, `[middle].md`, `[advanced].md` | `content/css/Basic/`, `Middle/`, `Advanced/` |
+
+React, Next.js, TypeScript, Node.js, HTML, CSS는 계획 파일과 콘텐츠를 전부 지우고 보류 중이다 (위 "지금 당장의 작업 범위" 참고). 재개할 때 `plan-claude/[과목][단계].md`를 새로 쓰고 이 표에도 다시 추가한다.
 
 ## MDX 작성 규칙
 

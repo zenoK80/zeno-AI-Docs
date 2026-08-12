@@ -21,37 +21,20 @@ Claude가 담당하는 과목의 **목차와 과목별 작성 지침**이 들어
 ## 지금 작업 범위
 
 지금은 `[javascript][ecmascript].md`, `[javascript][webapis].md` **두 계획만 작업 중**이다. 한 편씩 완성하며 진행한다.
-나머지 과목은 이 문서의 새 형식(본편+복습 한 파일, 5분 이내 분량)이 자리 잡을 때까지 보류한다. 아래 목차 편 수는 예전 계획의 기록이며, 실제 작성 시점에 이 원칙에 맞춰 다시 조정한다.
+
+React, Next.js, TypeScript, Node.js, HTML, CSS의 계획 파일과 콘텐츠는 관리를 단순하게 유지하려고 전부 지운 상태다. `content/_meta.js` 헤더에도 없다. 이 두 시리즈가 새 형식(본편+복습 한 파일, 5분 이내 분량)으로 자리 잡으면, 그때 과목별로 계획 파일을 새로 쓰고 `content/_meta.js`에 다시 추가한다.
 
 ## 단계 구분
 
 기술 과목은 **기초(basic) → 중급(middle) → 고급(advanced)** 3단계로 나눈다.
-**JavaScript만 예외**로, 단계 대신 ECMAScript와 Browser 둘로 나눈다.
+**JavaScript만 예외**로, 단계 대신 ECMAScript와 Browser 둘로 나눈다. (다른 과목을 재개할 때 적용할 규칙)
 
 ## 파일 목록
 
-| 계획 파일 | 콘텐츠 폴더 | 편 수 |
-| --- | --- | --- |
-| `[javascript][ecmascript].md` | `content/javascript/ECMAscript/` | 47 |
-| `[javascript][webapis].md` | `content/javascript/WebAPIs/` | 128 |
-| `[react][basic].md` | `content/React/Basic/` | 20 |
-| `[react][middle].md` | `content/React/Middle/` | 20 |
-| `[react][advanced].md` | `content/React/Advanced/` | 15 |
-| `[nextjs][basic].md` | `content/NextJs/Basic/` | 16 |
-| `[nextjs][middle].md` | `content/NextJs/Middle/` | 15 |
-| `[nextjs][advanced].md` | `content/NextJs/Advanced/` | 16 |
-| `[typescript][basic].md` | `content/Typescript/Basic/` | 14 |
-| `[typescript][middle].md` | `content/Typescript/Middle/` | 11 |
-| `[typescript][advanced].md` | `content/Typescript/Advanced/` | 14 |
-| `[nodejs][basic].md` | `content/NodeJs/Basic/` | 15 |
-| `[nodejs][middle].md` | `content/NodeJs/Middle/` | 18 |
-| `[nodejs][advanced].md` | `content/NodeJs/Advanced/` | 15 |
-| `[html][basic].md` | `content/html/Basic/` | 10 |
-| `[html][middle].md` | `content/html/Middle/` | 14 |
-| `[html][advanced].md` | `content/html/Advanced/` | 16 |
-| `[css][basic].md` | `content/css/Basic/` | 21 |
-| `[css][middle].md` | `content/css/Middle/` | 15 |
-| `[css][advanced].md` | `content/css/Advanced/` | 12 |
+| 계획 파일 | 콘텐츠 폴더 |
+| --- | --- |
+| `[javascript][ecmascript].md` | `content/javascript/ECMAscript/` |
+| `[javascript][webapis].md` | `content/javascript/WebAPIs/` |
 
 ## 계획 파일에 들어가는 것
 
