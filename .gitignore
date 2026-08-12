@@ -46,3 +46,6 @@ next-env.d.ts
 
 # os
 Thumbs.db
+
+#folder
+/mds

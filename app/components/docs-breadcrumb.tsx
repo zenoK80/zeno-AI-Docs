@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { ArrowRightIcon } from 'nextra/icons'
 import { useConfig } from 'nextra-theme-docs'
 import type { ReactNode } from 'react'
@@ -23,7 +24,10 @@ function firstPageRoute(item: BreadcrumbItem): string | undefined {
 }
 
 export function DocsBreadcrumb() {
+  const pathname = usePathname()
   const { activePath } = useConfig().normalizePagesResult
+
+  if (pathname === '/') return null
 
   return (
     <nav className="docs-breadcrumb" aria-label="Breadcrumb">

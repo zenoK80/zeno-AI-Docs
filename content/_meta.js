@@ -1,5 +1,15 @@
 const meta = {
-  index: '홈',
+  index: {
+    title: '홈',
+    theme: {
+      layout: 'full',
+      sidebar: false,
+      toc: false,
+      breadcrumb: false,
+      pagination: false,
+      copyPage: false,
+    },
+  },
   javascript: {
     title: 'JavaScript',
     type: 'menu',

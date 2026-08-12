@@ -79,6 +79,8 @@ export default async function RootLayout({
           navbar={<DocsNavbar key="docs-navbar" pageMap={pageMap} />}
           pageMap={pageMap}
           sidebar={{ autoCollapse: true, defaultMenuCollapseLevel: 1 }}
+          feedback={{ content: null }}
+          editLink={null}
         >
           {children}
         </Layout>

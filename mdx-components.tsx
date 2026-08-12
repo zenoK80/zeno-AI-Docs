@@ -20,6 +20,7 @@ import { ConceptFlow } from './app/components/concept-flow'
 import { DataBarChart } from './app/components/data-bar-chart'
 import { DocsBreadcrumb } from './app/components/docs-breadcrumb'
 import { DocsTab, DocsTabs } from './app/components/docs-tabs'
+import { HomeLanding } from './app/components/home-landing'
 import { Quiz } from './app/components/quiz'
 import { SetDiagram } from './app/components/set-diagram'
 
@@ -44,6 +45,7 @@ export function useMDXComponents(components = {}) {
     ConceptFlow,
     DataBarChart,
     FileTree,
+    HomeLanding,
     ImageZoom,
     Playground,
     Popup,

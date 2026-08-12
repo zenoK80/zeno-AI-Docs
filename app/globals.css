@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@import "../node_modules/pretendard/dist/web/static/pretendard.css";
+@import "../node_modules/@fontsource/montserrat/400.css";
+@import "../node_modules/@fontsource/montserrat/500.css";
+@import "../node_modules/@fontsource/montserrat/600.css";
+@import "../node_modules/@fontsource/montserrat/700.css";
 @import "@xyflow/react/dist/style.css";
 @import "../node_modules/jsxgraph/distrib/jsxgraph.css";
 
@@ -11,7 +16,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: Montserrat, Pretendard, Arial, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -27,7 +32,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Montserrat, Pretendard, Arial, sans-serif;
 }
 
 .docs-navbar {
@@ -227,9 +232,24 @@ body > div > article {
   max-width:960px;
 }
 
+/* 홈에서는 Nextra의 바깥 문서 컨테이너와 article을 모두 전체 폭으로 푼다. */
+body:has(.home-landing) > div:has(> article) {
+  width: 100%;
+  max-width: none;
+}
+
+body:has(.home-landing) > div > article {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
 article > .nextra-breadcrumb {
   display: none;
 }
+
+
+
 
 .docs-breadcrumb {
   display: flex;

@@ -14,6 +14,20 @@ GPT와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는
 
 ---
 
+## 디자인 방향
+
+홈 화면은 **Minimal Bento Grid**를 지향합니다. 중앙 프레임 안에 얇은 선과 흑백 카드로 정보를 나누고 실제 학습 흐름을 미리 보여줍니다.
+
+- **Bento Grid**: 과목과 시리즈를 규칙적인 2열 카드로 그룹화
+- **Technical Lines**: 얇은 가이드선과 구분선으로 화면 구조를 표현
+- **Neutral Palette**: 흰색·회색·검정을 중심으로 사용하고 Zeno 보라색은 활성 상태에만 제한
+- **Functional Preview**: 코드, 브라우저, 수식과 차트를 장식이 아닌 학습 미리보기로 사용
+- **Typography**: 한글은 Pretendard, 영문과 숫자는 Montserrat 사용
+
+참고 방향: [Cal.com](https://cal.com/), [Laravel](https://laravel.com/)
+
+---
+
 ## Structure
 
 - `content/`: 학습 문서(MDX)와 메뉴 설정
@@ -46,6 +60,7 @@ GPT와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는
 - React Flow (`@xyflow/react`): 노드와 연결선을 움직일 수 있는 상호작용 흐름도 제작
 - MathJax (`better-react-mathjax`): LaTeX 문법으로 수학·통계 수식을 접근성 있게 표시
 - Sandpack (`@codesandbox/sandpack-react`): 문서 안에서 JavaScript·React 코드를 편집하고 실행 결과를 바로 확인
+- Montserrat (`@fontsource/montserrat`): 사이트의 영문과 숫자에 사용하는 산세리프 웹폰트
 
 설치 패키지는 필요한 시각화·실습 컴포넌트를 `app/components/`에 만든 뒤 MDX에서 재사용합니다.
 
