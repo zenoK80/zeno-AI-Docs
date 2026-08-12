@@ -1,0 +1,9 @@
+.playground {
+  min-width: 0;
+  margin: 1.5rem 0;
+}
+
+.playground :global(.sp-wrapper) {
+  overflow: hidden;
+  border-radius: 6px;
+}

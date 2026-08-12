@@ -15,9 +15,13 @@ import {
   Steps,
   Table,
 } from 'nextra/components'
-import { DocsTab, DocsTabs } from './app/components/docs-tabs'
+import { CodePlayground } from './app/components/code-playground'
+import { ConceptFlow } from './app/components/concept-flow'
+import { DataBarChart } from './app/components/data-bar-chart'
 import { DocsBreadcrumb } from './app/components/docs-breadcrumb'
+import { DocsTab, DocsTabs } from './app/components/docs-tabs'
 import { Quiz } from './app/components/quiz'
+import { SetDiagram } from './app/components/set-diagram'
 
 const themeComponents = getThemeComponents()
 const ThemeWrapper = themeComponents.wrapper
@@ -30,13 +34,15 @@ const Tabs = Object.assign((props: Parameters<typeof DocsTabs>[0]) => {
 export function useMDXComponents(components = {}) {
   return {
     ...themeComponents,
-
     Banner,
     Bleed,
     Button,
     Callout,
     Cards,
+    CodePlayground,
     Collapse,
+    ConceptFlow,
+    DataBarChart,
     FileTree,
     ImageZoom,
     Playground,
@@ -44,6 +50,7 @@ export function useMDXComponents(components = {}) {
     Quiz,
     Search,
     Select,
+    SetDiagram,
     Steps,
     Table,
     Tabs,
@@ -54,7 +61,6 @@ export function useMDXComponents(components = {}) {
         {props.children}
       </ThemeWrapper>
     ),
-
     ...components,
   }
 }

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
+@import "../node_modules/jsxgraph/distrib/jsxgraph.css";
 
 :root {
   --background: rgb(var(--nextra-bg));
