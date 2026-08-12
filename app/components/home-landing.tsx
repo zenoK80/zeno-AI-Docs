@@ -206,8 +206,8 @@ export function HomeLanding() {
               <Image src="/zenoLogo.svg" alt="" width={20} height={20} />
               <span>ZENO AI DOCS</span>
             </div>
-            <h1 id="home-title">5분 안에 읽고,<br />빠르게 습득하자.</h1>
-            <p>웹 기술과 관련된 과목을 짧은 개념과 확인 문제로 학습합니다.</p>
+            <h1 id="home-title">학습 자료 정리<br />개인 문서입니다.</h1>
+            <p>각 챕터는 5분 안에 빠르게 학습할 수 있도록 구성했습니다</p>
             <div className={styles.actions}>
               <Link className={styles.primaryAction} href="#series">학습 시리즈 보기 <ArrowRightIcon aria-hidden="true" width="16" /></Link>
               <Link className={styles.secondaryAction} href="/javascript/ECMAscript/01_javascript-and-ecmascript">첫 문서 읽기</Link>
