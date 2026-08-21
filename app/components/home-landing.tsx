@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { ArrowRightIcon } from 'nextra/icons'
 import styles from './home-landing-v2.module.css'
 
-type PreviewKind = 'code' | 'browser' | 'sets' | 'chart'
+type PreviewKind = 'code' | 'browser' | 'sets' | 'chart' | 'sql'
 type AccentColor = 'blue' | 'green' | 'red' | 'amber'
 type LessonStage = 'concept' | 'practice' | 'quiz'
 
@@ -79,6 +79,29 @@ const groups: SeriesGroup[] = [
       },
     ],
   },
+  {
+    title: '자격증',
+    description: '시험 범위를 개념, 예제, 문제 풀이 순서로 나누어 실전까지 연결합니다.',
+    order: '03',
+    series: [
+      {
+        title: 'SQLD',
+        description: '데이터 모델링부터 SQL 조회와 조인까지, 결과표를 읽으며 익힙니다.',
+        href: '/자격증/SQLD/01_relational-database-and-table',
+        documentCount: 1,
+        preview: 'sql',
+        accent: 'blue',
+      },
+      {
+        title: '빅데이터분석기사 필기',
+        description: '분석 기획부터 탐색·모델링·결과 해석까지 데이터의 흐름을 배웁니다.',
+        href: '/자격증/빅데이터분석기사_필기/01_data-analysis-problem-definition',
+        documentCount: 1,
+        preview: 'chart',
+        accent: 'green',
+      },
+    ],
+  },
 ]
 
 function SeriesPreview({ kind }: { kind: PreviewKind }) {
@@ -93,6 +116,21 @@ function SeriesPreview({ kind }: { kind: PreviewKind }) {
         <code><b>function</b> understand(value) {'{'}</code>
         <code className={styles.indent}>return value.<strong>practice</strong>()</code>
         <code>{'}'}</code>
+      </div>
+    )
+  }
+
+  if (kind === 'sql') {
+    return (
+      <div className={styles.codePreview} aria-hidden="true">
+        <div className={styles.windowBar}>
+          <i /><i /><i />
+          <span>orders.sql</span>
+        </div>
+        <code><b>SELECT</b> customer, product</code>
+        <code><b>FROM</b> orders</code>
+        <code><b>WHERE</b> order_id = <strong>103</strong></code>
+        <code>→ 민지 · 마우스</code>
       </div>
     )
   }
