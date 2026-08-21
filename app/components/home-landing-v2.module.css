@@ -631,7 +631,7 @@
   width: min(var(--content-width), calc(100% - 64px));
   margin: 0 auto;
   --catalog-gutter: clamp(32px, 4vw, 64px);
-  padding: 108px var(--catalog-gutter) 120px;
+  padding: 92px var(--catalog-gutter) 120px;
 }
 
 .catalogHeader {
@@ -1303,7 +1303,7 @@
 
   .catalog {
     --catalog-gutter: 16px;
-    padding: 82px var(--catalog-gutter) 92px;
+    padding: 70px var(--catalog-gutter) 92px;
   }
 
   .catalogHeader {
