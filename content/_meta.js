@@ -38,6 +38,20 @@ const meta = {
       },
     },
   },
+  자격증: {
+    title: '자격증',
+    type: 'menu',
+    items: {
+      SQLD: {
+        title: 'SQLD',
+        href: '/자격증/SQLD/01_relational-database-and-table',
+      },
+      빅데이터분석기사_필기: {
+        title: '빅데이터분석기사 필기',
+        href: '/자격증/빅데이터분석기사_필기/01_data-analysis-problem-definition',
+      },
+    },
+  },
 }
 
 export default meta
