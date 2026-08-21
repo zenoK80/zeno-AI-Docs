@@ -214,20 +214,23 @@ export function HomeLanding() {
   useEffect(() => {
     document.body.classList.add('home-page')
     const junctions = document.querySelectorAll<HTMLElement>('[data-grid-junction]')
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
-          entry.target.dataset.active = 'true'
-          observer.unobserve(entry.target)
-        })
-      },
-      { threshold: 0.8 },
-    )
+    let lastRotation = 0
 
-    junctions.forEach((junction) => observer.observe(junction))
+    const rotateJunctions = () => {
+      const now = window.performance.now()
+      if (now - lastRotation < 650) return
+      lastRotation = now
+
+      junctions.forEach((junction) => {
+        delete junction.dataset.active
+        void junction.offsetWidth
+        junction.dataset.active = 'true'
+      })
+    }
+
+    window.addEventListener('scroll', rotateJunctions, { passive: true })
     return () => {
-      observer.disconnect()
+      window.removeEventListener('scroll', rotateJunctions)
       document.body.classList.remove('home-page')
     }
   }, [])

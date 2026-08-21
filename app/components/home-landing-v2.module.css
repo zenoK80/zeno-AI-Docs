@@ -482,43 +482,42 @@
 .groupJoint {
   position: absolute;
   z-index: 5;
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   background: var(--junction);
   box-shadow: 0 0 0 1px var(--page);
   opacity: 0.96;
   pointer-events: none;
   transform: rotate(45deg);
 }
-
 .gridJunctionLeft {
-  left: -3px;
+  left: -3.5px;
 }
 
 .groupJointLeft {
-  left: calc(-1 * var(--catalog-gutter) - 3px);
+  left: calc(-1 * var(--catalog-gutter) - 3.5px);
 }
 
 .gridJunctionRight {
-  right: -3px;
+  right: -3.5px;
 }
 
 .groupJointRight {
-  right: calc(-1 * var(--catalog-gutter) - 3px);
+  right: calc(-1 * var(--catalog-gutter) - 3.5px);
 }
 
 .gridJunctionTop,
 .groupJoint {
-  top: -3px;
+  top: -3.5px;
 }
 
 .gridJunctionBottom {
-  bottom: -3px;
+  bottom: -3.5px;
 }
 
 .gridJunction[data-active='true'],
 .groupJoint[data-active='true'] {
-  animation: junction-arrive 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: junction-arrive 640ms linear both;
 }
 
 @keyframes junction-arrive {
