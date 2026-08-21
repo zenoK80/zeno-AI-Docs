@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRightIcon } from 'nextra/icons'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { DiIllustrator, DiPhotoshop } from 'react-icons/di'
 import {
   SiCss,
@@ -210,6 +212,38 @@ function SeriesPreview({ kind }: { kind: PreviewKind }) {
 }
 
 export function HomeLanding() {
+  const rootRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    gsap.registerPlugin(ScrollTrigger)
+
+    const context = gsap.context(() => {
+      gsap
+        .timeline({ defaults: { duration: 0.6, ease: 'power2.out' } })
+        .from('[data-gsap="hero-copy"]', { autoAlpha: 0, x: -18 })
+        .from('[data-gsap="hero-video"]', { autoAlpha: 0, x: 18 }, 0.08)
+        .from('[data-gsap="feature-rail"]', { autoAlpha: 0, y: 12 }, 0.22)
+
+      gsap.utils.toArray<HTMLElement>('[data-gsap="scroll-reveal"]').forEach((element) => {
+        gsap.from(element, {
+          autoAlpha: 0,
+          y: 18,
+          duration: 0.6,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 84%',
+            once: true,
+          },
+        })
+      })
+    }, root)
+
+    return () => context.revert()
+  }, [])
 
   useEffect(() => {
     document.body.classList.add('home-page')
@@ -240,10 +274,10 @@ export function HomeLanding() {
   }
 
   return (
-    <main className={`home-landing ${styles.home}`}>
+    <main ref={rootRef} className={`home-landing ${styles.home}`}>
       <div className={styles.frame}>
         <section className={styles.hero} aria-labelledby="home-title">
-          <div className={styles.heroCopy}>
+          <div className={styles.heroCopy} data-gsap="hero-copy">
             <div className={styles.badge}>
               <Image src="/zenoLogo.svg" alt="" width={20} height={20} />
               <span>ZENO AI DOCS</span>
@@ -256,24 +290,24 @@ export function HomeLanding() {
             </div>
           </div>
 
-          <div className={styles.heroVideoPanel} aria-hidden="true">
+          <div className={styles.heroVideoPanel} data-gsap="hero-video" aria-hidden="true">
             <video autoPlay className={styles.heroVideo} loop muted playsInline preload="metadata">
               <source src="/pong-work.mp4" type="video/mp4" />
             </video>
           </div>
         </section>
-        <div className={styles.featureRail} aria-label="학습 방식">
+        <div className={styles.featureRail} data-gsap="feature-rail" aria-label="학습 방식">
           <span><b>01</b> 5분 단위 개념</span><span><b>02</b> 실행 가능한 예제</span><span><b>03</b> 바로 푸는 문제</span>
           <GridJunctions bottom />
         </div>
 
         <section className={styles.catalog} id="series" aria-labelledby="series-title">
-          <header className={styles.catalogHeader}>
+          <header className={styles.catalogHeader} data-gsap="scroll-reveal">
             <span>LEARNING LIBRARY</span><h2 id="series-title">배울 내용을 선택하세요</h2><p>과목별 시리즈를 선택하면 해당 문서의 첫 단계부터 시작합니다.</p>
           </header>
 
           {groups.map((group) => (
-            <section className={styles.group} key={group.title} aria-labelledby={`group-${group.order}`}>
+            <section className={styles.group} data-gsap="scroll-reveal" key={group.title} aria-labelledby={`group-${group.order}`}>
               <header className={styles.groupHeader}><span>{group.order}</span><div><h3 id={`group-${group.order}`}>{group.title}</h3><p>{group.description}</p></div></header>
                 <span className={`${styles.groupJoint} ${styles.groupJointLeft}`} aria-hidden="true" data-grid-junction />
                 <span className={`${styles.groupJoint} ${styles.groupJointRight}`} aria-hidden="true" data-grid-junction />
@@ -290,7 +324,7 @@ export function HomeLanding() {
         </section>
 
 
-        <section className={styles.closing} aria-labelledby="closing-title">
+        <section className={styles.closing} data-gsap="scroll-reveal" aria-labelledby="closing-title">
           <GridJunctions top />
           <div className={styles.closingCopy}>
             <span>STUDY ROUTINE</span>
