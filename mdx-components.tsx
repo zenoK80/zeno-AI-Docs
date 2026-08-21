@@ -21,6 +21,7 @@ import { DataBarChart } from './app/components/data-bar-chart'
 import { DocsBreadcrumb } from './app/components/docs-breadcrumb'
 import { DocsTab, DocsTabs } from './app/components/docs-tabs'
 import { HomeLanding } from './app/components/home-landing'
+import { OneDriveVideo } from './app/components/one-drive-video'
 import { Quiz } from './app/components/quiz'
 import { SetDiagram } from './app/components/set-diagram'
 
@@ -46,6 +47,7 @@ export function useMDXComponents(components = {}) {
     DataBarChart,
     FileTree,
     HomeLanding,
+    OneDriveVideo,
     ImageZoom,
     Playground,
     Popup,
