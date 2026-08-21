@@ -11,6 +11,7 @@ GPT와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는
 - **과목별 계획 기반 작성**: `plan-study/`와 `plan-skill/`의 범위와 목차를 먼저 읽고 MDX 문서를 만듭니다. (Plan-Driven Content)
 - **문서도 코드처럼 관리**: 문서, 메뉴 설정, 작업 규칙을 Git으로 함께 기록하고 변경 이력을 남깁니다. (Docs as Code)
 - **자동 빌드와 배포**: GitHub에 푸시하면 GitHub Actions가 사이트를 빌드하고 GitHub Pages에 배포합니다. (CI/CD)
+- **짧은 학습 흐름**: MDX 문서에 핵심 개념, 시각 자료, 영상, 퀴즈·실습을 함께 구성해 읽고 바로 확인할 수 있게 합니다.
 
 ---
 
@@ -87,5 +88,6 @@ GPT와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는
 - DocsTabs: 프로젝트에 맞게 만든 탭
 - DocsBreadcrumb: 상단 경로 표시
 - DocsNavbar: 커스텀 헤더와 드롭다운
+- OneDriveVideo: 문서 상단에 OneDrive 학습 영상을 iframe으로 표시
 
 ---
