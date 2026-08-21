@@ -261,6 +261,7 @@ export function HomeLanding() {
         </section>
         <div className={styles.featureRail} aria-label="학습 방식">
           <span><b>01</b> 5분 단위 개념</span><span><b>02</b> 실행 가능한 예제</span><span><b>03</b> 바로 푸는 문제</span>
+          <GridJunctions bottom />
         </div>
 
         <section className={styles.catalog} id="series" aria-labelledby="series-title">
