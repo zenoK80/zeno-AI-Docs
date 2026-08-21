@@ -272,3 +272,32 @@
     transition: none;
   }
 }
+
+:global(html.dark) .questionType {
+  border-color: #4b4b58;
+  background: #18181e;
+  color: #c9c9d4;
+}
+
+:global(html.dark) .option,
+:global(html.dark) .option:has(.radio:disabled):hover {
+  border-color: #454552;
+  background: #16161b;
+}
+
+:global(html.dark) .option:hover,
+:global(html.dark) .selected {
+  border-color: #9b80ff;
+  background: #201a31;
+}
+
+:global(html.dark) .marker {
+  border-color: #555563;
+  color: #c8c8d3;
+}
+
+:global(html.dark) .selected .marker {
+  border-color: #aa8cff;
+  background: #8d70f4;
+  color: #ffffff;
+}

@@ -1,6 +1,13 @@
 .flow,
 .chart,
 .diagram {
+  --chart-grid: color-mix(in srgb, currentColor 18%, transparent);
+  --chart-axis: color-mix(in srgb, currentColor 76%, transparent);
+  --chart-bar: #2563eb;
+  --diagram-blue: #2563eb;
+  --diagram-blue-fill: #60a5fa;
+  --diagram-red: #dc2626;
+  --diagram-red-fill: #f87171;
   width: 100%;
   margin: 1.25rem 0;
   border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
@@ -32,6 +39,31 @@
   color: color-mix(in srgb, currentColor 72%, transparent);
   font-size: 0.875rem;
   text-align: center;
+}
+
+:global(html.dark) .flow,
+:global(html.dark) .chart,
+:global(html.dark) .diagram {
+  --chart-grid: #3d3d49;
+  --chart-axis: #d0d0db;
+  --chart-bar: #9b80ff;
+  --diagram-blue: #8d70f4;
+  --diagram-blue-fill: #6d52ca;
+  --diagram-red: #ff8a9e;
+  --diagram-red-fill: #b84c62;
+  border-color: #474754;
+  background: #17171c;
+}
+
+:global(html.dark) .chart :global(.recharts-tooltip-wrapper) :global(.recharts-default-tooltip) {
+  border-color: #50505d !important;
+  background: #1b1b21 !important;
+  color: #f4f4f6 !important;
+}
+
+:global(html.dark) .chart :global(.recharts-tooltip-item),
+:global(html.dark) .chart :global(.recharts-tooltip-label) {
+  color: #f4f4f6 !important;
 }
 
 @media (max-width: 640px) {

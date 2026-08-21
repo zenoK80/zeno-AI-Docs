@@ -89,5 +89,6 @@ GPT와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는
 - DocsBreadcrumb: 상단 경로 표시
 - DocsNavbar: 커스텀 헤더와 드롭다운
 - OneDriveVideo: 문서 상단에 OneDrive 학습 영상을 iframe으로 표시
+- AiStudyAssistant: 우측 하단에서 열리는 학습 도우미 안내 버튼 (현재 대화 기능은 준비 중)
 
 ---

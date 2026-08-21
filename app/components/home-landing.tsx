@@ -4,6 +4,18 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRightIcon } from 'nextra/icons'
+import { DiIllustrator, DiPhotoshop } from 'react-icons/di'
+import {
+  SiCss,
+  SiFigma,
+  SiHtml5,
+  SiJavascript,
+  SiNextdotjs,
+  SiNextra,
+  SiNodedotjs,
+  SiReact,
+  SiTypescript,
+} from 'react-icons/si'
 import styles from './home-landing-v2.module.css'
 
 type PreviewKind = 'code' | 'browser' | 'sets' | 'chart' | 'sql'
@@ -32,6 +44,19 @@ type SeriesGroup = {
   series: Series[]
 }
 
+const techLogos = [
+  { label: 'HTML', Icon: SiHtml5, color: '#e34f26' },
+  { label: 'CSS', Icon: SiCss, color: '#1572b6' },
+  { label: 'JavaScript', Icon: SiJavascript, color: '#d4a900' },
+  { label: 'TypeScript', Icon: SiTypescript, color: '#3178c6' },
+  { label: 'React', Icon: SiReact, color: '#149eca' },
+  { label: 'Next.js', Icon: SiNextdotjs, color: '#151515' },
+  { label: 'Nextra', Icon: SiNextra, color: '#4913ec' },
+  { label: 'Node.js', Icon: SiNodedotjs, color: '#339933' },
+  { label: 'Figma', Icon: SiFigma, color: '#f24e1e' },
+  { label: 'Photoshop', Icon: DiPhotoshop, color: '#31a8ff' },
+  { label: 'Illustrator', Icon: DiIllustrator, color: '#ff9a00' },
+]
 const groups: SeriesGroup[] = [
   {
     title: 'JavaScript',
@@ -235,6 +260,10 @@ export function HomeLanding() {
   const [activeStage, setActiveStage] = useState<LessonStage>('concept')
   const [quizChoice, setQuizChoice] = useState<number | null>(null)
 
+  const showComingSoon = (name: string) => {
+    window.alert(`${name}는 준비 중입니다.`)
+  }
+
   return (
     <main className={`home-landing ${styles.home}`}>
       <div className={styles.frame}>
@@ -271,6 +300,21 @@ export function HomeLanding() {
           <span><b>01</b> 5분 단위 개념</span><span><b>02</b> 실행 가능한 예제</span><span><b>03</b> 바로 푸는 문제</span>
         </div>
 
+        <div className={styles.studyTicker} aria-hidden="true">
+          <div className={styles.tickerTrack}>
+            {[0, 1].map((set) => (
+              <div className={styles.tickerSet} key={set}>
+                {techLogos.map(({ label, Icon, color }) => (
+                  <span key={`${set}-${label}`}>
+                    <Icon style={{ color }} />
+                    <b>{label}</b>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
         <section className={styles.catalog} id="series" aria-labelledby="series-title">
           <header className={styles.catalogHeader}>
             <span>LEARNING LIBRARY</span><h2 id="series-title">배울 내용을 선택하세요</h2><p>과목별 시리즈를 선택하면 해당 문서의 첫 단계부터 시작합니다.</p>
@@ -279,7 +323,9 @@ export function HomeLanding() {
           {groups.map((group) => (
             <section className={styles.group} key={group.title} aria-labelledby={`group-${group.order}`}>
               <header className={styles.groupHeader}><span>{group.order}</span><div><h3 id={`group-${group.order}`}>{group.title}</h3><p>{group.description}</p></div></header>
-              <div className={styles.seriesGrid}>
+                <span className={`${styles.groupJoint} ${styles.groupJointLeft}`} aria-hidden="true" />
+                <span className={`${styles.groupJoint} ${styles.groupJointRight}`} aria-hidden="true" />
+                <div className={styles.seriesGrid}>
                 {group.series.map((series) => (
                   <Link className={styles.seriesCard} data-accent={series.accent} href={series.href} key={series.title}>
                     <div className={styles.cardBody}><div><span className={styles.count}>{String(series.documentCount).padStart(2, '0')} DOCUMENT</span><h4>{series.title}</h4><p>{series.description}</p></div><span className={styles.openLabel}>시작하기 <ArrowRightIcon aria-hidden="true" width="15" /></span></div>
@@ -291,7 +337,39 @@ export function HomeLanding() {
           ))}
         </section>
 
-        <section className={styles.closing}><span>START SMALL, KEEP GOING</span><h2>하루 하루<br />가볍게 읽으세요.</h2><Link href="/javascript/ECMAscript/01_javascript-and-ecmascript">첫 문서 읽기 <ArrowRightIcon aria-hidden="true" width="16" /></Link></section>
+        <section className={styles.closing} aria-labelledby="closing-title">
+          <div className={styles.closingCopy}>
+            <span>STUDY ROUTINE</span>
+            <h2 id="closing-title">오늘의 한 문서가<br />내일의 감각이 됩니다.</h2>
+            <p>짧게 읽고, 직접 확인하고, 다시 꺼내 보는 학습 기록을 쌓아갑니다.</p>
+          </div>
+          <div className={styles.closingSignal} aria-hidden="true">
+              <div className={styles.signalStep}><span>01</span><div><b>READ</b><small>핵심 개념</small></div></div>
+              <div className={styles.signalStep}><span>02</span><div><b>TRY</b><small>짧은 실행</small></div></div>
+              <div className={styles.signalStep}><span>03</span><div><b>CHECK</b><small>문제 확인</small></div></div>
+            </div>
+            <div className={styles.closingAction}>
+            <p>새로운 과목과 문서는 같은 학습 흐름 안에서 계속 추가됩니다.</p>
+            <div className={styles.closingLinks}>
+              <Link href="/javascript/ECMAscript/01_javascript-and-ecmascript">첫 문서 읽기 <ArrowRightIcon aria-hidden="true" width="16" /></Link>
+              <Link href="#series">시리즈 전체 보기 <ArrowRightIcon aria-hidden="true" width="16" /></Link>
+            </div>
+            <small>현재 3개 영역 · 6개 학습 시리즈</small>
+          </div>
+        </section>
+
+        <footer className={styles.siteFooter}>
+          <div className={styles.footerIdentity}>
+            <span><Image src="/zenoLogo.svg" alt="" width={20} height={20} /> Zeno AI Docs</span>
+            <p>읽고, 실행하고, 내 것으로 만드는 개인 학습 문서.</p>
+          </div>
+          <nav aria-label="외부 링크" className={styles.footerNav}>
+              <Link href="/blog" onClick={(event) => { event.preventDefault(); showComingSoon('Blog') }}>Blog</Link>
+              <Link href="/portfolio" onClick={(event) => { event.preventDefault(); showComingSoon('Portfolio') }}>Portfolio</Link>
+              <a href="https://github.com/zenoK80" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+          <small className={styles.copyright}>© 2026 Zeno AI Docs</small>
+        </footer>
       </div>
     </main>
   )

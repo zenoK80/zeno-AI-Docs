@@ -22,14 +22,14 @@ export function SetDiagram() {
 
     board.create('circle', [aCenter, 2], {
       fixed: true,
-      strokeColor: '#2563eb',
-      fillColor: '#60a5fa',
+      strokeColor: 'var(--diagram-blue)',
+      fillColor: 'var(--diagram-blue-fill)',
       fillOpacity: 0.3,
     })
     board.create('circle', [bCenter, 2], {
       fixed: true,
-      strokeColor: '#dc2626',
-      fillColor: '#f87171',
+      strokeColor: 'var(--diagram-red)',
+      fillColor: 'var(--diagram-red-fill)',
       fillOpacity: 0.3,
     })
     board.create('text', [-2.3, 1.8, 'A'], { fixed: true, fontSize: 18 })

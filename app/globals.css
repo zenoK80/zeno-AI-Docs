@@ -21,8 +21,15 @@
 }
 
 html.dark {
-  --foreground: var(--x-color-slate-200);
-  --docs-border: var(--x-color-gray-800);
+  --foreground: #f4f4f6;
+  --docs-border: #474754;
+  --x-color-gray-400: #858591;
+  --x-color-gray-500: #a1a1ad;
+  --x-color-gray-600: #c5c5d0;
+  --x-color-primary-100: #2a2140;
+  --x-color-primary-500: #987cff;
+  --x-color-primary-600: #aa8cff;
+  --x-color-primary-700: #c4b5fd;
 }
 
 html {
@@ -119,7 +126,7 @@ body {
   bottom: 0;
   left: 12px;
   height: 3px;
-  border-radius: 999px 999px 0 0;
+  border-radius: 0;
   background: transparent;
   content: '';
 }
@@ -168,7 +175,7 @@ body {
 
 .docs-navbar-panel-inner {
   border: 1px solid var(--docs-border);
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--background);
   box-shadow: 0 10px 24px rgb(15 23 42 / 12%);
   padding: 5px;
@@ -183,7 +190,7 @@ body {
   display: flex;
   align-items: center;
   min-height: 34px;
-  border-radius: 4px;
+  border-radius: 0;
   padding: 7px 10px;
   color: var(--foreground);
   font-size: 14px;
@@ -232,18 +239,35 @@ body > div > article {
   max-width:960px;
 }
 
+/* 선과 격자를 중심으로 한 문서 스타일: UI 표면은 각진 형태로 통일한다. */
+button,
+input,
+textarea,
+select,
+[class*='x:rounded'] {
+  border-radius: 0 !important;
+}
 /* 홈에서는 Nextra의 바깥 문서 컨테이너와 article을 모두 전체 폭으로 푼다. */
 body:has(.home-landing) > div:has(> article) {
   width: 100%;
   max-width: none;
 }
 
+/* 홈은 문서용 최대 폭 제한을 해제해 넓은 화면도 전체 폭으로 사용한다. */
+body:has(.home-landing) > div[class*='x:max-w-'] {
+  width: 100%;
+  max-width: none;
+}
 body:has(.home-landing) > div > article {
   width: 100%;
   max-width: none;
   padding: 0;
 }
 
+/* Nextra가 홈 콘텐츠 뒤에 남기는 빈 페이지 여백을 제거한다. */
+body:has(.home-landing) article > div.x\:mt-16 {
+  display: none;
+}
 article > .nextra-breadcrumb {
   display: none;
 }
@@ -356,14 +380,28 @@ html.dark .docs-tabs-trigger:disabled {
   color: var(--x-color-neutral-600);
 }
 
+html.dark .docs-navbar-logo img {
+  filter: brightness(1.18) saturate(0.78);
+}
+
+html.dark .docs-navbar-logo {
+  color: #fafafa;
+}
+
 html.dark .docs-navbar-trigger {
-  color: var(--x-color-gray-400);
+  color: #c7c8d1;
 }
 
 html.dark .docs-navbar-trigger:hover,
 html.dark .docs-navbar-trigger[aria-current='page'],
 html.dark .docs-navbar-group[data-open='true'] .docs-navbar-trigger {
-  color: var(--x-color-gray-100);
+  color: #f5f3ff;
+}
+
+html.dark .docs-navbar-trigger:hover::after,
+html.dark .docs-navbar-trigger[aria-current='page']::after,
+html.dark .docs-navbar-group[data-open='true'] .docs-navbar-trigger::after {
+  background: #aa8cff;
 }
 
 html.dark .docs-navbar-panel-link:hover,
@@ -373,6 +411,60 @@ html.dark .docs-navbar-panel-link[aria-current='page'] {
 
 html.dark .docs-navbar-panel-inner {
   box-shadow: 0 18px 42px rgb(0 0 0 / 36%);
+}
+
+/* 헤더는 본문보다 먼저 접는다. 768~1080px에서도 Nextra 모바일 내비게이션을 사용한다. */
+@media (min-width: 768px) and (max-width: 1080px) {
+  .docs-navbar-inner {
+    padding-inline: 12px;
+  }
+
+  .docs-navbar-logo {
+    flex-basis: auto;
+    min-width: max-content;
+  }
+
+  .docs-navbar-mobile-menu-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 34px;
+    height: 34px;
+    margin-left: auto;
+    border-radius: 0;
+    color: var(--foreground);
+  }
+
+  .docs-navbar-mobile-menu-button:hover,
+  .docs-navbar-mobile-menu-button[aria-expanded='true'] {
+    background: color-mix(in srgb, var(--foreground) 10%, transparent);
+  }
+
+  .docs-navbar-mobile-menu-button span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .docs-navbar-menu,
+  .docs-navbar-tools,
+  aside.nextra-sidebar,
+  .nextra-toc {
+    display: none !important;
+  }
+
+  aside.nextra-mobile-nav {
+    display: flex !important;
+  }
+
+  /* 사이드바를 감춘 중간 폭에서는 읽기 영역을 화면 중앙에 둔다. */
+  body > div > article {
+    margin-inline: auto;
+  }
 }
 
 /* Nextra의 모바일 구간(< md, 768px 미만)과 동일한 범위 */
@@ -395,7 +487,7 @@ html.dark .docs-navbar-panel-inner {
     width: 34px;
     height: 34px;
     margin-left: auto;
-    border-radius: 6px;
+    border-radius: 0;
     color: var(--foreground);
   }
 
@@ -426,5 +518,133 @@ html.dark .docs-navbar-panel-inner {
 
   .docs-navbar-tools {
     display: none;
+  }
+}
+
+.zeno-ai-launcher {
+  position: fixed !important;
+  z-index: 100;
+  right: 28px !important;
+  bottom: 28px !important;
+  left: auto !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.zeno-ai-button,
+.zeno-ai-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--docs-border);
+  border-radius: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.zeno-ai-button {
+  gap: 8px;
+  min-width: 128px;
+  height: 52px;
+  padding: 0 15px 0 10px;
+  border-color: #4913ec;
+  background: #4913ec;
+  color: #ffffff;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: 700;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.zeno-ai-button-image {
+  order: 2;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.zeno-ai-button span {
+  order: 1;
+}
+
+.zeno-ai-button:hover,
+.zeno-ai-button:focus-visible {
+  border-color: #6d42f4;
+  background: #6d42f4;
+  color: #ffffff;
+}
+
+.zeno-ai-panel {
+  position: absolute;
+  right: 0;
+  bottom: 58px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  width: min(320px, calc(100vw - 32px));
+  border: 1px solid var(--docs-border);
+  border-radius: 0;
+  padding: 18px;
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: 8px 8px 0 rgb(0 0 0 / 10%);
+}
+
+.zeno-ai-kicker {
+  color: var(--x-color-primary-600);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.zeno-ai-panel h2 {
+  margin: 5px 0 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.zeno-ai-panel p {
+  grid-column: 1 / -1;
+  margin: 17px 0 0;
+  color: var(--x-color-gray-600);
+  font-size: 13px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.zeno-ai-close {
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  color: var(--foreground);
+}
+
+.zeno-ai-close:hover,
+.zeno-ai-close:focus-visible {
+  border-color: var(--x-color-primary-600);
+  color: var(--x-color-primary-600);
+}
+
+@media (max-width: 767.98px) {
+  .zeno-ai-launcher {
+    right: 16px !important;
+    bottom: max(16px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .zeno-ai-button {
+    min-width: 54px;
+    width: 54px;
+    height: 54px;
+    padding: 0;
+  }
+
+  .zeno-ai-button span {
+    display: none;
+  }
+
+  .zeno-ai-button-image {
+    order: initial;
+    width: 38px;
+    height: 38px;
   }
 }

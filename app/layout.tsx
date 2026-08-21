@@ -4,6 +4,8 @@ import { Layout } from 'nextra-theme-docs'
 import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 import type { PageMapItem } from 'nextra'
+import { AiStudyAssistant } from './components/ai-study-assistant'
+import { CopyAttribution } from './components/copy-attribution'
 import { DocsNavbar } from './components/docs-navbar'
 import 'nextra-theme-docs/style.css'
 import './globals.css'
@@ -73,7 +75,13 @@ export default async function RootLayout({
 
   return (
     <html lang="ko" dir="ltr" suppressHydrationWarning>
-      <Head />
+      <Head
+        color={{
+          hue: 255,
+          saturation: { light: 85, dark: 100 },
+          lightness: { light: 50, dark: 74 },
+        }}
+      />
       <body>
         <Layout
           navbar={<DocsNavbar key="docs-navbar" pageMap={pageMap} />}
@@ -82,6 +90,8 @@ export default async function RootLayout({
           feedback={{ content: null }}
           editLink={null}
         >
+          <CopyAttribution />
+          <AiStudyAssistant />
           {children}
         </Layout>
       </body>
