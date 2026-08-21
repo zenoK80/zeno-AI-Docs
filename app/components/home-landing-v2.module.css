@@ -481,11 +481,11 @@
 .gridJunction,
 .groupJoint {
   position: absolute;
-  z-index: 5;
+  z-index: 10;
   width: 7px;
   height: 7px;
   background: var(--junction);
-  box-shadow: 0 0 0 1px var(--page);
+  box-shadow: 0 0 0 2px var(--page);
   opacity: 0.96;
   pointer-events: none;
   transform: rotate(45deg);
