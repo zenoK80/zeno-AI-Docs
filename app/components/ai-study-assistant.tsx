@@ -47,8 +47,8 @@ export function AiStudyAssistant() {
         onClick={() => setIsOpen((value) => !value)}
         type="button"
       >
-        <Image alt="" aria-hidden="true" className="zeno-ai-button-image" height={32} src="/zeno-chatbot.png" width={32} />
-        <span>AI 도우미</span>
+        <span className="zeno-ai-tooltip">문서 질문하기</span>
+        <Image alt="" aria-hidden="true" className="zeno-ai-button-image" height={34} src="/zeno-chatbot.png" width={34} />
       </button>
     </div>,
     document.body

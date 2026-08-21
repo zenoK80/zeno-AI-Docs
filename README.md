@@ -23,6 +23,8 @@ GPT와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는
 - **Technical Lines**: 얇은 가이드선과 구분선으로 화면 구조를 표현
 - **Neutral Palette**: 흰색·회색·검정을 중심으로 사용하고 Zeno 보라색은 활성 상태에만 제한
 - **Functional Preview**: 코드, 브라우저, 수식과 차트를 장식이 아닌 학습 미리보기로 사용
+- **Motion & Media**: 첫 화면은 짧은 배경 영상으로 학습 분위기를 보여 주고, 기술 로고 애니메이션은 푸터 최하단에만 배치해 본문 집중을 방해하지 않음
+- **Grid Junctions**: 가이드선이 만나는 핵심 지점에는 테마별 보라색 마름모 포인트를 사용
 - **Typography**: 한글은 Pretendard, 영문과 숫자는 Montserrat 사용
 
 참고 방향: [Cal.com](https://cal.com/), [Laravel](https://laravel.com/)

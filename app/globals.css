@@ -263,7 +263,26 @@ body:has(.home-landing) > div > article {
   max-width: none;
   padding: 0;
 }
+/* 홈은 문서 본문 전용 레이아웃을 쓰며, Nextra 사이드바 스크롤을 만들지 않는다. */
+body.home-page .nextra-sidebar {
+  display: none !important;
+}
 
+body.home-page .nextra-toc {
+  display: none !important;
+}
+body.home-page .nextra-sidebar + article {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  padding: 0;
+}
+
+body.home-page .x\:mx-auto.x\:flex.x\:max-w-\(--nextra-content-width\) {
+  display: block;
+  width: 100%;
+  max-width: none;
+}
 /* Nextra가 홈 콘텐츠 뒤에 남기는 빈 페이지 여백을 제거한다. */
 body:has(.home-landing) article > div.x\:mt-16 {
   display: none;
@@ -469,6 +488,10 @@ html.dark .docs-navbar-panel-inner {
 
 /* Nextra의 모바일 구간(< md, 768px 미만)과 동일한 범위 */
 @media (max-width: 767.98px) {
+  html {
+    --nextra-navbar-height: 52px;
+  }
+
   .docs-navbar-inner {
     padding-inline: 12px;
   }
@@ -476,6 +499,13 @@ html.dark .docs-navbar-panel-inner {
   .docs-navbar-logo {
     flex-basis: auto;
     min-width: max-content;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .docs-navbar-logo img {
+    width: 20px;
+    height: 20px;
   }
 
   .docs-navbar-mobile-menu-button {
@@ -544,35 +574,63 @@ html.dark .docs-navbar-panel-inner {
 }
 
 .zeno-ai-button {
-  gap: 8px;
-  min-width: 128px;
-  height: 52px;
-  padding: 0 15px 0 10px;
-  border-color: #4913ec;
-  background: #4913ec;
-  color: #ffffff;
-  box-shadow: none;
-  font-size: 12px;
-  font-weight: 700;
-  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+  position: relative;
+  width: 58px;
+  min-width: 58px;
+  height: 58px;
+  padding: 0;
+  border-color: var(--docs-border);
+  border-radius: 50% !important;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgb(48 34 101 / 14%);
+  transition: transform 150ms ease, border-color 150ms ease, background-color 150ms ease;
 }
 
 .zeno-ai-button-image {
-  order: 2;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
 }
 
-.zeno-ai-button span {
-  order: 1;
+.zeno-ai-tooltip {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 14px);
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--docs-border);
+  border-radius: 999px;
+  background: var(--background);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.zeno-ai-button[aria-expanded='true'] .zeno-ai-tooltip {
+  display: none;
+}
+.zeno-ai-tooltip::after {
+  position: absolute;
+  right: 21px;
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  border-right: 1px solid var(--docs-border);
+  border-bottom: 1px solid var(--docs-border);
+  background: var(--background);
+  content: '';
+  transform: rotate(45deg);
 }
 
 .zeno-ai-button:hover,
 .zeno-ai-button:focus-visible {
-  border-color: #6d42f4;
-  background: #6d42f4;
-  color: #ffffff;
+  border-color: #c9b9ff;
+  background: #ffffff;
+  transform: translateY(-2px);
 }
 
 .zeno-ai-panel {
@@ -632,19 +690,18 @@ html.dark .docs-navbar-panel-inner {
   }
 
   .zeno-ai-button {
-    min-width: 54px;
-    width: 54px;
-    height: 54px;
+    width: 58px;
+    min-width: 58px;
+    height: 58px;
     padding: 0;
   }
 
-  .zeno-ai-button span {
+  .zeno-ai-tooltip {
     display: none;
   }
 
   .zeno-ai-button-image {
-    order: initial;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
   }
 }

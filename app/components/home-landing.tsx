@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRightIcon } from 'nextra/icons'
@@ -20,14 +20,6 @@ import styles from './home-landing-v2.module.css'
 
 type PreviewKind = 'code' | 'browser' | 'sets' | 'chart' | 'sql'
 type AccentColor = 'blue' | 'green' | 'red' | 'amber'
-type LessonStage = 'concept' | 'practice' | 'quiz'
-
-const lessonStages: Array<{ id: LessonStage; label: string; description: string }> = [
-  { id: 'concept', label: '1. 개념 읽기', description: '핵심 개념과 용어를 먼저 살펴봅니다.' },
-  { id: 'practice', label: '2. 직접 실행', description: '짧은 예제를 직접 실행해 확인합니다.' },
-  { id: 'quiz', label: '3. 문제 확인', description: '문제로 이해한 내용을 점검합니다.' },
-]
-
 type Series = {
   title: string
   description: string
@@ -129,6 +121,16 @@ const groups: SeriesGroup[] = [
   },
 ]
 
+function GridJunctions({ bottom = false, top = false }: { bottom?: boolean; top?: boolean }) {
+  return (
+    <>
+      {top && <span aria-hidden="true" className={`${styles.gridJunction} ${styles.gridJunctionLeft} ${styles.gridJunctionTop}`} data-grid-junction />}
+      {top && <span aria-hidden="true" className={`${styles.gridJunction} ${styles.gridJunctionRight} ${styles.gridJunctionTop}`} data-grid-junction />}
+      {bottom && <span aria-hidden="true" className={`${styles.gridJunction} ${styles.gridJunctionLeft} ${styles.gridJunctionBottom}`} data-grid-junction />}
+      {bottom && <span aria-hidden="true" className={`${styles.gridJunction} ${styles.gridJunctionRight} ${styles.gridJunctionBottom}`} data-grid-junction />}
+    </>
+  )
+}
 function SeriesPreview({ kind }: { kind: PreviewKind }) {
   if (kind === 'code') {
     return (
@@ -207,58 +209,28 @@ function SeriesPreview({ kind }: { kind: PreviewKind }) {
   )
 }
 
-function StagePreview({
-  stage,
-  quizChoice,
-  onQuizChoice,
-}: {
-  stage: LessonStage
-  quizChoice: number | null
-  onQuizChoice: (choice: number) => void
-}) {
-  if (stage === 'practice') {
-    return (
-      <div className={styles.practicePreview}>
-        <header><span>playground.js</span><b>RUN</b></header>
-        <code><i>01</i><b>const</b> next = study()</code>
-        <code><i>02</i>next.<strong>practice</strong>()</code>
-        <code><i>03</i>console.log(next)</code>
-        <footer><span /> 실행 결과: 다음 단계로 이동합니다.</footer>
-      </div>
-    )
-  }
-
-  if (stage === 'quiz') {
-    return (
-      <div className={styles.quizPreview}>
-        <header><span>QUICK CHECK</span><b>01 / 03</b></header>
-        <p>표본에서 계산한 수치를 무엇이라고 할까요?</p>
-        <button aria-pressed={quizChoice === 1} className={quizChoice === 1 ? styles.selectedChoice : undefined} onClick={() => onQuizChoice(1)} type="button">01　모수</button>
-        <button aria-pressed={quizChoice === 2} className={quizChoice === 2 ? styles.selectedChoice : undefined} onClick={() => onQuizChoice(2)} type="button">02　통계량</button>
-        <footer aria-live="polite">
-          {quizChoice === null && '답을 선택하면 바로 해설을 확인할 수 있습니다.'}
-          {quizChoice === 1 && '다시 생각해 보세요. 모수는 모집단의 특성을 나타내는 값입니다.'}
-          {quizChoice === 2 && '정답입니다. 표본에서 계산한 값은 통계량입니다.'}
-        </footer>
-      </div>
-    )
-  }
-
-  return (
-    <div className={styles.conceptPreview}>
-      <header><span>CORE CONCEPT</span><b>5 MIN</b></header>
-      <div className={styles.conceptCopy}>
-        <span>01</span>
-        <div><small>일반수학 · 집합</small><strong>A ∪ B</strong><p>A 또는 B에 속하는 모든 원소를 모은 집합입니다.</p></div>
-      </div>
-      <div className={styles.conceptSets} aria-hidden="true"><span>A</span><span>B</span></div>
-    </div>
-  )
-}
-
 export function HomeLanding() {
-  const [activeStage, setActiveStage] = useState<LessonStage>('concept')
-  const [quizChoice, setQuizChoice] = useState<number | null>(null)
+
+  useEffect(() => {
+    document.body.classList.add('home-page')
+    const junctions = document.querySelectorAll<HTMLElement>('[data-grid-junction]')
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          entry.target.dataset.active = 'true'
+          observer.unobserve(entry.target)
+        })
+      },
+      { threshold: 0.8 },
+    )
+
+    junctions.forEach((junction) => observer.observe(junction))
+    return () => {
+      observer.disconnect()
+      document.body.classList.remove('home-page')
+    }
+  }, [])
 
   const showComingSoon = (name: string) => {
     window.alert(`${name}는 준비 중입니다.`)
@@ -274,45 +246,21 @@ export function HomeLanding() {
               <span>ZENO AI DOCS</span>
             </div>
             <h1 id="home-title">학습 자료 정리<br />개인 문서입니다.</h1>
-            <p>각 챕터는 5분 안에 빠르게 학습할 수 있도록 구성했습니다</p>
+            <p>각 챕터는 5분 안에 빠르게 학습할 수 있도록 구성했습니다.</p>
             <div className={styles.actions}>
               <Link className={styles.primaryAction} href="#series">학습 시리즈 보기 <ArrowRightIcon aria-hidden="true" width="16" /></Link>
               <Link className={styles.secondaryAction} href="/javascript/ECMAscript/01_javascript-and-ecmascript">첫 문서 읽기</Link>
             </div>
           </div>
 
-          <div className={styles.demoPanel}>
-            <div className={styles.demoHeading}><span><i /> LIVE STUDY PREVIEW</span><b>01 / FLOW</b></div>
-            <div className={styles.stageTabs} aria-label="학습 단계">
-              {lessonStages.map((stage) => (
-                <button aria-pressed={activeStage === stage.id} className={activeStage === stage.id ? styles.activeTab : undefined} key={stage.id} onClick={() => setActiveStage(stage.id)} type="button">
-                  {stage.label}
-                </button>
-              ))}
-            </div>
-            <div className={styles.demoViewport}>
-              <StagePreview onQuizChoice={setQuizChoice} quizChoice={quizChoice} stage={activeStage} />
-            </div>
+          <div className={styles.heroVideoPanel} aria-hidden="true">
+            <video autoPlay className={styles.heroVideo} loop muted playsInline preload="metadata">
+              <source src="/pong-work.mp4" type="video/mp4" />
+            </video>
           </div>
         </section>
-
         <div className={styles.featureRail} aria-label="학습 방식">
           <span><b>01</b> 5분 단위 개념</span><span><b>02</b> 실행 가능한 예제</span><span><b>03</b> 바로 푸는 문제</span>
-        </div>
-
-        <div className={styles.studyTicker} aria-hidden="true">
-          <div className={styles.tickerTrack}>
-            {[0, 1].map((set) => (
-              <div className={styles.tickerSet} key={set}>
-                {techLogos.map(({ label, Icon, color }) => (
-                  <span key={`${set}-${label}`}>
-                    <Icon style={{ color }} />
-                    <b>{label}</b>
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
         </div>
 
         <section className={styles.catalog} id="series" aria-labelledby="series-title">
@@ -323,8 +271,8 @@ export function HomeLanding() {
           {groups.map((group) => (
             <section className={styles.group} key={group.title} aria-labelledby={`group-${group.order}`}>
               <header className={styles.groupHeader}><span>{group.order}</span><div><h3 id={`group-${group.order}`}>{group.title}</h3><p>{group.description}</p></div></header>
-                <span className={`${styles.groupJoint} ${styles.groupJointLeft}`} aria-hidden="true" />
-                <span className={`${styles.groupJoint} ${styles.groupJointRight}`} aria-hidden="true" />
+                <span className={`${styles.groupJoint} ${styles.groupJointLeft}`} aria-hidden="true" data-grid-junction />
+                <span className={`${styles.groupJoint} ${styles.groupJointRight}`} aria-hidden="true" data-grid-junction />
                 <div className={styles.seriesGrid}>
                 {group.series.map((series) => (
                   <Link className={styles.seriesCard} data-accent={series.accent} href={series.href} key={series.title}>
@@ -337,7 +285,9 @@ export function HomeLanding() {
           ))}
         </section>
 
+
         <section className={styles.closing} aria-labelledby="closing-title">
+          <GridJunctions top />
           <div className={styles.closingCopy}>
             <span>STUDY ROUTINE</span>
             <h2 id="closing-title">오늘의 한 문서가<br />내일의 감각이 됩니다.</h2>
@@ -359,6 +309,7 @@ export function HomeLanding() {
         </section>
 
         <footer className={styles.siteFooter}>
+          <GridJunctions top />
           <div className={styles.footerIdentity}>
             <span><Image src="/zenoLogo.svg" alt="" width={20} height={20} /> Zeno AI Docs</span>
             <p>읽고, 실행하고, 내 것으로 만드는 개인 학습 문서.</p>
@@ -369,6 +320,20 @@ export function HomeLanding() {
               <a href="https://github.com/zenoK80" target="_blank" rel="noreferrer">GitHub</a>
             </nav>
           <small className={styles.copyright}>© 2026 Zeno AI Docs</small>
+          <div className={styles.studyTicker} aria-hidden="true">
+            <div className={styles.tickerTrack}>
+            {[0, 1].map((set) => (
+              <div className={styles.tickerSet} key={set}>
+                {techLogos.map(({ label, Icon, color }) => (
+                  <span key={`${set}-${label}`}>
+                    <Icon style={{ color }} />
+                    <b>{label}</b>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
         </footer>
       </div>
     </main>
