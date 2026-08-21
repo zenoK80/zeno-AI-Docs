@@ -18,8 +18,8 @@
 }
 
 :global(html.dark) .home {
-  --page: #1a1a1f;
-  --surface: #111111;
+  --page: #111111;
+  --surface: #1a1a1f;
   --surface-soft: #15151a;
   --ink: #fafafd;
   --muted: #b9b9c3;
