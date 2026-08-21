@@ -1,0 +1,134 @@
+---
+title: '02. 값, 표현식과 문'
+description: 'JavaScript 코드가 값을 만들고 계산하고 실행하는 기본 단위를 구분합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 값, 표현식, 문을 구분하고 간단한 계산 코드의 실행 순서를 읽습니다.
+</Callout>
+
+## 코드 한 줄은 무엇을 할까
+
+아래 코드에서 `12000`, `2`, `25000`처럼 실제 데이터가 되는 것을 **값(value)** 이라고 합니다. 숫자뿐 아니라 글자, 참·거짓도 값입니다.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="값과 표현식 계산 실습"
+  files={{
+    '/index.js': `const price = 12000
+const count = 2
+const total = price * count
+
+console.log(total)`,
+  }}
+/>
+
+실행 결과는 `24000`입니다. `price * count`가 계산되어 새 값 `24000`을 만들었기 때문입니다.
+
+## 값, 표현식, 문을 나누어 보기
+
+| 이름 | 쉽게 말하면 | 예 |
+| --- | --- | --- |
+| 값 | 코드가 다루는 실제 데이터 | `12000`, `'안녕'`, `true` |
+| 표현식(expression) | 계산해서 **값 하나를 만드는** 코드 | `price * count`, `2 + 3` |
+| 문(statement) | JavaScript에게 일을 시키는 한 단위 | `const total = price * count` |
+
+`2 + 3`은 계산하면 `5`가 되므로 표현식입니다. `const total = ...`은 변수를 만들라는 지시이므로 문입니다. 문 안에 표현식이 들어갈 수 있습니다.
+
+```js
+const total = price * count
+// └──── 문 ────┘   └── 표현식 ──┘
+```
+
+## 변수는 값에 이름을 붙이는 방법
+
+**변수(variable)** 는 나중에 다시 쓸 값을 이름으로 저장하는 공간입니다. `const`는 한 번 정한 이름에 다른 값을 다시 넣지 않을 때 사용합니다.
+
+```js
+const discount = 3000
+const finalPrice = total - discount
+
+console.log(finalPrice) // 21000
+```
+
+여기서 `discount`와 `finalPrice`는 변수 이름이고, 오른쪽 계산식은 표현식입니다. JavaScript는 오른쪽을 먼저 계산한 뒤 결과를 왼쪽 이름에 연결합니다.
+
+<Callout type="warning">
+  `=`는 수학의 “같다”가 아니라, 오른쪽 값을 왼쪽 변수에 **대입한다**는 뜻입니다. 그래서 `const total = price * count`는 “total을 계산하라”가 아니라 “계산 결과에 total이라는 이름을 붙여라”에 가깝습니다.
+</Callout>
+
+## 문은 위에서 아래로 실행된다
+
+```js
+const price = 12000
+const count = 2
+const total = price * count
+console.log(total)
+```
+
+이 코드는 위에서 아래로 읽습니다.
+
+1. `price`에 `12000`을 저장합니다.
+2. `count`에 `2`를 저장합니다.
+3. 두 값을 곱해 `total`에 저장합니다.
+4. `total`의 값을 콘솔에 보여 줍니다.
+
+아직 만든 적 없는 변수를 먼저 사용하면 오류가 납니다. 즉, 순서도 코드의 의미입니다.
+
+## 핵심 정리
+
+- 값은 숫자·문자열·참거짓처럼 코드가 다루는 데이터입니다.
+- 표현식은 계산되어 하나의 값을 만듭니다.
+- 문은 변수 선언이나 출력처럼 JavaScript에 일을 시킵니다.
+- 변수는 값을 다시 쓰기 위해 이름을 붙이는 방법입니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="다음 중 계산 결과로 값 하나를 만드는 표현식은 무엇인가요?"
+  options={['const score = 10', '2 + 3', 'console.log(score);', 'if (score > 5) {}']}
+  correctAnswer={2}
+  explanation="2 + 3은 계산되어 숫자 값 5를 만드는 표현식입니다."
+  optionExplanations={[
+    '변수를 선언하는 문이며, 안의 10은 값입니다.',
+    '맞습니다. 계산 결과로 5라는 값을 만듭니다.',
+    '출력을 지시하는 문입니다.',
+    '조건에 따라 실행할 일을 정하는 문입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`const total = price * count`에서 `price * count`는 무엇인가요?"
+  options={['변수 이름', '표현식', '주석', '문자열']}
+  correctAnswer={2}
+  explanation="price와 count를 곱해 새로운 값을 만들므로 표현식입니다."
+  optionExplanations={[
+    '변수 이름은 total, price, count입니다.',
+    '맞습니다. 계산 결과를 만드는 코드 조각입니다.',
+    '주석은 // 뒤에 쓰는 설명입니다.',
+    '문자열은 따옴표로 감싼 글자 값입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="다음 코드의 출력 결과는 무엇인가요? `const a = 4; const b = 3; console.log(a + b)`"
+  options={['1', '7', '12', 'a + b']}
+  correctAnswer={2}
+  explanation="a와 b에 저장한 4와 3을 더하므로 7이 출력됩니다."
+  optionExplanations={[
+    '4에서 3을 뺀 결과입니다.',
+    '맞습니다. 4 + 3은 7입니다.',
+    '4와 3을 곱한 결과입니다.',
+    '변수의 값으로 계산한 뒤 결과를 출력합니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - 표현식과 연산자](https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Expressions_and_operators)
+- [ECMAScript Language Specification - ECMAScript Language: Expressions](https://tc39.es/ecma262/#sec-ecmascript-language-expressions)

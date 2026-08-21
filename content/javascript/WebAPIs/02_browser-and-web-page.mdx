@@ -1,0 +1,129 @@
+---
+title: '02. 브라우저, 탭과 문서'
+description: '브라우저가 웹 페이지를 열고 JavaScript가 문서를 다루는 흐름을 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 브라우저, 탭, 웹 페이지, document의 관계를 구분합니다.
+</Callout>
+
+## 주소를 입력하면 무엇이 열릴까
+
+브라우저 주소창에 URL을 입력하면 브라우저는 서버에서 HTML 파일을 받아 **탭(tab)** 안에 표시합니다. 이때 화면에 보이는 한 페이지를 JavaScript에서는 보통 **문서(document)** 라고 부릅니다.
+
+<ConceptFlow
+  label="URL을 입력하면 브라우저가 서버에서 HTML을 받아 탭 안의 문서로 표시하는 흐름"
+  nodes={[
+    { id: 'url', position: { x: 0, y: 40 }, data: { label: 'URL 입력' } },
+    { id: 'browser', position: { x: 170, y: 40 }, data: { label: '브라우저' } },
+    { id: 'server', position: { x: 340, y: 0 }, data: { label: '웹 서버' } },
+    { id: 'document', position: { x: 340, y: 100 }, data: { label: '탭의 문서' } },
+  ]}
+  edges={[
+    { id: 'url-browser', source: 'url', target: 'browser' },
+    { id: 'browser-server', source: 'browser', target: 'server', label: '요청' },
+    { id: 'server-document', source: 'server', target: 'document', label: 'HTML 응답' },
+  ]}
+/>
+
+여기서 브라우저는 Chrome, Firefox처럼 웹을 여는 프로그램이고, 탭은 브라우저 안에서 페이지 하나를 여는 자리입니다.
+
+## HTML은 문서의 뼈대다
+
+웹 서버가 보내는 HTML은 화면에 보여 줄 구조를 적은 텍스트입니다.
+
+```html
+<h1>오늘의 할 일</h1>
+<p id="message">아직 시작하지 않았어요.</p>
+<button>시작</button>
+```
+
+브라우저는 이 HTML을 읽어 제목, 문장, 버튼을 화면에 만듭니다. 그리고 JavaScript가 이 문서를 찾고 바꾸도록 `document`라는 Web API를 제공합니다.
+
+```js
+console.log(document.title)
+```
+
+`document.title`은 현재 탭의 문서 제목을 읽습니다. `document`는 JavaScript 문법 자체가 아니라 **브라우저가 제공하는 기능**입니다.
+
+## 화면의 HTML은 DOM으로도 다룬다
+
+브라우저는 HTML을 JavaScript가 다룰 수 있는 객체 구조로 바꿉니다. 이것을 **DOM(Document Object Model)** 이라고 합니다.
+
+- HTML: 서버가 보낸 문서의 원본 구조
+- DOM: 브라우저가 메모리에 만든, JavaScript로 조작 가능한 문서 구조
+
+```js
+const message = document.querySelector('#message')
+message.textContent = '학습을 시작했어요!'
+```
+
+`querySelector()`는 문서에서 `#message`를 찾고, `textContent`는 그 요소의 글자를 바꿉니다. 사용자가 버튼을 누른 뒤 문구가 바뀌는 이유도 이런 DOM 조작 덕분입니다.
+
+<Callout type="warning">
+  브라우저 탭마다 document가 따로 있습니다. A 탭의 JavaScript가 특별한 권한 없이 B 탭의 문서를 마음대로 읽거나 바꿀 수는 없습니다.
+</Callout>
+
+## 네 단어만 정확히 기억하기
+
+| 단어 | 뜻 | 예 |
+| --- | --- | --- |
+| 브라우저 | 웹 페이지를 여는 프로그램 | Chrome, Firefox |
+| 탭 | 브라우저 안에서 페이지 하나를 여는 자리 | 새 탭 |
+| 웹 페이지 | 사용자가 보는 화면 | 로그인 화면, 글 목록 |
+| document | JavaScript가 다루는 현재 페이지의 문서 | `document.querySelector()` |
+
+## 핵심 정리
+
+- URL을 열면 브라우저가 HTML을 받아 탭 안에 웹 페이지로 표시합니다.
+- HTML은 페이지 구조이고, DOM은 JavaScript가 다룰 수 있게 만든 문서 객체 구조입니다.
+- `document`는 현재 탭의 문서를 나타내는 브라우저 Web API입니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Chrome이나 Firefox처럼 웹 페이지를 여는 프로그램은 무엇인가요?"
+  options={['브라우저', 'DOM', 'HTML 태그', '서버 로그']}
+  correctAnswer={1}
+  explanation="브라우저는 웹 서버에서 받은 페이지를 화면에 표시하고 Web API를 제공하는 프로그램입니다."
+  optionExplanations={[
+    '맞습니다. Chrome, Firefox가 대표적인 브라우저입니다.',
+    'DOM은 브라우저가 만든 문서 객체 구조입니다.',
+    'HTML 태그는 문서의 구조를 적는 표시입니다.',
+    '서버 로그는 서버의 기록입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`document`가 가리키는 것은 무엇인가요?"
+  options={['모든 웹사이트의 데이터', '현재 탭의 웹 문서', 'JavaScript 표준 문서', '컴퓨터의 파일 폴더']}
+  correctAnswer={2}
+  explanation="document는 JavaScript가 현재 브라우저 탭의 페이지를 읽고 바꾸도록 제공하는 객체입니다."
+  optionExplanations={[
+    '현재 문서의 범위를 넘어 다른 사이트 데이터를 뜻하지 않습니다.',
+    '맞습니다. 현재 탭에 열린 문서입니다.',
+    '언어 표준 문서가 아니라 브라우저의 Web API입니다.',
+    '파일 시스템을 뜻하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="DOM에 대한 설명으로 옳은 것은 무엇인가요?"
+  options={['HTML을 CSS로 꾸미는 규칙', '브라우저가 HTML을 JavaScript로 다룰 수 있게 만든 객체 구조', '서버의 데이터베이스', 'JavaScript의 새 이름']}
+  correctAnswer={2}
+  explanation="DOM은 문서 객체 모델로, JavaScript가 요소를 찾고 바꾸는 대상입니다."
+  optionExplanations={[
+    'CSS는 화면의 모양을 담당합니다.',
+    '맞습니다. document를 통해 DOM을 조작할 수 있습니다.',
+    '데이터베이스가 아니라 브라우저 메모리의 문서 구조입니다.',
+    'JavaScript와 DOM은 다른 개념입니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - 웹 페이지를 어떻게 동작시키나요?](https://developer.mozilla.org/ko/docs/Learn_web_development/Getting_started/Web_standards/How_the_web_works)
+- [MDN - Document](https://developer.mozilla.org/ko/docs/Web/API/Document)
