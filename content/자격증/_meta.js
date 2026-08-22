@@ -1,4 +1,8 @@
 const meta = {
+  리눅스마스터_1급: {
+    title: '리눅스마스터 1급',
+    type: 'page',
+  },
   SQLD: {
     title: 'SQLD',
     type: 'page',

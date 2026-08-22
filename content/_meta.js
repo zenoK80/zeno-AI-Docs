@@ -42,6 +42,10 @@ const meta = {
     title: '자격증',
     type: 'menu',
     items: {
+      리눅스마스터_1급: {
+        title: '리눅스마스터 1급',
+        href: '/자격증/리눅스마스터_1급/01_linux-architecture-and-distribution',
+      },
       SQLD: {
         title: 'SQLD',
         href: '/자격증/SQLD/01_relational-database-and-table',
