@@ -31,9 +31,6 @@
 
 .frame {
   --grid-edge: min(720px, calc(50% - 32px));
-  --frame-rail-offset: calc(50% - var(--grid-edge));
-  --junction-size: 6px;
-  --junction-half: calc(var(--junction-size) / 2);
   position: relative;
   isolation: isolate;
   width: 100%;
@@ -54,11 +51,11 @@
 }
 
 .frame::before {
-  left: var(--frame-rail-offset);
+  left: calc(50% - var(--grid-edge));
 }
 
 .frame::after {
-  right: var(--frame-rail-offset);
+  right: calc(50% - var(--grid-edge));
 }
 
 .hero {
@@ -484,38 +481,38 @@
 .gridJunction,
 .groupJoint {
   position: absolute;
-  z-index: 11;
-  width: var(--junction-size);
-  height: var(--junction-size);
+  z-index: 10;
+  width: 7px;
+  height: 7px;
   background: var(--junction);
-  box-shadow: 0 0 0 1px var(--page);
+  box-shadow: 0 0 0 2px var(--page);
   opacity: 0.96;
   pointer-events: none;
   transform: rotate(45deg);
 }
 .gridJunctionLeft {
-  left: calc(-1 * var(--junction-half));
+  left: -3.5px;
 }
 
 .groupJointLeft {
-  left: calc(-1 * var(--catalog-gutter) - var(--junction-half));
+  left: calc(-1 * var(--catalog-gutter) - 3.5px);
 }
 
 .gridJunctionRight {
-  right: calc(-1 * var(--junction-half));
+  right: -3.5px;
 }
 
 .groupJointRight {
-  right: calc(-1 * var(--catalog-gutter) - var(--junction-half));
+  right: calc(-1 * var(--catalog-gutter) - 3.5px);
 }
 
 .gridJunctionTop,
 .groupJoint {
-  top: calc(-1 * var(--junction-half));
+  top: -3.5px;
 }
 
 .gridJunctionBottom {
-  bottom: calc(-1 * var(--junction-half));
+  bottom: -3.5px;
 }
 
 .gridJunction[data-active='true'],
@@ -1301,7 +1298,6 @@
 
   .frame {
     --grid-edge: calc(50% - 12px);
-    --junction-size: 6px;
     background-position: 0 0;
   }
 
@@ -1318,20 +1314,25 @@
     font-size: 31px;
   }
 
+  .groupJoint {
+    width: 5px;
+    height: 5px;
+  }
+
   .gridJunctionLeft {
-    left: calc(var(--frame-rail-offset) - var(--junction-half));
+    left: 9px;
   }
 
   .gridJunctionRight {
-    right: calc(var(--frame-rail-offset) - var(--junction-half));
+    right: 9px;
   }
 
   .groupJointLeft {
-    left: calc(var(--frame-rail-offset) - var(--catalog-gutter) - var(--junction-half));
+    left: -4px;
   }
 
   .groupJointRight {
-    right: calc(var(--frame-rail-offset) - var(--catalog-gutter) - var(--junction-half));
+    right: -4px;
   }
 
   .groupHeader {
