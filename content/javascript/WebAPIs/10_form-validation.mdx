@@ -1,0 +1,275 @@
+---
+title: '10. 폼과 유효성 검사'
+description: 'FormData, 폼 이벤트, 유효성 검사 API를 코드로 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 폼 데이터를 읽고 제출하는 방법과 HTML5 Constraint Validation API로 유효성 검사하는 방법을 익힙니다.
+</Callout>
+
+## 폼 요소 값 읽기
+
+```js
+// 텍스트 인풋
+const name = document.querySelector('#name').value
+
+// 체크박스
+const agreed = document.querySelector('#agree').checked
+
+// 라디오 버튼 (선택된 것 찾기)
+const gender = document.querySelector('input[name="gender"]:checked')?.value
+
+// 셀렉트박스
+const country = document.querySelector('#country').value  // 선택된 option의 value
+const selected = document.querySelector('#country options:checked')
+
+// 파일 인풋
+const file = document.querySelector('#file').files[0]
+```
+
+## FormData
+
+폼 전체 데이터를 손쉽게 수집합니다.
+
+```js
+const form = document.querySelector('form')
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault()
+
+  const formData = new FormData(form)
+
+  // 값 읽기
+  console.log(formData.get('email'))
+  console.log(formData.getAll('tags'))  // 다중 선택
+
+  // 값 추가/변경/삭제
+  formData.set('timestamp', Date.now())
+  formData.append('extra', '추가값')
+  formData.delete('unusedField')
+
+  // 순회
+  for (const [key, value] of formData) {
+    console.log(key, value)
+  }
+
+  // 서버 전송
+  const response = await fetch('/api/submit', {
+    method: 'POST',
+    body: formData,  // multipart/form-data 자동 설정
+  })
+})
+```
+
+## HTML5 Constraint Validation API
+
+브라우저 내장 유효성 검사를 JavaScript로 제어합니다.
+
+```js
+const input = document.querySelector('#email')
+
+// 유효성 검사 결과
+console.log(input.validity.valid)           // 모든 조건 만족 시 true
+console.log(input.validity.valueMissing)    // required 인데 비어 있을 때
+console.log(input.validity.typeMismatch)    // type에 맞지 않을 때
+console.log(input.validity.patternMismatch) // pattern 정규식 불일치
+console.log(input.validity.tooLong)         // maxLength 초과
+console.log(input.validity.rangeUnderflow)  // min 미만
+
+// 커스텀 오류 메시지
+input.setCustomValidity('올바른 이메일을 입력해 주세요.')
+input.setCustomValidity('')  // 초기화
+
+// 오류 메시지 표시
+input.reportValidity()
+```
+
+## 커스텀 유효성 검사
+
+```js
+const passwordInput = document.querySelector('#password')
+const confirmInput = document.querySelector('#confirm-password')
+
+function validatePasswords() {
+  if (passwordInput.value !== confirmInput.value) {
+    confirmInput.setCustomValidity('비밀번호가 일치하지 않습니다.')
+  } else {
+    confirmInput.setCustomValidity('')
+  }
+}
+
+passwordInput.addEventListener('input', validatePasswords)
+confirmInput.addEventListener('input', validatePasswords)
+```
+
+## novalidate와 수동 검사
+
+```html
+<form novalidate>...</form>
+```
+
+`novalidate`를 추가하면 브라우저 기본 검사를 비활성화하고 JavaScript로 제어합니다.
+
+```js
+form.addEventListener('submit', (e) => {
+  e.preventDefault()
+
+  const inputs = form.querySelectorAll('input, textarea, select')
+  let isValid = true
+
+  inputs.forEach(input => {
+    if (!input.checkValidity()) {
+      input.classList.add('error')
+      isValid = false
+    } else {
+      input.classList.remove('error')
+    }
+  })
+
+  if (isValid) {
+    // 제출 처리
+  }
+})
+```
+
+## 입력 마스킹 예시
+
+```js
+const phoneInput = document.querySelector('#phone')
+
+phoneInput.addEventListener('input', (e) => {
+  const digits = e.target.value.replace(/\D/g, '')  // 숫자만
+  const formatted = digits
+    .replace(/(\d{3})(\d)/, '$1-$2')
+    .replace(/(\d{3}-\d{4})(\d)/, '$1-$2')
+    .slice(0, 13)
+  e.target.value = formatted
+})
+```
+
+## 핵심 정리
+
+- `FormData`로 폼 전체 데이터를 수집하고 서버에 전송합니다.
+- HTML5 Constraint Validation API로 `validity` 상태를 확인하고 커스텀 오류 메시지를 설정합니다.
+- `novalidate`로 브라우저 기본 검사를 끄고 JavaScript로 직접 제어할 수 있습니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="FormData의 장점은?"
+  options={[
+    '폼 데이터를 JSON으로 자동 변환한다.',
+    '폼 요소를 자동으로 검사한다.',
+    '폼 전체 입력값을 쉽게 수집하고 파일을 포함한 multipart 요청을 보낼 수 있다.',
+    'GET 요청에 자동으로 쿼리스트링을 추가한다.',
+  ]}
+  correctAnswer={3}
+  explanation="FormData는 폼의 모든 입력값을 자동으로 수집하고 파일을 포함한 multipart/form-data 형식으로 서버에 전송할 수 있습니다."
+  optionExplanations={[
+    '자동 JSON 변환은 없습니다.',
+    '유효성 검사는 Constraint Validation API입니다.',
+    '맞습니다. 데이터 수집과 파일 전송이 편리합니다.',
+    'POST 요청의 body에 데이터를 담습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`input.validity.valueMissing`이 true인 경우는?"
+  options={[
+    'input의 값이 너무 길 때',
+    'required 속성이 있는데 값이 비어 있을 때',
+    'type이 email인데 형식이 맞지 않을 때',
+    '숫자가 min보다 작을 때',
+  ]}
+  correctAnswer={2}
+  explanation="valueMissing은 required 속성이 있는 폼 요소가 비어 있을 때 true가 됩니다."
+  optionExplanations={[
+    '값이 너무 길면 tooLong이 true입니다.',
+    '맞습니다. required이면서 값이 없을 때 valueMissing이 true입니다.',
+    '이메일 형식 오류는 typeMismatch입니다.',
+    'min보다 작으면 rangeUnderflow입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`setCustomValidity('')`을 호출하는 이유는?"
+  options={[
+    '커스텀 오류 메시지를 표시하기 위해',
+    '이전에 설정한 커스텀 오류를 초기화하여 유효한 상태로 만들기 위해',
+    '폼 데이터를 초기화하기 위해',
+    '폼을 비활성화하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="setCustomValidity('')는 빈 문자열을 설정하여 커스텀 유효성 오류를 제거합니다. 오류 문자열을 설정하면 invalid 상태가 됩니다."
+  optionExplanations={[
+    '오류 메시지 표시는 비어 있지 않은 문자열을 설정할 때입니다.',
+    '맞습니다. 빈 문자열로 오류 상태를 초기화합니다.',
+    'FormData나 form.reset()이 데이터 초기화를 담당합니다.',
+    '폼 비활성화는 disabled 속성으로 합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`form` 태그에 `novalidate` 속성을 추가하는 이유는?"
+  options={[
+    '폼 제출을 비활성화하기 위해',
+    '브라우저 기본 유효성 검사 UI를 비활성화하고 JavaScript로 직접 제어하기 위해',
+    '폼을 읽기 전용으로 만들기 위해',
+    'AJAX 제출을 활성화하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="novalidate는 브라우저의 내장 유효성 검사 팝업을 비활성화합니다. 커스텀 UI로 오류를 표시하고 싶을 때 사용합니다."
+  optionExplanations={[
+    '폼 제출 자체를 막지는 않습니다.',
+    '맞습니다. 내장 검사 UI를 끄고 커스텀 처리를 합니다.',
+    '읽기 전용은 readonly 속성입니다.',
+    'AJAX와 직접 관련이 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="파일 인풋에서 선택된 파일을 얻는 방법은?"
+  options={[
+    "fileInput.value",
+    "fileInput.files[0]",
+    "fileInput.getFile()",
+    "fileInput.src",
+  ]}
+  correctAnswer={2}
+  explanation="파일 인풋의 files 프로퍼티는 FileList 객체를 반환합니다. files[0]으로 첫 번째 선택된 파일에 접근합니다."
+  optionExplanations={[
+    "value는 파일 이름 경로 문자열(보안상 제한됨)입니다.",
+    "맞습니다. files[0]이 선택된 File 객체입니다.",
+    "getFile()은 없는 메서드입니다.",
+    "src는 이미지/미디어 요소의 속성입니다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="`input.checkValidity()`의 반환값은?"
+  options={[
+    '유효성 오류 메시지 문자열',
+    'ValidityState 객체',
+    '유효하면 true, 그렇지 않으면 false',
+    'Promise',
+  ]}
+  correctAnswer={3}
+  explanation="checkValidity()는 요소가 유효하면 true, 그렇지 않으면 false를 반환하며 invalid 이벤트를 발생시킵니다."
+  optionExplanations={[
+    '문자열이 아닌 boolean을 반환합니다.',
+    'ValidityState 객체는 validity 프로퍼티로 접근합니다.',
+    '맞습니다. boolean을 반환합니다.',
+    '동기 메서드이며 boolean을 반환합니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - FormData](https://developer.mozilla.org/ko/docs/Web/API/FormData)
+- [MDN - Constraint validation](https://developer.mozilla.org/ko/docs/Web/HTML/Constraint_validation)

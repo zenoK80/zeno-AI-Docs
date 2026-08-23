@@ -1,0 +1,239 @@
+---
+title: '09. 타이머와 애니메이션'
+description: 'setTimeout, setInterval, requestAnimationFrame을 코드로 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 지연 실행, 반복 실행, 애니메이션 프레임 예약 API의 차이와 올바른 사용법을 익힙니다.
+</Callout>
+
+## setTimeout — 지연 실행
+
+지정한 시간(밀리초) 후 함수를 한 번 실행합니다.
+
+```js
+const timerId = setTimeout(() => {
+  console.log('1초 후 실행')
+}, 1000)
+
+// 실행 전 취소
+clearTimeout(timerId)
+```
+
+## setInterval — 반복 실행
+
+지정한 시간마다 함수를 반복 실행합니다.
+
+```js
+let count = 0
+const intervalId = setInterval(() => {
+  count++
+  console.log(`${count}초 경과`)
+  if (count >= 5) {
+    clearInterval(intervalId)  // 5번 후 중단
+  }
+}, 1000)
+```
+
+<Callout type="warning">
+  `setInterval`은 이전 실행이 완료되지 않아도 다음 실행을 예약합니다. 실행 시간이 지연 간격보다 길어지면 쌓일 수 있습니다. 이런 경우 `setTimeout` 재귀 호출 패턴이 더 안전합니다.
+</Callout>
+
+## setTimeout 재귀 패턴
+
+```js
+function tick() {
+  // 작업 수행
+  console.log('작업 실행')
+
+  setTimeout(tick, 1000)  // 완료 후 다음 예약
+}
+
+setTimeout(tick, 1000)  // 시작
+```
+
+## requestAnimationFrame — 화면 갱신 동기화
+
+브라우저가 다음 화면을 그리기 직전에 콜백을 호출합니다. 애니메이션에 최적입니다.
+
+```js
+let position = 0
+const box = document.querySelector('.box')
+
+function animate() {
+  position += 2
+  box.style.transform = `translateX(${position}px)`
+
+  if (position < 300) {
+    requestAnimationFrame(animate)  // 다음 프레임에 계속
+  }
+}
+
+requestAnimationFrame(animate)  // 시작
+```
+
+## setTimeout vs setInterval vs requestAnimationFrame
+
+| | setTimeout | setInterval | requestAnimationFrame |
+| --- | --- | --- | --- |
+| 실행 횟수 | 1회 | 반복 | 반복 (화면 갱신과 동기) |
+| 적합한 용도 | 지연 실행 | 주기적 작업 | 애니메이션 |
+| 정확성 | 낮음 | 낮음 | 높음 (60fps) |
+| 탭 비활성화 | 실행 유지 | 실행 유지 | 일시정지 |
+
+## cancelAnimationFrame
+
+```js
+const rafId = requestAnimationFrame(animate)
+cancelAnimationFrame(rafId)  // 취소
+```
+
+## 타임스탬프 활용
+
+`requestAnimationFrame`의 콜백은 타임스탬프를 받아 경과 시간 기반 애니메이션을 만들 수 있습니다.
+
+```js
+let start = null
+
+function animate(timestamp) {
+  if (!start) start = timestamp
+  const elapsed = timestamp - start  // 경과 시간(ms)
+  const progress = Math.min(elapsed / 2000, 1)  // 2초 동안 0→1
+
+  box.style.opacity = progress
+  box.style.transform = `translateX(${progress * 200}px)`
+
+  if (progress < 1) {
+    requestAnimationFrame(animate)
+  }
+}
+
+requestAnimationFrame(animate)
+```
+
+## 핵심 정리
+
+- `setTimeout`은 지연 후 1회, `setInterval`은 반복 실행합니다.
+- 애니메이션에는 `requestAnimationFrame`을 사용하세요. 화면 갱신과 동기화되어 부드러운 애니메이션을 만듭니다.
+- 탭이 비활성화되면 `requestAnimationFrame`은 자동으로 일시정지됩니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="requestAnimationFrame을 애니메이션에 사용하는 이유는?"
+  options={[
+    'setTimeout보다 느리지만 정확하다.',
+    '브라우저의 화면 갱신 주기(보통 60fps)와 동기화되어 부드럽고 효율적인 애니메이션을 만든다.',
+    '항상 1초마다 실행된다.',
+    '비동기가 아닌 동기적으로 실행된다.',
+  ]}
+  correctAnswer={2}
+  explanation="requestAnimationFrame은 브라우저가 화면을 그리기 직전에 호출됩니다. 이로써 프레임 단위로 부드러운 애니메이션을 만들 수 있고, 탭이 숨겨지면 자동으로 일시정지됩니다."
+  optionExplanations={[
+    'setTimeout보다 더 정확하고 효율적입니다.',
+    '맞습니다. 화면 갱신과 동기화된 것이 핵심입니다.',
+    '화면 주사율에 따라 실행 간격이 달라집니다(보통 약 16.7ms).',
+    'RAF도 비동기로 동작합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="setInterval의 주의점으로 옳은 것은?"
+  options={[
+    '지정 시간보다 빠르게 실행된다.',
+    '이전 실행이 완료되지 않아도 다음 실행을 예약하므로 작업이 쌓일 수 있다.',
+    'clearInterval 없이 자동으로 종료된다.',
+    'setInterval은 한 번만 실행된다.',
+  ]}
+  correctAnswer={2}
+  explanation="setInterval은 이전 콜백 실행 완료 여부와 관계없이 다음 실행을 예약합니다. 콜백이 느리면 실행이 겹칠 수 있어 setTimeout 재귀 패턴이 더 안전합니다."
+  optionExplanations={[
+    '지정 시간보다 빠르게 실행되지 않습니다.',
+    '맞습니다. 실행 시간이 간격보다 길면 쌓입니다.',
+    'clearInterval을 호출해야 중단됩니다.',
+    'setInterval은 반복 실행됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="타이머를 취소하는 올바른 방법은?"
+  options={[
+    'setTimeout() 반환값에 .cancel()을 호출한다.',
+    'clearTimeout(timerId) 또는 clearInterval(intervalId)로 취소한다.',
+    'timerId = null로 설정한다.',
+    '타이머는 취소할 수 없다.',
+  ]}
+  correctAnswer={2}
+  explanation="setTimeout과 setInterval은 타이머 ID를 반환합니다. clearTimeout(id) 또는 clearInterval(id)로 취소합니다."
+  optionExplanations={[
+    '.cancel() 메서드는 없습니다.',
+    '맞습니다. clearTimeout/clearInterval로 취소합니다.',
+    'null 할당으로 타이머가 취소되지 않습니다.',
+    '타이머는 취소 가능합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="requestAnimationFrame의 콜백이 받는 인수는?"
+  options={[
+    '없다.',
+    '현재 타임스탬프(DOMHighResTimeStamp)',
+    '화면 크기 정보',
+    'false 또는 true',
+  ]}
+  correctAnswer={2}
+  explanation="requestAnimationFrame의 콜백은 DOMHighResTimeStamp(고정밀 타임스탬프)를 인수로 받습니다. 이를 이용해 경과 시간 기반 애니메이션을 만들 수 있습니다."
+  optionExplanations={[
+    '타임스탬프 인수가 있습니다.',
+    '맞습니다. 고정밀 타임스탬프를 받습니다.',
+    '화면 크기 정보는 아닙니다.',
+    'boolean이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="탭이 비활성화(백그라운드)되면 requestAnimationFrame은 어떻게 되나요?"
+  options={[
+    '더 빠르게 실행된다.',
+    '자동으로 일시정지되어 CPU 사용량을 줄인다.',
+    '즉시 취소된다.',
+    '영향을 받지 않는다.',
+  ]}
+  correctAnswer={2}
+  explanation="브라우저는 백그라운드 탭에서 requestAnimationFrame을 일시정지합니다. 배터리와 CPU를 절약하고, 탭이 다시 활성화되면 재개됩니다."
+  optionExplanations={[
+    '백그라운드에서 더 빠르게 실행되지 않습니다.',
+    '맞습니다. 자동 일시정지로 리소스를 절약합니다.',
+    '취소되지 않고 일시정지됩니다.',
+    '백그라운드 탭에서는 동작이 달라집니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="setTimeout(() => {}, 0)은 무엇을 의미하나요?"
+  options={[
+    '즉시 동기적으로 실행된다.',
+    '0밀리초 후 실행되므로 사실상 즉시 실행된다.',
+    '현재 실행 중인 동기 코드가 모두 완료된 후 이벤트 루프에서 실행된다.',
+    '절대 실행되지 않는다.',
+  ]}
+  correctAnswer={3}
+  explanation="setTimeout(..., 0)은 즉시 실행되지 않습니다. 현재 콜 스택이 비워진 후 이벤트 루프가 처리합니다. 동기 코드를 블로킹하지 않고 다음 틱에 실행하고 싶을 때 사용합니다."
+  optionExplanations={[
+    '동기 실행이 아닌 비동기 큐에 들어갑니다.',
+    '즉시처럼 보이지만 현재 스택이 끝난 후 실행됩니다.',
+    '맞습니다. 이벤트 루프의 다음 턴에 실행됩니다.',
+    '실행됩니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - setTimeout](https://developer.mozilla.org/ko/docs/Web/API/setTimeout)
+- [MDN - requestAnimationFrame](https://developer.mozilla.org/ko/docs/Web/API/window/requestAnimationFrame)

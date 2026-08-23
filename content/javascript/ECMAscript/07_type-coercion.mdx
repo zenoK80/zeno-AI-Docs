@@ -1,0 +1,209 @@
+---
+title: '07. 타입 변환'
+description: '암묵적/명시적 타입 변환 규칙과 == vs === 를 실습 코드로 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 암묵적 타입 변환이 언제 일어나는지 이해하고, 명시적 변환 방법과 엄격 동등 연산자를 활용합니다.
+</Callout>
+
+## 암묵적 타입 변환
+
+JavaScript 엔진이 연산을 수행하기 위해 자동으로 타입을 변환하는 것을 **암묵적 타입 변환(implicit coercion)** 이라고 합니다.
+
+```js
+// 문자열로 변환
+console.log(1 + '2')      // '12'
+console.log(true + '!')   // 'true!'
+
+// 숫자로 변환
+console.log('5' - 3)      // 2
+console.log('4' * '2')    // 8
+console.log(true + 1)     // 2  (true → 1)
+console.log(false + 1)    // 1  (false → 0)
+console.log(null + 1)     // 1  (null → 0)
+console.log(undefined + 1) // NaN (undefined → NaN)
+
+// 불리언으로 변환
+if ('hello') console.log('truthy')  // 출력됨
+if (0) console.log('falsy')         // 출력 안 됨
+```
+
+## Falsy 값 목록
+
+조건식에서 `false`로 평가되는 값들입니다.
+
+| 값 | 타입 |
+| --- | --- |
+| `false` | boolean |
+| `0`, `-0`, `0n` | number, bigint |
+| `''` (빈 문자열) | string |
+| `null` | null |
+| `undefined` | undefined |
+| `NaN` | number |
+
+이 외의 값은 모두 **truthy**입니다. 빈 배열 `[]`과 빈 객체 `{}`도 truthy입니다.
+
+## 명시적 타입 변환
+
+개발자가 의도적으로 타입을 바꾸는 것입니다.
+
+```js
+// 숫자로 변환
+Number('42')     // 42
+Number('3.14')   // 3.14
+Number('')       // 0
+Number('abc')    // NaN
+Number(true)     // 1
+Number(null)     // 0
+Number(undefined) // NaN
+parseInt('42px') // 42 (선행 숫자만 파싱)
+parseFloat('3.14em') // 3.14
+
+// 문자열로 변환
+String(42)      // '42'
+String(true)    // 'true'
+String(null)    // 'null'
+(42).toString() // '42'
+
+// 불리언으로 변환
+Boolean(0)      // false
+Boolean('hello') // true
+Boolean([])     // true
+!!0             // false (이중 부정)
+!!'hello'       // true
+```
+
+## == vs ===
+
+`==` (동등 연산자)는 타입이 다르면 변환 후 비교합니다. `===` (일치 연산자)는 타입과 값 모두 같아야 `true`입니다.
+
+```js
+0 == false       // true  (false → 0)
+'' == false      // true  ('' → 0, false → 0)
+null == undefined // true  (특수 규칙)
+null == 0        // false
+NaN == NaN       // false (NaN은 자기 자신과도 같지 않음)
+
+0 === false      // false
+'' === false     // false
+null === undefined // false
+```
+
+<Callout type="warning">
+  예상치 못한 타입 변환 버그를 막으려면 항상 `===`와 `!==`를 사용하세요. `null` 체크는 `== null`이 null과 undefined를 함께 처리하는 편리한 예외입니다.
+</Callout>
+
+## NaN 확인 방법
+
+`NaN`은 자기 자신과도 같지 않으므로 `=== NaN`으로 확인할 수 없습니다.
+
+```js
+const x = NaN
+console.log(x === NaN)     // false
+console.log(isNaN(x))      // true (단, isNaN('abc') → true 주의)
+console.log(Number.isNaN(x)) // true (더 엄격한 방법)
+```
+
+## 핵심 정리
+
+- 암묵적 타입 변환은 예상치 못한 결과를 낳을 수 있어 주의가 필요합니다.
+- Falsy 값은 false, 0, '', null, undefined, NaN이며 나머지는 truthy입니다.
+- 명시적 변환에는 `Number()`, `String()`, `Boolean()`, `!!` 등을 사용합니다.
+- 타입 비교 시 항상 `===`를 사용하세요.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="다음 중 falsy 값이 아닌 것은?"
+  options={['0', 'null', "''", '[]']}
+  correctAnswer={4}
+  explanation="빈 배열 []은 truthy입니다. falsy 값은 false, 0, '', null, undefined, NaN입니다."
+  optionExplanations={[
+    '0은 falsy 값입니다.',
+    'null은 falsy 값입니다.',
+    "빈 문자열 ''은 falsy 값입니다.",
+    '맞습니다. 빈 배열은 truthy입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`null == undefined`의 결과는?"
+  options={['true', 'false', 'TypeError', 'null']}
+  correctAnswer={1}
+  explanation="ECMAScript 명세에서 null과 undefined는 == 비교 시 서로 같다고 정의합니다."
+  optionExplanations={[
+    '맞습니다. null == undefined는 특수 규칙으로 true입니다.',
+    'false가 아닙니다.',
+    '오류가 발생하지 않습니다.',
+    'null이 반환되지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`NaN === NaN`의 결과는?"
+  options={['true', 'false', 'TypeError', 'undefined']}
+  correctAnswer={2}
+  explanation="NaN은 자기 자신과도 같지 않습니다. NaN 확인에는 Number.isNaN()을 사용합니다."
+  optionExplanations={[
+    'NaN은 자기 자신과도 같지 않습니다.',
+    '맞습니다. NaN과의 모든 비교는 false입니다.',
+    '오류가 발생하지 않습니다.',
+    'undefined가 반환되지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`Number(undefined)`의 결과는?"
+  options={['0', '1', 'null', 'NaN']}
+  correctAnswer={4}
+  explanation="undefined를 숫자로 변환하면 NaN이 됩니다. null은 0, false는 0, true는 1입니다."
+  optionExplanations={[
+    '0은 null, false, 빈 문자열 변환 결과입니다.',
+    '1은 true 변환 결과입니다.',
+    'null이 반환되지 않습니다.',
+    '맞습니다. undefined → NaN입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="다음 중 `Number.isNaN()`이 `isNaN()`보다 더 엄격한 이유는?"
+  options={[
+    'Number.isNaN()은 더 빠르기 때문이다.',
+    "isNaN()은 인수를 숫자로 변환한 뒤 검사하므로 isNaN('abc')가 true가 된다. Number.isNaN()은 값이 실제 NaN인 경우에만 true를 반환한다.",
+    'Number.isNaN()은 null도 NaN으로 처리한다.',
+    '둘은 완전히 동일하다.',
+  ]}
+  correctAnswer={2}
+  explanation="isNaN('abc')는 'abc'를 숫자로 변환하면 NaN이므로 true를 반환합니다. Number.isNaN()은 실제 NaN 값인 경우에만 true입니다."
+  optionExplanations={[
+    '성능 차이가 이유가 아닙니다.',
+    '맞습니다. isNaN은 암묵 변환 후 검사합니다.',
+    'Number.isNaN(null)은 false입니다.',
+    '둘은 다르게 동작합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="`Boolean([])`의 결과는?"
+  options={['false', 'true', '0', 'null']}
+  correctAnswer={2}
+  explanation="빈 배열 []은 객체이므로 truthy입니다. Boolean([])은 true를 반환합니다."
+  optionExplanations={[
+    '빈 배열은 falsy가 아닙니다.',
+    '맞습니다. 모든 객체(배열 포함)는 truthy입니다.',
+    '0은 숫자형 falsy 값입니다.',
+    'null이 반환되지 않습니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - 타입 변환](https://developer.mozilla.org/ko/docs/Glossary/Type_coercion)
+- [MDN - 동등 비교](https://developer.mozilla.org/ko/docs/Web/JavaScript/Equality_comparisons_and_sameness)

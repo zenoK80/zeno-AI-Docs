@@ -1,6 +1,26 @@
 const meta = {
   '01_javascript-and-ecmascript': '01. JavaScript와 ECMAScript',
   '02_values-and-code': '02. 값, 표현식과 문',
+  '03_expressions-and-statements': '03. 표현식과 문',
+  '04_data-types': '04. 데이터 타입',
+  '05_operators': '05. 연산자',
+  '06_control-flow': '06. 제어 흐름',
+  '07_type-coercion': '07. 타입 변환',
+  '08_object-literal': '08. 객체 리터럴',
+  '09_primitive-vs-object': '09. 원시값 vs 객체',
+  '10_function': '10. 함수',
+  '11_scope': '11. 스코프',
+  '12_closure': '12. 클로저',
+  '13_this': '13. this',
+  '14_prototype': '14. 프로토타입',
+  '15_class': '15. 클래스',
+  '16_es6-features': '16. ES6+ 핵심 문법',
+  '17_array-methods': '17. 배열 메서드',
+  '18_promise-async': '18. Promise와 async/await',
+  '19_module': '19. 모듈',
+  '20_iterator-generator': '20. 이터레이터와 제너레이터',
+  '21_set-map': '21. Set과 Map',
+  '22_ecmascript-practice': '22. ECMAScript 핵심 퀴즈',
 }
 
 export default meta

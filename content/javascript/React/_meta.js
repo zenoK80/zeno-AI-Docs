@@ -1,0 +1,23 @@
+const meta = {
+  '01_react-overview': '01. React 개요',
+  '02_jsx': '02. JSX와 렌더링',
+  '03_component': '03. 컴포넌트와 Props',
+  '04_useState': '04. useState',
+  '05_useEffect': '05. useEffect',
+  '06_event-handling': '06. 이벤트 핸들링',
+  '07_conditional-and-list': '07. 조건부·리스트 렌더링',
+  '08_forms': '08. 폼과 제어 컴포넌트',
+  '09_useRef': '09. useRef와 useCallback',
+  '10_useContext': '10. Context API',
+  '11_useReducer': '11. useReducer',
+  '12_custom-hooks': '12. 커스텀 훅',
+  '13_react-router': '13. React Router v6',
+  '14_state-management': '14. 전역 상태 관리',
+  '15_data-fetching': '15. 데이터 페칭',
+  '16_performance': '16. 성능 최적화',
+  '17_nextjs-basics': '17. Next.js 기초',
+  '18_styling': '18. 스타일링',
+  '19_react-patterns': '19. React 패턴',
+  '20_react-practice': '20. React 예상기출문제',
+}
+export default meta

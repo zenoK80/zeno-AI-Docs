@@ -1,0 +1,246 @@
+---
+title: '04. DOM 조작'
+description: 'innerHTML, textContent, createElement로 DOM을 동적으로 변경하는 방법을 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** DOM 요소의 내용을 읽고 변경하고, 새 요소를 만들어 추가하는 방법을 익힙니다.
+</Callout>
+
+## 내용 읽기와 변경
+
+```js
+const title = document.querySelector('h1')
+
+// textContent: 텍스트만 다룸 (HTML 태그 무시)
+console.log(title.textContent)
+title.textContent = '새 제목'
+
+// innerHTML: HTML 마크업 포함
+const list = document.querySelector('ul')
+console.log(list.innerHTML)
+list.innerHTML = '<li>첫 번째</li><li>두 번째</li>'
+```
+
+<Callout type="warning">
+  `innerHTML`에 사용자 입력을 직접 삽입하면 **XSS(Cross-Site Scripting)** 공격에 취약합니다. 사용자 입력은 반드시 `textContent`로 처리하거나 DOMPurify 등으로 정화하세요.
+</Callout>
+
+## 요소 생성과 추가
+
+```js
+// 새 요소 생성
+const newItem = document.createElement('li')
+newItem.textContent = '새 항목'
+newItem.className = 'item active'
+
+// 부모에 추가
+const list = document.querySelector('ul')
+list.appendChild(newItem)    // 마지막에 추가
+list.prepend(newItem)        // 첫 번째에 추가
+
+// 특정 위치에 추가
+const referenceNode = list.querySelector('li:nth-child(2)')
+list.insertBefore(newItem, referenceNode)  // referenceNode 앞에
+
+// 여러 요소 한 번에
+list.append('텍스트', newItem, document.createElement('li'))
+```
+
+## insertAdjacentHTML
+
+특정 위치에 HTML을 삽입합니다.
+
+```js
+const container = document.querySelector('#container')
+
+container.insertAdjacentHTML('beforebegin', '<p>컨테이너 앞</p>')
+container.insertAdjacentHTML('afterbegin', '<p>컨테이너 내부 첫 번째</p>')
+container.insertAdjacentHTML('beforeend', '<p>컨테이너 내부 마지막</p>')
+container.insertAdjacentHTML('afterend', '<p>컨테이너 뒤</p>')
+```
+
+## 요소 제거와 교체
+
+```js
+const item = document.querySelector('.item')
+
+item.remove()  // 자기 자신 제거
+
+// 교체
+const newEl = document.createElement('span')
+item.replaceWith(newEl)  // item 대신 newEl
+
+// 복사
+const clone = item.cloneNode(true)  // true: 자식 노드까지 복사
+```
+
+## 속성 조작
+
+```js
+const img = document.querySelector('img')
+
+img.getAttribute('src')           // 속성 값 읽기
+img.setAttribute('alt', '설명')   // 속성 설정
+img.removeAttribute('disabled')   // 속성 제거
+img.hasAttribute('hidden')        // 속성 존재 여부
+
+// data 속성
+const el = document.querySelector('[data-user-id]')
+el.dataset.userId          // data-user-id 값
+el.dataset.createdAt = '2024'  // data-created-at 설정
+```
+
+## 클래스 조작
+
+```js
+const el = document.querySelector('.card')
+
+el.classList.add('active')           // 추가
+el.classList.remove('disabled')      // 제거
+el.classList.toggle('hidden')        // 없으면 추가, 있으면 제거
+el.classList.contains('active')      // 존재 여부 (boolean)
+el.classList.replace('old', 'new')   // 교체
+```
+
+## 스타일 조작
+
+```js
+const box = document.querySelector('.box')
+
+// 인라인 스타일
+box.style.backgroundColor = 'red'
+box.style.fontSize = '20px'
+
+// 계산된 스타일 읽기
+const computed = getComputedStyle(box)
+console.log(computed.color)
+```
+
+## 핵심 정리
+
+- `textContent`는 텍스트만, `innerHTML`은 HTML 마크업을 다룹니다.
+- `createElement()` + `appendChild()` 로 새 요소를 만들어 추가합니다.
+- `classList`로 클래스를 안전하게 추가/제거/토글합니다.
+- `dataset`으로 data-* 속성에 쉽게 접근합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="`textContent`와 `innerHTML`의 차이는?"
+  options={[
+    'textContent가 더 빠르게 동작하고 innerHTML은 느리다.',
+    'textContent는 텍스트만 처리하고 innerHTML은 HTML 마크업도 처리한다.',
+    'innerHTML은 읽기만 가능하다.',
+    '두 프로퍼티는 동일하다.',
+  ]}
+  correctAnswer={2}
+  explanation="textContent는 텍스트 노드만 다루며 HTML 태그를 이스케이프합니다. innerHTML은 HTML 마크업을 그대로 파싱하고 렌더링합니다."
+  optionExplanations={[
+    '성능 차이가 핵심 구분이 아닙니다.',
+    '맞습니다. 처리하는 내용의 범위가 다릅니다.',
+    'innerHTML은 읽기와 쓰기 모두 가능합니다.',
+    '처리 방식이 다릅니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="innerHTML에 사용자 입력을 직접 삽입하면 안 되는 이유는?"
+  options={[
+    '렌더링 속도가 느려지기 때문이다.',
+    'XSS(Cross-Site Scripting) 공격에 취약해지기 때문이다.',
+    'HTML 태그가 이스케이프되기 때문이다.',
+    '텍스트만 지원하기 때문이다.',
+  ]}
+  correctAnswer={2}
+  explanation="innerHTML은 HTML을 파싱하여 렌더링하므로 사용자 입력에 악성 스크립트가 포함되면 실행될 수 있습니다."
+  optionExplanations={[
+    '보안 문제가 핵심입니다.',
+    '맞습니다. 악성 script 태그 등이 실행될 수 있습니다.',
+    'innerHTML은 오히려 이스케이프하지 않습니다.',
+    'innerHTML은 HTML 마크업을 지원합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`classList.toggle('active')`의 동작은?"
+  options={[
+    "'active' 클래스를 항상 추가한다.",
+    "'active' 클래스를 항상 제거한다.",
+    "'active' 클래스가 없으면 추가하고, 있으면 제거한다.",
+    "오류가 발생한다.",
+  ]}
+  correctAnswer={3}
+  explanation="toggle()은 클래스가 없으면 추가하고 있으면 제거합니다. ON/OFF 전환에 유용합니다."
+  optionExplanations={[
+    "항상 추가하려면 add()를 씁니다.",
+    "항상 제거하려면 remove()를 씁니다.",
+    "맞습니다. 있으면 제거, 없으면 추가합니다.",
+    "toggle()은 정상 동작합니다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="새 요소를 만들어 부모 요소 마지막에 추가하는 방법은?"
+  options={[
+    "parent.addChild(newEl)",
+    "parent.appendChild(newEl)",
+    "parent.insertChild(newEl)",
+    "parent.push(newEl)",
+  ]}
+  correctAnswer={2}
+  explanation="appendChild()는 노드를 부모의 마지막 자식으로 추가합니다."
+  optionExplanations={[
+    "addChild()는 없는 메서드입니다.",
+    "맞습니다. appendChild()가 마지막에 추가합니다.",
+    "insertChild()는 없는 메서드입니다.",
+    "push()는 배열 메서드입니다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`data-user-id` 속성에 JavaScript로 접근하는 방법은?"
+  options={[
+    "el.getAttribute('data-user-id')",
+    "el.dataset.userId",
+    "el['data-user-id']",
+    "위 중 두 가지 이상이 올바르다.",
+  ]}
+  correctAnswer={4}
+  explanation="getAttribute('data-user-id')와 dataset.userId(카멜케이스 변환) 모두 올바른 방법입니다."
+  optionExplanations={[
+    "getAttribute도 올바른 방법입니다.",
+    "dataset.userId도 올바른 방법입니다.",
+    "el['data-user-id']는 DOM 속성 접근 방법이 아닙니다.",
+    "맞습니다. getAttribute와 dataset 모두 사용 가능합니다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="`cloneNode(true)`와 `cloneNode(false)`의 차이는?"
+  options={[
+    "true는 이벤트 리스너도 복사한다.",
+    "true는 자식 노드까지 복사하고, false는 요소 자체만 복사한다.",
+    "false는 원본을 삭제한다.",
+    "두 방법은 동일하다.",
+  ]}
+  correctAnswer={2}
+  explanation="cloneNode(true)는 깊은 복사로 자식 노드까지 복사합니다. cloneNode(false)는 얕은 복사로 요소 자체만 복사합니다."
+  optionExplanations={[
+    "이벤트 리스너는 복사되지 않습니다.",
+    "맞습니다. true는 깊은 복사, false는 얕은 복사입니다.",
+    "false가 원본을 삭제하지 않습니다.",
+    "자식 포함 여부에서 다릅니다.",
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - Document.createElement](https://developer.mozilla.org/ko/docs/Web/API/Document/createElement)
+- [MDN - Element.classList](https://developer.mozilla.org/ko/docs/Web/API/Element/classList)

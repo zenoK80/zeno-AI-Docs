@@ -1,0 +1,233 @@
+---
+title: '06. 이벤트 핸들링'
+description: 'React 이벤트 시스템, 합성 이벤트, 이벤트 핸들러 패턴을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** React의 이벤트 핸들러 작성 방법과 합성 이벤트의 특징을 이해합니다.
+</Callout>
+
+## React 이벤트 기본
+
+```jsx
+function Button() {
+  const handleClick = (event) => {
+    event.preventDefault()
+    console.log('클릭됨', event.type)
+  }
+
+  return <button onClick={handleClick}>클릭</button>
+}
+```
+
+HTML과의 차이:
+
+- 이벤트 이름: camelCase (`onclick` → `onClick`)
+- 핸들러: 함수 참조 (`"handleClick()"` → `{handleClick}`)
+- 기본 동작 방지: `return false` 불가, `e.preventDefault()` 사용
+
+## 합성 이벤트 (SyntheticEvent)
+
+React는 브라우저 네이티브 이벤트를 래핑한 **합성 이벤트**를 사용합니다.
+
+```jsx
+function InputTracker() {
+  const handleInput = (e) => {
+    console.log(e.target.value)       // 입력값
+    console.log(e.type)               // 'input'
+    console.log(e.nativeEvent)        // 네이티브 이벤트
+  }
+
+  return <input onInput={handleInput} />
+}
+```
+
+## 이벤트에 인수 전달
+
+```jsx
+function TodoList() {
+  const handleDelete = (id, e) => {
+    e.stopPropagation()
+    console.log('삭제:', id)
+  }
+
+  return (
+    <ul>
+      {todos.map(todo => (
+        <li key={todo.id} onClick={() => handleDelete(todo.id)}>
+          {todo.text}
+          <button onClick={(e) => handleDelete(todo.id, e)}>삭제</button>
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+## 자주 사용하는 이벤트
+
+```jsx
+function Form() {
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault()
+      console.log('폼 제출')
+    }}>
+      <input
+        onChange={(e) => console.log(e.target.value)}
+        onFocus={() => console.log('포커스')}
+        onBlur={() => console.log('블러')}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') console.log('엔터 입력')
+        }}
+      />
+      <button type="submit">제출</button>
+    </form>
+  )
+}
+```
+
+## 마우스 이벤트
+
+```jsx
+function HoverCard() {
+  const [isHovered, setIsHovered] = useState(false)
+
+  return (
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{ background: isHovered ? '#e0e0e0' : 'white' }}
+    >
+      {isHovered ? '마우스가 올라와 있습니다!' : '마우스를 올려보세요'}
+    </div>
+  )
+}
+```
+
+## 핵심 정리
+
+- React 이벤트는 camelCase로 작성합니다.
+- 핸들러에 함수 참조를 전달합니다(즉시 호출 `{fn()}` 금지).
+- 합성 이벤트로 브라우저 간 일관성을 제공합니다.
+- `e.preventDefault()`로 기본 동작을 막고, `e.stopPropagation()`으로 전파를 중단합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="React 이벤트 핸들러를 올바르게 작성한 것은?"
+  options={[
+    'onClick="handleClick()"',
+    'onclick={handleClick}',
+    'onClick={handleClick}',
+    'onClick={handleClick()}',
+  ]}
+  correctAnswer={3}
+  explanation="JSX 이벤트는 camelCase(onClick)이며, 핸들러는 함수 참조 형태 {handleClick}으로 전달합니다. {handleClick()}처럼 즉시 호출하면 렌더링 시 실행됩니다."
+  optionExplanations={[
+    'JSX에서 문자열로 이벤트를 전달하지 않습니다.',
+    'JSX 이벤트는 camelCase로 onClick입니다.',
+    '맞습니다. camelCase + 함수 참조입니다.',
+    '즉시 호출은 렌더링 시 실행되어 버그가 생깁니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="React의 합성 이벤트(SyntheticEvent)가 존재하는 이유는?"
+  options={[
+    'DOM 이벤트보다 빠르기 때문에',
+    '브라우저마다 다른 이벤트 구현을 추상화하여 일관된 API를 제공하기 위해',
+    '이벤트 이름을 camelCase로 바꾸기 위해',
+    '이벤트를 비동기로 처리하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="합성 이벤트는 브라우저 간 이벤트 API 차이를 통일된 인터페이스로 감쌉니다. 크로스 브라우저 호환성을 자동으로 처리합니다."
+  optionExplanations={[
+    '속도가 주된 이유가 아닙니다.',
+    '맞습니다. 크로스 브라우저 일관성 제공이 목적입니다.',
+    'camelCase는 부수적인 결과입니다.',
+    '이벤트 처리 방식과 관련이 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`onClick={(e) => handleDelete(id, e)}`처럼 화살표 함수로 감싸는 이유는?"
+  options={[
+    '반드시 화살표 함수로 감싸야 한다.',
+    '인수(id)를 이벤트 핸들러에 전달하기 위해',
+    '이벤트 기본 동작을 막기 위해',
+    '비동기 처리를 위해',
+  ]}
+  correctAnswer={2}
+  explanation="onClick에는 함수 참조를 전달해야 하는데, 인수를 함께 전달하려면 화살표 함수로 감싸 클로저를 활용합니다."
+  optionExplanations={[
+    '필요할 때만 감쌉니다.',
+    '맞습니다. 추가 인수를 핸들러에 전달하기 위해 감쌉니다.',
+    '기본 동작 방지는 핸들러 내부에서 합니다.',
+    '비동기와 무관합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="폼 제출 시 `e.preventDefault()`를 호출하는 이유는?"
+  options={[
+    '이벤트를 취소하기 위해',
+    '브라우저가 폼을 제출하고 페이지를 새로고침하는 기본 동작을 막기 위해',
+    '이벤트 전파를 막기 위해',
+    '유효성 검사를 활성화하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="폼의 기본 동작은 서버로 데이터를 보내고 페이지를 새로고침하는 것입니다. SPA에서는 이를 막고 JavaScript로 제출을 처리합니다."
+  optionExplanations={[
+    '이벤트 자체를 취소하는 것이 아닙니다.',
+    '맞습니다. 페이지 새로고침을 방지합니다.',
+    '전파 방지는 stopPropagation()입니다.',
+    '유효성 검사 활성화가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`onMouseEnter`와 `onMouseOver`의 차이는?"
+  options={[
+    '차이가 없다.',
+    'onMouseEnter는 해당 요소에 진입 시만, onMouseOver는 자식 요소로 이동할 때도 발생한다.',
+    'onMouseOver가 더 정확하다.',
+    'onMouseEnter는 모바일에서만 사용한다.',
+  ]}
+  correctAnswer={2}
+  explanation="onMouseEnter는 버블링 없이 해당 요소에 진입할 때만 발생합니다. onMouseOver는 자식 요소로 이동해도 발생합니다. 대부분 onMouseEnter가 적합합니다."
+  optionExplanations={[
+    '발생 조건이 다릅니다.',
+    '맞습니다. Enter는 버블링 없고 Over는 자식 포함입니다.',
+    '용도에 따라 다릅니다.',
+    '둘 다 모든 환경에서 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="이벤트 핸들러에서 `e.stopPropagation()`을 호출하는 이유는?"
+  options={[
+    '이벤트 자체를 취소하기 위해',
+    '이벤트가 부모 요소로 버블링되는 것을 중단하기 위해',
+    '브라우저 기본 동작을 막기 위해',
+    '비동기 이벤트를 동기로 바꾸기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="stopPropagation()은 이벤트 버블링을 중단합니다. 예를 들어 리스트 아이템 내 버튼 클릭이 리스트 아이템의 클릭 핸들러까지 전달되는 것을 막을 때 사용합니다."
+  optionExplanations={[
+    '이벤트 취소는 preventDefault()입니다.',
+    '맞습니다. 버블링을 중단합니다.',
+    '기본 동작 방지는 preventDefault()입니다.',
+    '동기/비동기와 관련 없습니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [React - 이벤트에 응답하기](https://react.dev/learn/responding-to-events)

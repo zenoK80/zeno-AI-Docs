@@ -1,0 +1,170 @@
+---
+title: '03. 로지스틱 회귀'
+description: '시그모이드 함수, 이진 분류, 다중 분류(소프트맥스)를 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 로지스틱 회귀의 시그모이드 함수를 이해하고, 이진/다중 분류에 적용합니다.
+</Callout>
+
+## 로지스틱 회귀 (Logistic Regression)
+
+분류(Classification) 문제를 위한 선형 모델입니다. 이름에 "회귀"가 있지만 실제로는 분류 알고리즘입니다.
+
+## 시그모이드 함수 (Sigmoid Function)
+
+선형 결합 $z = \theta^T x$를 0~1 사이의 확률값으로 변환합니다.
+
+$$\sigma(z) = \frac{1}{1 + e^{-z}}$$
+
+| z | σ(z) |
+| --- | --- |
+| 매우 큰 양수 | ≈ 1 |
+| 0 | 0.5 |
+| 매우 큰 음수 | ≈ 0 |
+
+## 이진 분류 (Binary Classification)
+
+$$\hat{p} = \sigma(\theta^T x), \quad \hat{y} = \begin{cases} 1 & \text{if } \hat{p} \geq 0.5 \\ 0 & \text{if } \hat{p} < 0.5 \end{cases}$$
+
+**비용 함수 (로그 손실, Cross-Entropy):**
+
+$$J(\theta) = -\frac{1}{m} \sum_{i=1}^{m} \left[ y^{(i)} \log(\hat{p}^{(i)}) + (1 - y^{(i)}) \log(1 - \hat{p}^{(i)}) \right]$$
+
+<Callout type="warning">
+  로지스틱 회귀의 비용 함수는 MSE가 아닌 **교차 엔트로피(Cross-Entropy)** 입니다. 이 함수는 볼록(Convex)하여 경사하강법으로 전역 최솟값을 찾을 수 있습니다.
+</Callout>
+
+## 결정 경계 (Decision Boundary)
+
+$\sigma(\theta^T x) = 0.5$일 때, 즉 $\theta^T x = 0$인 직선(또는 초평면)이 결정 경계가 됩니다.
+
+## 다중 분류 (Multiclass Classification)
+
+### OvR (One-vs-Rest) 전략
+
+각 클래스에 대해 이진 분류기를 훈련시킵니다. K개 클래스 → K개의 이진 분류기
+
+### 소프트맥스 회귀 (Softmax Regression)
+
+K개 클래스에 대한 확률을 동시에 계산합니다.
+
+$$\hat{p}_k = \text{softmax}(\mathbf{s})_k = \frac{e^{s_k}}{\sum_{j=1}^{K} e^{s_j}}$$
+
+여기서 $s_k = \theta_k^T x$는 클래스 k에 대한 점수입니다.
+
+**특성:**
+- 출력은 K개 클래스에 대한 확률 (합이 1)
+- 비용 함수: 다중 클래스 교차 엔트로피
+
+## 핵심 정리
+
+- 로지스틱 회귀: 분류 문제에 사용, 선형 결합 + 시그모이드
+- 시그모이드: 0~1 범위의 확률값 출력
+- 비용 함수: 교차 엔트로피 (MSE 아님)
+- 다중 분류: OvR 전략 또는 소프트맥스 회귀
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="로지스틱 회귀는 어떤 문제에 주로 사용되는가?"
+  options={['① 연속값 예측(회귀)', '② 분류(Classification)', '③ 군집화', '④ 차원 축소']}
+  correctAnswer={2}
+  explanation="이름에 '회귀'가 있지만 로지스틱 회귀는 분류 문제에 사용됩니다. 시그모이드 함수로 확률을 계산하여 클래스를 분류합니다."
+  optionExplanations={[
+    '연속값 예측은 선형 회귀입니다.',
+    '맞습니다. 로지스틱 회귀는 분류 알고리즘입니다.',
+    '군집화는 비지도 학습입니다.',
+    '차원 축소는 PCA 등이 담당합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="시그모이드 함수 σ(0)의 값은?"
+  options={['① 0', '② 0.5', '③ 1', '④ -1']}
+  correctAnswer={2}
+  explanation="σ(z) = 1/(1+e^(-z))에서 z=0이면 σ(0) = 1/(1+e^0) = 1/(1+1) = 0.5입니다."
+  optionExplanations={[
+    'z가 매우 큰 음수일 때 σ(z) ≈ 0입니다.',
+    '맞습니다. σ(0) = 0.5입니다.',
+    'z가 매우 큰 양수일 때 σ(z) ≈ 1입니다.',
+    '시그모이드 함수는 항상 0과 1 사이입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="로지스틱 회귀의 비용 함수는?"
+  options={['① 평균 제곱 오차(MSE)', '② 교차 엔트로피(Cross-Entropy)', '③ 힌지 손실', '④ 절대 오차(MAE)']}
+  correctAnswer={2}
+  explanation="로지스틱 회귀의 비용 함수는 교차 엔트로피(로그 손실)입니다. MSE를 사용하면 비볼록 함수가 되어 지역 최솟값 문제가 발생합니다."
+  optionExplanations={[
+    'MSE는 선형 회귀의 비용 함수입니다.',
+    '맞습니다. 로지스틱 회귀는 교차 엔트로피를 사용합니다.',
+    '힌지 손실은 SVM에서 사용됩니다.',
+    'MAE는 평균 절대 오차입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="소프트맥스(Softmax) 함수의 출력값의 합은?"
+  options={['① 0', '② 0.5', '③ 1', '④ 클래스 수']}
+  correctAnswer={3}
+  explanation="소프트맥스 함수는 각 클래스에 대한 확률을 출력하며, 모든 클래스 확률의 합은 항상 1입니다."
+  optionExplanations={[
+    '0이 아닙니다.',
+    '0.5는 2개 클래스의 경우 각 클래스 확률입니다.',
+    '맞습니다. 소프트맥스 출력의 합 = 1입니다.',
+    '클래스 수는 차원의 크기이지 합이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="이진 분류에서 로지스틱 회귀의 결정 기준(임계값)은 일반적으로?"
+  options={['① 0', '② 0.5', '③ 1', '④ 클래스에 따라 다름']}
+  correctAnswer={2}
+  explanation="기본적으로 예측 확률이 0.5 이상이면 양성 클래스(1), 미만이면 음성 클래스(0)로 분류합니다. 임계값은 조정 가능합니다."
+  optionExplanations={[
+    '0은 결정 경계에서의 선형 결합 z 값입니다.',
+    '맞습니다. 기본 임계값은 0.5입니다.',
+    '1이면 모든 샘플이 음성으로 분류됩니다.',
+    '기본값은 0.5이지만 도메인에 따라 조정할 수 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="OvR(One-vs-Rest) 전략으로 K클래스 분류 시 필요한 분류기 수는?"
+  options={['① 1개', '② K/2개', '③ K개', '④ K(K-1)/2개']}
+  correctAnswer={3}
+  explanation="OvR은 각 클래스에 대해 '이 클래스 vs 나머지'로 이진 분류기를 훈련합니다. K개 클래스이면 K개의 이진 분류기가 필요합니다."
+  optionExplanations={[
+    '1개만으로는 K클래스 분류가 불가합니다.',
+    'K/2개가 아닌 K개입니다.',
+    '맞습니다. OvR: K개 클래스 → K개 이진 분류기입니다.',
+    'K(K-1)/2는 OvO(One-vs-One) 전략의 분류기 수입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="시그모이드 함수의 출력 범위는?"
+  options={['① (-∞, +∞)', '② [0, 1]', '③ [-1, 1]', '④ [0, +∞)']}
+  correctAnswer={2}
+  explanation="시그모이드 함수 σ(z) = 1/(1+e^(-z))의 출력 범위는 (0, 1)입니다. 엄밀히는 개구간이지만 실용적으로 [0, 1]로 표현합니다."
+  optionExplanations={[
+    '(-∞, +∞)은 시그모이드의 입력 범위입니다.',
+    '맞습니다. 시그모이드 출력은 0과 1 사이입니다.',
+    '[-1, 1]은 하이퍼볼릭 탄젠트(tanh) 함수의 범위입니다.',
+    '[0, +∞)는 ReLU 함수의 범위입니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [국가평생교육진흥원 독학학위제](https://bdes.nile.or.kr/nile/study/nStudy1_1.do)
+- Aurélien Géron, "Hands-On Machine Learning with Scikit-Learn, Keras & TensorFlow"

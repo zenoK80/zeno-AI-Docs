@@ -1,0 +1,243 @@
+---
+title: '02. JSX'
+description: 'JSX 문법, 표현식 삽입, 조건부 렌더링, 리스트 렌더링을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** JSX가 JavaScript로 어떻게 변환되는지 이해하고, 표현식 삽입과 렌더링 패턴을 익힙니다.
+</Callout>
+
+## JSX란
+
+**JSX**(JavaScript XML)는 JavaScript 안에 HTML과 비슷한 마크업을 쓸 수 있는 문법 확장입니다. Babel이 JSX를 `React.createElement()` 호출로 변환합니다.
+
+```jsx
+// JSX
+const element = <h1 className="title">Hello</h1>
+
+// Babel 변환 결과
+const element = React.createElement('h1', { className: 'title' }, 'Hello')
+```
+
+## JSX 규칙
+
+```jsx
+// 1. 반드시 하나의 루트 요소 (또는 Fragment)
+function App() {
+  return (
+    <>
+      <h1>제목</h1>
+      <p>내용</p>
+    </>
+  )
+}
+
+// 2. 모든 태그는 닫아야 함
+const img = <img src="/logo.png" alt="로고" />
+
+// 3. camelCase 속성명
+// class → className, for → htmlFor, onclick → onClick
+const btn = <button className="btn" onClick={handleClick}>클릭</button>
+```
+
+## 표현식 삽입
+
+JSX 안에서 중괄호로 JavaScript 표현식을 삽입합니다.
+
+```jsx
+const name = '김철수'
+const age = 25
+const isAdmin = true
+
+function Profile() {
+  return (
+    <div>
+      <p>이름: {name}</p>
+      <p>나이: {age}</p>
+      <p>2 + 3 = {2 + 3}</p>
+      <p>역할: {isAdmin ? '관리자' : '일반 사용자'}</p>
+    </div>
+  )
+}
+```
+
+## 조건부 렌더링
+
+```jsx
+function Alert({ type, message }) {
+  // 삼항 연산자
+  return (
+    <div className={type === 'error' ? 'alert-error' : 'alert-info'}>
+      {message}
+    </div>
+  )
+}
+
+function UserGreeting({ isLoggedIn }) {
+  // && 단락 평가
+  return (
+    <div>
+      {isLoggedIn && <p>환영합니다!</p>}
+      {!isLoggedIn && <p>로그인해 주세요.</p>}
+    </div>
+  )
+}
+```
+
+## 리스트 렌더링
+
+```jsx
+const fruits = ['사과', '바나나', '딸기']
+
+function FruitList() {
+  return (
+    <ul>
+      {fruits.map((fruit, index) => (
+        <li key={index}>{fruit}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+<Callout type="warning">
+  리스트의 각 항목에는 고유한 `key` prop이 필요합니다. 인덱스보다 항목 고유 ID를 사용하세요.
+</Callout>
+
+## 스타일 적용
+
+```jsx
+// 인라인 스타일: 객체 형태
+const style = { color: 'red', fontSize: '16px' }
+const el = <p style={style}>텍스트</p>
+
+// className으로 CSS 클래스 적용
+const el2 = <p className="highlight">텍스트</p>
+```
+
+## 핵심 정리
+
+- JSX는 `React.createElement()` 호출로 변환되는 문법 설탕입니다.
+- 중괄호로 JavaScript 표현식을 삽입합니다.
+- 삼항 연산자나 `&&`로 조건부 렌더링합니다.
+- `map()`으로 리스트를 렌더링하고 각 항목에 `key`를 줍니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="JSX에서 CSS 클래스를 지정하는 올바른 방법은?"
+  options={[
+    'class="btn"',
+    'className="btn"',
+    'cssClass="btn"',
+    'style="btn"',
+  ]}
+  correctAnswer={2}
+  explanation="JSX에서 HTML의 class 속성은 JavaScript 예약어와 충돌을 피하기 위해 className으로 씁니다."
+  optionExplanations={[
+    'HTML에서는 class지만 JSX에서는 className입니다.',
+    '맞습니다. JSX에서는 className을 사용합니다.',
+    'cssClass는 없는 속성입니다.',
+    'style은 CSS 스타일 객체를 받습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="JSX에서 여러 형제 요소를 반환할 때 사용하는 것은?"
+  options={[
+    'div로 감싸는 것이 유일한 방법이다.',
+    'Fragment(빈 태그 &lt;&gt;&lt;/&gt; 또는 React.Fragment)로 감싼다.',
+    '쉼표로 구분한다.',
+    '배열로 반환한다.',
+  ]}
+  correctAnswer={2}
+  explanation="Fragment를 사용하면 실제 DOM에 추가 노드를 만들지 않고 여러 요소를 반환할 수 있습니다. div로 감싸도 되지만 불필요한 DOM 노드가 생깁니다."
+  optionExplanations={[
+    'div 외에도 Fragment를 사용할 수 있습니다.',
+    '맞습니다. Fragment는 불필요한 DOM 노드를 만들지 않습니다.',
+    '쉼표로 구분하면 오류가 납니다.',
+    '배열도 가능하지만 key가 필요합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="JSX 리스트 렌더링에서 `key` prop이 필요한 이유는?"
+  options={[
+    '스타일 적용을 위해',
+    'React가 어떤 항목이 추가/수정/삭제되었는지 효율적으로 추적하기 위해',
+    'JavaScript 배열 인덱스를 위해',
+    '유니크한 CSS 클래스를 위해',
+  ]}
+  correctAnswer={2}
+  explanation="key는 React가 리스트 항목을 식별하는 데 사용합니다. 올바른 key 없이는 불필요한 재렌더링이나 잘못된 상태 연결이 발생할 수 있습니다."
+  optionExplanations={[
+    '스타일과 관련이 없습니다.',
+    '맞습니다. React가 항목 변화를 추적하기 위해 필요합니다.',
+    '배열 인덱스와 별개입니다.',
+    'CSS 클래스를 위한 것이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="JSX에서 `{isLoggedIn && <Welcome />}`의 동작은?"
+  options={[
+    '항상 Welcome을 렌더링한다.',
+    'isLoggedIn이 true일 때만 Welcome을 렌더링한다.',
+    'isLoggedIn이 false일 때 Welcome을 렌더링한다.',
+    '오류가 발생한다.',
+  ]}
+  correctAnswer={2}
+  explanation="JavaScript의 단락 평가에 의해 isLoggedIn이 true면 오른쪽 값을 반환하고, false면 false를 반환합니다. React는 false를 렌더링하지 않습니다."
+  optionExplanations={[
+    'isLoggedIn 값에 따라 다릅니다.',
+    '맞습니다. true일 때만 우측 표현식이 렌더링됩니다.',
+    'false일 때는 아무것도 렌더링하지 않습니다.',
+    '올바른 JSX 패턴입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="JSX에서 인라인 스타일을 적용하는 올바른 방법은?"
+  options={[
+    'style="color: red; font-size: 16px"',
+    'style={{ color: "red", fontSize: "16px" }}',
+    'css={{ color: "red" }}',
+    'style={color: "red"}',
+  ]}
+  correctAnswer={2}
+  explanation="JSX 인라인 스타일은 JavaScript 객체 형태로 전달합니다. camelCase 속성명을 사용하고 이중 중괄호(하나는 JSX 표현식, 다른 하나는 객체)를 씁니다."
+  optionExplanations={[
+    'HTML 문자열 형태는 JSX에서 작동하지 않습니다.',
+    '맞습니다. 객체 형태로 전달하고 camelCase를 사용합니다.',
+    'css 속성은 없습니다.',
+    '객체는 중괄호로 감싸야 합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="JSX에서 `for` 루프를 직접 사용할 수 없는 이유와 대안은?"
+  options={[
+    'for는 JSX에서 금지된 키워드이다. while을 사용한다.',
+    'JSX 표현식 안에는 문(statement)이 아닌 표현식(expression)만 올 수 있다. map()을 사용한다.',
+    'for는 비동기이기 때문이다.',
+    'for를 사용하면 성능이 나빠지기 때문이다.',
+  ]}
+  correctAnswer={2}
+  explanation="JSX 중괄호 안에는 값을 반환하는 표현식만 올 수 있습니다. for는 문(statement)이므로 사용할 수 없고, 배열을 반환하는 map() 메서드를 사용합니다."
+  optionExplanations={[
+    'while도 동일하게 문이라 사용 불가합니다.',
+    '맞습니다. 표현식만 가능하므로 map()을 사용합니다.',
+    '비동기와 관련이 없습니다.',
+    '성능 문제가 이유가 아닙니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [React - JSX로 마크업 작성](https://react.dev/learn/writing-markup-with-jsx)

@@ -1,0 +1,271 @@
+---
+title: '08. 폼 처리'
+description: '제어 컴포넌트, 비제어 컴포넌트, 폼 상태 관리 패턴을 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** React에서 폼 데이터를 제어 컴포넌트 방식으로 관리하는 방법을 익힙니다.
+</Callout>
+
+## 제어 컴포넌트 (Controlled Component)
+
+React 상태가 폼의 단일 진실 공급원(Single Source of Truth)이 되는 방식입니다.
+
+```jsx
+function LoginForm() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    console.log({ email, password })
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="이메일"
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="비밀번호"
+      />
+      <button type="submit">로그인</button>
+    </form>
+  )
+}
+```
+
+## 객체로 폼 상태 관리
+
+```jsx
+function SignupForm() {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    age: '',
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
+  }
+
+  return (
+    <form>
+      <input name="name" value={form.name} onChange={handleChange} placeholder="이름" />
+      <input name="email" value={form.email} onChange={handleChange} placeholder="이메일" />
+      <input name="age" type="number" value={form.age} onChange={handleChange} placeholder="나이" />
+    </form>
+  )
+}
+```
+
+## 체크박스와 라디오
+
+```jsx
+function OptionsForm() {
+  const [agreed, setAgreed] = useState(false)
+  const [gender, setGender] = useState('')
+
+  return (
+    <form>
+      {/* 체크박스 */}
+      <label>
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+        />
+        약관에 동의합니다
+      </label>
+
+      {/* 라디오 */}
+      {['남성', '여성', '기타'].map(g => (
+        <label key={g}>
+          <input
+            type="radio"
+            name="gender"
+            value={g}
+            checked={gender === g}
+            onChange={(e) => setGender(e.target.value)}
+          />
+          {g}
+        </label>
+      ))}
+    </form>
+  )
+}
+```
+
+## 셀렉트 박스
+
+```jsx
+function CountrySelect() {
+  const [country, setCountry] = useState('')
+
+  return (
+    <select value={country} onChange={(e) => setCountry(e.target.value)}>
+      <option value="">선택하세요</option>
+      <option value="kr">한국</option>
+      <option value="us">미국</option>
+      <option value="jp">일본</option>
+    </select>
+  )
+}
+```
+
+## 비제어 컴포넌트 (Uncontrolled Component)
+
+```jsx
+import { useRef } from 'react'
+
+function FileForm() {
+  const fileRef = useRef(null)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const file = fileRef.current.files[0]
+    console.log('선택된 파일:', file?.name)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="file" ref={fileRef} />
+      <button type="submit">업로드</button>
+    </form>
+  )
+}
+```
+
+## 핵심 정리
+
+- 제어 컴포넌트는 React 상태로 폼 값을 관리합니다.
+- `value`와 `onChange`를 함께 사용해 단방향 흐름을 유지합니다.
+- 체크박스는 `checked`와 `onChange`를 사용합니다.
+- 파일 인풋 같은 특수한 경우 비제어 컴포넌트(useRef)를 사용합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="제어 컴포넌트(Controlled Component)란?"
+  options={[
+    'React가 자동으로 관리하는 폼',
+    'React 상태(state)가 폼 요소의 값을 제어하는 패턴',
+    'HTML 폼의 기본 동작을 사용하는 방식',
+    'useRef로 폼 데이터를 읽는 방식',
+  ]}
+  correctAnswer={2}
+  explanation="제어 컴포넌트는 폼 요소의 value를 React 상태로 관리하고 onChange로 상태를 업데이트합니다. React 상태가 단일 진실 공급원입니다."
+  optionExplanations={[
+    'React 상태가 직접 제어합니다.',
+    '맞습니다. state가 폼 값의 단일 진실 공급원입니다.',
+    'HTML 기본 동작을 사용하는 것은 비제어 방식입니다.',
+    'useRef는 비제어 컴포넌트에서 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="폼 input에 `value={name}`만 있고 `onChange`가 없으면?"
+  options={[
+    '정상 동작한다.',
+    '읽기 전용 인풋이 되어 사용자가 입력할 수 없다.',
+    '자동으로 onChange가 추가된다.',
+    '컴포넌트가 비제어 방식으로 작동한다.',
+  ]}
+  correctAnswer={2}
+  explanation="value만 지정하고 onChange가 없으면 인풋이 고정되어 사용자 입력이 적용되지 않습니다. 읽기 전용이 됩니다. React가 경고를 출력합니다."
+  optionExplanations={[
+    'onChange 없이 value만 있으면 입력이 안 됩니다.',
+    '맞습니다. 읽기 전용 인풋이 됩니다.',
+    '자동으로 추가되지 않습니다.',
+    '비제어 방식은 value 없이 defaultValue를 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="체크박스 제어 컴포넌트에서 사용하는 prop은?"
+  options={[
+    'value와 onChange',
+    'checked와 onChange',
+    'selected와 onChange',
+    'active와 onChange',
+  ]}
+  correctAnswer={2}
+  explanation="체크박스는 텍스트가 아닌 boolean 상태를 가집니다. value 대신 checked prop으로 상태를 제어하고, onChange에서 e.target.checked를 사용합니다."
+  optionExplanations={[
+    'value는 텍스트/숫자 인풋에 사용합니다.',
+    '맞습니다. 체크박스는 checked로 제어합니다.',
+    'selected는 option 요소에 사용합니다.',
+    'active prop은 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="여러 인풋을 하나의 handleChange 함수로 처리할 때 활용하는 속성은?"
+  options={[
+    'id',
+    'data-field',
+    'name 속성과 e.target.name',
+    'className',
+  ]}
+  correctAnswer={3}
+  explanation="각 인풋에 name 속성을 지정하고 e.target.name으로 어느 필드인지 확인한 후 setForm(prev => ({ ...prev, [name]: value }))로 업데이트합니다."
+  optionExplanations={[
+    'id보다 name을 활용합니다.',
+    'data-field도 사용 가능하지만 name이 표준입니다.',
+    '맞습니다. e.target.name으로 폼 필드를 식별합니다.',
+    'className은 스타일용입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="파일 인풋에 제어 컴포넌트 방식을 사용하지 않는 이유는?"
+  options={[
+    'React가 지원하지 않아서',
+    '보안 정책상 파일 인풋의 value는 브라우저에서 직접 설정할 수 없어 비제어 방식을 사용한다.',
+    '파일은 항상 비동기로 처리해야 해서',
+    'useState로 파일 객체를 저장할 수 없어서',
+  ]}
+  correctAnswer={2}
+  explanation="보안상 이유로 파일 인풋의 value를 JavaScript로 설정할 수 없습니다. useRef로 파일 인풋에 접근해 files 프로퍼티를 읽는 비제어 방식을 주로 사용합니다."
+  optionExplanations={[
+    'React가 지원하지 않아서가 아닙니다.',
+    '맞습니다. 브라우저 보안 정책으로 value 설정이 불가합니다.',
+    '비동기 처리는 별개입니다.',
+    'useState로 File 객체는 저장 가능합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="`e.preventDefault()`를 form의 onSubmit에서 호출해야 하는 이유는?"
+  options={[
+    '폼 유효성 검사를 위해',
+    '브라우저가 폼 데이터를 서버에 전송하고 페이지를 리로드하는 기본 동작을 막기 위해',
+    '이벤트 버블링을 막기 위해',
+    '폼 데이터를 초기화하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="HTML 폼의 기본 제출 동작은 HTTP 요청으로 데이터를 보내고 페이지를 새로고침합니다. SPA에서는 preventDefault()로 이를 막고 JavaScript로 처리합니다."
+  optionExplanations={[
+    '유효성 검사는 별도로 구현합니다.',
+    '맞습니다. 페이지 새로고침을 방지합니다.',
+    '이벤트 버블링 방지는 stopPropagation()입니다.',
+    '폼 데이터 초기화는 상태를 리셋하면 됩니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [React - 폼](https://react.dev/learn/reacting-to-input-with-state)

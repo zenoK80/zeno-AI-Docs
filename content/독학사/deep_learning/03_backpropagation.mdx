@@ -1,0 +1,151 @@
+---
+title: '03. 역전파 알고리즘'
+description: '체인 룰을 이용한 역전파 알고리즘의 원리와 경사하강법으로 가중치를 업데이트하는 과정을 이해한다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 역전파(Backpropagation)가 어떻게 체인 룰을 이용해 각 가중치의 기울기를 계산하는지, 그리고 경사하강법으로 가중치를 최적화하는 원리를 이해한다.
+</Callout>
+
+## 신경망 학습의 목표
+
+신경망 학습은 **손실 함수(Loss Function)**의 값을 최소화하는 가중치를 찾는 최적화 문제입니다.
+
+$$L = \text{Loss}(\hat{y}, y)$$
+
+- $\hat{y}$: 신경망의 예측값
+- $y$: 실제 정답값
+
+## 경사하강법 (Gradient Descent)
+
+손실 함수를 최소화하기 위해 기울기(Gradient)의 반대 방향으로 가중치를 업데이트합니다.
+
+$$w \leftarrow w - \eta \frac{\partial L}{\partial w}$$
+
+- $\eta$ (learning rate): 학습률, 업데이트 보폭 크기
+- $\frac{\partial L}{\partial w}$: 가중치 w에 대한 손실의 편미분(기울기)
+
+학습률이 너무 크면 최솟값을 지나치고, 너무 작으면 학습이 느립니다.
+
+## 체인 룰 (Chain Rule)
+
+역전파는 **합성 함수의 미분(체인 룰)**을 이용합니다.
+
+$$\frac{\partial L}{\partial w} = \frac{\partial L}{\partial a} \cdot \frac{\partial a}{\partial z} \cdot \frac{\partial z}{\partial w}$$
+
+- $z = wx + b$ (가중 합)
+- $a = f(z)$ (활성화 함수 적용)
+- $L$ (손실 함수)
+
+각 층의 기울기를 출력층부터 입력층 방향으로 순서대로 계산합니다.
+
+## 역전파 동작 과정
+
+```
+순전파(Forward Pass):
+입력 x → [층1] → [층2] → ... → 출력 ŷ → 손실 L 계산
+
+역전파(Backward Pass):
+손실 L → ∂L/∂w(출력층) → ∂L/∂w(층2) → ∂L/∂w(층1)
+(체인 룰로 각 층의 기울기 계산)
+
+가중치 업데이트:
+w ← w - η × ∂L/∂w
+```
+
+## 계산 그래프
+
+복잡한 신경망의 역전파를 이해하기 위해 **계산 그래프(Computational Graph)**를 사용합니다.
+
+- 순전파: 입력에서 출력 방향으로 계산
+- 역전파: 기울기를 출력에서 입력 방향으로 전파
+
+예시: $z = x \times w + b$의 계산 그래프
+
+```
+x ─┐
+   × ─── + ─── z ─── f ─── a
+w ─┘         b
+```
+
+역전파 시 각 노드는 "국소 기울기(Local Gradient)"를 계산하고, 상위에서 전달받은 기울기를 곱하여 하위로 전달합니다.
+
+## 손실 함수
+
+| 손실 함수 | 수식 | 사용 |
+|---------|------|------|
+| **MSE(평균 제곱 오차)** | $\frac{1}{n}\sum(y_i - \hat{y}_i)^2$ | 회귀 |
+| **Binary Cross-Entropy** | $-[y\log\hat{y} + (1-y)\log(1-\hat{y})]$ | 이진 분류 |
+| **Categorical Cross-Entropy** | $-\sum y_i \log\hat{y}_i$ | 다중 분류 |
+
+## 기울기 소실 문제 (Vanishing Gradient)
+
+Sigmoid나 Tanh의 기울기는 입력이 크거나 작을 때 0에 수렴합니다. 역전파 시 이 작은 기울기가 여러 층을 거치며 곱해지면 점점 작아져 앞쪽 층의 가중치가 업데이트되지 않습니다.
+
+**해결책:**
+- ReLU 사용 (기울기가 0 또는 1)
+- 배치 정규화
+- 잔차 연결(ResNet)
+
+## 핵심 정리
+
+- 역전파: 체인 룰로 각 가중치의 기울기 계산
+- 경사하강법: 기울기 반대 방향으로 가중치 업데이트
+- 손실 함수: 회귀=MSE, 이진 분류=Binary CE, 다중 분류=Categorical CE
+- 기울기 소실: Sigmoid/Tanh에서 발생, ReLU로 완화
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="역전파(Backpropagation) 알고리즘에서 사용하는 수학적 원리는?"
+  options={['테일러 급수(Taylor Series)', '체인 룰(Chain Rule)', '베이즈 정리(Bayes Theorem)', '가우스 소거법']}
+  correctAnswer={2}
+  explanation="역전파는 합성 함수의 미분법인 체인 룰을 이용하여 각 층의 가중치에 대한 손실 함수의 기울기를 계산합니다."
+  optionExplanations={['테일러 급수는 함수를 다항식으로 근사하는 방법입니다.', '역전파는 체인 룰을 이용하여 기울기를 계산합니다. (정답)', '베이즈 정리는 확률 이론에서 조건부 확률 계산에 사용됩니다.', '가우스 소거법은 선형 방정식 계를 푸는 방법입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="경사하강법에서 학습률(Learning Rate)이 너무 클 경우 발생하는 문제는?"
+  options={['학습이 너무 느려진다', '손실 함수의 최솟값을 지나쳐 발산할 수 있다', '기울기 소실 문제가 발생한다', '과소적합이 발생한다']}
+  correctAnswer={2}
+  explanation="학습률이 너무 크면 가중치 업데이트 폭이 너무 커서 최솟값을 지나치거나 손실이 발산할 수 있습니다."
+  optionExplanations={['학습이 느려지는 것은 학습률이 너무 작을 때의 문제입니다.', '학습률이 너무 크면 최솟값을 지나치거나 발산합니다. (정답)', '기울기 소실은 Sigmoid/Tanh 활성화 함수와 관련됩니다.', '과소적합은 모델 표현력이 부족할 때 발생합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="기울기 소실(Vanishing Gradient) 문제가 주로 발생하는 활성화 함수는?"
+  options={['ReLU', 'Leaky ReLU', 'Sigmoid', 'ELU']}
+  correctAnswer={3}
+  explanation="Sigmoid와 Tanh는 입력이 크거나 작을 때 기울기가 0에 수렴합니다. 역전파 시 이 작은 기울기가 곱해지며 앞쪽 층의 기울기가 거의 0이 되는 기울기 소실 문제가 발생합니다."
+  optionExplanations={['ReLU는 양수 영역에서 기울기가 1이어서 기울기 소실 문제가 거의 없습니다.', 'Leaky ReLU도 ReLU와 마찬가지로 기울기 소실 문제를 완화합니다.', 'Sigmoid의 기울기는 최대 0.25로 작아 기울기 소실 문제가 발생합니다. (정답)', 'ELU도 기울기 소실 완화를 위해 설계된 함수입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="회귀(Regression) 문제에서 주로 사용하는 손실 함수는?"
+  options={['Binary Cross-Entropy', 'Categorical Cross-Entropy', 'MSE (Mean Squared Error)', 'Hinge Loss']}
+  correctAnswer={3}
+  explanation="MSE(평균 제곱 오차)는 예측값과 실제값의 차이의 제곱 평균으로, 연속값을 예측하는 회귀 문제에 주로 사용됩니다."
+  optionExplanations={['Binary Cross-Entropy는 이진 분류 문제에 사용됩니다.', 'Categorical Cross-Entropy는 다중 분류 문제에 사용됩니다.', 'MSE는 회귀 문제에 주로 사용되는 손실 함수입니다. (정답)', 'Hinge Loss는 SVM 등에서 사용됩니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="역전파에서 순전파와 역전파의 방향으로 옳은 것은?"
+  options={['둘 다 입력층에서 출력층 방향', '순전파: 출력→입력, 역전파: 입력→출력', '순전파: 입력→출력, 역전파: 출력→입력', '둘 다 출력층에서 입력층 방향']}
+  correctAnswer={3}
+  explanation="순전파는 입력층에서 출력층 방향으로 계산(예측)하고, 역전파는 출력층에서 입력층 방향으로 기울기를 전파합니다."
+  optionExplanations={['역전파는 출력에서 입력 방향으로 진행합니다.', '방향이 반대입니다.', '순전파: 입력→출력, 역전파: 출력→입력이 올바릅니다. (정답)', '순전파는 입력에서 출력 방향입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="기울기 소실(Vanishing Gradient) 문제의 해결 방법이 아닌 것은?"
+  options={['ReLU 활성화 함수 사용', '배치 정규화(Batch Normalization)', 'Sigmoid 활성화 함수 사용', '잔차 연결(Residual Connection)']}
+  correctAnswer={3}
+  explanation="Sigmoid는 기울기 소실의 원인 중 하나입니다. 해결 방법으로는 ReLU 계열 활성화 함수, 배치 정규화, 잔차 연결 등이 있습니다."
+  optionExplanations={['ReLU는 기울기 소실을 완화합니다.', '배치 정규화는 내부 공변량 이동을 줄여 기울기 소실을 완화합니다.', 'Sigmoid는 기울기 소실의 원인입니다. 해결책이 아닙니다. (정답)', '잔차 연결(ResNet)은 기울기를 직접 흐르게 하여 기울기 소실을 해결합니다.']}
+/>

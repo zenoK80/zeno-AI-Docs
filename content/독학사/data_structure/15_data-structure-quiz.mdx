@@ -1,0 +1,296 @@
+---
+title: '15. 자료구조 예상기출문제'
+description: '자료구조 전 범위에 걸친 예상기출 Quiz 20개로 실력을 점검합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 자료구조 전 범위의 핵심 개념을 Quiz로 최종 점검합니다.
+</Callout>
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="추상 자료형(ADT)에 대한 설명으로 옳은 것은?"
+  options={['① 자료의 물리적 구현 방법을 명세한 것이다', '② 자료의 집합과 연산 집합을 구현 없이 명세한 것이다', '③ 알고리즘의 시간 복잡도를 분석하는 방법이다', '④ 자료를 메모리에 저장하는 방식이다']}
+  correctAnswer={2}
+  explanation="ADT(Abstract Data Type)는 자료의 집합과 그 자료에 적용할 연산의 집합을 구현 세부사항 없이 명세한 것입니다."
+  optionExplanations={[
+    '물리적 구현 방법은 ADT가 아닌 구체적 자료구조의 영역입니다.',
+    '맞습니다. ADT는 구현 없이 데이터와 연산만 명세합니다.',
+    '복잡도 분석은 ADT와 별개의 개념입니다.',
+    '메모리 저장 방식은 자료구조의 구현 세부사항입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="시작 주소 100, 원소 크기 4바이트인 1차원 배열 A에서 A[6]의 주소는?"
+  options={['① 106', '② 120', '③ 124', '④ 128']}
+  correctAnswer={3}
+  explanation="addr(A[6]) = 100 + 6 × 4 = 124입니다."
+  optionExplanations={[
+    '100 + 6 = 106은 원소 크기를 고려하지 않은 계산입니다.',
+    '100 + 5×4 = 120은 A[5]의 주소입니다.',
+    '맞습니다. 100 + 6×4 = 124입니다.',
+    '100 + 7×4 = 128은 A[7]의 주소입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="스택에서 오버플로(Overflow)가 발생하는 경우는?"
+  options={['① 빈 스택에서 pop을 시도할 때', '② 가득 찬 스택에 push를 시도할 때', '③ 스택의 top을 조회할 때', '④ 스택을 초기화할 때']}
+  correctAnswer={2}
+  explanation="오버플로는 스택이 가득 찬 상태에서 push를 시도할 때 발생합니다. 반대로 빈 스택에서 pop 시도 시 언더플로가 발생합니다."
+  optionExplanations={[
+    '빈 스택에서 pop 시도는 언더플로입니다.',
+    '맞습니다. 가득 찬 스택에 push 시 오버플로가 발생합니다.',
+    'top 조회는 peek 연산으로 오버/언더플로가 없습니다.',
+    '초기화는 정상 연산입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="크기 5인 원형 큐에서 (rear+1)%5 == front일 때의 상태는?"
+  options={['① 공백 상태', '② 원소가 1개인 상태', '③ 포화 상태', '④ 오류 상태']}
+  correctAnswer={3}
+  explanation="원형 큐에서 (rear+1)%n == front이면 한 칸을 비워두는 방식으로 포화 상태를 나타냅니다."
+  optionExplanations={[
+    '공백 상태는 front == rear입니다.',
+    '원소가 1개인 것은 (front+1)%n == rear입니다.',
+    '맞습니다. (rear+1)%n == front는 포화 상태입니다.',
+    '정상적인 포화 상태 조건입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="단순 연결 리스트에서 삽입/삭제 연산의 시간 복잡도는? (위치를 이미 알고 있는 경우)"
+  options={['① O(1)', '② O(log n)', '③ O(n)', '④ O(n²)']}
+  correctAnswer={1}
+  explanation="연결 리스트에서 포인터만 수정하면 되므로 삽입/삭제는 O(1)입니다. 단, 위치를 모르면 탐색에 O(n)이 필요합니다."
+  optionExplanations={[
+    '맞습니다. 포인터 변경만 필요하므로 O(1)입니다.',
+    'O(log n)은 이진 탐색의 복잡도입니다.',
+    'O(n)은 위치를 모를 때 탐색하는 복잡도입니다.',
+    'O(n²)은 연결 리스트의 삽입/삭제와 무관합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="이진트리에서 전위 순회 순서는?"
+  options={['① 왼쪽 → 루트 → 오른쪽', '② 루트 → 왼쪽 → 오른쪽', '③ 왼쪽 → 오른쪽 → 루트', '④ 오른쪽 → 루트 → 왼쪽']}
+  correctAnswer={2}
+  explanation="전위(Preorder) 순회는 루트를 먼저 방문한 후 왼쪽 서브트리, 오른쪽 서브트리 순서입니다."
+  optionExplanations={[
+    '왼쪽→루트→오른쪽은 중위(Inorder) 순회입니다.',
+    '맞습니다. 전위 순회는 루트→왼→오입니다.',
+    '왼쪽→오른쪽→루트는 후위(Postorder) 순회입니다.',
+    '오른쪽→루트→왼쪽은 역방향 중위 순회입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="이진 탐색 트리(BST)에서 탐색의 평균 시간 복잡도는?"
+  options={['① O(1)', '② O(log n)', '③ O(n)', '④ O(n²)']}
+  correctAnswer={2}
+  explanation="균형 잡힌 BST에서 탐색은 매 단계 절반을 제거하므로 O(log n)입니다. 편향 트리에서는 최악 O(n)이 됩니다."
+  optionExplanations={[
+    'O(1)은 해시 테이블 탐색 복잡도입니다.',
+    '맞습니다. 균형 BST의 평균 탐색은 O(log n)입니다.',
+    'O(n)은 편향 BST의 최악 탐색 복잡도입니다.',
+    'O(n²)은 BST 탐색의 복잡도가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="Max-Heap에서 삭제 연산 후 수행되는 과정은?"
+  options={['① 마지막 원소를 삭제하고 Sift-Up 수행', '② 루트를 제거하고 마지막 원소를 루트로 이동 후 Sift-Down 수행', '③ 루트를 제거하고 왼쪽 자식을 루트로 승격', '④ 루트를 제거하고 오른쪽 자식을 루트로 승격']}
+  correctAnswer={2}
+  explanation="힙 삭제는 루트를 제거하고 마지막 원소를 루트 자리에 놓은 후, 힙 성질을 복원하기 위해 Sift-Down(위에서 아래로 재정렬)을 수행합니다."
+  optionExplanations={[
+    '마지막 원소를 삭제하면 힙 구조 유지가 어렵습니다.',
+    '맞습니다. 루트 제거 후 마지막 원소를 루트로, 그 후 Sift-Down입니다.',
+    '왼쪽 자식만 승격하면 오른쪽 서브트리가 처리되지 않습니다.',
+    '오른쪽 자식만 승격하면 왼쪽 서브트리가 처리되지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="그래프의 인접 리스트 표현에서 공간 복잡도는? (V: 정점 수, E: 간선 수)"
+  options={['① O(V²)', '② O(V)', '③ O(E)', '④ O(V + E)']}
+  correctAnswer={4}
+  explanation="인접 리스트는 각 정점에 대한 헤더 배열(O(V))과 모든 간선(O(E))을 저장하므로 총 O(V+E)의 공간이 필요합니다."
+  optionExplanations={[
+    'O(V²)는 인접 행렬의 공간 복잡도입니다.',
+    'O(V)는 정점만의 공간입니다.',
+    'O(E)는 간선만의 공간입니다.',
+    '맞습니다. 인접 리스트의 공간 복잡도는 O(V+E)입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="다익스트라 알고리즘으로 최단경로를 구할 수 없는 경우는?"
+  options={['① 가중치가 모두 양수인 방향 그래프', '② 가중치가 모두 양수인 무방향 그래프', '③ 음의 가중치가 존재하는 그래프', '④ 완전 그래프']}
+  correctAnswer={3}
+  explanation="다익스트라 알고리즘은 음의 가중치가 있으면 최단경로를 잘못 계산할 수 있습니다. 음의 가중치에는 벨만-포드를 사용해야 합니다."
+  optionExplanations={[
+    '양수 가중치 방향 그래프는 다익스트라 적용이 가능합니다.',
+    '양수 가중치 무방향 그래프도 다익스트라 적용이 가능합니다.',
+    '맞습니다. 음의 가중치 그래프는 다익스트라를 사용할 수 없습니다.',
+    '완전 그래프도 다익스트라를 적용할 수 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="버블 정렬의 최선 시간 복잡도는? (개선된 버블 정렬 사용 시)"
+  options={['① O(1)', '② O(log n)', '③ O(n)', '④ O(n²)']}
+  correctAnswer={3}
+  explanation="개선된 버블 정렬은 이미 정렬된 배열에서 교환이 한 번도 없으면 즉시 종료하므로 최선 O(n)을 달성합니다."
+  optionExplanations={[
+    'O(1)은 불가능한 복잡도입니다.',
+    'O(log n)은 이진 탐색의 복잡도입니다.',
+    '맞습니다. 개선 버블 정렬의 최선은 O(n)입니다.',
+    'O(n²)은 버블 정렬의 평균/최악 복잡도입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="합병 정렬(Merge Sort)의 추가 메모리 필요량은?"
+  options={['① O(1)', '② O(log n)', '③ O(n)', '④ O(n²)']}
+  correctAnswer={3}
+  explanation="합병 정렬은 두 배열을 합병할 때 임시 배열을 사용하므로 O(n)의 추가 메모리가 필요합니다."
+  optionExplanations={[
+    'O(1)은 제자리 정렬(힙 정렬, 삽입 정렬 등)의 추가 메모리입니다.',
+    'O(log n)은 재귀 스택의 깊이입니다.',
+    '맞습니다. 합병 정렬은 O(n) 추가 메모리가 필요합니다.',
+    'O(n²)은 합병 정렬의 추가 메모리가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="이진 탐색의 시간 복잡도는?"
+  options={['① O(1)', '② O(log n)', '③ O(n)', '④ O(n log n)']}
+  correctAnswer={2}
+  explanation="이진 탐색은 매 단계 탐색 범위를 절반으로 줄이므로 O(log n)의 시간 복잡도를 갖습니다."
+  optionExplanations={[
+    'O(1)은 해시 탐색의 평균 복잡도입니다.',
+    '맞습니다. 이진 탐색은 O(log n)입니다.',
+    'O(n)은 순차 탐색의 복잡도입니다.',
+    'O(n log n)은 비교 기반 정렬의 최적 복잡도입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="해시 테이블에서 클러스터링(Clustering) 문제를 일으키는 충돌 처리 방법은?"
+  options={['① 체이닝', '② 선형 조사법', '③ 이중 해싱', '④ 이차 조사법']}
+  correctAnswer={2}
+  explanation="선형 조사법은 충돌 시 연속된 다음 슬롯을 탐색하므로, 충돌한 원소들이 연속된 슬롯에 몰리는 1차 클러스터링 문제가 발생합니다."
+  optionExplanations={[
+    '체이닝은 연결 리스트를 사용하여 클러스터링이 없습니다.',
+    '맞습니다. 선형 조사법이 1차 클러스터링을 일으킵니다.',
+    '이중 해싱은 클러스터링을 줄이는 방법입니다.',
+    '이차 조사법은 2차 클러스터링이 발생하지만 1차보다 덜합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="동적 프로그래밍(DP)과 분할 정복의 차이점으로 옳은 것은?"
+  options={['① DP는 재귀를 사용하지 않는다', '② DP는 겹치는 부분 문제의 결과를 저장하여 재사용한다', '③ 분할 정복이 항상 더 빠르다', '④ 두 기법은 동일한 알고리즘이다']}
+  correctAnswer={2}
+  explanation="DP는 겹치는 부분 문제의 결과를 저장(메모)하여 재사용하므로 중복 계산을 방지합니다. 분할 정복은 부분 문제가 독립적이어서 중복이 없습니다."
+  optionExplanations={[
+    'DP의 메모이제이션 방식은 재귀를 사용합니다.',
+    '맞습니다. DP의 핵심은 겹치는 부분 문제 결과의 재사용입니다.',
+    '상황에 따라 다릅니다.',
+    '두 기법은 서로 다른 알고리즘 설계 기법입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={16}
+  question="AVL 트리에서 노드 삽입 후 균형 인수가 2가 되었을 때 필요한 작업은?"
+  options={['① 아무 작업도 필요 없다', '② 해당 노드를 삭제한다', '③ 회전 연산으로 균형을 복구한다', '④ 트리를 재구성한다']}
+  correctAnswer={3}
+  explanation="AVL 트리에서 균형 인수가 ±1을 초과하면 LL, RR, LR, RL 유형에 맞는 회전(Rotation) 연산으로 균형을 복구합니다."
+  optionExplanations={[
+    'AVL 트리는 균형 인수 ±1 유지가 필수입니다.',
+    '노드 삭제는 균형 복구 방법이 아닙니다.',
+    '맞습니다. 회전 연산으로 균형을 복구합니다.',
+    '전체 트리 재구성은 비효율적입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={17}
+  question="BFS(너비 우선 탐색)와 DFS(깊이 우선 탐색)의 시간 복잡도는? (인접 리스트 기준)"
+  options={['① BFS: O(V²), DFS: O(V+E)', '② BFS: O(V+E), DFS: O(V+E)', '③ BFS: O(V+E), DFS: O(V²)', '④ BFS: O(V²), DFS: O(V²)']}
+  correctAnswer={2}
+  explanation="인접 리스트를 사용할 때 BFS와 DFS 모두 각 정점과 간선을 한 번씩 방문하므로 O(V+E)의 시간 복잡도를 갖습니다."
+  optionExplanations={[
+    'BFS도 O(V+E)입니다.',
+    '맞습니다. BFS와 DFS 모두 O(V+E)입니다.',
+    'DFS도 O(V+E)입니다.',
+    'O(V²)는 인접 행렬을 사용할 때의 복잡도입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={18}
+  question="퀵 정렬에서 피벗 선택 방법으로 최악을 피하기 위한 방법은?"
+  options={['① 항상 첫 번째 원소를 피벗으로 선택', '② 항상 마지막 원소를 피벗으로 선택', '③ 중간값(Median-of-Three) 방법으로 피벗 선택', '④ 피벗을 사용하지 않는다']}
+  correctAnswer={3}
+  explanation="중간값(Median-of-Three) 방법은 배열의 처음, 중간, 끝 원소 중 중간값을 피벗으로 선택하여 최악의 경우를 방지합니다."
+  optionExplanations={[
+    '첫 번째 원소 선택은 이미 정렬된 배열에서 최악이 됩니다.',
+    '마지막 원소 선택도 특정 경우 최악이 됩니다.',
+    '맞습니다. Median-of-Three는 최악 방지에 효과적입니다.',
+    '피벗 없이는 퀵 정렬이 불가능합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={19}
+  question="다음 중 안정 정렬(Stable Sort)이 아닌 것은?"
+  options={['① 버블 정렬', '② 삽입 정렬', '③ 합병 정렬', '④ 힙 정렬']}
+  correctAnswer={4}
+  explanation="힙 정렬은 힙 구조를 이용하여 원소를 이동할 때 동일 키 원소의 상대적 순서가 변할 수 있어 불안정 정렬입니다."
+  optionExplanations={[
+    '버블 정렬은 안정 정렬입니다.',
+    '삽입 정렬은 안정 정렬입니다.',
+    '합병 정렬은 안정 정렬입니다.',
+    '맞습니다. 힙 정렬은 불안정 정렬입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={20}
+  question="n개의 정점을 가진 신장 트리(Spanning Tree)의 간선 수는?"
+  options={['① n', '② n-1', '③ n+1', '④ n(n-1)/2']}
+  correctAnswer={2}
+  explanation="신장 트리는 사이클 없이 모든 정점을 연결하는 최소 연결 그래프로, 항상 정점 수보다 1 적은 n-1개의 간선을 갖습니다."
+  optionExplanations={[
+    'n개의 간선이면 사이클이 1개 생깁니다.',
+    '맞습니다. 신장 트리의 간선 수는 n-1입니다.',
+    'n+1개의 간선은 트리가 아닙니다.',
+    'n(n-1)/2는 완전 그래프의 간선 수입니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [국가평생교육진흥원 독학학위제](https://bdes.nile.or.kr/nile/study/nStudy1_1.do)
+- Ellis Horowitz, "Fundamentals of Data Structures"
+- 독학사 기출 출제 기준 (2단계 자료구조)

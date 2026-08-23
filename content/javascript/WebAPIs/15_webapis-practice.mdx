@@ -1,0 +1,394 @@
+---
+title: '15. Web API 핵심 퀴즈'
+description: 'Web API 전 범위 예상 기출문제 20선'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** Web API 전 범위(DOM, 이벤트, Fetch, Storage, Timer, Canvas, Worker 등)를 종합 복습합니다.
+</Callout>
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="`document.querySelector('.item')`이 반환하는 것은?"
+  options={[
+    '조건에 맞는 모든 요소의 배열',
+    '조건에 맞는 첫 번째 요소 하나',
+    'NodeList',
+    'HTMLCollection',
+  ]}
+  correctAnswer={2}
+  explanation="querySelector는 조건에 맞는 첫 번째 요소 하나를 반환합니다. 없으면 null을 반환합니다."
+  optionExplanations={[
+    '모든 요소는 querySelectorAll이 반환합니다.',
+    '맞습니다. 첫 번째 요소 하나입니다.',
+    'querySelectorAll이 NodeList를 반환합니다.',
+    'getElementsByClassName 등이 HTMLCollection을 반환합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`textContent`와 `innerHTML`의 차이는?"
+  options={[
+    '차이가 없다.',
+    'textContent는 텍스트만, innerHTML은 HTML 마크업도 파싱한다.',
+    'innerHTML이 더 안전하다.',
+    'textContent는 읽기 전용이다.',
+  ]}
+  correctAnswer={2}
+  explanation="textContent는 HTML 태그 없이 순수 텍스트를 설정/반환합니다. innerHTML은 HTML 파싱 후 렌더링하므로 XSS 위험이 있습니다."
+  optionExplanations={[
+    '보안성과 동작 방식이 다릅니다.',
+    '맞습니다. textContent는 안전, innerHTML은 HTML 파싱합니다.',
+    'innerHTML은 XSS 위험이 있어 더 안전하지 않습니다.',
+    'textContent는 읽기/쓰기 모두 가능합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="이벤트 버블링(Event Bubbling)이란?"
+  options={[
+    '이벤트가 부모에서 자식으로 전파된다.',
+    '이벤트가 발생한 요소부터 document까지 부모 방향으로 전파된다.',
+    '이벤트가 취소된다.',
+    '이벤트가 중복으로 발생한다.',
+  ]}
+  correctAnswer={2}
+  explanation="버블링은 이벤트가 발생한 요소에서 시작해 부모 요소들을 거쳐 document까지 올라가는 전파 방식입니다."
+  optionExplanations={[
+    '자식으로 내려가는 것은 캡처링 단계입니다.',
+    '맞습니다. 하위 요소에서 상위 방향으로 전파됩니다.',
+    '이벤트 취소와 관련이 없습니다.',
+    '이벤트 중복 발생이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="이벤트 위임(Event Delegation)이 유리한 상황은?"
+  options={[
+    '단 하나의 버튼만 있을 때',
+    '이벤트를 취소해야 할 때',
+    '동적으로 추가되는 다수의 자식 요소에 이벤트를 처리해야 할 때',
+    '이벤트가 캡처 단계에서 처리되어야 할 때',
+  ]}
+  correctAnswer={3}
+  explanation="이벤트 위임은 부모에 리스너를 하나만 두고 자식들의 이벤트를 처리합니다. 동적으로 생성되는 요소에도 자동으로 적용됩니다."
+  optionExplanations={[
+    '하나일 때는 위임이 필요 없습니다.',
+    '이벤트 취소와 위임은 별개입니다.',
+    '맞습니다. 다수의 동적 자식 요소 처리에 효과적입니다.',
+    '캡처와 위임은 별개 개념입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`fetch('/api')`가 reject되는 경우는?"
+  options={[
+    '서버가 404를 반환할 때',
+    '서버가 500을 반환할 때',
+    '네트워크 연결 오류나 CORS 차단이 발생할 때',
+    '응답 본문이 비어 있을 때',
+  ]}
+  correctAnswer={3}
+  explanation="fetch는 HTTP 오류 상태(404, 500)에서는 reject되지 않고 fulfilled됩니다. 네트워크 연결 실패나 CORS 정책 위반 시에만 reject됩니다."
+  optionExplanations={[
+    '404는 fulfilled 상태로 response.ok가 false입니다.',
+    '500도 fulfilled 상태로 반환됩니다.',
+    '맞습니다. 네트워크 오류와 CORS 차단이 reject 원인입니다.',
+    '빈 본문도 fulfilled 상태입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="`localStorage`와 `sessionStorage`의 차이는?"
+  options={[
+    '저장 용량이 다르다.',
+    'localStorage는 탭이 닫혀도 유지되고, sessionStorage는 탭이 닫히면 삭제된다.',
+    'sessionStorage가 더 보안이 높다.',
+    'localStorage는 JSON만 저장 가능하다.',
+  ]}
+  correctAnswer={2}
+  explanation="localStorage는 명시적으로 삭제하지 않는 한 영구 보존됩니다. sessionStorage는 탭(브라우저 세션)이 닫히면 자동으로 삭제됩니다."
+  optionExplanations={[
+    '용량은 둘 다 약 5MB로 비슷합니다.',
+    '맞습니다. 지속 시간이 핵심 차이입니다.',
+    '보안 차이는 주된 구분이 아닙니다.',
+    '둘 다 문자열만 저장하므로 JSON.stringify가 필요합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="`requestAnimationFrame`을 `setInterval` 대신 애니메이션에 사용하는 이유는?"
+  options={[
+    'setInterval은 사용이 어렵기 때문에',
+    '브라우저의 렌더링 주기에 맞춰 실행되어 부드럽고 효율적인 애니메이션이 가능하다.',
+    'requestAnimationFrame이 더 빠르게 실행되기 때문에',
+    'setInterval은 여러 번 호출이 불가하기 때문에',
+  ]}
+  correctAnswer={2}
+  explanation="requestAnimationFrame은 브라우저가 다음 프레임을 그리기 직전에 콜백을 실행합니다. 보통 60fps에 동기화되며, 탭이 비활성 상태이면 자동으로 멈춰 성능을 절약합니다."
+  optionExplanations={[
+    'setInterval도 간단하지만 애니메이션에 부적합합니다.',
+    '맞습니다. 렌더링 주기 동기화가 핵심 장점입니다.',
+    '반드시 더 빠르지는 않습니다.',
+    'setInterval도 여러 번 호출 가능합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="`FormData`의 주요 용도는?"
+  options={[
+    'DOM 요소를 생성한다.',
+    '폼 데이터와 파일을 포함한 multipart/form-data 요청을 쉽게 보낼 수 있다.',
+    'localStorage에 데이터를 저장한다.',
+    'CSS 스타일을 동적으로 변경한다.',
+  ]}
+  correctAnswer={2}
+  explanation="FormData는 폼 요소의 데이터와 파일을 자동으로 수집하고 multipart/form-data 형식으로 서버에 전송할 때 사용합니다."
+  optionExplanations={[
+    'DOM 생성은 createElement로 합니다.',
+    '맞습니다. 폼 데이터와 파일 전송에 사용합니다.',
+    'Storage와 관련이 없습니다.',
+    'CSS 변경이 목적이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="`canvas.getContext('2d')`로 얻는 것은?"
+  options={[
+    '캔버스 요소 자체',
+    '2D 렌더링 컨텍스트 객체 (ctx)',
+    'WebGL 컨텍스트',
+    '이미지 데이터',
+  ]}
+  correctAnswer={2}
+  explanation="getContext('2d')는 2D 렌더링 컨텍스트(CanvasRenderingContext2D) 객체를 반환합니다. 이 객체의 메서드로 도형, 이미지, 텍스트를 그립니다."
+  optionExplanations={[
+    '캔버스 요소는 document.querySelector로 얻습니다.',
+    "맞습니다. '2d' 컨텍스트 객체를 반환합니다.",
+    "WebGL은 getContext('webgl')입니다.",
+    '이미지 데이터는 getImageData()로 얻습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="Web Worker가 DOM에 접근하려면 어떻게 해야 하나요?"
+  options={[
+    'document 객체를 import해서 사용한다.',
+    '직접 접근은 불가하며, postMessage로 메인 스레드에 요청해야 한다.',
+    'Worker 내에서 DOM API를 그대로 사용할 수 있다.',
+    'Shadow DOM을 통해 접근한다.',
+  ]}
+  correctAnswer={2}
+  explanation="Web Worker는 별도 스레드이므로 DOM에 직접 접근할 수 없습니다. 계산 결과를 postMessage로 메인 스레드에 보내면 메인 스레드가 DOM을 업데이트합니다."
+  optionExplanations={[
+    'Worker에서 document에 접근하면 오류가 발생합니다.',
+    '맞습니다. 메시지 패싱으로 간접 접근합니다.',
+    'DOM API는 Worker에서 사용 불가합니다.',
+    'Shadow DOM도 Worker에서 접근할 수 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="Intersection Observer에서 `threshold: 0.5`의 의미는?"
+  options={[
+    '요소가 0.5픽셀 보일 때 트리거된다.',
+    '요소의 50%가 뷰포트에 교차될 때 콜백이 호출된다.',
+    '500ms 후에 콜백이 호출된다.',
+    '요소의 50%가 숨겨질 때만 트리거된다.',
+  ]}
+  correctAnswer={2}
+  explanation="threshold는 요소와 뷰포트의 교차 비율 기준입니다. 0.5이면 요소의 50%가 보일 때 콜백이 호출됩니다."
+  optionExplanations={[
+    '픽셀 단위가 아닌 비율입니다.',
+    '맞습니다. 0.5는 50% 교차 시 트리거입니다.',
+    '시간과 관련이 없습니다.',
+    '진입과 이탈 모두에서 트리거됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="Service Worker를 등록할 수 있는 환경은?"
+  options={[
+    'HTTP와 HTTPS 모두',
+    'HTTPS 또는 localhost',
+    'Node.js 환경에서만',
+    '특정 브라우저 플러그인 설치 시에만',
+  ]}
+  correctAnswer={2}
+  explanation="Service Worker는 보안 컨텍스트(HTTPS 또는 localhost)에서만 등록 가능합니다. HTTP 환경에서는 보안 위험으로 지원하지 않습니다."
+  optionExplanations={[
+    'HTTP에서는 등록 불가합니다.',
+    '맞습니다. HTTPS나 localhost가 필수입니다.',
+    '브라우저 환경에서 동작합니다.',
+    '별도 플러그인이 필요 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="`e.stopPropagation()`과 `e.preventDefault()`의 차이는?"
+  options={[
+    '동일한 기능이다.',
+    'stopPropagation은 이벤트 전파를 중단하고, preventDefault는 브라우저 기본 동작을 막는다.',
+    'preventDefault가 이벤트 전파를 중단한다.',
+    'stopPropagation이 브라우저 기본 동작을 막는다.',
+  ]}
+  correctAnswer={2}
+  explanation="stopPropagation()은 이벤트가 부모로 전파되는 것을 막고, preventDefault()는 링크 이동, 폼 제출 등 브라우저 기본 동작을 막습니다."
+  optionExplanations={[
+    '서로 다른 역할을 합니다.',
+    '맞습니다. 전파 중단과 기본 동작 차단이 각각의 역할입니다.',
+    'preventDefault는 전파와 무관합니다.',
+    'stopPropagation은 기본 동작을 막지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="Fetch API에서 POST 요청으로 JSON을 보내는 올바른 방법은?"
+  options={[
+    "fetch('/api', { method: 'POST', body: data })",
+    "fetch('/api', { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' } })",
+    "fetch('/api').post(data)",
+    "fetch('/api', { json: data })",
+  ]}
+  correctAnswer={2}
+  explanation="fetch로 JSON을 보낼 때 body에 JSON.stringify(data)를 설정하고 Content-Type 헤더를 'application/json'으로 지정해야 합니다."
+  optionExplanations={[
+    'JSON.stringify와 Content-Type 헤더가 필요합니다.',
+    '맞습니다. JSON.stringify와 Content-Type 설정이 모두 필요합니다.',
+    'fetch에는 .post() 메서드가 없습니다.',
+    'json 옵션이 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="`DOMContentLoaded`와 `load` 이벤트의 차이는?"
+  options={[
+    '차이가 없다.',
+    'DOMContentLoaded는 HTML 파싱 완료 시, load는 이미지/스타일시트 등 모든 리소스 로딩 완료 시 발생한다.',
+    'load가 항상 먼저 발생한다.',
+    'DOMContentLoaded는 script 태그에서만 사용한다.',
+  ]}
+  correctAnswer={2}
+  explanation="DOMContentLoaded는 HTML 파싱이 끝나 DOM이 준비되면 발생합니다. load는 이미지, 스타일시트, 폰트 등 모든 외부 리소스까지 로딩이 완료된 후 발생합니다."
+  optionExplanations={[
+    '발생 시점이 다릅니다.',
+    '맞습니다. DOM 준비 vs 전체 리소스 로딩 완료의 차이입니다.',
+    'DOMContentLoaded가 항상 먼저 발생합니다.',
+    'document에서도 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={16}
+  question="`AbortController`를 Fetch API와 함께 사용하는 이유는?"
+  options={[
+    '요청 URL을 수정하기 위해',
+    '진행 중인 fetch 요청을 취소하기 위해',
+    '요청 헤더를 추가하기 위해',
+    'JSON 응답을 파싱하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="AbortController를 사용하면 fetch에 signal을 전달해 요청 도중 controller.abort()를 호출하여 요청을 취소할 수 있습니다."
+  optionExplanations={[
+    'URL 수정 용도가 아닙니다.',
+    '맞습니다. 요청 취소가 목적입니다.',
+    '헤더는 fetch 옵션으로 추가합니다.',
+    'JSON 파싱은 response.json()으로 합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={17}
+  question="`navigator.geolocation.watchPosition()`을 사용하는 경우는?"
+  options={[
+    '위치를 한 번만 가져올 때',
+    '사용자의 위치 변화를 지속적으로 감시할 때',
+    '지도를 표시할 때',
+    '권한을 확인할 때',
+  ]}
+  correctAnswer={2}
+  explanation="watchPosition()은 사용자가 이동할 때마다 콜백을 호출합니다. getCurrentPosition()은 한 번만 가져옵니다."
+  optionExplanations={[
+    '한 번만 가져올 때는 getCurrentPosition()을 씁니다.',
+    '맞습니다. 위치 변화를 지속 감시합니다.',
+    '지도 표시는 별도 API가 필요합니다.',
+    '권한 확인과 직접 관련이 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={18}
+  question="canvas `ctx.save()`를 호출하는 이유는?"
+  options={[
+    '캔버스 이미지를 파일로 저장하기 위해',
+    '현재 fillStyle, transform 등 컨텍스트 상태를 스택에 저장해 restore()로 되돌리기 위해',
+    '그린 도형을 고정하기 위해',
+    '새 레이어를 만들기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="save()는 현재 컨텍스트 상태(색상, 변환, 클리핑 등)를 스택에 저장합니다. 변환 적용 후 restore()로 이전 상태로 되돌릴 수 있습니다."
+  optionExplanations={[
+    '파일 저장은 canvas.toDataURL() 등을 씁니다.',
+    '맞습니다. 상태 스택 저장과 복원이 목적입니다.',
+    '도형 고정과 관련 없습니다.',
+    '캔버스는 레이어 개념이 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={19}
+  question="`localStorage.setItem('key', obj)`처럼 객체를 직접 저장하면 어떻게 되나요?"
+  options={[
+    '객체가 그대로 저장된다.',
+    '"[object Object]" 문자열로 저장된다.',
+    '오류가 발생한다.',
+    '자동으로 JSON으로 변환된다.',
+  ]}
+  correctAnswer={2}
+  explanation="localStorage는 문자열만 저장합니다. 객체를 직접 전달하면 toString()이 호출되어 '[object Object]'로 저장됩니다. JSON.stringify()로 직렬화해야 합니다."
+  optionExplanations={[
+    '객체 그대로 저장되지 않습니다.',
+    '맞습니다. "[object Object]" 문자열이 됩니다.',
+    '오류는 발생하지 않고 잘못된 값이 저장됩니다.',
+    '자동 변환이 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={20}
+  question="Intersection Observer에서 이미지 지연 로딩 구현 시 로딩 후 `unobserve(img)`를 호출하는 이유는?"
+  options={[
+    '이미지를 삭제하기 위해',
+    '이미지가 이미 로드되었으므로 더 이상 감시가 필요 없어 불필요한 리소스를 해제하기 위해',
+    '이미지 재로딩을 막기 위해',
+    '메모리 오류를 방지하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="이미지를 한 번 로드한 후에는 더 이상 교차 감지가 필요 없습니다. unobserve()를 호출해 감시를 중단하면 메모리와 리소스가 절약됩니다."
+  optionExplanations={[
+    '이미지 삭제가 목적이 아닙니다.',
+    '맞습니다. 불필요한 감시를 해제해 최적화합니다.',
+    '재로딩 방지보다는 최적화가 목적입니다.',
+    '오류 방지가 주된 이유가 아닙니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - Web APIs](https://developer.mozilla.org/ko/docs/Web/API)

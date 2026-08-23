@@ -1,0 +1,245 @@
+---
+title: '21. Set과 Map'
+description: 'Set, Map, WeakSet, WeakMap의 사용법과 활용 시나리오를 코드로 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** Set과 Map의 특징과 사용법을 이해하고 일반 배열/객체와의 차이를 구분합니다.
+</Callout>
+
+## Set — 중복 없는 값 집합
+
+`Set`은 고유한 값만 저장합니다.
+
+```js
+const set = new Set([1, 2, 3, 2, 1])
+console.log(set)        // Set(3) {1, 2, 3}
+console.log(set.size)   // 3
+
+set.add(4)
+set.delete(2)
+set.has(3)      // true
+set.has(2)      // false
+
+// 순회
+for (const v of set) {
+  console.log(v)  // 1, 3, 4
+}
+
+// 배열로 변환
+const arr = [...set]  // [1, 3, 4]
+```
+
+## Set 활용 — 배열 중복 제거
+
+```js
+const withDuplicates = [1, 2, 2, 3, 3, 4]
+const unique = [...new Set(withDuplicates)]
+console.log(unique)  // [1, 2, 3, 4]
+```
+
+## Set으로 집합 연산
+
+```js
+const a = new Set([1, 2, 3, 4])
+const b = new Set([3, 4, 5, 6])
+
+const union = new Set([...a, ...b])         // 합집합
+const intersection = new Set([...a].filter(x => b.has(x)))  // 교집합
+const difference = new Set([...a].filter(x => !b.has(x)))   // 차집합
+
+console.log([...union])        // [1, 2, 3, 4, 5, 6]
+console.log([...intersection]) // [3, 4]
+console.log([...difference])   // [1, 2]
+```
+
+## Map — 키-값 쌍 컬렉션
+
+`Map`은 모든 타입을 키로 사용할 수 있고, 삽입 순서를 유지합니다.
+
+```js
+const map = new Map()
+map.set('name', '철수')
+map.set(1, '숫자 키')
+map.set({ id: 1 }, '객체 키')
+
+console.log(map.get('name'))  // '철수'
+console.log(map.has(1))       // true
+console.log(map.size)         // 3
+
+map.delete('name')
+
+// 초기화
+const map2 = new Map([
+  ['a', 1],
+  ['b', 2],
+])
+```
+
+## Map 순회
+
+```js
+for (const [key, value] of map2) {
+  console.log(key, value)
+}
+
+map2.forEach((value, key) => {
+  console.log(key, value)
+})
+
+console.log([...map2.keys()])    // ['a', 'b']
+console.log([...map2.values()])  // [1, 2]
+console.log([...map2.entries()]) // [['a', 1], ['b', 2]]
+```
+
+## Map vs Object
+
+| | Map | Object |
+| --- | --- | --- |
+| 키 타입 | 모든 타입 | 문자열/Symbol |
+| 순서 | 삽입 순서 보장 | 정수 키 우선 |
+| 크기 확인 | `.size` | `Object.keys().length` |
+| 성능 | 잦은 삽입/삭제에 유리 | 정적 구조에 유리 |
+
+## WeakSet과 WeakMap
+
+`WeakSet`과 `WeakMap`은 객체만 키(또는 항목)로 가질 수 있고, 참조가 없어지면 가비지 컬렉션 대상이 됩니다.
+
+```js
+let obj = { data: '중요' }
+const wm = new WeakMap()
+wm.set(obj, '연결된 데이터')
+
+console.log(wm.get(obj))  // '연결된 데이터'
+
+obj = null  // 참조 해제 → obj와 wm의 항목 모두 GC 대상
+```
+
+WeakMap의 용도: DOM 요소에 연결된 데이터, 캐시, private 데이터 저장.
+
+<Callout type="warning">
+  WeakSet과 WeakMap은 이터러블이 아닙니다. `forEach`, `size`, `keys()` 등을 사용할 수 없습니다.
+</Callout>
+
+## 핵심 정리
+
+- Set은 중복 없는 값 집합이며 배열 중복 제거에 유용합니다.
+- Map은 모든 타입의 키를 지원하며 삽입 순서를 유지합니다.
+- WeakSet/WeakMap은 가비지 컬렉션에 영향을 주지 않는 약한 참조를 유지합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Set에 동일한 값을 여러 번 추가하면 어떻게 되나요?"
+  options={[
+    '오류가 발생한다.',
+    '값이 여러 개 저장된다.',
+    '중복이 무시되어 값은 하나만 저장된다.',
+    '기존 값이 삭제된다.',
+  ]}
+  correctAnswer={3}
+  explanation="Set은 중복을 허용하지 않습니다. 이미 있는 값을 add()해도 무시됩니다."
+  optionExplanations={[
+    '오류가 아닌 조용한 무시입니다.',
+    '중복이 저장되지 않습니다.',
+    '맞습니다. Set은 고유한 값만 유지합니다.',
+    '기존 값이 삭제되지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="Map과 일반 Object의 차이로 옳은 것은?"
+  options={[
+    'Map은 순서를 보장하지 않는다.',
+    'Object는 어떤 타입이든 키로 사용할 수 있다.',
+    'Map은 어떤 타입이든 키로 사용 가능하며 삽입 순서를 보장한다.',
+    'Object가 Map보다 항상 성능이 좋다.',
+  ]}
+  correctAnswer={3}
+  explanation="Map은 객체, 함수, 숫자 등 모든 타입을 키로 사용할 수 있고 삽입 순서를 보장합니다. Object는 키가 문자열 또는 Symbol만 가능합니다."
+  optionExplanations={[
+    'Map은 삽입 순서를 보장합니다.',
+    'Object의 키는 문자열과 Symbol만 가능합니다.',
+    '맞습니다. Map의 키 타입 유연성과 순서 보장이 장점입니다.',
+    '잦은 삽입/삭제에는 Map이 더 유리합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="WeakMap과 Map의 핵심 차이는?"
+  options={[
+    'WeakMap은 문자열 키만 허용한다.',
+    'WeakMap은 객체 키만 허용하며 키 객체가 다른 곳에서 참조되지 않으면 가비지 컬렉션된다.',
+    'WeakMap은 더 많은 값을 저장할 수 있다.',
+    'WeakMap은 forEach로 순회 가능하다.',
+  ]}
+  correctAnswer={2}
+  explanation="WeakMap의 키는 반드시 객체여야 합니다. 키 객체에 대한 다른 참조가 없어지면 WeakMap의 항목도 자동으로 GC됩니다."
+  optionExplanations={[
+    'WeakMap은 문자열이 아닌 객체만 키로 허용합니다.',
+    '맞습니다. 약한 참조(weak reference)가 핵심 특징입니다.',
+    '저장 용량과 관련이 없습니다.',
+    'WeakMap은 이터러블이 아니며 forEach가 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="배열에서 중복을 제거하는 가장 간단한 방법은?"
+  options={[
+    'arr.filter((v, i) => arr.indexOf(v) === i)',
+    '[...new Set(arr)]',
+    'arr.reduce((acc, v) => acc.includes(v) ? acc : [...acc, v], [])',
+    'arr.unique()',
+  ]}
+  correctAnswer={2}
+  explanation="Set은 중복을 허용하지 않으므로 new Set(arr)로 중복을 제거하고 [...] 전개로 배열로 변환합니다."
+  optionExplanations={[
+    '동작하지만 더 복잡합니다.',
+    '맞습니다. 가장 간단하고 명확한 방법입니다.',
+    '동작하지만 더 복잡합니다.',
+    'unique()는 JavaScript 내장 메서드가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="Map에서 값을 가져오는 메서드는?"
+  options={['map.value(key)', 'map.get(key)', 'map[key]', 'map.fetch(key)']}
+  correctAnswer={2}
+  explanation="Map에서 값을 가져올 때는 get(key) 메서드를 사용합니다. 대괄호 표기법은 Map에서 동작하지 않습니다."
+  optionExplanations={[
+    'value() 메서드는 없습니다.',
+    '맞습니다. map.get(key)가 올바른 방법입니다.',
+    '대괄호 표기법은 Map의 프로퍼티 접근이지 내용 접근이 아닙니다.',
+    'fetch() 메서드는 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="Set으로 교집합을 구하는 방법은?"
+  options={[
+    'new Set(a + b)',
+    'new Set([...a].filter(x => b.has(x)))',
+    'a.intersect(b)',
+    'Set.intersection(a, b)',
+  ]}
+  correctAnswer={2}
+  explanation="a를 배열로 펼쳐 filter로 b에도 있는 것만 남기고 새 Set을 만들면 교집합입니다."
+  optionExplanations={[
+    '+ 연산자는 Set에 사용할 수 없습니다.',
+    '맞습니다. filter와 has()를 조합하는 방법입니다.',
+    'intersect() 메서드는 없습니다.',
+    'Set.intersection은 없습니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - Set](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Set)
+- [MDN - Map](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Map)
+- [MDN - WeakMap](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/WeakMap)

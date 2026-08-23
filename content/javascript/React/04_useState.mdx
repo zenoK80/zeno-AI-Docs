@@ -1,0 +1,284 @@
+---
+title: '04. useState'
+description: 'React의 상태 관리 훅 useState, 상태 업데이트, 불변성 원칙을 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** useState로 컴포넌트 상태를 관리하고, 상태 업데이트의 비동기성과 불변성 원칙을 이해합니다.
+</Callout>
+
+## useState 기본
+
+```jsx
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)  // 초기값 0
+
+  return (
+    <div>
+      <p>카운트: {count}</p>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+      <button onClick={() => setCount(count - 1)}>-1</button>
+      <button onClick={() => setCount(0)}>초기화</button>
+    </div>
+  )
+}
+```
+
+## 다양한 타입의 상태
+
+```jsx
+function Form() {
+  const [name, setName] = useState('')
+  const [age, setAge] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
+  const [items, setItems] = useState([])
+  const [user, setUser] = useState({ name: '', email: '' })
+
+  return (
+    <input
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      placeholder="이름"
+    />
+  )
+}
+```
+
+## 함수형 업데이트
+
+이전 상태를 기반으로 업데이트할 때는 함수형 업데이트를 사용합니다.
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  const increment = () => {
+    // 직접 값 사용 (잠재적 버그 가능)
+    setCount(count + 1)
+
+    // 함수형 업데이트 (안전)
+    setCount(prev => prev + 1)
+  }
+
+  const incrementThree = () => {
+    // 비동기 때문에 3번 호출해도 1만 증가
+    setCount(count + 1)
+    setCount(count + 1)
+    setCount(count + 1)
+
+    // 함수형 업데이트로 3 증가
+    setCount(prev => prev + 1)
+    setCount(prev => prev + 1)
+    setCount(prev => prev + 1)
+  }
+
+  return <button onClick={incrementThree}>{count}</button>
+}
+```
+
+## 객체 상태와 불변성
+
+```jsx
+function Profile() {
+  const [user, setUser] = useState({ name: '김철수', age: 25 })
+
+  const updateName = () => {
+    // 틀린 방법: 직접 수정
+    user.name = '이영희'
+    setUser(user)  // 동일 참조라 리렌더링 안 됨
+
+    // 옳은 방법: 새 객체 생성 (불변성 유지)
+    setUser({ ...user, name: '이영희' })
+  }
+
+  return (
+    <div>
+      <p>{user.name} ({user.age})</p>
+      <button onClick={updateName}>이름 변경</button>
+    </div>
+  )
+}
+```
+
+## 배열 상태와 불변성
+
+```jsx
+function TodoList() {
+  const [todos, setTodos] = useState([
+    { id: 1, text: '공부하기', done: false },
+  ])
+
+  // 추가
+  const addTodo = (text) => {
+    setTodos([...todos, { id: Date.now(), text, done: false }])
+  }
+
+  // 삭제
+  const deleteTodo = (id) => {
+    setTodos(todos.filter(todo => todo.id !== id))
+  }
+
+  // 완료 토글
+  const toggleTodo = (id) => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, done: !todo.done } : todo
+    ))
+  }
+
+  return (
+    <ul>
+      {todos.map(todo => (
+        <li key={todo.id}>
+          <span style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>
+            {todo.text}
+          </span>
+          <button onClick={() => toggleTodo(todo.id)}>완료</button>
+          <button onClick={() => deleteTodo(todo.id)}>삭제</button>
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+## 지연 초기화
+
+초기값 계산이 복잡할 때 함수를 전달합니다.
+
+```jsx
+function App() {
+  // 매 렌더링마다 호출됨 (비효율)
+  const [data] = useState(expensiveCalculation())
+
+  // 초기 렌더링 시에만 호출됨 (효율적)
+  const [data2] = useState(() => expensiveCalculation())
+}
+```
+
+## 핵심 정리
+
+- `useState`로 컴포넌트 상태를 선언하고 setter 함수로 업데이트합니다.
+- 이전 상태 기반 업데이트는 함수형 업데이트 `prev => prev + 1`을 사용합니다.
+- 객체/배열 상태는 직접 수정하지 말고 새 값을 생성합니다(불변성).
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="`useState`에서 반환되는 두 가지는?"
+  options={[
+    '현재 상태와 이전 상태',
+    '현재 상태와 상태를 업데이트하는 함수',
+    '상태와 props',
+    '상태와 ref',
+  ]}
+  correctAnswer={2}
+  explanation="useState는 [현재 상태값, 상태 업데이트 함수] 배열을 반환합니다. 구조 분해 할당으로 받습니다."
+  optionExplanations={[
+    '이전 상태는 함수형 업데이트의 인수로 받습니다.',
+    '맞습니다. 현재 상태와 setter 함수입니다.',
+    'props는 useState와 별개입니다.',
+    'useRef와 혼동하지 마세요.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="함수형 업데이트 `setCount(prev => prev + 1)`를 사용해야 하는 경우는?"
+  options={[
+    '항상 사용해야 한다.',
+    '이전 상태 값을 기반으로 새 상태를 계산할 때, 특히 연속 호출 시',
+    '초기값을 설정할 때',
+    '비동기 작업이 없을 때',
+  ]}
+  correctAnswer={2}
+  explanation="이전 상태 기반으로 업데이트할 때, 특히 같은 이벤트에서 여러 번 setCount를 호출하거나 클로저 문제가 있을 때 함수형 업데이트가 안전합니다."
+  optionExplanations={[
+    '단순 값 할당 시에는 직접 값을 써도 됩니다.',
+    '맞습니다. 이전 상태 기반 연산이나 연속 호출 시 사용합니다.',
+    '초기값 설정과 관련 없습니다.',
+    '비동기가 없어도 안전한 방법입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="객체 상태를 업데이트할 때 `setUser({ ...user, name: '새이름' })`처럼 스프레드하는 이유는?"
+  options={[
+    '문법적 편의를 위해',
+    '불변성을 유지하기 위해 새 객체를 만들어 React가 변화를 감지하도록',
+    '기존 객체를 삭제하기 위해',
+    'TypeScript 타입 호환을 위해',
+  ]}
+  correctAnswer={2}
+  explanation="React는 상태 참조 비교로 변화를 감지합니다. 기존 객체를 직접 수정하면 참조가 같아 리렌더링이 되지 않습니다. 새 객체를 만들어야 합니다."
+  optionExplanations={[
+    '편의성보다 불변성이 핵심 이유입니다.',
+    '맞습니다. 새 객체를 만들어야 React가 변화를 인식합니다.',
+    '기존 객체를 삭제하지 않습니다.',
+    'TypeScript와 무관합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="배열 상태에서 항목을 삭제하는 올바른 방법은?"
+  options={[
+    'todos.splice(index, 1); setTodos(todos)',
+    'setTodos(todos.filter(todo => todo.id !== id))',
+    'delete todos[index]; setTodos(todos)',
+    'todos.length = todos.length - 1; setTodos(todos)',
+  ]}
+  correctAnswer={2}
+  explanation="filter는 새 배열을 반환하므로 불변성을 유지합니다. splice나 delete는 원본 배열을 수정해 React가 변화를 감지 못합니다."
+  optionExplanations={[
+    'splice는 원본 배열을 변경합니다.',
+    '맞습니다. filter로 새 배열을 만들어 setTodos에 전달합니다.',
+    'delete는 원본 배열을 변경합니다.',
+    '원본 배열을 변경합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`useState(() => expensiveCalculation())`처럼 함수를 전달하는 이유는?"
+  options={[
+    '에러를 방지하기 위해',
+    '초기값 계산을 최초 렌더링 시에만 실행하고 이후 렌더링에서는 무시하기 위해',
+    '비동기 초기화를 위해',
+    '타입 검사를 위해',
+  ]}
+  correctAnswer={2}
+  explanation="useState에 직접 함수 호출 결과를 전달하면 매 렌더링마다 실행됩니다. 함수 자체를 전달하면 최초 렌더링 시에만 실행됩니다(지연 초기화)."
+  optionExplanations={[
+    '에러 방지가 주된 이유가 아닙니다.',
+    '맞습니다. 비용이 큰 계산을 초기화 시에만 실행합니다.',
+    '동기 초기화입니다.',
+    '타입 검사와 무관합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="상태를 직접 수정하면(`state.value = 'new'`) 안 되는 이유는?"
+  options={[
+    'JavaScript 문법 오류가 발생한다.',
+    '참조가 바뀌지 않아 React가 상태 변화를 감지하지 못하고 리렌더링이 발생하지 않는다.',
+    '항상 리렌더링이 발생한다.',
+    '메모리 누수가 발생한다.',
+  ]}
+  correctAnswer={2}
+  explanation="React는 참조 비교(===)로 상태 변화를 감지합니다. 같은 객체를 수정하면 참조가 동일해 변화를 감지하지 못해 UI가 갱신되지 않습니다."
+  optionExplanations={[
+    'JavaScript 문법 오류는 아닙니다.',
+    '맞습니다. 참조가 바뀌지 않아 리렌더링이 안 됩니다.',
+    '리렌더링이 발생하지 않습니다.',
+    '메모리 누수보다 리렌더링 미발생이 문제입니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [React - State: 컴포넌트의 메모리](https://react.dev/learn/state-a-components-memory)

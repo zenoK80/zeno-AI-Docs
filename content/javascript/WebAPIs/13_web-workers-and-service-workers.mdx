@@ -1,0 +1,247 @@
+---
+title: '13. Web Workers와 Service Workers'
+description: 'Web Worker로 백그라운드 처리하고, Service Worker로 PWA 기초를 구현합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** Web Worker로 무거운 계산을 메인 스레드에서 분리하고, Service Worker로 오프라인 캐싱을 구현하는 방법을 익힙니다.
+</Callout>
+
+## Web Worker란
+
+JavaScript는 기본적으로 싱글 스레드입니다. 무거운 계산이 실행되면 UI가 멈춥니다. **Web Worker**를 사용하면 별도 스레드에서 계산을 처리할 수 있습니다.
+
+```js
+// main.js
+const worker = new Worker('/worker.js')
+
+// 워커에 메시지 보내기
+worker.postMessage({ type: 'calculate', data: [1, 2, 3, 4, 5] })
+
+// 워커에서 결과 받기
+worker.onmessage = (event) => {
+  console.log('결과:', event.data)
+}
+
+worker.onerror = (error) => {
+  console.error('워커 오류:', error.message)
+}
+
+// 워커 종료
+worker.terminate()
+```
+
+```js
+// worker.js
+self.onmessage = (event) => {
+  const { type, data } = event.data
+
+  if (type === 'calculate') {
+    const result = data.reduce((sum, n) => sum + n, 0)
+    self.postMessage(result)
+  }
+}
+```
+
+## Web Worker 제한 사항
+
+- DOM에 직접 접근 불가
+- `window` 객체 없음
+- 파일 시스템 접근 제한
+- 동일 출처 정책 적용
+
+## 전용 워커 vs 공유 워커
+
+```js
+// 전용 워커 (Dedicated Worker) - 하나의 페이지와 1:1
+const worker = new Worker('/worker.js')
+
+// 공유 워커 (Shared Worker) - 여러 탭/페이지가 공유
+const shared = new SharedWorker('/shared-worker.js')
+shared.port.onmessage = (e) => console.log(e.data)
+shared.port.postMessage('hello')
+```
+
+## Service Worker 개요
+
+**Service Worker**는 브라우저와 네트워크 사이에 있는 프록시입니다. 오프라인 지원, 백그라운드 동기화, 푸시 알림에 사용됩니다.
+
+## Service Worker 등록
+
+```js
+// main.js
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js')
+      console.log('SW 등록됨:', registration.scope)
+    } catch (err) {
+      console.error('SW 등록 실패:', err)
+    }
+  })
+}
+```
+
+## Service Worker 파일 (sw.js)
+
+```js
+const CACHE_NAME = 'my-app-v1'
+const CACHED_URLS = ['/', '/index.html', '/style.css', '/app.js']
+
+// 설치 단계: 리소스 캐시
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(CACHED_URLS))
+  )
+})
+
+// 활성화 단계: 이전 캐시 정리
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
+      )
+    )
+  )
+})
+
+// 네트워크 요청 가로채기: 캐시 우선 전략
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      return cached || fetch(event.request)
+    })
+  )
+})
+```
+
+## 핵심 정리
+
+- Web Worker는 메인 스레드와 별도로 무거운 계산을 수행합니다.
+- `postMessage()`와 `onmessage`로 메인 스레드와 통신합니다.
+- Service Worker는 네트워크 요청을 가로채 캐싱, 오프라인 지원을 구현합니다.
+- HTTPS 환경에서만 Service Worker가 등록됩니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Web Worker를 사용하는 주된 이유는?"
+  options={[
+    '서버 사이드 렌더링을 위해',
+    '무거운 계산을 별도 스레드에서 처리하여 메인 스레드(UI)가 멈추지 않게 하기 위해',
+    '네트워크 요청을 가로채기 위해',
+    'DOM을 빠르게 업데이트하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="Web Worker는 별도 스레드에서 계산을 처리하므로 무거운 작업이 있어도 UI가 끊기지 않습니다."
+  optionExplanations={[
+    'Web Worker는 브라우저 측 기술입니다.',
+    '맞습니다. 메인 스레드 블로킹 방지가 핵심 목적입니다.',
+    '네트워크 가로채기는 Service Worker의 역할입니다.',
+    'Web Worker에서는 DOM에 접근할 수 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="Web Worker에서 할 수 없는 것은?"
+  options={[
+    '복잡한 수학 계산',
+    '네트워크 요청(fetch)',
+    'DOM 조작',
+    'JSON 파싱',
+  ]}
+  correctAnswer={3}
+  explanation="Web Worker는 별도 스레드에서 실행되므로 DOM에 직접 접근할 수 없습니다. DOM 업데이트가 필요하면 메인 스레드에 postMessage로 결과를 보내야 합니다."
+  optionExplanations={[
+    '수학 계산은 Web Worker의 주 용도입니다.',
+    'Web Worker에서도 fetch 사용이 가능합니다.',
+    '맞습니다. DOM 접근은 불가합니다.',
+    'JSON 파싱도 Web Worker에서 할 수 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Service Worker의 주된 역할은?"
+  options={[
+    'JavaScript 코드를 최적화한다.',
+    '네트워크 요청을 가로채 캐싱, 오프라인 지원, 푸시 알림 등을 구현한다.',
+    'CSS 스타일을 처리한다.',
+    '데이터베이스를 관리한다.',
+  ]}
+  correctAnswer={2}
+  explanation="Service Worker는 브라우저와 서버 사이에서 프록시 역할을 합니다. 캐시 전략, 오프라인 페이지, 백그라운드 동기화, 푸시 알림에 사용됩니다."
+  optionExplanations={[
+    'JS 최적화는 Service Worker의 역할이 아닙니다.',
+    '맞습니다. 네트워크 가로채기가 핵심 기능입니다.',
+    'CSS 처리와 관련이 없습니다.',
+    '데이터베이스 관리는 IndexedDB 등을 씁니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="Service Worker를 등록하기 위한 필수 조건은?"
+  options={[
+    '모든 환경에서 사용 가능하다.',
+    'HTTPS 환경(또는 localhost)이어야 한다.',
+    'Node.js가 필요하다.',
+    '특정 브라우저에서만 사용 가능하다.',
+  ]}
+  correctAnswer={2}
+  explanation="Service Worker는 보안 컨텍스트(HTTPS 또는 localhost)에서만 등록 가능합니다. HTTP에서는 보안 위험이 있어 지원하지 않습니다."
+  optionExplanations={[
+    'HTTPS 조건이 필요합니다.',
+    '맞습니다. HTTPS나 localhost가 필요합니다.',
+    'Node.js가 필요하지 않습니다.',
+    '대부분의 최신 브라우저가 지원합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="Service Worker의 fetch 이벤트에서 `Cache First` 전략이란?"
+  options={[
+    '항상 네트워크에서 먼저 요청한다.',
+    '캐시에 있으면 캐시를 반환하고, 없으면 네트워크에 요청한다.',
+    '모든 요청을 거부한다.',
+    '네트워크 요청 후 항상 캐시를 업데이트한다.',
+  ]}
+  correctAnswer={2}
+  explanation="Cache First(캐시 우선) 전략은 캐시에 리소스가 있으면 즉시 반환하고, 없으면 네트워크에 요청합니다. 빠른 응답과 오프라인 지원에 적합합니다."
+  optionExplanations={[
+    '네트워크 우선은 Network First 전략입니다.',
+    '맞습니다. 캐시 → 네트워크 순서로 처리합니다.',
+    '요청을 거부하는 전략이 아닙니다.',
+    'Stale While Revalidate 전략과 가깝습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="메인 스레드와 Web Worker 간의 통신 방법은?"
+  options={[
+    '공유 변수를 직접 사용한다.',
+    'postMessage()로 메시지를 보내고 onmessage로 받는다.',
+    'HTTP 요청으로 통신한다.',
+    '이벤트 리스너로 DOM을 공유한다.',
+  ]}
+  correctAnswer={2}
+  explanation="메인 스레드와 Web Worker는 postMessage()로 메시지를 보내고 onmessage(또는 addEventListener('message'))로 받습니다. 직접 변수나 메모리를 공유하지 않습니다."
+  optionExplanations={[
+    '공유 변수는 기본적으로 불가합니다(SharedArrayBuffer 제외).',
+    '맞습니다. 메시지 패싱 방식으로 통신합니다.',
+    'HTTP 요청 없이 메시지로 통신합니다.',
+    'DOM을 공유할 수 없습니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - Web Workers API](https://developer.mozilla.org/ko/docs/Web/API/Web_Workers_API)
+- [MDN - Service Worker API](https://developer.mozilla.org/ko/docs/Web/API/Service_Worker_API)

@@ -1,0 +1,256 @@
+---
+title: '18. Promise와 async/await'
+description: '콜백 지옥, Promise, async/await, 에러 처리를 코드로 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 비동기 코드를 Promise와 async/await로 다루는 방법과 에러 처리 패턴을 익힙니다.
+</Callout>
+
+## 동기 vs 비동기
+
+```js
+// 동기: 순서대로 실행
+console.log('1')
+console.log('2')
+console.log('3')  // 1, 2, 3 순서
+
+// 비동기: 나중에 실행
+console.log('1')
+setTimeout(() => console.log('2'), 1000)
+console.log('3')  // 1, 3, 2 순서 (2는 1초 후)
+```
+
+## 콜백 지옥
+
+비동기 작업을 중첩된 콜백으로 처리하면 코드가 복잡해집니다.
+
+```js
+fetchUser(id, function(user) {
+  fetchOrders(user.id, function(orders) {
+    fetchProduct(orders[0].productId, function(product) {
+      // 점점 깊어지는 중첩...
+    })
+  })
+})
+```
+
+## Promise
+
+비동기 작업의 완료(또는 실패)를 나타내는 객체입니다. 세 가지 상태를 가집니다.
+
+- `pending`: 대기 중
+- `fulfilled`: 성공 완료 → `.then()` 실행
+- `rejected`: 실패 → `.catch()` 실행
+
+```js
+const p = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    const success = true
+    if (success) {
+      resolve('완료!')
+    } else {
+      reject(new Error('실패'))
+    }
+  }, 1000)
+})
+
+p.then(result => console.log(result))
+ .catch(err => console.error(err.message))
+ .finally(() => console.log('항상 실행'))
+```
+
+## Promise 체이닝
+
+`.then()`은 새 Promise를 반환하므로 체이닝할 수 있습니다.
+
+```js
+fetchUser(id)
+  .then(user => fetchOrders(user.id))
+  .then(orders => fetchProduct(orders[0].productId))
+  .then(product => console.log(product))
+  .catch(err => console.error(err))
+```
+
+## Promise 유틸리티
+
+```js
+// 여러 Promise 동시 실행
+const [user, settings] = await Promise.all([
+  fetchUser(id),
+  fetchSettings(id),
+])
+
+// 가장 먼저 완료된 것만
+const result = await Promise.race([
+  slowTask(),
+  fastTask(),
+])
+
+// 모두 완료, 성공/실패 모두 포함
+const results = await Promise.allSettled([
+  fetchA(),
+  fetchB(),
+])
+```
+
+## async/await
+
+`async` 함수는 항상 Promise를 반환합니다. `await`는 Promise가 완료될 때까지 기다립니다.
+
+```js
+async function loadUserData(id) {
+  const user = await fetchUser(id)
+  const orders = await fetchOrders(user.id)
+  return { user, orders }
+}
+```
+
+## 에러 처리
+
+```js
+async function getData() {
+  try {
+    const data = await fetchData()
+    return data
+  } catch (error) {
+    console.error('에러:', error.message)
+    return null
+  } finally {
+    console.log('완료')
+  }
+}
+```
+
+여러 await를 한 번에 처리하거나 각각 처리할 수 있습니다.
+
+```js
+// 각각 처리
+async function fn() {
+  try {
+    const a = await fetchA()
+  } catch (e) { /* A 에러 처리 */ }
+
+  try {
+    const b = await fetchB()
+  } catch (e) { /* B 에러 처리 */ }
+}
+```
+
+## 핵심 정리
+
+- Promise는 비동기 결과를 pending/fulfilled/rejected 상태로 표현합니다.
+- `.then().catch().finally()`로 체이닝하거나 `async/await`로 동기 코드처럼 작성합니다.
+- `Promise.all`은 모두 완료, `Promise.race`는 가장 먼저 완료된 것을 처리합니다.
+- `async/await`에서 에러는 `try/catch`로 처리합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Promise의 상태 중 아직 완료되지 않은 초기 상태는?"
+  options={['fulfilled', 'rejected', 'pending', 'settled']}
+  correctAnswer={3}
+  explanation="Promise는 pending(대기 중), fulfilled(성공), rejected(실패) 세 가지 상태를 가집니다. 초기 상태는 pending입니다."
+  optionExplanations={[
+    'fulfilled는 성공 완료 상태입니다.',
+    'rejected는 실패 상태입니다.',
+    '맞습니다. pending이 초기 대기 상태입니다.',
+    'settled는 fulfilled나 rejected로 결정된 상태를 통칭하는 표현입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="async 함수의 반환값은 항상 무엇인가요?"
+  options={['undefined', '배열', 'Promise', '일반 값']}
+  correctAnswer={3}
+  explanation="async 함수는 값을 반환해도 항상 그 값으로 resolved된 Promise를 반환합니다."
+  optionExplanations={[
+    'async 함수는 undefined가 아닌 Promise를 반환합니다.',
+    '배열이 아닌 Promise를 반환합니다.',
+    '맞습니다. async 함수는 항상 Promise를 반환합니다.',
+    '일반 값처럼 보여도 Promise로 감싸집니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Promise.all()의 특징은?"
+  options={[
+    '가장 먼저 완료된 Promise의 결과를 반환한다.',
+    '모든 Promise가 fulfilled 상태가 되어야 결과 배열을 반환하며, 하나라도 reject되면 전체가 reject된다.',
+    '실패한 Promise를 무시하고 성공한 것만 반환한다.',
+    '순서에 상관없이 완료된 순서대로 결과를 반환한다.',
+  ]}
+  correctAnswer={2}
+  explanation="Promise.all은 모든 Promise가 성공해야 결과 배열을 반환합니다. 하나라도 실패하면 즉시 reject됩니다."
+  optionExplanations={[
+    '가장 먼저 완료되는 것은 Promise.race()입니다.',
+    '맞습니다. 모두 성공해야 하며 하나 실패 시 전체 실패입니다.',
+    '실패를 무시하는 것은 Promise.allSettled()를 쓸 때입니다.',
+    '입력 순서대로 결과 배열이 반환됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="async/await에서 비동기 에러를 처리하는 방법은?"
+  options={[
+    '.catch() 체이닝만 가능하다.',
+    'try/catch 블록으로 처리한다.',
+    '에러는 자동으로 무시된다.',
+    'setTimeout으로 처리한다.',
+  ]}
+  correctAnswer={2}
+  explanation="async/await를 사용하면 비동기 에러도 try/catch로 동기 코드처럼 처리할 수 있습니다."
+  optionExplanations={[
+    'try/catch 방식이 더 자연스럽습니다.',
+    '맞습니다. try/catch로 비동기 에러를 잡을 수 있습니다.',
+    '에러는 자동으로 무시되지 않고 처리하지 않으면 uncaught rejection이 됩니다.',
+    'setTimeout은 에러 처리 방법이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="await 없이 async 함수 안에서 Promise를 반환하면 어떻게 되나요?"
+  options={[
+    'Promise 객체 자체가 반환된다.',
+    '자동으로 await가 적용된다.',
+    '오류가 발생한다.',
+    'undefined가 반환된다.',
+  ]}
+  correctAnswer={1}
+  explanation="await를 붙이지 않으면 Promise 객체 자체가 다음 줄로 전달됩니다. 값이 필요하면 await를 붙여야 합니다."
+  optionExplanations={[
+    '맞습니다. await 없이는 Promise 객체가 그대로 전달됩니다.',
+    '자동 await는 없습니다.',
+    '오류가 발생하지 않습니다.',
+    'undefined가 아닌 Promise가 반환됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="Promise.allSettled()를 사용하는 이유는?"
+  options={[
+    '가장 빠른 Promise의 결과를 얻기 위해',
+    '일부 Promise가 실패해도 나머지 결과를 모두 얻고 싶을 때',
+    'Promise를 순차적으로 실행하기 위해',
+    'Promise를 취소하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="allSettled는 모든 Promise가 성공/실패와 관계없이 완료될 때까지 기다린 뒤 각각의 결과(status, value/reason)를 배열로 반환합니다."
+  optionExplanations={[
+    '가장 빠른 것은 Promise.race()입니다.',
+    '맞습니다. 실패한 것도 포함해 모든 결과를 받습니다.',
+    '순차 실행은 체이닝이나 for-await-of를 씁니다.',
+    'Promise 취소는 AbortController를 씁니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - Promise](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+- [MDN - async function](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Statements/async_function)

@@ -1,0 +1,248 @@
+---
+title: '05. 이벤트 시스템'
+description: 'addEventListener, 이벤트 버블링/캡처링, 이벤트 위임을 코드로 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 이벤트 등록 방법과 버블링/캡처링 전파 방식, 이벤트 위임 패턴을 익힙니다.
+</Callout>
+
+## 이벤트 등록 — addEventListener
+
+```js
+const button = document.querySelector('button')
+
+function handleClick(event) {
+  console.log('클릭됨', event.target)
+}
+
+button.addEventListener('click', handleClick)
+
+// 이벤트 제거 (같은 함수 참조 필요)
+button.removeEventListener('click', handleClick)
+```
+
+## 이벤트 객체 (Event)
+
+핸들러 함수가 받는 이벤트 객체에는 다양한 정보가 담겨 있습니다.
+
+```js
+button.addEventListener('click', (event) => {
+  console.log(event.type)       // 'click'
+  console.log(event.target)     // 실제 클릭된 요소
+  console.log(event.currentTarget) // 리스너가 등록된 요소
+  console.log(event.clientX, event.clientY) // 클릭 좌표
+
+  event.preventDefault()         // 기본 동작 취소
+  event.stopPropagation()        // 버블링 중단
+})
+```
+
+## 이벤트 전파 — 버블링과 캡처링
+
+이벤트는 세 단계로 전파됩니다.
+
+1. **캡처링 단계**: 최상위(`document`)에서 이벤트 발생 요소로 내려옵니다.
+2. **타겟 단계**: 이벤트 발생 요소에서 처리합니다.
+3. **버블링 단계**: 이벤트 발생 요소에서 최상위로 올라갑니다.
+
+```js
+const parent = document.querySelector('.parent')
+const child = document.querySelector('.child')
+
+// 버블링 단계 처리 (기본)
+parent.addEventListener('click', () => console.log('parent 버블링'))
+child.addEventListener('click', () => console.log('child 버블링'))
+// child 클릭 시: child → parent 순으로 출력
+
+// 캡처링 단계 처리 (세 번째 인수 true 또는 { capture: true })
+parent.addEventListener('click', () => console.log('parent 캡처링'), true)
+// child 클릭 시: parent 캡처링 → child 순으로 출력
+```
+
+## stopPropagation vs preventDefault
+
+```js
+// stopPropagation: 이벤트 전파(버블링/캡처링)를 중단
+child.addEventListener('click', (e) => {
+  e.stopPropagation()   // 부모로 버블링 안 됨
+})
+
+// preventDefault: 기본 동작만 취소 (전파는 계속)
+const link = document.querySelector('a')
+link.addEventListener('click', (e) => {
+  e.preventDefault()    // 페이지 이동 취소
+  // 버블링은 계속됨
+})
+```
+
+## 이벤트 위임 (Event Delegation)
+
+개별 요소가 아닌 부모에 리스너를 달고, 이벤트가 버블링될 때 `event.target`으로 구분합니다.
+
+```js
+const list = document.querySelector('ul')
+
+list.addEventListener('click', (event) => {
+  if (event.target.tagName === 'LI') {
+    event.target.classList.toggle('done')
+  }
+  if (event.target.matches('.delete-btn')) {
+    event.target.closest('li').remove()
+  }
+})
+```
+
+장점:
+- 리스너 수가 적어 메모리 절약
+- 동적으로 추가된 요소에도 자동 적용
+
+## once 옵션 — 한 번만 실행
+
+```js
+button.addEventListener('click', handler, { once: true })
+// 한 번 실행 후 자동으로 리스너 제거
+```
+
+## 커스텀 이벤트
+
+```js
+const myEvent = new CustomEvent('userLogin', {
+  detail: { username: '철수' },
+  bubbles: true,
+})
+
+document.dispatchEvent(myEvent)
+
+document.addEventListener('userLogin', (e) => {
+  console.log(e.detail.username)  // '철수'
+})
+```
+
+## 핵심 정리
+
+- `addEventListener(type, handler)`로 이벤트를 등록하고 `removeEventListener`로 제거합니다.
+- 이벤트는 캡처링 → 타겟 → 버블링 순으로 전파됩니다.
+- `stopPropagation()`은 전파를 중단하고, `preventDefault()`는 기본 동작을 취소합니다.
+- 이벤트 위임으로 동적 요소를 효율적으로 처리합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="이벤트 버블링이란?"
+  options={[
+    '이벤트가 최상위에서 타겟 요소로 내려가는 것',
+    '이벤트가 타겟 요소에서 최상위 조상으로 올라가는 것',
+    '이벤트를 취소하는 것',
+    '이벤트 핸들러를 등록하는 것',
+  ]}
+  correctAnswer={2}
+  explanation="버블링은 이벤트가 발생한 요소에서 시작해 부모, 조상 순으로 올라가는 전파 방식입니다."
+  optionExplanations={[
+    '최상위에서 내려가는 것은 캡처링입니다.',
+    '맞습니다. 아래에서 위로 이벤트가 전파됩니다.',
+    '이벤트 취소는 preventDefault()입니다.',
+    '이벤트 등록은 addEventListener()입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`event.target`과 `event.currentTarget`의 차이는?"
+  options={[
+    '둘 다 리스너가 등록된 요소를 가리킨다.',
+    'target은 실제 이벤트가 발생한 요소, currentTarget은 리스너가 등록된 요소이다.',
+    'currentTarget은 부모 요소를 가리킨다.',
+    '두 프로퍼티는 항상 같다.',
+  ]}
+  correctAnswer={2}
+  explanation="target은 클릭 등 이벤트가 실제 발생한 요소이고, currentTarget은 addEventListener가 등록된 요소입니다. 버블링 시 두 값이 달라집니다."
+  optionExplanations={[
+    'currentTarget이 리스너 등록 요소입니다.',
+    '맞습니다. 버블링 단계에서는 두 값이 다를 수 있습니다.',
+    'currentTarget이 항상 부모를 가리키지는 않습니다.',
+    '이벤트 전파 중에는 달라질 수 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="이벤트 위임(event delegation)의 장점은?"
+  options={[
+    '이벤트 전파를 완전히 막을 수 있다.',
+    '리스너를 부모에 하나만 달아도 되어 메모리 효율적이고 동적 요소에도 자동 적용된다.',
+    '동기적으로 이벤트를 처리한다.',
+    '캡처링 단계에서만 동작한다.',
+  ]}
+  correctAnswer={2}
+  explanation="이벤트 위임은 부모에 리스너 하나로 모든 자식 요소의 이벤트를 처리합니다. 리스너가 적어 메모리 절약되고 나중에 추가된 요소에도 동작합니다."
+  optionExplanations={[
+    '이벤트 전파 차단은 stopPropagation()을 씁니다.',
+    '맞습니다. 효율성과 동적 요소 대응이 핵심 장점입니다.',
+    '동기/비동기와 관련이 없습니다.',
+    '버블링 단계를 이용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`event.preventDefault()`의 동작은?"
+  options={[
+    '이벤트 버블링을 중단한다.',
+    '이벤트 리스너를 제거한다.',
+    '링크 이동, 폼 제출 같은 브라우저의 기본 동작을 취소한다.',
+    '이벤트를 다시 발생시킨다.',
+  ]}
+  correctAnswer={3}
+  explanation="preventDefault()는 이벤트의 기본 동작(링크 이동, 폼 제출, 체크박스 토글 등)을 취소합니다. 이벤트 전파는 계속됩니다."
+  optionExplanations={[
+    '버블링 중단은 stopPropagation()입니다.',
+    '리스너 제거는 removeEventListener()입니다.',
+    '맞습니다. 브라우저 기본 동작을 막습니다.',
+    '이벤트를 재발생시키는 것은 dispatchEvent()입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="addEventListener의 세 번째 인수 `{ once: true }`는 무엇을 의미하나요?"
+  options={[
+    '이벤트를 한 번만 캡처링 단계에서 처리한다.',
+    '핸들러가 한 번 실행된 후 자동으로 리스너가 제거된다.',
+    '이벤트를 한 번만 발생시킨다.',
+    '버블링을 한 번만 허용한다.',
+  ]}
+  correctAnswer={2}
+  explanation="{ once: true } 옵션은 핸들러가 처음 호출된 후 리스너를 자동으로 제거합니다. removeEventListener를 직접 호출하지 않아도 됩니다."
+  optionExplanations={[
+    '캡처링 단계를 지정하려면 { capture: true }를 씁니다.',
+    '맞습니다. 한 번 실행 후 자동 제거됩니다.',
+    '이벤트 발생 횟수를 제한하는 것이 아닙니다.',
+    '버블링과 직접 관련이 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="커스텀 이벤트를 생성하는 올바른 방법은?"
+  options={[
+    "document.createEvent('myEvent')",
+    "new CustomEvent('myEvent', { detail: { data: '...' } })",
+    "new Event('myEvent', { custom: true })",
+    "document.fireEvent('myEvent')",
+  ]}
+  correctAnswer={2}
+  explanation="CustomEvent 생성자에 이벤트 이름과 detail 옵션으로 커스텀 데이터를 담은 이벤트를 만듭니다. dispatchEvent()로 발생시킵니다."
+  optionExplanations={[
+    "createEvent()는 구식 API입니다.",
+    "맞습니다. CustomEvent로 커스텀 데이터를 담을 수 있습니다.",
+    "Event 생성자는 detail을 지원하지 않습니다.",
+    "fireEvent()는 없는 메서드입니다.",
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - EventTarget.addEventListener](https://developer.mozilla.org/ko/docs/Web/API/EventTarget/addEventListener)
+- [MDN - 이벤트 버블링과 캡처](https://developer.mozilla.org/ko/docs/Learn_web_development/Core/Scripting/Event_bubbling)

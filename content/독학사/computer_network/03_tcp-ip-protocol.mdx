@@ -1,0 +1,130 @@
+---
+title: '03. TCP/IP 프로토콜'
+description: 'TCP/IP 4계층 모델의 구조와 OSI 모델과의 대응 관계, 주요 헤더 필드를 이해한다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 인터넷의 실제 기반인 TCP/IP 4계층 모델의 각 계층 역할과 OSI 7계층과의 매핑 관계를 이해한다.
+</Callout>
+
+## TCP/IP 모델이란?
+
+**TCP/IP 모델**은 인터넷에서 실제로 사용되는 프로토콜 스택입니다. ARPANET 연구에서 발전하여 현재 인터넷의 근간을 이룹니다. OSI 7계층 모델이 이론적 참조 모델인 반면, TCP/IP는 실제 구현된 모델입니다.
+
+## OSI 7계층 vs TCP/IP 4계층 대응
+
+| TCP/IP 계층 | OSI 계층 대응 | 주요 프로토콜 |
+|------------|--------------|--------------|
+| **응용 계층** | 응용(7) + 표현(6) + 세션(5) | HTTP, FTP, SMTP, DNS, DHCP |
+| **전송 계층** | 전송(4) | TCP, UDP |
+| **인터넷 계층** | 네트워크(3) | IP, ICMP, ARP, IGMP |
+| **네트워크 액세스 계층** | 데이터링크(2) + 물리(1) | 이더넷, Wi-Fi, PPP |
+
+## IP 헤더 주요 필드
+
+| 필드 | 크기 | 설명 |
+|------|------|------|
+| Version | 4비트 | IP 버전 (IPv4=4, IPv6=6) |
+| Header Length | 4비트 | 헤더 길이 (4바이트 단위) |
+| TTL | 8비트 | 패킷 수명, 라우터를 거칠 때마다 1 감소 |
+| Protocol | 8비트 | 상위 프로토콜 (TCP=6, UDP=17, ICMP=1) |
+| Source IP | 32비트 | 출발지 IP 주소 |
+| Destination IP | 32비트 | 목적지 IP 주소 |
+
+## TCP 헤더 주요 필드
+
+| 필드 | 크기 | 설명 |
+|------|------|------|
+| Source Port | 16비트 | 출발지 포트 번호 |
+| Destination Port | 16비트 | 목적지 포트 번호 |
+| Sequence Number | 32비트 | 데이터 순서 번호 |
+| Acknowledgment Number | 32비트 | 수신 확인 번호 |
+| Flags | 6비트 | SYN, ACK, FIN, RST, PSH, URG |
+| Window Size | 16비트 | 수신 버퍼 크기 (흐름 제어) |
+| Checksum | 16비트 | 오류 검출 |
+
+## 잘 알려진 포트 번호
+
+| 포트 | 프로토콜 | 용도 |
+|------|---------|------|
+| 20, 21 | FTP | 파일 전송 (데이터: 20, 제어: 21) |
+| 22 | SSH | 보안 원격 접속 |
+| 23 | Telnet | 원격 접속 (비암호화) |
+| 25 | SMTP | 이메일 전송 |
+| 53 | DNS | 도메인 이름 해석 |
+| 67/68 | DHCP | IP 주소 자동 할당 |
+| 80 | HTTP | 웹 통신 |
+| 110 | POP3 | 이메일 수신 |
+| 443 | HTTPS | 암호화 웹 통신 |
+
+## 핵심 정리
+
+- TCP/IP 4계층: 네트워크 액세스 → 인터넷 → 전송 → 응용
+- 인터넷 계층 핵심: IP, ICMP, ARP, IGMP
+- TCP 헤더: 포트·순서번호·ACK 번호·플래그·윈도우 크기
+- 주요 포트: HTTP=80, HTTPS=443, FTP=21, SMTP=25, DNS=53, SSH=22
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="TCP/IP 모델에서 HTTP, FTP, SMTP 프로토콜이 속하는 계층은?"
+  options={['네트워크 액세스 계층', '인터넷 계층', '전송 계층', '응용 계층']}
+  correctAnswer={4}
+  explanation="HTTP, FTP, SMTP는 모두 사용자와 직접 상호작용하는 응용 계층 프로토콜입니다."
+  optionExplanations={['네트워크 액세스 계층은 이더넷, Wi-Fi 등을 담당합니다.', '인터넷 계층은 IP, ICMP, ARP를 담당합니다.', '전송 계층은 TCP, UDP를 담당합니다.', 'HTTP, FTP, SMTP는 응용 계층 프로토콜입니다. (정답)']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="IP 헤더의 TTL(Time To Live) 필드에 대한 설명으로 옳은 것은?"
+  options={['패킷의 전송 시간을 초 단위로 나타낸다', '라우터를 거칠 때마다 1씩 감소하고 0이 되면 패킷이 폐기된다', '수신측에서 데이터를 수신한 시간을 기록한다', '패킷이 목적지에 도달하는 최대 경로 수를 나타낸다']}
+  correctAnswer={2}
+  explanation="TTL은 패킷이 네트워크에서 무한 순환하지 않도록 라우터를 하나 지날 때마다 1씩 감소하고, 0이 되면 해당 패킷을 폐기합니다."
+  optionExplanations={['TTL은 시간이 아니라 라우터 통과 횟수(홉 수)를 제한하는 필드입니다.', 'TTL은 라우터를 거칠 때마다 1씩 감소하여 0이 되면 패킷이 폐기됩니다. (정답)', 'TTL은 수신 시간을 기록하는 필드가 아닙니다.', '최대 경로 수가 아니라 최대 홉 수를 제한합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="잘 알려진 포트 번호와 프로토콜이 올바르게 연결된 것은?"
+  options={['FTP: 포트 80', 'SMTP: 포트 25', 'DNS: 포트 22', 'HTTP: 포트 443']}
+  correctAnswer={2}
+  explanation="SMTP(Simple Mail Transfer Protocol)는 이메일 전송에 사용되며 포트 25번을 사용합니다."
+  optionExplanations={['FTP는 포트 20(데이터)과 21(제어)을 사용합니다. 80은 HTTP입니다.', 'SMTP는 이메일 전송 프로토콜로 포트 25를 사용합니다. (정답)', 'DNS는 포트 53을 사용합니다. 22는 SSH입니다.', 'HTTP는 포트 80을 사용합니다. 443은 HTTPS입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="TCP/IP 모델의 인터넷 계층에 해당하는 OSI 계층은?"
+  options={['응용 계층', '전송 계층', '네트워크 계층', '데이터 링크 계층']}
+  correctAnswer={3}
+  explanation="TCP/IP의 인터넷 계층은 OSI 7계층 모델의 네트워크 계층(3계층)에 대응합니다. IP, ICMP, ARP가 이 계층에서 동작합니다."
+  optionExplanations={['응용 계층은 TCP/IP의 응용 계층에 대응합니다.', '전송 계층은 TCP/IP의 전송 계층에 대응합니다.', 'TCP/IP 인터넷 계층은 OSI 네트워크 계층에 대응합니다. (정답)', '데이터 링크 계층은 TCP/IP의 네트워크 액세스 계층에 포함됩니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="TCP 헤더에서 수신 측이 한 번에 받을 수 있는 데이터 양을 알리는 필드는?"
+  options={['Sequence Number', 'Acknowledgment Number', 'Window Size', 'Checksum']}
+  correctAnswer={3}
+  explanation="Window Size 필드는 수신 측의 버퍼 크기를 송신 측에 알려 흐름 제어에 사용됩니다."
+  optionExplanations={['Sequence Number는 전송 데이터의 순서를 나타냅니다.', 'Acknowledgment Number는 다음에 받을 바이트 번호를 나타냅니다.', 'Window Size는 수신 버퍼 크기를 알려 흐름 제어에 사용됩니다. (정답)', 'Checksum은 데이터 오류 검출에 사용됩니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="HTTPS에서 사용하는 기본 포트 번호는?"
+  options={['80', '8080', '443', '8443']}
+  correctAnswer={3}
+  explanation="HTTPS(HTTP Secure)는 SSL/TLS로 암호화된 HTTP로, 기본 포트는 443번입니다. HTTP는 80번을 사용합니다."
+  optionExplanations={['80번은 HTTP의 기본 포트입니다.', '8080은 개발 환경에서 대체 HTTP 포트로 많이 사용됩니다.', 'HTTPS의 기본 포트는 443번입니다. (정답)', '8443은 일부 환경에서 대체 HTTPS 포트로 사용됩니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="IP 헤더의 Protocol 필드값이 6일 때 의미하는 상위 프로토콜은?"
+  options={['ICMP', 'UDP', 'TCP', 'IGMP']}
+  correctAnswer={3}
+  explanation="IP 헤더의 Protocol 필드에서 6은 TCP, 17은 UDP, 1은 ICMP를 의미합니다."
+  optionExplanations={['ICMP의 Protocol 번호는 1입니다.', 'UDP의 Protocol 번호는 17입니다.', 'TCP의 Protocol 번호는 6입니다. (정답)', 'IGMP의 Protocol 번호는 2입니다.']}
+/>

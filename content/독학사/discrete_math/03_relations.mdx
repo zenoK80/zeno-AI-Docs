@@ -1,0 +1,184 @@
+---
+title: '03. 관계'
+description: '이진 관계의 성질(반사, 대칭, 추이), 동치 관계, 편순서를 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 이진 관계의 네 가지 성질을 판별하고, 동치 관계와 편순서 관계의 차이를 설명합니다.
+</Callout>
+
+## 이진 관계 (Binary Relation)
+
+집합 $A$에서 $B$로의 **이진 관계** $R$은 $A \times B$의 부분집합입니다.
+
+$$R \subseteq A \times B$$
+
+$(a, b) \in R$을 $aRb$로 표기합니다.
+
+**예시:** $A = \{1, 2, 3\}$, $R = \{(1,1), (2,2), (1,2)\}$
+
+## 관계의 표현
+
+**행렬 표현:** 관계 행렬 $M_R$에서 $(i,j)$ 위치가 1이면 $(a_i, a_j) \in R$
+
+**화살표 그림(Directed Graph):** 정점에서 정점으로 화살표로 관계 표시
+
+## 관계의 성질
+
+| 성질 | 정의 | 예시 |
+| --- | --- | --- |
+| 반사적(Reflexive) | 모든 $a \in A$에 대해 $(a,a) \in R$ | 같거나 작다(≤) |
+| 비반사적(Irreflexive) | 모든 $a \in A$에 대해 $(a,a) \notin R$ | 작다(&lt;) |
+| 대칭적(Symmetric) | $(a,b) \in R$이면 $(b,a) \in R$ | 같다(=) |
+| 반대칭적(Antisymmetric) | $(a,b) \in R$이고 $(b,a) \in R$이면 $a=b$ | 같거나 작다(≤) |
+| 추이적(Transitive) | $(a,b) \in R$이고 $(b,c) \in R$이면 $(a,c) \in R$ | 작다(&lt;), 같다(=) |
+
+## 동치 관계 (Equivalence Relation)
+
+다음 세 가지를 모두 만족하는 관계를 **동치 관계**라고 합니다.
+
+1. 반사적 (Reflexive): $aRa$
+2. 대칭적 (Symmetric): $aRb \Rightarrow bRa$
+3. 추이적 (Transitive): $aRb$이고 $bRc$이면 $aRc$
+
+**동치류(Equivalence Class):** 원소 $a$의 동치류 $[a] = \{x \in A \mid xRa\}$
+
+동치 관계는 집합을 동치류들로 분할합니다.
+
+**예시:** 정수에서 "같은 나머지를 가진다" (mod n) — 동치 관계
+
+## 편순서 관계 (Partial Order)
+
+다음 세 가지를 만족하는 관계를 **편순서 관계**라고 합니다.
+
+1. 반사적 (Reflexive)
+2. 반대칭적 (Antisymmetric)
+3. 추이적 (Transitive)
+
+편순서를 가진 집합을 **편순서 집합(Poset)**이라 합니다.
+
+**예시:** 정수에서 "≤" 관계, 집합에서 "⊆" 관계
+
+**전순서:** 편순서에서 모든 원소 쌍이 비교 가능한 경우
+
+## 하세 도표 (Hasse Diagram)
+
+편순서 집합을 표현하는 다이어그램입니다. 덮개 관계만 화살표로 표시하고 반사 관계와 추이 관계는 생략합니다.
+
+## 관계의 폐쇄 (Closure)
+
+- **반사적 폐쇄:** $R \cup \{(a,a) \mid a \in A\}$
+- **대칭적 폐쇄:** $R \cup R^{-1}$
+- **추이적 폐쇄:** $R^+$ (R의 추이적 폐쇄)
+
+## 핵심 정리
+
+- 동치 관계: 반사적 + 대칭적 + 추이적
+- 편순서 관계: 반사적 + 반대칭적 + 추이적
+- 동치 관계는 집합을 동치류로 분할합니다.
+- 하세 도표: 편순서 집합의 시각적 표현
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="집합 A={1, 2, 3}에서 관계 R={(1,2), (1,3), (3,2)}의 정의역 D와 치역 R은?"
+  options={['① D={1,3}, R={1,3}', '② D={1,3}, R={2,3}', '③ D={1,2,3}, R={1,3}', '④ D={1,2,3}, R={1,2,3}']}
+  correctAnswer={2}
+  explanation="정의역(Domain)은 순서쌍의 첫 번째 원소들의 집합: {1, 3}. 치역(Range)은 두 번째 원소들의 집합: {2, 3}입니다."
+  optionExplanations={[
+    'R의 치역은 {1,3}이 아닌 {2,3}입니다.',
+    '맞습니다. 정의역={1,3}, 치역={2,3}입니다.',
+    '정의역에 2는 첫 번째 원소로 등장하지 않습니다.',
+    '치역에 1은 두 번째 원소로 등장하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="동치 관계(Equivalence Relation)가 되기 위한 조건이 아닌 것은?"
+  options={['① 반사적(Reflexive)', '② 대칭적(Symmetric)', '③ 반대칭적(Antisymmetric)', '④ 추이적(Transitive)']}
+  correctAnswer={3}
+  explanation="동치 관계는 반사적, 대칭적, 추이적 세 가지 성질을 만족해야 합니다. 반대칭적은 편순서 관계의 조건입니다."
+  optionExplanations={[
+    '반사적은 동치 관계의 조건입니다.',
+    '대칭적은 동치 관계의 조건입니다.',
+    '맞습니다. 반대칭적은 편순서 관계의 조건입니다.',
+    '추이적은 동치 관계의 조건입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="편순서 관계(Partial Order)가 되기 위한 세 조건은?"
+  options={['① 반사적, 대칭적, 추이적', '② 반사적, 반대칭적, 추이적', '③ 비반사적, 대칭적, 추이적', '④ 반사적, 반대칭적, 비추이적']}
+  correctAnswer={2}
+  explanation="편순서 관계는 반사적(Reflexive), 반대칭적(Antisymmetric), 추이적(Transitive) 세 조건을 만족해야 합니다."
+  optionExplanations={[
+    '반사적, 대칭적, 추이적은 동치 관계의 조건입니다.',
+    '맞습니다. 편순서는 반사적, 반대칭적, 추이적입니다.',
+    '비반사적은 편순서의 조건이 아닙니다.',
+    '비추이적은 편순서의 조건이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="관계 R이 대칭적(Symmetric)이란 의미는?"
+  options={['① 모든 원소에 대해 (a,a)∈R이다', '② (a,b)∈R이면 (b,a)∈R이다', '③ (a,b)∈R이고 (b,a)∈R이면 a=b이다', '④ (a,b)∈R이고 (b,c)∈R이면 (a,c)∈R이다']}
+  correctAnswer={2}
+  explanation="대칭적 관계는 (a,b)가 관계 R에 있으면 반드시 (b,a)도 R에 있어야 합니다."
+  optionExplanations={[
+    '모든 (a,a)∈R은 반사적 관계의 정의입니다.',
+    '맞습니다. 대칭적 관계의 정의입니다.',
+    '(a,b), (b,a)∈R이면 a=b는 반대칭적 관계입니다.',
+    '(a,b), (b,c)∈R이면 (a,c)∈R은 추이적 관계입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="정수에서 '같은 나머지를 가진다 (mod n)' 관계는 어떤 종류의 관계인가?"
+  options={['① 편순서 관계', '② 전순서 관계', '③ 동치 관계', '④ 함수 관계']}
+  correctAnswer={3}
+  explanation="mod n 관계는 반사적(a mod n = a mod n), 대칭적(a ≡ b이면 b ≡ a), 추이적(a ≡ b이고 b ≡ c이면 a ≡ c)이므로 동치 관계입니다."
+  optionExplanations={[
+    '편순서 관계는 반대칭성이 필요합니다.',
+    '전순서 관계는 모든 쌍이 비교 가능해야 합니다.',
+    '맞습니다. mod n은 동치 관계입니다.',
+    '함수는 관계의 특수한 형태입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="동치 관계의 동치류(Equivalence Class)에 대한 설명으로 옳은 것은?"
+  options={['① 모든 동치류는 같은 크기여야 한다', '② 서로 다른 동치류는 반드시 겹친다', '③ 동치류들은 서로 겹치지 않으며 전체 집합을 분할한다', '④ 동치류는 한 원소만 가진다']}
+  correctAnswer={3}
+  explanation="동치 관계는 집합을 서로 겹치지 않는 동치류들로 분할합니다. 각 원소는 정확히 하나의 동치류에 속합니다."
+  optionExplanations={[
+    '동치류의 크기는 달라도 됩니다.',
+    '서로 다른 동치류는 겹치지 않습니다.',
+    '맞습니다. 동치류들은 집합의 분할을 형성합니다.',
+    '동치류는 여러 원소를 가질 수 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="정수에서 '≤' 관계가 갖는 성질로 옳은 것은?"
+  options={['① 반사적, 대칭적, 추이적', '② 비반사적, 대칭적, 추이적', '③ 반사적, 반대칭적, 추이적', '④ 반사적, 대칭적, 비추이적']}
+  correctAnswer={3}
+  explanation="'≤' 관계는 a ≤ a(반사적), a ≤ b이고 b ≤ a이면 a=b(반대칭적), a ≤ b이고 b ≤ c이면 a ≤ c(추이적)입니다. 이는 편순서 관계입니다."
+  optionExplanations={[
+    '대칭적이 아닙니다. 1 ≤ 2이지만 2 ≤ 1은 거짓입니다.',
+    '비반사적이 아닙니다. a ≤ a는 항상 참입니다.',
+    '맞습니다. ≤는 반사적, 반대칭적, 추이적인 편순서입니다.',
+    '추이적은 맞지만 대칭적이 아닙니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [국가평생교육진흥원 독학학위제](https://bdes.nile.or.kr/nile/study/nStudy1_1.do)
+- Kenneth H. Rosen, "Discrete Mathematics and Its Applications"

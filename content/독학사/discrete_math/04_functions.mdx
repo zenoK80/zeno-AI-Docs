@@ -1,0 +1,186 @@
+---
+title: '04. 함수'
+description: '단사·전사·전단사 함수, 역함수, 합성함수의 개념과 성질을 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 함수의 종류(단사, 전사, 전단사)를 판별하고, 역함수와 합성함수를 계산합니다.
+</Callout>
+
+## 함수의 정의
+
+**함수(Function)** $f: A \rightarrow B$는 집합 A(정의역)의 각 원소에 집합 B(공역)의 원소를 정확히 하나 대응시키는 관계입니다.
+
+- **정의역(Domain):** 함수의 입력 집합 A
+- **공역(Codomain):** 함수의 출력이 속할 집합 B
+- **치역(Range/Image):** 실제 출력값들의 집합 $f(A) \subseteq B$
+
+## 함수의 종류
+
+### 단사 함수 (One-to-One / Injective)
+
+서로 다른 원소는 서로 다른 함수값을 가집니다.
+
+$$f(a) = f(b) \Rightarrow a = b$$
+
+즉, 두 입력이 같은 출력을 가지면 그 두 입력은 반드시 같아야 합니다.
+
+### 전사 함수 (Onto / Surjective)
+
+공역의 모든 원소가 적어도 하나의 정의역 원소에 대응됩니다.
+
+$$\forall b \in B,\ \exists a \in A : f(a) = b$$
+
+즉, 치역과 공역이 일치합니다: $f(A) = B$
+
+### 전단사 함수 (Bijective / One-to-One Correspondence)
+
+단사이면서 전사인 함수입니다. 정의역과 공역 사이에 완전한 일대일 대응이 성립합니다.
+
+| 종류 | 조건 | 역함수 존재 |
+| --- | --- | --- |
+| 단사(Injective) | 입력 다르면 출력 다름 | 가능하지 않을 수 있음 |
+| 전사(Surjective) | 치역 = 공역 | 가능하지 않을 수 있음 |
+| 전단사(Bijective) | 단사 + 전사 | 항상 존재 |
+
+## 역함수 (Inverse Function)
+
+전단사 함수 $f: A \rightarrow B$에 대해 역함수 $f^{-1}: B \rightarrow A$가 존재합니다.
+
+$$f^{-1}(f(a)) = a,\quad f(f^{-1}(b)) = b$$
+
+**예시:** $f(x) = 2x + 3$의 역함수
+
+$$y = 2x + 3 \Rightarrow x = \frac{y-3}{2} \Rightarrow f^{-1}(x) = \frac{x-3}{2}$$
+
+## 합성함수 (Composite Function)
+
+$f: A \rightarrow B$, $g: B \rightarrow C$일 때 합성함수 $g \circ f: A \rightarrow C$는 다음과 같습니다.
+
+$$(g \circ f)(x) = g(f(x))$$
+
+<Callout type="warning">
+  합성함수는 일반적으로 교환 법칙이 성립하지 않습니다. $g \circ f \neq f \circ g$
+</Callout>
+
+**예시:** $f(x) = x + 1$, $g(x) = 2x$일 때
+
+$$(g \circ f)(3) = g(f(3)) = g(4) = 8$$
+$$(f \circ g)(3) = f(g(3)) = f(6) = 7$$
+
+## 바닥 함수와 천장 함수
+
+- **바닥 함수(Floor):** $\lfloor x \rfloor$ — x보다 크지 않은 최대 정수 ($\lfloor 3.7 \rfloor = 3$)
+- **천장 함수(Ceiling):** $\lceil x \rceil$ — x보다 작지 않은 최소 정수 ($\lceil 3.2 \rceil = 4$)
+
+## 핵심 정리
+
+- 단사: $f(a) = f(b) \Rightarrow a = b$ (다른 입력은 다른 출력)
+- 전사: 치역 = 공역 (모든 출력값이 실제로 나옴)
+- 전단사: 단사 + 전사, 역함수 존재
+- 합성: $(g \circ f)(x) = g(f(x))$, 일반적으로 교환 법칙 불성립
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="함수 f: A → B에서 f(A) = B가 성립할 때 이 함수는?"
+  options={['① 단사 함수', '② 전사 함수', '③ 항등 함수', '④ 상수 함수']}
+  correctAnswer={2}
+  explanation="f(A) = B는 치역이 공역과 같다는 의미로, 이는 전사 함수(Surjective)의 정의입니다."
+  optionExplanations={[
+    '단사 함수는 다른 입력이 다른 출력을 가지는 함수입니다.',
+    '맞습니다. 치역 = 공역은 전사 함수의 조건입니다.',
+    '항등 함수는 f(x) = x인 함수입니다.',
+    '상수 함수는 모든 입력에 동일한 출력을 주는 함수입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="역함수가 반드시 존재하는 함수의 종류는?"
+  options={['① 단사 함수', '② 전사 함수', '③ 전단사 함수', '④ 상수 함수']}
+  correctAnswer={3}
+  explanation="역함수는 전단사(Bijective) 함수, 즉 단사이면서 전사인 함수에서만 항상 존재합니다."
+  optionExplanations={[
+    '단사이지만 전사가 아니면 역함수가 A 전체에 정의되지 않습니다.',
+    '전사이지만 단사가 아니면 역함수가 유일하지 않습니다.',
+    '맞습니다. 전단사 함수에서만 역함수가 항상 존재합니다.',
+    '상수 함수는 단사가 아니므로 역함수가 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="f(x) = 3x + 6의 역함수 f⁻¹(x)는?"
+  options={['① (x-6)/3', '② 3x-6', '③ x/3+6', '④ (x+6)/3']}
+  correctAnswer={1}
+  explanation="y = 3x + 6에서 x를 구하면: 3x = y - 6, x = (y-6)/3입니다. 따라서 f⁻¹(x) = (x-6)/3입니다."
+  optionExplanations={[
+    '맞습니다. y = 3x+6에서 x = (y-6)/3이므로 f⁻¹(x) = (x-6)/3입니다.',
+    '3x-6은 원래 함수와 유사하지만 역함수가 아닙니다.',
+    'x/3+6은 잘못된 계산입니다.',
+    '(x+6)/3은 부호 오류입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="합성함수 (g∘f)(x) = g(f(x))에서 먼저 적용되는 함수는?"
+  options={['① g', '② f', '③ g와 f 동시에', '④ 순서에 상관없다']}
+  correctAnswer={2}
+  explanation="(g∘f)(x) = g(f(x))에서 먼저 f를 x에 적용하고, 그 결과를 g에 적용합니다. 안쪽에 있는 f가 먼저입니다."
+  optionExplanations={[
+    'g는 f의 결과에 나중에 적용됩니다.',
+    '맞습니다. 합성함수에서 f가 먼저 적용됩니다.',
+    '동시에 적용되지 않습니다.',
+    '순서가 매우 중요합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="단사 함수(Injective)의 특성으로 옳은 것은?"
+  options={['① 모든 공역 원소에 입력이 대응된다', '② f(a) = f(b)이면 a = b이다', '③ 치역이 공역보다 크다', '④ 역함수가 항상 존재한다']}
+  correctAnswer={2}
+  explanation="단사 함수(One-to-One)는 서로 다른 입력이 서로 다른 출력을 가집니다. 즉 f(a) = f(b)이면 반드시 a = b이어야 합니다."
+  optionExplanations={[
+    '모든 공역 원소에 대응은 전사 함수의 특성입니다.',
+    '맞습니다. 단사 함수는 f(a)=f(b) ⇒ a=b입니다.',
+    '치역은 공역의 부분집합이므로 클 수 없습니다.',
+    '역함수가 항상 존재하려면 전단사 함수여야 합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="floor(3.7)과 ceiling(3.2)의 합은?"
+  options={['① 6', '② 7', '③ 8', '④ 9']}
+  correctAnswer={2}
+  explanation="floor(3.7) = 3 (3.7보다 크지 않은 최대 정수), ceiling(3.2) = 4 (3.2보다 작지 않은 최소 정수). 3 + 4 = 7입니다."
+  optionExplanations={[
+    '3 + 3 = 6은 ceiling을 잘못 계산한 결과입니다.',
+    '맞습니다. floor(3.7)=3, ceiling(3.2)=4이므로 합은 7입니다.',
+    '4 + 4 = 8은 floor를 잘못 계산한 결과입니다.',
+    '잘못된 계산입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="f(x) = x², g(x) = x+1일 때 (f∘g)(2)의 값은?"
+  options={['① 5', '② 9', '③ 6', '④ 4']}
+  correctAnswer={2}
+  explanation="(f∘g)(2) = f(g(2)) = f(3) = 3² = 9입니다. g를 먼저 적용하면 2+1=3, 그 결과를 f에 적용하면 3²=9입니다."
+  optionExplanations={[
+    '5는 g(f(2)) = g(4) = 5로 순서가 반대입니다.',
+    '맞습니다. f(g(2)) = f(3) = 9입니다.',
+    '6은 잘못된 계산입니다.',
+    '4 = 2²는 g를 무시한 계산입니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [국가평생교육진흥원 독학학위제](https://bdes.nile.or.kr/nile/study/nStudy1_1.do)
+- Kenneth H. Rosen, "Discrete Mathematics and Its Applications"

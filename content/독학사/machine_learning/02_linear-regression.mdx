@@ -1,0 +1,184 @@
+---
+title: '02. 선형 회귀'
+description: '최소제곱법, 경사하강법, 정규방정식으로 선형 회귀 모델을 학습하는 방법을 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 선형 회귀의 비용 함수를 정의하고, 경사하강법과 정규방정식으로 파라미터를 최적화합니다.
+</Callout>
+
+## 선형 회귀 (Linear Regression)
+
+입력 특성(feature)과 연속형 출력값(target) 사이의 선형 관계를 모델링합니다.
+
+$$\hat{y} = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \cdots + \theta_n x_n = \mathbf{\theta}^T \mathbf{x}$$
+
+- $\theta$: 모델 파라미터 (가중치)
+- $\hat{y}$: 예측값
+- $x_i$: 입력 특성
+
+## 비용 함수 (Cost Function)
+
+**평균 제곱 오차(Mean Squared Error, MSE):**
+
+$$J(\theta) = \frac{1}{2m} \sum_{i=1}^{m} (\hat{y}^{(i)} - y^{(i)})^2 = \frac{1}{2m} \|\mathbf{X\theta} - \mathbf{y}\|^2$$
+
+선형 회귀의 목표는 $J(\theta)$를 최소화하는 $\theta$를 찾는 것입니다.
+
+## 정규방정식 (Normal Equation)
+
+$J(\theta)$를 $\theta$에 대해 편미분하여 0으로 놓으면:
+
+$$\hat{\theta} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}$$
+
+**장단점:**
+
+| 항목 | 정규방정식 |
+| --- | --- |
+| 장점 | 학습률 불필요, 단번에 최적해 계산 |
+| 단점 | 특성 수가 많으면 느림 (역행렬 계산: $O(n^3)$) |
+
+## 경사하강법 (Gradient Descent)
+
+비용 함수의 기울기(gradient) 반대 방향으로 파라미터를 업데이트합니다.
+
+$$\theta_{j} \leftarrow \theta_j - \alpha \frac{\partial J(\theta)}{\partial \theta_j}$$
+
+여기서 $\alpha$는 **학습률(Learning Rate)** 입니다.
+
+### 경사하강법의 종류
+
+| 종류 | 설명 | 특징 |
+| --- | --- | --- |
+| 배치 경사하강법 | 전체 훈련 세트 | 안정적, 느림 |
+| 확률적 경사하강법(SGD) | 무작위 1개 샘플 | 빠름, 불안정 |
+| 미니배치 경사하강법 | 소규모 배치 | 절충안, 일반적 사용 |
+
+<Callout type="warning">
+  학습률이 너무 크면 발산하고, 너무 작으면 수렴이 매우 느립니다. 적절한 학습률 선택이 중요합니다.
+</Callout>
+
+## 다항 회귀 (Polynomial Regression)
+
+비선형 데이터를 다항 특성으로 변환하여 선형 회귀를 적용합니다.
+
+$$\hat{y} = \theta_0 + \theta_1 x + \theta_2 x^2 + \cdots$$
+
+다항식의 차수가 높을수록 훈련 데이터에 더 잘 맞지만 과적합 위험이 있습니다.
+
+## 규제화된 회귀
+
+- **릿지 회귀(Ridge):** L2 정규화 추가 → 가중치 크기 제한
+- **라쏘 회귀(Lasso):** L1 정규화 추가 → 일부 가중치를 0으로 (특성 선택)
+
+## 핵심 정리
+
+- 선형 회귀: $\hat{y} = \theta^T x$, 비용 함수 MSE 최소화
+- 정규방정식: $\hat{\theta} = (X^TX)^{-1}X^Ty$ (소규모 특성에 적합)
+- 경사하강법: 기울기 반대 방향으로 $\theta$ 업데이트
+- 학습률: 너무 크면 발산, 너무 작으면 수렴 느림
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="선형 회귀의 비용 함수로 가장 일반적으로 사용되는 것은?"
+  options={['① 교차 엔트로피', '② 평균 제곱 오차(MSE)', '③ 힌지 손실', '④ KL 발산']}
+  correctAnswer={2}
+  explanation="선형 회귀의 비용 함수로 MSE(Mean Squared Error, 평균 제곱 오차)가 일반적으로 사용됩니다. 예측값과 실제값 차이의 제곱 평균입니다."
+  optionExplanations={[
+    '교차 엔트로피는 분류 문제에 사용됩니다.',
+    '맞습니다. 선형 회귀의 비용 함수는 MSE입니다.',
+    '힌지 손실은 SVM에서 사용됩니다.',
+    'KL 발산은 확률 분포 비교에 사용됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="경사하강법에서 학습률(Learning Rate)이 너무 크면 어떻게 되는가?"
+  options={['① 수렴이 매우 느려진다', '② 비용 함수가 발산할 수 있다', '③ 지역 최솟값에 갇힌다', '④ 과적합이 발생한다']}
+  correctAnswer={2}
+  explanation="학습률이 너무 크면 각 업데이트 폭이 너무 커져서 최솟값을 지나치고 비용 함수가 발산(증가)할 수 있습니다."
+  optionExplanations={[
+    '수렴이 느려지는 것은 학습률이 너무 작을 때입니다.',
+    '맞습니다. 학습률이 너무 크면 발산할 수 있습니다.',
+    '지역 최솟값에 갇히는 것은 비볼록 함수에서 발생합니다.',
+    '과적합은 모델 복잡도와 관련됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="정규방정식의 최적해 공식은?"
+  options={['① θ̂ = (XᵀX)Xᵀy', '② θ̂ = (XᵀX)⁻¹Xᵀy', '③ θ̂ = X⁻¹y', '④ θ̂ = XᵀXy']}
+  correctAnswer={2}
+  explanation="정규방정식의 최적해: θ̂ = (XᵀX)⁻¹Xᵀy입니다. XᵀX의 역행렬이 존재할 때 MSE를 최소화하는 파라미터를 직접 계산합니다."
+  optionExplanations={[
+    '역행렬이 빠져있습니다.',
+    '맞습니다. θ̂ = (XᵀX)⁻¹Xᵀy입니다.',
+    'X⁻¹은 X가 정방행렬일 때만 가능합니다.',
+    '역행렬이 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="미니배치 경사하강법의 특징은?"
+  options={['① 전체 훈련 세트를 한 번에 사용', '② 1개 샘플만 사용', '③ 소규모 배치를 사용하여 배치와 SGD의 절충안', '④ 정규방정식보다 느림']}
+  correctAnswer={3}
+  explanation="미니배치 경사하강법은 전체 데이터(배치)와 1개 샘플(SGD)의 절충안으로, 소규모 배치(mini-batch)를 사용하여 효율성과 안정성을 균형 있게 유지합니다."
+  optionExplanations={[
+    '전체 세트 사용은 배치 경사하강법입니다.',
+    '1개 샘플은 SGD(확률적 경사하강법)입니다.',
+    '맞습니다. 미니배치는 배치와 SGD의 절충안입니다.',
+    '경사하강법과 정규방정식의 속도 비교는 데이터 크기에 따라 다릅니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="다항 회귀(Polynomial Regression)에 대한 설명으로 옳은 것은?"
+  options={['① 선형 모델이 아니라 비선형 모델이다', '② 다항 특성을 추가한 선형 회귀이다', '③ 항상 과적합이 발생한다', '④ 특성이 하나일 때만 사용 가능하다']}
+  correctAnswer={2}
+  explanation="다항 회귀는 x², x³ 등의 다항 특성을 추가하지만, 새로운 특성들에 대한 선형 회귀로 처리됩니다. 파라미터에 대해서는 여전히 선형입니다."
+  optionExplanations={[
+    '파라미터에 대해서는 선형 모델입니다.',
+    '맞습니다. 다항 특성을 추가한 후 선형 회귀를 적용합니다.',
+    '차수를 적절히 선택하면 과적합을 피할 수 있습니다.',
+    '다변수에도 적용 가능합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="라쏘 회귀(Lasso)와 릿지 회귀(Ridge)의 차이점은?"
+  options={['① 라쏘는 L2, 릿지는 L1 정규화', '② 라쏘는 L1으로 일부 가중치를 0으로 만듦, 릿지는 L2로 가중치 축소', '③ 릿지만 정규화를 사용', '④ 라쏘는 회귀, 릿지는 분류에 사용']}
+  correctAnswer={2}
+  explanation="라쏘는 L1 정규화를 사용하여 일부 가중치를 정확히 0으로 만들어 특성 선택 효과가 있습니다. 릿지는 L2 정규화로 가중치를 작게 만들지만 0으로 만들지는 않습니다."
+  optionExplanations={[
+    '라쏘가 L1, 릿지가 L2입니다.',
+    '맞습니다. 라쏘(L1)는 희소 모델, 릿지(L2)는 가중치 축소입니다.',
+    '두 방법 모두 정규화를 사용합니다.',
+    '두 방법 모두 회귀에 사용됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="확률적 경사하강법(SGD)의 특징으로 옳은 것은?"
+  options={['① 한 번에 전체 데이터를 사용', '② 무작위로 1개 샘플을 선택하여 업데이트', '③ 항상 전역 최솟값에 수렴', '④ 배치 경사하강법보다 메모리가 더 필요']}
+  correctAnswer={2}
+  explanation="SGD는 매 업데이트마다 무작위로 1개 샘플을 선택하여 기울기를 계산합니다. 빠르지만 업데이트가 불안정합니다."
+  optionExplanations={[
+    '전체 데이터 사용은 배치 경사하강법입니다.',
+    '맞습니다. SGD는 무작위 1개 샘플로 업데이트합니다.',
+    'SGD는 전역 최솟값을 보장하지 않습니다.',
+    'SGD는 1개 샘플만 메모리에 올려 더 적은 메모리를 사용합니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [국가평생교육진흥원 독학학위제](https://bdes.nile.or.kr/nile/study/nStudy1_1.do)
+- Aurélien Géron, "Hands-On Machine Learning with Scikit-Learn, Keras & TensorFlow"

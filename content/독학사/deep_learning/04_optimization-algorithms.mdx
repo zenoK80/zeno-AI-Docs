@@ -1,0 +1,143 @@
+---
+title: '04. 최적화 알고리즘'
+description: 'SGD, Momentum, Adam, RMSProp 등 주요 최적화 알고리즘의 원리와 차이를 이해한다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 기본 경사하강법의 한계를 이해하고, 이를 개선한 다양한 최적화 알고리즘의 동작 원리와 장단점을 비교한다.
+</Callout>
+
+## 배치 경사하강법의 종류
+
+| 종류 | 데이터 단위 | 특징 |
+|------|-----------|------|
+| **배치 GD (Batch GD)** | 전체 데이터 | 안정적이나 느림 |
+| **확률적 GD (SGD)** | 1개 샘플 | 빠르나 불안정 (잡음) |
+| **미니배치 GD (Mini-Batch)** | 소규모 배치 (32~256) | 두 방법의 절충 (실무 주로 사용) |
+
+## SGD (Stochastic Gradient Descent)
+
+$$w \leftarrow w - \eta \nabla L(w)$$
+
+**한계:**
+- 학습률 설정이 어려움
+- 지역 최솟값(Local Minimum)에 빠질 수 있음
+- 기울기 방향이 불안정하여 수렴이 느림
+
+## Momentum
+
+과거 기울기의 방향을 기억하여 진행 방향에 가속도를 부여합니다. 공의 관성처럼 동작합니다.
+
+$$v \leftarrow \beta v - \eta \nabla L(w)$$
+$$w \leftarrow w + v$$
+
+- $\beta$: 모멘텀 계수 (보통 0.9)
+- 이전 기울기 방향을 누적하여 지역 최솟값 탈출 용이
+
+## AdaGrad
+
+각 매개변수마다 다른 학습률을 적용합니다. 자주 업데이트된 매개변수의 학습률은 작게, 드물게 업데이트된 매개변수의 학습률은 크게 조정합니다.
+
+$$G \leftarrow G + (\nabla L)^2$$
+$$w \leftarrow w - \frac{\eta}{\sqrt{G + \epsilon}} \nabla L$$
+
+**한계:** G가 계속 누적되어 학습이 진행될수록 학습률이 0에 수렴 → 학습 중단
+
+## RMSProp
+
+AdaGrad의 누적 문제를 지수 이동 평균으로 해결합니다.
+
+$$G \leftarrow \rho G + (1-\rho)(\nabla L)^2$$
+$$w \leftarrow w - \frac{\eta}{\sqrt{G + \epsilon}} \nabla L$$
+
+- $\rho$: 감쇠율 (보통 0.9~0.99)
+- 최신 기울기에 더 높은 가중치 부여
+
+## Adam (Adaptive Moment Estimation)
+
+Momentum과 RMSProp을 결합한 알고리즘입니다. 현재 가장 널리 사용되는 최적화 알고리즘입니다.
+
+$$m \leftarrow \beta_1 m + (1-\beta_1)\nabla L \quad \text{(1차 모멘트: 기울기 평균)}$$
+$$v \leftarrow \beta_2 v + (1-\beta_2)(\nabla L)^2 \quad \text{(2차 모멘트: 기울기 분산)}$$
+$$\hat{m} = \frac{m}{1-\beta_1^t}, \quad \hat{v} = \frac{v}{1-\beta_2^t} \quad \text{(편향 보정)}$$
+$$w \leftarrow w - \frac{\eta}{\sqrt{\hat{v}} + \epsilon} \hat{m}$$
+
+**주요 하이퍼파라미터:**
+- $\beta_1 = 0.9$ (1차 모멘트 감쇠율)
+- $\beta_2 = 0.999$ (2차 모멘트 감쇠율)
+- $\eta = 0.001$ (학습률)
+- $\epsilon = 10^{-8}$ (0 나눗셈 방지)
+
+## 최적화 알고리즘 비교
+
+| 알고리즘 | 학습률 적응 | 모멘텀 | 특징 |
+|---------|-----------|--------|------|
+| SGD | 없음 | 없음 | 단순, 불안정 |
+| SGD + Momentum | 없음 | 있음 | SGD 개선 |
+| AdaGrad | 있음 | 없음 | 학습률 소멸 문제 |
+| RMSProp | 있음 | 없음 | AdaGrad 개선 |
+| Adam | 있음 | 있음 | 실무에서 가장 많이 사용 |
+
+## 핵심 정리
+
+- SGD: 샘플 하나씩 기울기 계산, 불안정
+- Momentum: 과거 기울기 방향 누적, 가속도 효과
+- AdaGrad: 매개변수별 학습률 적응, 학습률 소멸 문제
+- RMSProp: AdaGrad 개선, 지수 이동 평균 사용
+- Adam: Momentum + RMSProp, 편향 보정 포함, 가장 널리 사용
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Adam 최적화 알고리즘은 어떤 두 알고리즘을 결합한 것인가?"
+  options={['SGD와 AdaGrad', 'Momentum과 RMSProp', 'SGD와 RMSProp', 'AdaGrad와 Momentum']}
+  correctAnswer={2}
+  explanation="Adam(Adaptive Moment Estimation)은 Momentum(1차 모멘트: 기울기 평균)과 RMSProp(2차 모멘트: 기울기 제곱 지수 평균)을 결합한 알고리즘입니다."
+  optionExplanations={['SGD와 AdaGrad의 결합이 아닙니다.', 'Adam은 Momentum과 RMSProp을 결합했습니다. (정답)', 'SGD와 RMSProp의 결합이 아닙니다.', 'AdaGrad와 Momentum의 단순 결합도 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="AdaGrad의 단점은?"
+  options={['모멘텀이 없어 수렴이 느리다', '기울기가 0이 되는 문제가 발생한다', '학습이 진행될수록 학습률이 점점 0에 수렴하여 학습이 중단될 수 있다', '매개변수별 학습률을 적용하지 않는다']}
+  correctAnswer={3}
+  explanation="AdaGrad는 기울기 제곱의 누적합 G가 계속 증가하므로, 학습이 진행될수록 학습률이 점점 감소하여 결국 0에 수렴해 학습이 중단될 수 있습니다."
+  optionExplanations={['모멘텀 부재는 단점이지만 AdaGrad의 가장 큰 한계는 학습률 소멸입니다.', '기울기가 0이 되는 것은 Dead ReLU 문제입니다.', 'AdaGrad의 가장 큰 한계는 G의 누적으로 학습률이 점점 0에 수렴하는 것입니다. (정답)', '매개변수별 학습률 적용은 AdaGrad의 장점입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="실무에서 가장 널리 사용되는 최적화 알고리즘은?"
+  options={['배치 경사하강법', 'Momentum', 'AdaGrad', 'Adam']}
+  correctAnswer={4}
+  explanation="Adam은 Momentum과 RMSProp의 장점을 결합하고 편향 보정을 포함하여 실무에서 기본 선택으로 가장 많이 사용됩니다."
+  optionExplanations={['배치 경사하강법은 대용량 데이터에 느려 실무에서 잘 사용하지 않습니다.', 'Momentum은 SGD의 개선이지만 Adam에 비해 덜 사용됩니다.', 'AdaGrad는 학습률 소멸 문제로 실무에서 잘 사용하지 않습니다.', 'Adam이 실무에서 가장 널리 사용되는 최적화 알고리즘입니다. (정답)']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="Momentum 최적화의 핵심 아이디어는?"
+  options={['각 매개변수에 다른 학습률을 적용한다', '과거 기울기를 누적하여 진행 방향에 가속도를 부여한다', '기울기 제곱의 지수 이동 평균으로 학습률을 조정한다', '일부 뉴런을 무작위로 비활성화한다']}
+  correctAnswer={2}
+  explanation="Momentum은 물리의 관성과 유사하게, 이전 기울기 방향을 누적하여 진행 방향에 가속도를 부여합니다. 이를 통해 지역 최솟값 탈출과 수렴 속도 향상이 가능합니다."
+  optionExplanations={['각 매개변수별 다른 학습률 적용은 AdaGrad/RMSProp의 특징입니다.', 'Momentum은 과거 기울기를 누적하여 가속도를 부여합니다. (정답)', '기울기 제곱의 지수 이동 평균은 RMSProp의 특징입니다.', '뉴런 비활성화는 드롭아웃(Dropout) 기법입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="미니배치 경사하강법(Mini-Batch GD)의 특징으로 옳은 것은?"
+  options={['전체 데이터셋을 한 번에 사용한다', '샘플 하나씩 기울기를 계산한다', '소규모 배치 단위로 기울기를 계산하여 두 방법의 장점을 절충한다', '항상 전역 최솟값(Global Minimum)을 찾는다']}
+  correctAnswer={3}
+  explanation="미니배치 GD는 32~256개 샘플로 구성된 배치 단위로 기울기를 계산하여 배치 GD의 안정성과 SGD의 속도를 절충합니다."
+  optionExplanations={['전체 데이터를 한 번에 사용하는 것은 배치 GD입니다.', '샘플 하나씩 계산하는 것은 SGD입니다.', '미니배치 GD는 두 방법의 장점을 절충합니다. (정답)', '어떤 최적화 알고리즘도 전역 최솟값을 보장하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="RMSProp이 AdaGrad의 문제를 해결하는 방법은?"
+  options={['학습률을 고정값으로 설정', '기울기 제곱의 지수 이동 평균 사용으로 오래된 기울기 영향 감소', '모멘텀을 추가하여 수렴 속도 향상', '배치 크기를 자동으로 조정']}
+  correctAnswer={2}
+  explanation="AdaGrad는 기울기 제곱을 무한 누적하지만, RMSProp는 지수 이동 평균을 사용해 최근 기울기에 더 높은 가중치를 주고 오래된 기울기는 지수적으로 감쇠시킵니다."
+  optionExplanations={['학습률 고정은 AdaGrad의 문제를 해결하지 않습니다.', '지수 이동 평균으로 오래된 기울기 영향을 줄이는 것이 RMSProp의 핵심입니다. (정답)', '모멘텀 추가는 RMSProp이 아닌 Adam의 특징입니다.', '배치 크기 자동 조정은 최적화 알고리즘의 기능이 아닙니다.']}
+/>

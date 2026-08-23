@@ -1,0 +1,133 @@
+---
+title: '04. 데이터 링크 계층'
+description: 'MAC 주소, CSMA/CD, 이더넷 프레임 구조와 ARQ 오류 제어 방식을 이해한다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 데이터 링크 계층이 같은 네트워크 내에서 어떻게 신뢰성 있는 전송을 제공하는지, MAC 주소와 CSMA/CD 방식을 정확히 이해한다.
+</Callout>
+
+## 데이터 링크 계층의 역할
+
+**데이터 링크 계층(Data Link Layer)**은 동일 네트워크 내 두 노드 사이에서 신뢰성 있는 데이터 전달을 담당합니다.
+
+- **프레이밍(Framing):** 비트 스트림을 프레임 단위로 구분
+- **오류 검출 및 정정:** CRC(Cyclic Redundancy Check)로 오류 검출
+- **흐름 제어:** 송신 속도가 수신 처리 속도를 초과하지 않도록 조절
+- **매체 접근 제어(MAC):** 공유 매체에 대한 접근 순서 결정
+
+## MAC 주소
+
+**MAC(Media Access Control) 주소**는 네트워크 인터페이스 카드(NIC)에 부여된 48비트 하드웨어 주소입니다.
+
+- 형식: `AA:BB:CC:DD:EE:FF` (16진수 6쌍)
+- 앞 24비트: 제조사 식별자(OUI)
+- 뒤 24비트: 장치 일련번호
+
+## 이더넷 프레임 구조
+
+| 필드 | 크기 | 설명 |
+|------|------|------|
+| 프리앰블 | 7바이트 | 동기화 신호 |
+| SFD | 1바이트 | 프레임 시작 구분자 |
+| 목적지 MAC | 6바이트 | 수신자 하드웨어 주소 |
+| 출발지 MAC | 6바이트 | 송신자 하드웨어 주소 |
+| 타입/길이 | 2바이트 | 상위 프로토콜(IPv4=0x0800) 또는 데이터 길이 |
+| 데이터 | 46~1500바이트 | 실제 전송 데이터 |
+| FCS | 4바이트 | 오류 검출용 CRC 값 |
+
+이더넷 프레임의 최소 크기는 64바이트이며, 최대 전송 단위(MTU)는 1500바이트입니다.
+
+## CSMA/CD
+
+**CSMA/CD(Carrier Sense Multiple Access with Collision Detection)**는 이더넷이 사용하는 매체 접근 제어 방식입니다.
+
+1. **CS(Carrier Sense):** 전송 전에 매체가 사용 중인지 확인
+2. **MA(Multiple Access):** 여러 장치가 동일 매체를 공유
+3. **CD(Collision Detection):** 충돌 발생을 감지하면 즉시 전송 중단 → **잼 신호(Jam Signal)** 전송 → **임의 시간(Back-off)** 대기 → 재전송
+
+<Callout type="warning">
+  CSMA/CD는 유선 이더넷(반이중)에서 사용됩니다. 무선 네트워크(Wi-Fi)는 충돌 감지가 어렵기 때문에 **CSMA/CA(Collision Avoidance)**를 사용합니다.
+</Callout>
+
+## ARQ 오류 제어 방식
+
+**ARQ(Automatic Repeat reQuest)**는 오류가 발생한 프레임을 재전송하여 신뢰성을 보장합니다.
+
+| ARQ 방식 | 동작 | 특징 |
+|----------|------|------|
+| **Stop-and-Wait ARQ** | 프레임 하나를 보내고 ACK를 받을 때까지 대기 | 구현 간단, 효율 낮음 |
+| **Go-Back-N ARQ** | 오류 발생 시 해당 프레임부터 이후 전부 재전송 | 수신측 버퍼 불필요 |
+| **Selective-Repeat ARQ** | 오류 발생한 프레임만 선택적 재전송 | 효율 높음, 수신측 버퍼 필요 |
+
+## 핵심 정리
+
+- MAC 주소: 48비트, 제조사(24비트) + 일련번호(24비트)
+- 이더넷 프레임: 최소 64바이트, MTU 1500바이트, FCS로 오류 검출
+- CSMA/CD: 충돌 감지 → 잼 신호 → 백오프 대기 → 재전송
+- ARQ: Stop-and-Wait / Go-Back-N / Selective-Repeat
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="이더넷(Ethernet)에서 사용하는 매체 접근 제어 방식은?"
+  options={['TDMA', 'CSMA/CD', 'CSMA/CA', 'Token Ring']}
+  correctAnswer={2}
+  explanation="이더넷은 CSMA/CD 방식을 사용합니다. CSMA/CA는 Wi-Fi에서 사용합니다."
+  optionExplanations={['TDMA는 시분할 다중 접속으로 주로 이동통신에서 사용됩니다.', 'CSMA/CD는 유선 이더넷에서 사용하는 충돌 감지 방식입니다. (정답)', 'CSMA/CA는 무선 네트워크(Wi-Fi)에서 사용하는 충돌 회피 방식입니다.', 'Token Ring은 IBM이 개발한 구형 LAN 기술입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="송신 측이 프레임에 일련번호를 부여하여 연속적으로 보내다가 REJ 명령과 함께 수신된 번호에 해당하는 프레임부터 다시 연속 전송하는 ARQ 방식은?"
+  options={['Stop-and-Wait ARQ', 'Selective-Repeat ARQ', 'Go-Back-N ARQ', 'Adaptive ARQ']}
+  correctAnswer={3}
+  explanation="Go-Back-N ARQ는 오류 발생 시 해당 프레임 번호부터 이후 프레임을 모두 재전송하는 방식입니다."
+  optionExplanations={['Stop-and-Wait ARQ는 한 프레임씩 보내고 ACK를 기다리는 방식입니다.', 'Selective-Repeat ARQ는 오류가 발생한 특정 프레임만 재전송합니다.', 'Go-Back-N ARQ가 REJ 번호부터 연속 재전송하는 방식입니다. (정답)', 'Adaptive ARQ는 오류율에 따라 프레임 크기를 조절하는 방식입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="MAC 주소에 대한 설명으로 옳지 않은 것은?"
+  options={['48비트로 구성된다', '앞 24비트는 제조사 식별자이다', 'IP 주소처럼 네트워크 관리자가 임의로 변경할 수 있다', '네트워크 인터페이스 카드에 부여된 하드웨어 주소이다']}
+  correctAnswer={3}
+  explanation="MAC 주소는 제조사가 NIC에 영구적으로 부여하는 하드웨어 주소로, 임의 변경이 의도된 설계가 아닙니다."
+  optionExplanations={['MAC 주소는 48비트(6바이트)로 구성됩니다. 올바른 설명입니다.', '앞 24비트는 OUI로 제조사를 식별합니다. 올바른 설명입니다.', 'MAC 주소는 하드웨어에 고정된 주소로 임의 변경이 의도된 설계가 아닙니다. (정답 - 틀린 설명)', 'MAC 주소는 NIC에 부여된 하드웨어 주소입니다. 올바른 설명입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="이더넷 프레임에서 FCS(Frame Check Sequence) 필드의 역할은?"
+  options={['프레임의 시작을 알리는 동기화 신호', '목적지의 MAC 주소를 저장', '프레임의 오류 검출을 위한 CRC 값', '상위 프로토콜 유형을 식별']}
+  correctAnswer={3}
+  explanation="FCS는 CRC(Cyclic Redundancy Check) 알고리즘을 이용해 프레임 전송 중 발생한 오류를 검출하는 필드입니다."
+  optionExplanations={['프레임 시작을 알리는 것은 SFD(Start Frame Delimiter) 필드입니다.', '목적지 MAC 주소는 별도의 Destination MAC 필드에 저장됩니다.', 'FCS는 CRC를 이용한 오류 검출 필드입니다. (정답)', '상위 프로토콜 유형 식별은 Type/Length 필드가 담당합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="CSMA/CD 방식에서 충돌(Collision) 감지 후 취하는 조치를 올바른 순서로 나열한 것은?"
+  options={['즉시 재전송 → 잼 신호 전송 → 백오프 대기', '잼 신호 전송 → 전송 중단 → 백오프 대기 → 재전송', '전송 중단 → 잼 신호 전송 → 백오프 대기 → 재전송', '전송 중단 → 백오프 대기 → 잼 신호 전송 → 재전송']}
+  correctAnswer={3}
+  explanation="충돌 감지 시 CSMA/CD는 전송을 즉시 중단하고 잼 신호를 전송하여 모든 장치에 충돌을 알린 후, 임의의 백오프 시간 대기 후 재전송합니다."
+  optionExplanations={['즉시 재전송하면 또 다른 충돌이 발생할 수 있습니다.', '충돌 감지 후에는 전송을 먼저 중단해야 합니다. 순서가 틀렸습니다.', '전송 중단 → 잼 신호 → 백오프 대기 → 재전송이 올바른 순서입니다. (정답)', '잼 신호는 백오프 대기 전에 전송합니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="Selective-Repeat ARQ가 Go-Back-N ARQ에 비해 가지는 장점은?"
+  options={['구현이 더 단순하다', '수신측 버퍼가 필요하지 않다', '오류 프레임만 재전송하므로 전송 효율이 높다', '최대 15홉까지 전송이 가능하다']}
+  correctAnswer={3}
+  explanation="Selective-Repeat ARQ는 오류가 발생한 특정 프레임만 선택적으로 재전송하므로, 오류 이후 모든 프레임을 재전송하는 Go-Back-N에 비해 전송 효율이 높습니다."
+  optionExplanations={['Selective-Repeat은 수신측 버퍼가 필요해 구현이 더 복잡합니다.', 'Selective-Repeat은 수신측에 버퍼가 필요합니다. Go-Back-N은 필요하지 않습니다.', '오류 프레임만 재전송하여 전송 효율이 높습니다. (정답)', '홉 수 제한은 ARQ와 관련 없고 IP의 TTL 개념입니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="데이터 링크 계층의 주요 기능이 아닌 것은?"
+  options={['프레이밍(Framing)', 'CRC 오류 검출', '흐름 제어(Flow Control)', 'IP 주소 기반 라우팅']}
+  correctAnswer={4}
+  explanation="IP 주소 기반 라우팅은 네트워크 계층(3계층)의 기능입니다. 데이터 링크 계층은 MAC 주소를 사용하며 동일 네트워크 내 전달을 담당합니다."
+  optionExplanations={['프레이밍은 데이터 링크 계층의 핵심 기능입니다.', 'CRC를 이용한 오류 검출은 데이터 링크 계층의 기능입니다.', '흐름 제어는 데이터 링크 계층의 기능입니다.', 'IP 주소 기반 라우팅은 네트워크 계층(3계층)의 기능입니다. (정답)']}
+/>

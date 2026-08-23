@@ -1,0 +1,210 @@
+---
+title: '09. 원시값 vs 객체'
+description: '원시값과 객체의 복사 및 참조 전달 차이를 코드로 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 원시값과 객체가 메모리에 저장되고 전달되는 방식의 차이를 이해합니다.
+</Callout>
+
+## 원시값은 값으로 복사된다
+
+원시 타입(number, string, boolean 등)은 변수에 값 자체가 저장됩니다. 다른 변수에 대입하면 **값이 복사**됩니다.
+
+```js
+let a = 10
+let b = a   // a의 값 10이 b에 복사됨
+
+b = 20
+console.log(a)  // 10 (a는 변하지 않음)
+console.log(b)  // 20
+```
+
+a와 b는 완전히 독립된 공간에 각자의 값을 가집니다.
+
+## 객체는 참조로 전달된다
+
+객체는 변수에 **참조(reference)**, 즉 메모리 주소가 저장됩니다. 다른 변수에 대입하면 **같은 객체를 가리키는 참조가 복사**됩니다.
+
+```js
+const objA = { name: '철수' }
+const objB = objA   // 같은 객체를 참조
+
+objB.name = '영희'
+console.log(objA.name)  // '영희' (같은 객체이므로 함께 변경됨)
+```
+
+objA와 objB는 메모리의 같은 객체를 가리킵니다.
+
+```mermaid
+flowchart LR
+  objA["변수 objA"] --> obj["객체 {name: '철수'}"]
+  objB["변수 objB"] --> obj
+```
+
+## 함수 인수로 전달할 때
+
+원시값은 복사본이 전달되고, 객체는 참조가 전달됩니다.
+
+```js
+function changePrimitive(x) {
+  x = 100
+}
+function changeObject(obj) {
+  obj.value = 100
+}
+
+let num = 1
+let myObj = { value: 1 }
+
+changePrimitive(num)
+changeObject(myObj)
+
+console.log(num)        // 1 (원시값은 복사본 변경)
+console.log(myObj.value) // 100 (객체는 참조 공유)
+```
+
+## 객체 동등 비교
+
+두 변수가 같은 객체를 참조하는지 비교합니다.
+
+```js
+const x = { a: 1 }
+const y = { a: 1 }
+const z = x
+
+console.log(x === y)  // false (내용이 같아도 다른 객체)
+console.log(x === z)  // true  (같은 참조)
+```
+
+내용이 같은 두 객체를 비교하려면 JSON 직렬화나 재귀 비교가 필요합니다.
+
+## 깊은 복사 만들기
+
+객체를 완전히 독립적으로 복사하는 방법입니다.
+
+```js
+// JSON 방법 (단순한 경우)
+const original = { a: 1, b: { c: 2 } }
+const deep = JSON.parse(JSON.stringify(original))
+
+deep.b.c = 99
+console.log(original.b.c)  // 2 (원본 유지)
+```
+
+<Callout type="warning">
+  JSON 방법은 함수, undefined, Symbol, 순환 참조를 가진 객체는 제대로 복사하지 못합니다. 복잡한 경우 structuredClone() 또는 라이브러리를 활용하세요.
+</Callout>
+
+```js
+// structuredClone (모던 브라우저/Node.js 17+)
+const deep2 = structuredClone(original)
+```
+
+## 핵심 정리
+
+- 원시값은 변수에 값 자체가 저장되며 복사 시 독립적입니다.
+- 객체는 참조가 저장되며 복사 시 같은 객체를 공유합니다.
+- 함수에 객체를 전달하면 참조가 전달되어 내부에서 변경하면 원본도 바뀝니다.
+- 독립된 객체를 만들려면 깊은 복사가 필요합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="다음 코드의 결과는? `let a = 5; let b = a; b = 10; console.log(a);`"
+  options={['10', '5', 'undefined', 'null']}
+  correctAnswer={2}
+  explanation="원시값은 복사 시 값 자체가 복사됩니다. b를 바꿔도 a는 변하지 않습니다."
+  optionExplanations={[
+    'b를 바꿔도 원시값인 a는 영향을 받지 않습니다.',
+    '맞습니다. a와 b는 독립적인 값을 가집니다.',
+    'a는 5로 정의되어 있습니다.',
+    'a는 null이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="다음 코드의 결과는? `const x = { n: 1 }; const y = x; y.n = 99; console.log(x.n);`"
+  options={['1', '99', 'undefined', 'TypeError']}
+  correctAnswer={2}
+  explanation="x와 y는 같은 객체를 참조합니다. y.n을 바꾸면 x.n도 바뀝니다."
+  optionExplanations={[
+    'y.n 변경이 x에도 반영됩니다.',
+    '맞습니다. x와 y가 같은 객체를 가리키기 때문입니다.',
+    'n 프로퍼티가 없어지지 않습니다.',
+    '오류가 발생하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`const a = {}; const b = {}; console.log(a === b);`의 결과는?"
+  options={['true', 'false', 'null', 'TypeError']}
+  correctAnswer={2}
+  explanation="내용이 같아도 서로 다른 메모리 주소를 가리키는 다른 객체이므로 false입니다."
+  optionExplanations={[
+    '내용이 같아도 참조가 다르면 false입니다.',
+    '맞습니다. 다른 객체를 참조하므로 false입니다.',
+    'null이 반환되지 않습니다.',
+    '오류가 발생하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="함수에 객체를 인수로 전달했을 때 함수 안에서 프로퍼티를 변경하면 어떻게 되나요?"
+  options={[
+    '복사본이 전달되므로 원본은 변하지 않는다.',
+    '참조가 전달되므로 원본 객체의 프로퍼티도 변경된다.',
+    '함수 안에서는 프로퍼티를 변경할 수 없다.',
+    '오류가 발생한다.',
+  ]}
+  correctAnswer={2}
+  explanation="객체는 참조가 전달되므로 함수 안에서 프로퍼티를 변경하면 원본 객체에도 반영됩니다."
+  optionExplanations={[
+    '객체는 참조 전달이므로 복사본이 아닙니다.',
+    '맞습니다. 참조가 공유되어 원본도 변경됩니다.',
+    '함수 안에서도 프로퍼티를 변경할 수 있습니다.',
+    '오류가 발생하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="JSON.parse(JSON.stringify(obj))로 깊은 복사를 할 때 복사되지 않는 것은?"
+  options={['숫자 프로퍼티', '문자열 프로퍼티', '배열 프로퍼티', '함수 프로퍼티']}
+  correctAnswer={4}
+  explanation="JSON은 함수, undefined, Symbol을 직렬화하지 못합니다. 함수 프로퍼티는 복사에서 제외됩니다."
+  optionExplanations={[
+    '숫자는 JSON으로 직렬화됩니다.',
+    '문자열도 JSON으로 직렬화됩니다.',
+    '배열도 JSON으로 직렬화됩니다.',
+    '맞습니다. 함수는 JSON 직렬화 대상이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="원시값과 객체의 주요 차이를 올바르게 설명한 것은?"
+  options={[
+    '원시값은 메서드를 가질 수 없지만 객체는 가질 수 있다.',
+    '원시값과 객체 모두 참조로 전달된다.',
+    '객체는 변경 불가능(immutable)이다.',
+    '원시값은 크기 제한이 없다.',
+  ]}
+  correctAnswer={1}
+  explanation="원시값에 메서드가 있는 것처럼 보이는 것은 임시 래퍼 객체 덕분입니다. 원시값 자체는 메서드를 가질 수 없고 불변입니다."
+  optionExplanations={[
+    '맞습니다. 원시값 자체는 프로퍼티나 메서드가 없습니다.',
+    '원시값은 값으로 전달됩니다.',
+    '객체는 변경 가능(mutable)합니다.',
+    '원시값 크기는 타입에 따라 정해집니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - JavaScript의 메모리 관리](https://developer.mozilla.org/ko/docs/Web/JavaScript/Memory_management)
+- [MDN - 구조적 클론](https://developer.mozilla.org/ko/docs/Web/API/structuredClone)

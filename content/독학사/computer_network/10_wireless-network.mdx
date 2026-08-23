@@ -1,0 +1,129 @@
+---
+title: '10. 무선 네트워크'
+description: 'Wi-Fi 802.11 표준, CSMA/CA 동작 방식, 이동통신 세대별 특징을 이해한다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 무선 LAN(Wi-Fi)의 동작 원리와 유선 이더넷과의 차이, 이동통신 기술의 발전 과정을 이해한다.
+</Callout>
+
+## IEEE 802.11 (Wi-Fi)
+
+**IEEE 802.11**은 무선 LAN(WLAN)의 표준입니다. 세대별 주요 특징은 다음과 같습니다.
+
+| 표준 | 세대 | 주파수 | 최대 속도 |
+|------|------|--------|---------|
+| 802.11b | Wi-Fi 1 | 2.4 GHz | 11 Mbps |
+| 802.11a | Wi-Fi 2 | 5 GHz | 54 Mbps |
+| 802.11g | Wi-Fi 3 | 2.4 GHz | 54 Mbps |
+| 802.11n | Wi-Fi 4 | 2.4/5 GHz | 600 Mbps |
+| 802.11ac | Wi-Fi 5 | 5 GHz | 3.5 Gbps |
+| 802.11ax | Wi-Fi 6 | 2.4/5/6 GHz | 9.6 Gbps |
+
+### 2.4 GHz vs 5 GHz
+
+| 특성 | 2.4 GHz | 5 GHz |
+|------|---------|-------|
+| 범위 | 넓음 | 좁음 |
+| 속도 | 낮음 | 높음 |
+| 혼잡 | 많음 (전자레인지 등 간섭) | 적음 |
+| 투과성 | 좋음 | 나쁨 |
+
+## CSMA/CA
+
+유선 이더넷은 **CSMA/CD(충돌 감지)**를 사용하지만, 무선 환경에서는 신호 감지가 어려워 **CSMA/CA(Collision Avoidance, 충돌 회피)**를 사용합니다.
+
+### CSMA/CA 동작 과정
+
+1. **채널 감지:** 매체가 사용 중인지 확인
+2. **IFS(Interframe Space) 대기:** 정해진 시간 대기
+3. **Back-off:** 임의 시간 추가 대기
+4. **RTS/CTS 교환(옵션):** 은닉 단말 문제 해결
+   - 송신자가 **RTS(Request to Send)** 전송
+   - 수신자가 **CTS(Clear to Send)** 응답
+5. **데이터 전송 및 ACK 확인**
+
+### 은닉 단말 문제 (Hidden Station Problem)
+
+A와 C가 서로 통신 범위 밖에 있지만 둘 다 B와 통신할 수 있는 상황에서, A와 C가 동시에 B에게 전송하면 B에서 충돌이 발생합니다. RTS/CTS로 이 문제를 완화합니다.
+
+## 무선 LAN 구성 요소
+
+- **AP(Access Point):** 무선 단말과 유선 네트워크를 연결하는 기지국
+- **BSS(Basic Service Set):** 하나의 AP와 연결된 단말들의 집합
+- **ESS(Extended Service Set):** 여러 BSS를 연결한 더 넓은 무선 네트워크
+- **SSID:** 무선 네트워크 식별 이름
+
+## 이동통신 세대별 특징
+
+| 세대 | 기술 | 특징 |
+|------|------|------|
+| 1G | AMPS | 아날로그 음성 통화 |
+| 2G | GSM, CDMA | 디지털 음성, SMS |
+| 3G | WCDMA, CDMA2000 | 모바일 인터넷, 영상통화 |
+| 4G | LTE, LTE-A | 고속 데이터, 스트리밍 |
+| 5G | NR | 초고속, 초저지연, 대규모 IoT |
+
+## 핵심 정리
+
+- Wi-Fi 표준: IEEE 802.11, 세대별 속도 증가
+- CSMA/CA: 무선 환경에서 충돌 회피 방식 (유선의 CSMA/CD와 구분)
+- 은닉 단말 문제: RTS/CTS로 해결
+- AP(Access Point): 무선 단말-유선 네트워크 연결
+- 5G: 초고속·초저지연·대규모 연결 지원
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="무선 LAN(Wi-Fi)에서 충돌을 방지하기 위해 사용하는 매체 접근 제어 방식은?"
+  options={['CSMA/CD', 'CSMA/CA', 'TDMA', 'FDMA']}
+  correctAnswer={2}
+  explanation="무선 환경에서는 충돌 감지(CD)가 어렵기 때문에 충돌 회피(CA) 방식인 CSMA/CA를 사용합니다."
+  optionExplanations={['CSMA/CD는 유선 이더넷에서 사용하는 충돌 감지 방식입니다.', 'CSMA/CA는 무선 LAN에서 충돌을 회피하는 방식입니다. (정답)', 'TDMA는 시분할 다중 접속으로 주로 이동통신에서 사용됩니다.', 'FDMA는 주파수 분할 다중 접속으로 주로 아날로그 이동통신에서 사용됩니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="무선 LAN에서 은닉 단말 문제(Hidden Station Problem)를 해결하기 위한 메커니즘은?"
+  options={['CSMA/CD', 'Back-off 알고리즘', 'RTS/CTS 교환', 'CRC 오류 검출']}
+  correctAnswer={3}
+  explanation="RTS(Request to Send)/CTS(Clear to Send) 교환으로 은닉 단말 문제를 해결합니다. 송신자가 RTS를 보내면 주변 단말들이 CTS를 듣고 전송을 자제합니다."
+  optionExplanations={['CSMA/CD는 유선 이더넷에서 충돌을 감지하는 방식으로 은닉 단말 문제 해결과 무관합니다.', '백오프 알고리즘은 충돌 후 대기 시간 조절에 사용됩니다.', 'RTS/CTS 교환이 은닉 단말 문제를 해결합니다. (정답)', 'CRC는 프레임 오류 검출에 사용됩니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="IEEE 802.11ac(Wi-Fi 5)가 사용하는 주파수 대역은?"
+  options={['2.4 GHz만 사용', '5 GHz만 사용', '2.4 GHz와 5 GHz 모두 사용', '6 GHz만 사용']}
+  correctAnswer={2}
+  explanation="802.11ac(Wi-Fi 5)는 5 GHz 대역만 사용합니다. 2.4 GHz도 사용하는 것은 802.11n(Wi-Fi 4)과 802.11ax(Wi-Fi 6)입니다."
+  optionExplanations={['2.4 GHz만 사용하는 것은 802.11b와 802.11g입니다.', '802.11ac(Wi-Fi 5)는 5 GHz 대역만 사용합니다. (정답)', '2.4 GHz와 5 GHz 모두 사용하는 것은 802.11n(Wi-Fi 4)입니다.', '6 GHz를 포함하는 것은 802.11ax(Wi-Fi 6)입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="5G 이동통신의 주요 특징이 아닌 것은?"
+  options={['초고속 데이터 전송', '초저지연(Ultra-Low Latency)', '대규모 IoT 기기 연결 지원', '아날로그 신호 기반 통신']}
+  correctAnswer={4}
+  explanation="5G는 디지털 방식으로 초고속·초저지연·대규모 연결을 제공합니다. 아날로그 신호 기반은 1세대(1G) 이동통신의 특징입니다."
+  optionExplanations={['초고속 데이터 전송은 5G의 핵심 특징입니다.', '초저지연은 자율주행, 원격 의료 등을 위한 5G 핵심 특징입니다.', '대규모 IoT 연결 지원은 5G의 핵심 특징입니다.', '아날로그 신호 기반은 1G의 특징입니다. 5G는 디지털 방식입니다. (정답)']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="무선 LAN에서 AP(Access Point)의 역할은?"
+  options={['무선 신호를 증폭하여 전달하는 리피터 역할', '무선 단말과 유선 네트워크를 연결하는 기지국 역할', '여러 유선 네트워크를 연결하는 라우터 역할', '이더넷 프레임을 패킷으로 변환하는 역할']}
+  correctAnswer={2}
+  explanation="AP(Access Point)는 무선 단말(스마트폰, 노트북 등)이 유선 네트워크에 접속할 수 있도록 연결 통로 역할을 하는 기지국입니다."
+  optionExplanations={['리피터는 단순히 신호를 증폭하는 장비로 AP와 다릅니다.', 'AP는 무선 단말과 유선 네트워크를 연결하는 기지국 역할입니다. (정답)', 'AP는 라우터가 아니지만, 가정용 무선 공유기는 AP와 라우터 기능을 통합하기도 합니다.', '이더넷 프레임-패킷 변환은 네트워크 계층 기능으로 AP의 주 역할이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="2.4 GHz 대역에 비해 5 GHz 대역의 특징으로 옳은 것은?"
+  options={['전송 범위가 더 넓다', '장애물 투과성이 더 좋다', '더 빠른 속도를 제공하나 범위가 좁다', '간섭이 더 많다']}
+  correctAnswer={3}
+  explanation="5 GHz 대역은 2.4 GHz보다 더 빠른 속도를 제공하지만 전파 특성상 범위가 좁고 장애물 투과성이 낮습니다."
+  optionExplanations={['더 넓은 범위는 2.4 GHz의 특징입니다.', '장애물 투과성이 더 좋은 것은 2.4 GHz입니다.', '5 GHz는 더 빠르지만 범위가 좁습니다. (정답)', '간섭이 더 많은 것은 2.4 GHz 대역입니다 (전자레인지 등과 간섭).']}
+/>

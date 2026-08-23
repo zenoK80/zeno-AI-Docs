@@ -1,0 +1,172 @@
+---
+title: '01. 명제와 논리'
+description: '명제, 논리 연산자, 진리표, 논리적 동치와 추론 규칙을 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 명제의 진리값을 결정하고, 논리 연산자를 이용한 복합 명제의 진리표를 작성합니다.
+</Callout>
+
+## 명제 (Proposition)
+
+**명제**는 참(True) 또는 거짓(False)으로 명확히 판별할 수 있는 선언적 문장입니다.
+
+- "서울은 대한민국의 수도이다" → 참(T) → 명제
+- "2 + 3 = 5" → 참(T) → 명제
+- "오늘 날씨가 좋다" → 판별 기준 없음 → 명제 아님
+- "x + 1 = 3" → 변수가 있어 판별 불가 → 명제 아님 (명제 함수)
+
+## 논리 연산자
+
+| 연산 | 기호 | 읽기 | 설명 |
+| --- | --- | --- | --- |
+| 부정 | $\neg p$ | not p | p가 참이면 거짓, 거짓이면 참 |
+| 논리곱 | $p \land q$ | p and q | p와 q 모두 참일 때만 참 |
+| 논리합 | $p \lor q$ | p or q | p 또는 q 중 하나라도 참이면 참 |
+| 조건 | $p \rightarrow q$ | p이면 q | p가 참이고 q가 거짓일 때만 거짓 |
+| 쌍조건 | $p \leftrightarrow q$ | p이면 q, q이면 p | p와 q의 진리값이 같을 때 참 |
+| 배타적 논리합 | $p \oplus q$ | p xor q | p와 q의 진리값이 다를 때 참 |
+
+## 진리표 (Truth Table)
+
+| $p$ | $q$ | $\neg p$ | $p \land q$ | $p \lor q$ | $p \rightarrow q$ | $p \leftrightarrow q$ |
+| --- | --- | --- | --- | --- | --- | --- |
+| T | T | F | T | T | T | T |
+| T | F | F | F | T | F | F |
+| F | T | T | F | T | T | F |
+| F | F | T | F | F | T | T |
+
+<Callout type="warning">
+  조건문 $p \rightarrow q$는 전제(p)가 거짓이면 결론(q)과 무관하게 항상 참입니다. "거짓 전제는 어떤 결론도 허용한다(Ex falso quodlibet)"라는 원리입니다.
+</Callout>
+
+## 논리적 동치 (Logical Equivalence)
+
+두 명제가 항상 같은 진리값을 가질 때 논리적으로 동치라고 합니다. 기호: $p \equiv q$
+
+주요 동치 법칙:
+
+| 법칙 | 내용 |
+| --- | --- |
+| 드모르간 법칙 | $\neg(p \land q) \equiv \neg p \lor \neg q$ |
+| 드모르간 법칙 | $\neg(p \lor q) \equiv \neg p \land \neg q$ |
+| 대우 법칙 | $p \rightarrow q \equiv \neg q \rightarrow \neg p$ |
+| 흡수 법칙 | $p \land (p \lor q) \equiv p$ |
+| 이중 부정 | $\neg(\neg p) \equiv p$ |
+
+## 항진 명제와 모순 명제
+
+- **항진 명제(Tautology):** 어떤 진리값에서도 항상 참인 명제 (예: $p \lor \neg p$)
+- **모순 명제(Contradiction):** 어떤 진리값에서도 항상 거짓인 명제 (예: $p \land \neg p$)
+
+## 핵심 정리
+
+- 명제: 참 또는 거짓으로 판별 가능한 선언문
+- 조건문 $p \rightarrow q$: p가 T, q가 F일 때만 거짓
+- 드모르간: $\neg(p \land q) \equiv \neg p \lor \neg q$
+- 대우: $p \rightarrow q \equiv \neg q \rightarrow \neg p$ (역, 이는 원래 명제와 동치 아님)
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="다음 중 모순 명제(Contradiction)에 해당하는 것은?"
+  options={['① p → p', '② (p ∧ (p→q)) → q', '③ ∼(p∨q) → (∼p → ∼q)', '④ p ∧ ∼p']}
+  correctAnswer={4}
+  explanation="p ∧ ∼p는 p가 참이면 ∼p가 거짓이 되어 논리곱이 거짓, p가 거짓이면 p가 거짓이 되어 논리곱이 거짓입니다. 항상 거짓이므로 모순 명제입니다."
+  optionExplanations={[
+    'p → p는 p의 진리값에 무관하게 항상 참인 항진 명제입니다.',
+    '이 명제는 논리 추론 규칙(긍정식)으로 항진 명제입니다.',
+    '이 명제도 항진 명제입니다.',
+    '맞습니다. p ∧ ∼p는 항상 거짓이므로 모순 명제입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="조건문 p → q에서 p가 거짓(F), q가 거짓(F)일 때 진리값은?"
+  options={['① 참(T)', '② 거짓(F)', '③ 판별 불가', '④ p와 q에 따라 다름']}
+  correctAnswer={1}
+  explanation="조건문 p → q는 p가 참이고 q가 거짓일 때만 거짓입니다. p가 거짓이면 q에 무관하게 조건문은 참입니다."
+  optionExplanations={[
+    '맞습니다. 전제(p)가 거짓이면 조건문은 항상 참입니다.',
+    '거짓이 되려면 p가 참이고 q가 거짓이어야 합니다.',
+    '진리표로 명확히 판별됩니다.',
+    'p = F일 때 q에 무관하게 항상 참입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="드모르간 법칙 ∼(p ∧ q)와 동치인 명제는?"
+  options={['① ∼p ∧ ∼q', '② ∼p ∨ ∼q', '③ p ∨ q', '④ p ∧ q']}
+  correctAnswer={2}
+  explanation="드모르간 법칙: ∼(p ∧ q) ≡ ∼p ∨ ∼q입니다. NOT이 AND 안으로 분배되면 AND가 OR로 바뀝니다."
+  optionExplanations={[
+    '∼p ∧ ∼q는 ∼(p ∨ q)와 동치입니다.',
+    '맞습니다. ∼(p ∧ q) ≡ ∼p ∨ ∼q입니다.',
+    'p ∨ q는 드모르간과 무관합니다.',
+    'p ∧ q는 원래 명제의 부정이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="명제 p → q의 대우(Contrapositive)는?"
+  options={['① q → p', '② ∼p → ∼q', '③ ∼q → ∼p', '④ p → ∼q']}
+  correctAnswer={3}
+  explanation="조건문 p → q의 대우는 ∼q → ∼p입니다. 대우는 원래 명제와 논리적으로 동치입니다."
+  optionExplanations={[
+    'q → p는 역(Converse)으로 원래 명제와 동치가 아닙니다.',
+    '∼p → ∼q는 이(Inverse)로 원래 명제와 동치가 아닙니다.',
+    '맞습니다. 대우는 ∼q → ∼p이며 원래 명제와 동치입니다.',
+    'p → ∼q는 원래 명제를 부정한 것과 다릅니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="항진 명제(Tautology)란?"
+  options={['① 항상 거짓인 명제', '② 변수에 따라 참/거짓이 달라지는 명제', '③ 어떤 진리값 조합에서도 항상 참인 명제', '④ 두 명제가 동치인 경우']}
+  correctAnswer={3}
+  explanation="항진 명제(Tautology)는 모든 명제 변수의 진리값 조합에 대해 항상 참이 되는 명제입니다. 대표 예: p ∨ ∼p"
+  optionExplanations={[
+    '항상 거짓인 명제는 모순 명제(Contradiction)입니다.',
+    '경우에 따라 달라지는 명제는 우발적 명제입니다.',
+    '맞습니다. 항진 명제는 항상 참입니다.',
+    '두 명제가 동치인 것은 논리적 동치입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="p ∨ q와 q ∨ p의 관계는?"
+  options={['① 서로 모순이다', '② 논리적으로 동치이다', '③ 첫 번째만 항진 명제이다', '④ 두 명제는 서로 다르다']}
+  correctAnswer={2}
+  explanation="논리합(∨)은 교환 법칙이 성립합니다. p ∨ q ≡ q ∨ p로 두 명제는 논리적으로 동치입니다."
+  optionExplanations={[
+    '두 명제는 항상 같은 진리값을 가집니다.',
+    '맞습니다. 교환 법칙: p ∨ q ≡ q ∨ p입니다.',
+    '두 명제 모두 항진 명제가 아닙니다.',
+    '진리표 결과가 동일하여 동치입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="p = 참(T), q = 거짓(F)일 때 p ↔ q(쌍조건)의 진리값은?"
+  options={['① 참(T)', '② 거짓(F)', '③ 미정', '④ 항상 참']}
+  correctAnswer={2}
+  explanation="쌍조건 p ↔ q는 p와 q의 진리값이 같을 때만 참입니다. p=T, q=F이면 진리값이 다르므로 거짓(F)입니다."
+  optionExplanations={[
+    'p와 q가 같은 진리값일 때 참이 됩니다.',
+    '맞습니다. p=T, q=F이면 진리값이 달라 거짓입니다.',
+    '진리표로 명확히 판별됩니다.',
+    '쌍조건은 항상 참이 아닙니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [국가평생교육진흥원 독학학위제](https://bdes.nile.or.kr/nile/study/nStudy1_1.do)
+- Kenneth H. Rosen, "Discrete Mathematics and Its Applications"

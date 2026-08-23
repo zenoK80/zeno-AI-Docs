@@ -1,0 +1,256 @@
+---
+title: '12. Canvas 2D'
+description: 'Canvas 2D 기초, 도형, 이미지, 텍스트 그리기를 코드로 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** Canvas 2D API로 도형을 그리고, 이미지를 렌더링하며, 텍스트를 표시하는 방법을 익힙니다.
+</Callout>
+
+## Canvas 기본 설정
+
+```html
+<canvas id="canvas" width="600" height="400"></canvas>
+```
+
+```js
+const canvas = document.querySelector('#canvas')
+const ctx = canvas.getContext('2d')  // 2D 렌더링 컨텍스트
+```
+
+## 직사각형 그리기
+
+```js
+// 채운 직사각형
+ctx.fillStyle = 'skyblue'
+ctx.fillRect(50, 50, 200, 100)  // x, y, width, height
+
+// 테두리 직사각형
+ctx.strokeStyle = 'navy'
+ctx.lineWidth = 3
+ctx.strokeRect(300, 50, 200, 100)
+
+// 지우기
+ctx.clearRect(0, 0, canvas.width, canvas.height)
+```
+
+## 경로(Path) 그리기
+
+```js
+ctx.beginPath()
+ctx.moveTo(100, 200)     // 시작점
+ctx.lineTo(200, 100)     // 선 그리기
+ctx.lineTo(300, 200)     // 계속
+ctx.closePath()           // 시작점으로 닫기
+ctx.fillStyle = 'coral'
+ctx.fill()               // 채우기
+ctx.strokeStyle = 'darkred'
+ctx.stroke()             // 테두리 그리기
+```
+
+## 원 그리기 (arc)
+
+```js
+ctx.beginPath()
+ctx.arc(
+  300, 200,        // 중심 x, y
+  80,              // 반지름
+  0,               // 시작 각도 (라디안)
+  Math.PI * 2,     // 끝 각도 (360도)
+)
+ctx.fillStyle = 'gold'
+ctx.fill()
+```
+
+## 텍스트 그리기
+
+```js
+ctx.font = 'bold 32px sans-serif'
+ctx.fillStyle = 'black'
+ctx.textAlign = 'center'
+ctx.textBaseline = 'middle'
+ctx.fillText('Hello Canvas!', canvas.width / 2, canvas.height / 2)
+
+// 테두리 텍스트
+ctx.strokeStyle = 'red'
+ctx.lineWidth = 1
+ctx.strokeText('Hello!', 100, 100)
+```
+
+## 이미지 그리기
+
+```js
+const img = new Image()
+img.onload = () => {
+  // 원본 크기
+  ctx.drawImage(img, 10, 10)
+
+  // 크기 지정
+  ctx.drawImage(img, 10, 10, 300, 200)
+
+  // 소스 잘라내기 + 크기 지정
+  // drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+  ctx.drawImage(img, 0, 0, 100, 100, 200, 200, 200, 200)
+}
+img.src = '/image.png'
+```
+
+## 변환 (Transform)
+
+```js
+ctx.save()                          // 현재 상태 저장
+
+ctx.translate(canvas.width / 2, canvas.height / 2)  // 원점 이동
+ctx.rotate(Math.PI / 4)             // 45도 회전
+ctx.scale(1.5, 1.5)                 // 1.5배 확대
+
+ctx.fillRect(-50, -50, 100, 100)    // 원점 기준으로 그리기
+
+ctx.restore()                       // 상태 복원
+```
+
+## 그라디언트
+
+```js
+// 선형 그라디언트
+const gradient = ctx.createLinearGradient(0, 0, 600, 0)
+gradient.addColorStop(0, 'red')
+gradient.addColorStop(0.5, 'yellow')
+gradient.addColorStop(1, 'blue')
+
+ctx.fillStyle = gradient
+ctx.fillRect(0, 0, 600, 100)
+
+// 원형 그라디언트
+const radial = ctx.createRadialGradient(300, 200, 10, 300, 200, 150)
+radial.addColorStop(0, 'white')
+radial.addColorStop(1, 'black')
+```
+
+## 핵심 정리
+
+- `canvas.getContext('2d')`로 2D 컨텍스트를 얻습니다.
+- `fillRect`, `strokeRect`로 직사각형을, `arc`로 원을, `beginPath` + `lineTo`로 경로를 그립니다.
+- `save()`/`restore()`로 상태를 저장/복원해 변환을 안전하게 적용합니다.
+- `drawImage()`로 이미지를 그리고 잘라낼 수 있습니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Canvas 2D 컨텍스트를 얻는 방법은?"
+  options={[
+    "canvas.getContext('canvas')",
+    "canvas.get2D()",
+    "canvas.getContext('2d')",
+    "new Canvas2D(canvas)",
+  ]}
+  correctAnswer={3}
+  explanation="canvas.getContext('2d')로 2D 렌더링 컨텍스트 객체를 가져옵니다."
+  optionExplanations={[
+    "인수는 '2d'이어야 합니다.",
+    "get2D()는 없는 메서드입니다.",
+    "맞습니다. '2d'를 인수로 전달합니다.",
+    "Canvas2D 생성자는 없습니다.",
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`ctx.beginPath()`를 호출하는 이유는?"
+  options={[
+    '새로운 색상을 설정하기 위해',
+    '이전 경로 내용을 초기화하고 새 경로를 시작하기 위해',
+    '캔버스를 초기화하기 위해',
+    '그라디언트를 시작하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="beginPath()를 호출하지 않으면 이전 경로에 이어서 그려집니다. 새 경로를 그리기 전에 항상 beginPath()로 초기화합니다."
+  optionExplanations={[
+    '색상 설정은 fillStyle, strokeStyle로 합니다.',
+    '맞습니다. 이전 경로를 지우고 새로 시작합니다.',
+    '캔버스 초기화는 clearRect()를 씁니다.',
+    '그라디언트는 createLinearGradient() 등을 씁니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`ctx.save()`와 `ctx.restore()`의 용도는?"
+  options={[
+    '파일로 저장하고 불러온다.',
+    '캔버스 이미지를 저장하고 복원한다.',
+    'fillStyle, transform 등 현재 상태를 스택에 저장하고, restore()로 이전 상태로 되돌린다.',
+    '변환을 취소한다.',
+  ]}
+  correctAnswer={3}
+  explanation="save()는 현재 fillStyle, strokeStyle, transform 등 컨텍스트 상태를 스택에 저장합니다. restore()는 가장 최근 저장된 상태를 꺼내 복원합니다."
+  optionExplanations={[
+    '파일 저장/불러오기가 아닙니다.',
+    '캔버스 픽셀이 아닌 컨텍스트 상태를 저장합니다.',
+    '맞습니다. 상태 스택으로 안전한 변환 적용에 사용합니다.',
+    '변환만 취소하는 것이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="canvas의 width/height와 CSS의 너비/높이의 차이는?"
+  options={[
+    '차이가 없다.',
+    'canvas 속성은 캔버스 내부 해상도이고, CSS는 화면에 표시되는 크기이다.',
+    'CSS 크기가 더 중요하다.',
+    'width만 canvas 속성으로 지정해야 한다.',
+  ]}
+  correctAnswer={2}
+  explanation="canvas의 width/height는 내부 픽셀 해상도이고, CSS의 width/height는 화면에 표시되는 크기입니다. 둘이 다르면 그림이 늘어나거나 축소됩니다."
+  optionExplanations={[
+    '둘은 다른 개념입니다.',
+    '맞습니다. 해상도와 표시 크기가 별도입니다.',
+    '내부 해상도(canvas 속성)도 중요합니다.',
+    'width와 height 모두 canvas 속성으로 지정합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`ctx.arc(x, y, r, 0, Math.PI * 2)`에서 Math.PI * 2는 무엇을 의미하나요?"
+  options={[
+    '지름',
+    '360도(완전한 원)',
+    '반원',
+    '90도',
+  ]}
+  correctAnswer={2}
+  explanation="arc의 끝 각도가 Math.PI * 2(= 2π 라디안)이면 360도, 즉 완전한 원을 그립니다."
+  optionExplanations={[
+    '지름은 반지름 r의 2배입니다.',
+    '맞습니다. 2π 라디안은 360도 완전한 원입니다.',
+    '반원은 Math.PI입니다.',
+    '90도는 Math.PI / 2입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="캔버스에서 이미지를 그리기 전에 해야 하는 것은?"
+  options={[
+    '특별히 없다.',
+    "Image 객체를 만들고 src를 설정한 후 onload 콜백 안에서 그려야 한다.",
+    'fetch로 이미지를 다운로드해야 한다.',
+    'CSS로 이미지를 먼저 표시해야 한다.',
+  ]}
+  correctAnswer={2}
+  explanation="이미지가 로딩 완료된 후에만 drawImage가 정상 동작합니다. img.onload 콜백 안에서 drawImage를 호출해야 합니다."
+  optionExplanations={[
+    '이미지 로딩이 완료될 때까지 기다려야 합니다.',
+    '맞습니다. onload 이후에 drawImage를 호출합니다.',
+    'fetch가 필수는 아닙니다.',
+    'CSS 표시가 필요하지 않습니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [MDN - Canvas API](https://developer.mozilla.org/ko/docs/Web/API/Canvas_API)
+- [MDN - CanvasRenderingContext2D](https://developer.mozilla.org/ko/docs/Web/API/CanvasRenderingContext2D)

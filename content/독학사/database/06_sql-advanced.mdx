@@ -1,0 +1,209 @@
+---
+title: '06. SQL 고급'
+description: '조인, 서브쿼리, 집합 연산, 뷰(View)의 사용법을 이해한다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** JOIN, 서브쿼리, UNION 등의 고급 SQL 구문과 뷰(View)의 개념을 이해한다.
+</Callout>
+
+## JOIN
+
+두 개 이상의 테이블을 연결하여 데이터를 조회합니다.
+
+### INNER JOIN (내부 조인)
+
+두 테이블에서 조인 조건을 만족하는 행만 반환합니다.
+
+```sql
+SELECT 학생.학번, 학생.이름, 학과.학과명
+FROM 학생
+INNER JOIN 학과 ON 학생.학과코드 = 학과.학과코드;
+
+-- 또는 (구식 표기)
+SELECT 학생.학번, 학생.이름, 학과.학과명
+FROM 학생, 학과
+WHERE 학생.학과코드 = 학과.학과코드;
+```
+
+### LEFT OUTER JOIN
+
+왼쪽 테이블의 모든 행을 반환하고, 매칭되지 않는 오른쪽은 NULL로 채웁니다.
+
+```sql
+SELECT 학생.학번, 학생.이름, 수강.과목코드
+FROM 학생
+LEFT OUTER JOIN 수강 ON 학생.학번 = 수강.학번;
+-- 수강 기록이 없는 학생도 포함 (과목코드: NULL)
+```
+
+### SELF JOIN
+
+같은 테이블을 두 번 참조합니다.
+
+```sql
+SELECT a.이름 AS 직원, b.이름 AS 상관
+FROM 직원 a
+JOIN 직원 b ON a.상관ID = b.직원ID;
+```
+
+## 서브쿼리 (Subquery)
+
+쿼리 안에 중첩된 쿼리입니다.
+
+### 단순 서브쿼리
+
+```sql
+-- 평균 나이보다 많은 학생 조회
+SELECT 이름, 나이
+FROM 학생
+WHERE 나이 > (SELECT AVG(나이) FROM 학생);
+```
+
+### IN 서브쿼리
+
+```sql
+-- CS 학과 학생이 수강한 과목
+SELECT DISTINCT 과목코드
+FROM 수강
+WHERE 학번 IN (SELECT 학번 FROM 학생 WHERE 학과코드 = 'CS');
+```
+
+### EXISTS 서브쿼리
+
+서브쿼리 결과가 존재하면 TRUE입니다.
+
+```sql
+-- 수강 기록이 있는 학생
+SELECT 이름
+FROM 학생 s
+WHERE EXISTS (SELECT 1 FROM 수강 WHERE 학번 = s.학번);
+```
+
+### 상관 서브쿼리 (Correlated Subquery)
+
+외부 쿼리의 값을 참조하는 서브쿼리입니다. 행마다 서브쿼리를 실행합니다.
+
+```sql
+-- 해당 학과에서 가장 나이 많은 학생
+SELECT 이름, 학과코드, 나이
+FROM 학생 s1
+WHERE 나이 = (
+    SELECT MAX(나이) FROM 학생 s2
+    WHERE s2.학과코드 = s1.학과코드
+);
+```
+
+## 집합 연산
+
+두 쿼리 결과를 집합 연산으로 결합합니다. 두 SELECT의 열 수와 데이터 타입이 호환되어야 합니다.
+
+| 연산 | 설명 | 중복 |
+|------|------|------|
+| `UNION` | 합집합 | 제거 |
+| `UNION ALL` | 합집합 | 유지 |
+| `INTERSECT` | 교집합 | 제거 |
+| `EXCEPT` (MINUS) | 차집합 | 제거 |
+
+```sql
+-- CS 또는 EE 학과 학생의 학번 (중복 제거)
+SELECT 학번 FROM 학생 WHERE 학과코드 = 'CS'
+UNION
+SELECT 학번 FROM 학생 WHERE 학과코드 = 'EE';
+```
+
+## 뷰 (View)
+
+**뷰**는 하나 이상의 테이블에서 유도된 가상 테이블입니다. 실제 데이터를 저장하지 않고 쿼리만 저장합니다.
+
+```sql
+-- 뷰 생성
+CREATE VIEW CS학생뷰 AS
+SELECT 학번, 이름, 나이
+FROM 학생
+WHERE 학과코드 = 'CS';
+
+-- 뷰 조회 (일반 테이블처럼 사용)
+SELECT * FROM CS학생뷰;
+
+-- 뷰 삭제
+DROP VIEW CS학생뷰;
+```
+
+### 뷰의 장점
+
+- **보안:** 특정 열/행만 노출
+- **단순화:** 복잡한 쿼리를 간단하게 재사용
+- **논리적 독립성:** 기본 테이블 변경 시 뷰 인터페이스 유지
+
+### 뷰 업데이트 제한
+
+뷰를 통한 INSERT/UPDATE/DELETE는 제한적으로만 가능합니다.
+
+- **가능:** 기본 테이블 하나에서 생성된 단순 뷰
+- **불가:** GROUP BY, DISTINCT, JOIN, 집계 함수를 사용한 뷰
+
+## 핵심 정리
+
+- INNER JOIN: 조인 조건 만족하는 행만 반환
+- LEFT OUTER JOIN: 왼쪽 테이블 전체 + 매칭 행 (NULL 포함)
+- 서브쿼리: WHERE/FROM/SELECT 절에 중첩 사용 가능
+- EXISTS: 서브쿼리 결과 존재 여부 확인
+- UNION vs UNION ALL: 중복 제거 vs 유지
+- 뷰: 가상 테이블, 데이터 저장 없이 쿼리만 저장
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="INNER JOIN과 LEFT OUTER JOIN의 차이는?"
+  options={['INNER JOIN은 왼쪽 테이블 전체를, LEFT OUTER JOIN은 조건을 만족하는 행만 반환한다', 'INNER JOIN은 조인 조건을 만족하는 행만 반환하고, LEFT OUTER JOIN은 왼쪽 테이블의 모든 행을 반환한다', '두 JOIN은 항상 같은 결과를 반환한다', 'LEFT OUTER JOIN은 오른쪽 테이블 전체를 반환한다']}
+  correctAnswer={2}
+  explanation="INNER JOIN은 두 테이블에서 조인 조건을 만족하는 행만 반환합니다. LEFT OUTER JOIN은 왼쪽 테이블의 모든 행을 반환하며, 오른쪽 테이블에 매칭되지 않는 경우 NULL로 채웁니다."
+  optionExplanations={['설명이 반대입니다.', 'INNER JOIN은 조건 만족 행만, LEFT OUTER JOIN은 왼쪽 전체를 반환합니다. (정답)', '매칭되지 않는 행이 있으면 결과가 다릅니다.', 'LEFT OUTER JOIN은 왼쪽 테이블 전체를 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="뷰(View)의 특징으로 옳은 것은?"
+  options={['뷰는 실제 데이터를 별도로 저장한다', '뷰는 쿼리만 저장하는 가상 테이블로 일반 테이블처럼 사용할 수 있다', '뷰를 통한 데이터 수정은 항상 가능하다', '뷰는 단일 테이블에서만 생성할 수 있다']}
+  correctAnswer={2}
+  explanation="뷰는 실제 데이터를 저장하지 않고 SELECT 쿼리만 저장하는 가상 테이블입니다. 사용자는 뷰를 일반 테이블처럼 조회할 수 있으며, 뷰 접근 시 저장된 쿼리가 실행됩니다."
+  optionExplanations={['뷰는 실제 데이터를 저장하지 않습니다.', '뷰는 쿼리를 저장하는 가상 테이블입니다. (정답)', '뷰를 통한 수정은 단순 뷰에서만 제한적으로 가능합니다.', '뷰는 여러 테이블을 조인하여 생성할 수도 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="UNION과 UNION ALL의 차이는?"
+  options={['UNION은 합집합, UNION ALL은 교집합이다', 'UNION은 중복 행을 제거하고, UNION ALL은 중복 행을 포함한다', 'UNION ALL만 집합 호환성이 필요하다', 'UNION은 ORDER BY와 함께 사용할 수 없다']}
+  correctAnswer={2}
+  explanation="UNION은 두 쿼리 결과의 합집합에서 중복을 제거합니다. UNION ALL은 중복을 제거하지 않고 모든 행을 포함합니다. UNION ALL이 중복 제거 비용이 없어 더 빠릅니다."
+  optionExplanations={['UNION과 UNION ALL 모두 합집합입니다.', 'UNION은 중복 제거, UNION ALL은 중복 포함입니다. (정답)', '두 연산 모두 집합 호환성이 필요합니다.', 'UNION도 ORDER BY와 함께 사용 가능합니다 (마지막 SELECT에).']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="EXISTS 서브쿼리와 IN 서브쿼리의 차이는?"
+  options={['EXISTS는 값을 비교하고, IN은 존재 여부를 확인한다', 'IN은 값의 목록과 비교하고, EXISTS는 서브쿼리 결과의 존재 여부를 확인한다', 'EXISTS와 IN은 항상 동일한 결과를 반환한다', 'IN은 상관 서브쿼리에만 사용 가능하다']}
+  correctAnswer={2}
+  explanation="IN은 값이 서브쿼리 결과 목록에 포함되는지 비교합니다. EXISTS는 서브쿼리가 하나 이상의 행을 반환하면 TRUE입니다. EXISTS는 상관 서브쿼리와 함께 자주 사용됩니다."
+  optionExplanations={['설명이 반대입니다.', 'IN은 값 목록 비교, EXISTS는 결과 존재 여부 확인입니다. (정답)', 'NULL 처리 등에서 결과가 다를 수 있습니다.', 'IN도 상관 서브쿼리가 아닌 일반 서브쿼리에 자주 사용됩니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="GROUP BY를 포함한 뷰에서 데이터를 수정(INSERT/UPDATE/DELETE)할 수 없는 이유는?"
+  options={['뷰는 읽기 전용이기 때문에', 'GROUP BY, 집계 함수, DISTINCT 등은 기본 테이블의 특정 행과 매핑이 불명확하여 수정 불가', '뷰는 인덱스가 없기 때문에', '보안상의 이유로 모든 뷰는 수정 불가']}
+  correctAnswer={2}
+  explanation="GROUP BY나 집계 함수를 사용한 뷰는 여러 행이 하나의 행으로 합쳐지므로, 뷰의 한 행이 기본 테이블의 어느 행에 해당하는지 특정할 수 없어 수정이 불가능합니다."
+  optionExplanations={['단순 뷰는 수정이 가능합니다.', 'GROUP BY 등으로 기본 테이블 행과 매핑이 불명확하여 수정 불가합니다. (정답)', '인덱스 부재는 수정 불가와 무관합니다.', '모든 뷰가 수정 불가하지는 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="셀프 조인(Self Join)이 사용되는 전형적인 예시는?"
+  options={['두 개의 서로 다른 테이블을 합칠 때', '같은 테이블 내에서 계층적 관계(상관관계 등)를 조회할 때', '집계 함수를 사용할 때', '서브쿼리를 대체할 때']}
+  correctAnswer={2}
+  explanation="셀프 조인은 같은 테이블을 두 번 참조합니다. 직원 테이블에서 직원과 그 상관을 같은 테이블에서 조회하거나, 카테고리 테이블에서 부모-자식 관계를 조회할 때 사용합니다."
+  optionExplanations={['서로 다른 테이블을 합칠 때는 일반 JOIN을 사용합니다.', '같은 테이블 내 계층적 관계 조회가 셀프 조인의 전형적 사용입니다. (정답)', '집계 함수는 GROUP BY와 함께 사용합니다.', '서브쿼리와 셀프 조인은 다른 개념입니다.']}
+/>

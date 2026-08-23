@@ -1,0 +1,196 @@
+---
+title: '13. 알고리즘 분석'
+description: '점근 표기법(Big-O, Ω, Θ), 시간 복잡도와 공간 복잡도 분석, 복잡도 비교를 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 점근 표기법을 정확히 정의하고, 주요 알고리즘의 시간 복잡도를 분석합니다.
+</Callout>
+
+## 알고리즘 복잡도 분석
+
+알고리즘의 효율성을 **입력 크기 n에 대한 함수**로 표현합니다.
+
+- **시간 복잡도(Time Complexity):** 수행되는 연산의 수
+- **공간 복잡도(Space Complexity):** 사용되는 메모리의 양
+
+## 점근 표기법 (Asymptotic Notation)
+
+### Big-O 표기법 (상한)
+
+$f(n) = O(g(n))$이면: 충분히 큰 $n$에 대해 $f(n) \leq c \cdot g(n)$을 만족하는 양의 상수 $c$, $n_0$가 존재합니다.
+
+**의미:** $g(n)$은 $f(n)$의 점근적 상한
+
+### Big-Ω 표기법 (하한)
+
+$f(n) = \Omega(g(n))$이면: 충분히 큰 $n$에 대해 $f(n) \geq c \cdot g(n)$
+
+**의미:** $g(n)$은 $f(n)$의 점근적 하한
+
+### Big-Θ 표기법 (정확한 한계)
+
+$f(n) = \Theta(g(n))$이면: $f(n) = O(g(n))$ 이면서 $f(n) = \Omega(g(n))$
+
+**의미:** $f(n)$과 $g(n)$은 점근적으로 같은 속도로 성장
+
+## 복잡도 성장 순서
+
+$$O(1) < O(\log n) < O(n) < O(n \log n) < O(n^2) < O(n^3) < O(2^n) < O(n!)$$
+
+| 표기 | 이름 | 예시 알고리즘 |
+| --- | --- | --- |
+| $O(1)$ | 상수 | 배열 인덱스 접근 |
+| $O(\log n)$ | 로그 | 이진 탐색 |
+| $O(n)$ | 선형 | 선형 탐색 |
+| $O(n \log n)$ | 선형 로그 | 합병 정렬, 힙 정렬 |
+| $O(n^2)$ | 이차 | 버블 정렬, 삽입 정렬 |
+| $O(2^n)$ | 지수 | 재귀적 피보나치 |
+| $O(n!)$ | 팩토리얼 | 순열 생성 |
+
+## 점화식 분석
+
+**분할 정복 알고리즘** 복잡도는 점화식으로 표현됩니다.
+
+**마스터 정리:** $T(n) = aT(n/b) + f(n)$
+
+| 경우 | 조건 | 결과 |
+| --- | --- | --- |
+| 경우 1 | $f(n)$ 더 작음 | $T(n) = \Theta(n^{\log_b a})$ |
+| 경우 2 | 동일 속도 | $T(n) = \Theta(n^{\log_b a} \log n)$ |
+| 경우 3 | $f(n)$ 더 큼 | $T(n) = \Theta(f(n))$ |
+
+## 최선/평균/최악 분석
+
+| 경우 | 설명 | 표기 |
+| --- | --- | --- |
+| 최선(Best Case) | 입력이 가장 유리한 경우 | $\Omega$ |
+| 평균(Average Case) | 무작위 입력의 기대값 | $\Theta$ (일반적으로) |
+| 최악(Worst Case) | 입력이 가장 불리한 경우 | $O$ |
+
+<Callout type="warning">
+  보통 알고리즘의 성능을 논할 때 **최악의 경우(Worst Case)**를 기준으로 합니다. 성능을 보장해야 하기 때문입니다.
+</Callout>
+
+## 주요 알고리즘 복잡도 정리
+
+| 알고리즘 | 최선 | 평균 | 최악 |
+| --- | --- | --- | --- |
+| 버블 정렬 | $O(n)$ | $O(n^2)$ | $O(n^2)$ |
+| 선택 정렬 | $O(n^2)$ | $O(n^2)$ | $O(n^2)$ |
+| 삽입 정렬 | $O(n)$ | $O(n^2)$ | $O(n^2)$ |
+| 퀵 정렬 | $O(n \log n)$ | $O(n \log n)$ | $O(n^2)$ |
+| 합병 정렬 | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
+| 이진 탐색 | $O(1)$ | $O(\log n)$ | $O(\log n)$ |
+
+## 핵심 정리
+
+- Big-O: 상한, Big-Ω: 하한, Big-Θ: 정확한 한계
+- 복잡도 순서: O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ)
+- 마스터 정리로 분할 정복 복잡도 분석
+- 일반적으로 최악의 경우 분석을 사용
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="f(n) = 3n² + 5n + 100의 Big-O 표기는?"
+  options={['① O(1)', '② O(n)', '③ O(n²)', '④ O(n³)']}
+  correctAnswer={3}
+  explanation="점근 표기법에서 최고차 항만 남기고 상수 계수를 제거합니다. 3n² + 5n + 100에서 최고차 항은 n²이므로 O(n²)입니다."
+  optionExplanations={[
+    'O(1)은 상수 복잡도입니다.',
+    'O(n)은 선형 복잡도입니다.',
+    '맞습니다. 최고차 항 n²에 의해 O(n²)입니다.',
+    'O(n³)은 과대 추정이나 상한으로 틀리지는 않지만 정확하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="이진 탐색(Binary Search)의 시간 복잡도는?"
+  options={['① O(1)', '② O(log n)', '③ O(n)', '④ O(n log n)']}
+  correctAnswer={2}
+  explanation="이진 탐색은 매번 탐색 범위를 절반으로 줄이므로 T(n) = T(n/2) + 1이고, 마스터 정리에 의해 O(log n)입니다."
+  optionExplanations={[
+    'O(1)은 배열 인덱스 접근과 같은 상수 시간입니다.',
+    '맞습니다. 이진 탐색은 O(log n)입니다.',
+    'O(n)은 선형 탐색의 복잡도입니다.',
+    'O(n log n)은 합병 정렬의 복잡도입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Big-O, Big-Ω, Big-Θ의 의미를 바르게 연결한 것은?"
+  options={['① O=하한, Ω=상한, Θ=정확한 한계', '② O=상한, Ω=하한, Θ=정확한 한계', '③ O=정확한 한계, Ω=상한, Θ=하한', '④ O=하한, Ω=정확한 한계, Θ=상한']}
+  correctAnswer={2}
+  explanation="Big-O는 점근적 상한, Big-Ω는 점근적 하한, Big-Θ는 점근적으로 정확한 한계(상한과 하한 모두)를 나타냅니다."
+  optionExplanations={[
+    'O와 Ω의 의미가 반대로 되었습니다.',
+    '맞습니다. O=상한, Ω=하한, Θ=정확한 한계입니다.',
+    'O와 Θ의 의미가 다릅니다.',
+    '모두 잘못된 연결입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="퀵 정렬의 최악의 경우 시간 복잡도는?"
+  options={['① O(n log n)', '② O(n²)', '③ O(n)', '④ O(log n)']}
+  correctAnswer={2}
+  explanation="퀵 정렬의 최악의 경우는 피봇이 항상 최솟값이나 최댓값일 때입니다. 이때 분할이 불균형하게 되어 O(n²)이 됩니다."
+  optionExplanations={[
+    'O(n log n)은 퀵 정렬의 평균과 최선 복잡도입니다.',
+    '맞습니다. 퀵 정렬 최악은 O(n²)입니다.',
+    'O(n)은 퀵 정렬에 해당하지 않습니다.',
+    'O(log n)은 이진 탐색에 해당합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="합병 정렬의 점화식 T(n) = 2T(n/2) + n에서 마스터 정리를 적용한 결과는?"
+  options={['① O(n)', '② O(n log n)', '③ O(n²)', '④ O(log n)']}
+  correctAnswer={2}
+  explanation="a=2, b=2, f(n)=n. n^(log₂2) = n¹ = n. f(n) = n = Θ(n)이므로 마스터 정리 경우 2: T(n) = Θ(n log n)입니다."
+  optionExplanations={[
+    'O(n)은 선형 복잡도입니다.',
+    '맞습니다. 합병 정렬은 O(n log n)입니다.',
+    'O(n²)은 버블/선택/삽입 정렬의 복잡도입니다.',
+    'O(log n)은 이진 탐색의 복잡도입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="복잡도의 성장 순서로 옳은 것은?"
+  options={['① O(n²) < O(n log n) < O(n) < O(log n)', '② O(1) < O(log n) < O(n) < O(n log n) < O(n²)', '③ O(n) < O(1) < O(log n)', '④ O(n!) < O(2ⁿ) < O(n²)']}
+  correctAnswer={2}
+  explanation="알고리즘 복잡도의 성장 순서: O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(n³) < O(2ⁿ) < O(n!)입니다."
+  optionExplanations={[
+    '순서가 반대입니다.',
+    '맞습니다. 이것이 올바른 복잡도 성장 순서입니다.',
+    'O(1)이 O(n)보다 크지 않습니다.',
+    'O(n!)이 O(2ⁿ)보다 큽니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="알고리즘 분석에서 일반적으로 사용하는 경우는?"
+  options={['① 최선의 경우(Best Case)', '② 평균적인 경우(Average Case)', '③ 최악의 경우(Worst Case)', '④ 모든 경우의 평균']}
+  correctAnswer={3}
+  explanation="알고리즘 성능을 논할 때 일반적으로 최악의 경우를 기준으로 합니다. 어떤 입력에도 성능을 보장하기 위해서입니다."
+  optionExplanations={[
+    '최선의 경우는 실용적 의미가 적습니다.',
+    '평균의 경우도 중요하지만 가장 일반적인 기준은 최악입니다.',
+    '맞습니다. 최악의 경우가 가장 일반적 기준입니다.',
+    '모든 경우의 평균은 실제로 계산하기 어렵습니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [국가평생교육진흥원 독학학위제](https://bdes.nile.or.kr/nile/study/nStudy1_1.do)
+- Kenneth H. Rosen, "Discrete Mathematics and Its Applications"

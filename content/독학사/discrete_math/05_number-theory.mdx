@@ -1,0 +1,187 @@
+---
+title: '05. 수론'
+description: '나머지 정리, 유클리드 알고리즘, 모듈러 연산의 기본 개념을 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 유클리드 알고리즘으로 최대공약수를 계산하고, 모듈러 연산의 성질을 적용합니다.
+</Callout>
+
+## 정수 나눗셈과 나머지
+
+정수 $a$를 양의 정수 $d$로 나눌 때:
+
+$$a = dq + r, \quad 0 \leq r < d$$
+
+여기서 $q$는 몫(quotient), $r$은 나머지(remainder)입니다.
+
+표기: $r = a \mod d$
+
+## 약수와 배수
+
+- $d \mid a$: d는 a의 약수 (a를 d로 나눌 때 나머지가 0)
+- $d \nmid a$: d는 a의 약수가 아님
+
+## 최대공약수 (GCD)
+
+두 정수 $a$, $b$의 최대공약수(Greatest Common Divisor)는 $a$와 $b$ 모두의 약수 중 최대값입니다.
+
+$$\gcd(a, b) = \gcd(b, a \mod b)$$
+
+## 유클리드 알고리즘 (Euclidean Algorithm)
+
+$\gcd(a, b)$를 나머지 연산의 반복으로 효율적으로 구합니다.
+
+**예시:** $\gcd(252, 198)$ 계산
+
+```
+gcd(252, 198): 252 = 198 × 1 + 54  → gcd(198, 54)
+gcd(198, 54):  198 = 54 × 3  + 36  → gcd(54, 36)
+gcd(54, 36):   54  = 36 × 1  + 18  → gcd(36, 18)
+gcd(36, 18):   36  = 18 × 2  + 0   → gcd(18, 0) = 18
+
+∴ gcd(252, 198) = 18
+```
+
+시간 복잡도: $O(\log(\min(a, b)))$
+
+## 최소공배수 (LCM)
+
+$$\text{lcm}(a, b) = \frac{a \times b}{\gcd(a, b)}$$
+
+## 모듈러 산술 (Modular Arithmetic)
+
+정수 $a$와 $b$가 모듈러 $m$에 대해 합동이면:
+
+$$a \equiv b \pmod{m} \iff m \mid (a - b)$$
+
+**모듈러 연산의 성질:**
+
+$$\begin{aligned}
+(a + b) \bmod m &= ((a \bmod m) + (b \bmod m)) \bmod m \\
+(a \times b) \bmod m &= ((a \bmod m) \times (b \bmod m)) \bmod m
+\end{aligned}$$
+
+## 페르마의 소정리
+
+$p$가 소수이고 $p \nmid a$이면:
+
+$$a^{p-1} \equiv 1 \pmod{p}$$
+
+암호학(RSA 등)의 수학적 기반이 됩니다.
+
+## 중국인의 나머지 정리 (CRT)
+
+$m_1, m_2, ..., m_k$가 쌍마다 서로소일 때, 연립 합동 방정식의 해가 유일하게 존재합니다.
+
+## 핵심 정리
+
+- 유클리드: $\gcd(a, b) = \gcd(b, a \bmod b)$
+- $\text{lcm}(a, b) = a \times b / \gcd(a, b)$
+- 모듈러 덧셈과 곱셈은 각각 mod 연산 후 다시 mod 가능
+- 모듈러 합동은 동치 관계를 형성
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="유클리드 알고리즘으로 gcd(48, 18)을 구하면?"
+  options={['① 3', '② 6', '③ 9', '④ 12']}
+  correctAnswer={2}
+  explanation="gcd(48,18): 48 = 18×2 + 12 → gcd(18,12): 18 = 12×1 + 6 → gcd(12,6): 12 = 6×2 + 0 → gcd=6"
+  optionExplanations={[
+    '3은 gcd(48,18)이 아닙니다.',
+    '맞습니다. gcd(48,18) = 6입니다.',
+    '9는 gcd(48,18)이 아닙니다.',
+    '12는 48과 18의 공약수지만 최대공약수가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="lcm(12, 8)은?"
+  options={['① 4', '② 24', '③ 48', '④ 96']}
+  correctAnswer={2}
+  explanation="gcd(12,8) = 4. lcm(12,8) = 12×8/4 = 96/4 = 24입니다."
+  optionExplanations={[
+    '4는 gcd(12,8)입니다.',
+    '맞습니다. lcm(12,8) = 12×8/gcd(12,8) = 96/4 = 24입니다.',
+    '48 = 12×4은 lcm이 아닙니다.',
+    '96 = 12×8은 lcm 계산 전 분자값입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="17 mod 5의 값은?"
+  options={['① 1', '② 2', '③ 3', '④ 4']}
+  correctAnswer={2}
+  explanation="17 = 5 × 3 + 2이므로 17 mod 5 = 2입니다."
+  optionExplanations={[
+    '1은 17 mod 5가 아닙니다.',
+    '맞습니다. 17 = 5×3 + 2이므로 나머지는 2입니다.',
+    '3은 17 mod 5가 아닙니다.',
+    '4는 17 mod 5가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="a ≡ b (mod m)의 의미는?"
+  options={['① a와 b의 합이 m이다', '② m이 (a-b)를 나눈다', '③ a와 b의 최대공약수가 m이다', '④ a mod b = m이다']}
+  correctAnswer={2}
+  explanation="a ≡ b (mod m)은 m이 (a-b)를 나누어 떨어지게 한다는 의미입니다. 즉 a와 b는 m으로 나눈 나머지가 같습니다."
+  optionExplanations={[
+    'a와 b의 합이 m이라는 의미가 아닙니다.',
+    '맞습니다. m | (a-b)가 합동의 정의입니다.',
+    '최대공약수와 합동은 다른 개념입니다.',
+    'a mod b = m은 다른 표현입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="(13 + 7) mod 5의 값은?"
+  options={['① 0', '② 1', '③ 2', '④ 3']}
+  correctAnswer={1}
+  explanation="13 mod 5 = 3, 7 mod 5 = 2. (3 + 2) mod 5 = 5 mod 5 = 0. 또는 직접 (13+7) mod 5 = 20 mod 5 = 0입니다."
+  optionExplanations={[
+    '맞습니다. 20 mod 5 = 0입니다.',
+    '1이 아닙니다.',
+    '2가 아닙니다.',
+    '3이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="gcd(a, b) = 1일 때 a와 b의 관계는?"
+  options={['① a와 b는 같다', '② a와 b는 서로소이다', '③ a는 b의 배수이다', '④ b는 a의 약수이다']}
+  correctAnswer={2}
+  explanation="두 수의 최대공약수가 1이면 두 수는 서로소(Coprime, Relatively Prime)라고 합니다. 공통 약수가 1뿐이라는 의미입니다."
+  optionExplanations={[
+    'a = b이면 gcd(a,a) = a이므로 1이 되려면 a = 1이어야 합니다.',
+    '맞습니다. gcd = 1이면 서로소입니다.',
+    '배수 관계이면 gcd가 a 또는 b입니다.',
+    '약수 관계이면 gcd가 b입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="모듈러 연산 (6 × 8) mod 7의 값은?"
+  options={['① 0', '② 1', '③ 6', '④ 4']}
+  correctAnswer={2}
+  explanation="6 mod 7 = 6, 8 mod 7 = 1. (6 × 1) mod 7 = 6. 또는 직접 48 mod 7 = 6. 잠깐, 48 = 7×6 + 6이므로 48 mod 7 = 6입니다."
+  optionExplanations={[
+    '0이 아닙니다.',
+    '1이 아닙니다.',
+    '맞습니다. 6×8 = 48, 48 = 7×6 + 6이므로 48 mod 7 = 6입니다.',
+    '4가 아닙니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [국가평생교육진흥원 독학학위제](https://bdes.nile.or.kr/nile/study/nStudy1_1.do)
+- Kenneth H. Rosen, "Discrete Mathematics and Its Applications"
