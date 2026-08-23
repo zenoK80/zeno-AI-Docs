@@ -29,6 +29,9 @@ const meta = {
   '28_network-security-scenarios': '28. 네트워크·보안 실전 시나리오',
   '29_first-exam-practice': '29. 1차 객관식 실전 점검',
   '30_second-exam-practice': '30. 2차 단답·서술 실전 점검',
+  '31_기출-practice-round-1': '31. 1차 기출 연습 1회 — 시스템 관리',
+  '32_기출-practice-round-2': '32. 1차 기출 연습 2회 — 네트워크·서비스',
+  '33_기출-practice-round-3': '33. 1차 최종 실전 50문항',
 }
 
 export default meta
