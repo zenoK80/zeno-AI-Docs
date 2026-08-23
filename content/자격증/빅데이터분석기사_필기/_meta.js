@@ -29,6 +29,9 @@ const meta = {
   '28_modeling-and-interpretation-question-types': '28. 모델링·결과 해석 기출 유형',
   '29_mock-exam-1': '29. 실전 모의 1회',
   '30_mock-exam-2': '30. 실전 모의 2회',
+  '31_기출-practice-round-1': '31. 기출 유형 연습 1회 — 기획·탐색',
+  '32_기출-practice-round-2': '32. 기출 유형 연습 2회 — 모델링·평가',
+  '33_기출-practice-round-3': '33. 최종 실전 50문항',
 }
 
 export default meta

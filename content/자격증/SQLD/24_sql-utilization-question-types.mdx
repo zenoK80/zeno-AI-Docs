@@ -15,72 +15,49 @@ description: '서브쿼리·윈도우 함수·TCL·DDL·MERGE 등 활용 파트 
 
 | 서브쿼리 종류 | 반환 행 수 | 사용 가능 연산자 |
 |--------------|-----------|-----------------|
-| 단일행 서브쿼리 | 1행 | =, >, &lt;, >=, &lt;=, &lt;> |
+| 단일행 서브쿼리 | 1행 | =, &gt;, &lt;, &gt;=, &lt;=, &lt;&gt; |
 | 다중행 서브쿼리 | N행 | IN, ANY, ALL, EXISTS |
 | 다중컬럼 서브쿼리 | N행, N컬럼 | IN과 함께 (컬럼, 컬럼) 형태 |
 
 ---
 
-**[예제 1-1]** 다음 쿼리의 실행 결과는?
+직원 테이블 데이터:
 
+| 직원번호 | 부서코드 | 급여 |
+|----------|----------|------|
+| E001 | D01 | 3000000 |
+| E002 | D01 | 4000000 |
+| E003 | D02 | 2500000 |
+| E004 | D02 | 3500000 |
+
+쿼리:
 ```sql
--- 직원 테이블
--- 직원번호 | 부서코드 | 급여
---   E001  |   D01   | 3000000
---   E002  |   D01   | 4000000
---   E003  |   D02   | 2500000
---   E004  |   D02   | 3500000
-
 SELECT 직원번호, 급여
 FROM 직원
 WHERE 급여 > (SELECT AVG(급여) FROM 직원);
 ```
 
-1. E001, E003
-2. E002, E004
-3. E002만
-4. E001, E002, E003, E004
-
-<Callout type="success">
-  **정답: 2번 (E002, E004)**
-
-  서브쿼리 먼저 계산:
-  - AVG(급여) = (3000000 + 4000000 + 2500000 + 3500000) / 4 = 3250000
-
-  메인쿼리: 급여 > 3250000인 직원
-  - E001: 3000000 → 제외
-  - E002: 4000000 → 포함
-  - E003: 2500000 → 제외
-  - E004: 3500000 → 포함
-
-  결과: E002(4000000), E004(3500000)
-</Callout>
+<Quiz
+  questionNumber={1}
+  question="위 쿼리의 실행 결과는?"
+  options={['① E001, E003', '② E002, E004', '③ E002만', '④ E001, E002, E003, E004']}
+  correctAnswer={2}
+  explanation="서브쿼리 계산: AVG(급여) = (3000000+4000000+2500000+3500000)/4 = 3250000. 메인쿼리: 급여 > 3250000인 직원 → E001(3000000): 제외, E002(4000000): 포함, E003(2500000): 제외, E004(3500000): 포함. 결과: E002, E004."
+  optionExplanations={['①은 평균 이하의 직원들입니다. 조건은 평균 초과입니다.', '정답. 평균(3250000) 초과인 E002(4000000)와 E004(3500000)가 반환됩니다.', '③은 E004(3500000)도 평균 초과이므로 포함되어야 합니다.', '④는 평균 이하인 직원도 포함했습니다. WHERE 조건으로 필터링됩니다.']}
+/>
 
 ---
 
-**[예제 1-2]** 다음 중 오류가 발생하는 쿼리는?
+부서별 최고 급여 서브쿼리는 다중행을 반환합니다: SELECT MAX(급여) FROM 직원 GROUP BY 부서코드 → 4000000, 3500000 (2행)
 
-```sql
--- 상황: 부서별 최고 급여가 여러 값(다중행)을 반환
--- SELECT MAX(급여) FROM 직원 GROUP BY 부서코드
--- → 결과: 4000000, 3500000 (2행)
-```
-
-1. `WHERE 급여 IN (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)`
-2. `WHERE 급여 = ANY (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)`
-3. `WHERE 급여 = (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)`
-4. `WHERE 급여 >= ALL (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)`
-
-<Callout type="success">
-  **정답: 3번**
-
-  서브쿼리가 다중행(4000000, 3500000)을 반환하는데 단일행 연산자(=)를 사용했습니다. 단일행 연산자(=, >, &lt;, >=, &lt;=, &lt;>)는 서브쿼리가 정확히 1행을 반환할 때만 사용 가능합니다.
-
-  - ①: IN은 다중행 연산자 → 정상
-  - ②: ANY는 다중행 연산자 → 정상 (하나라도 만족하면 참)
-  - ③: = 단일행 연산자인데 다중행 반환 → **ORA-01427 오류**
-  - ④: ALL은 다중행 연산자 → 정상 (모두 만족해야 참)
-</Callout>
+<Quiz
+  questionNumber={2}
+  question="위 서브쿼리(다중행 반환)와 함께 사용 시 오류가 발생하는 쿼리는?"
+  options={['① WHERE 급여 IN (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)', '② WHERE 급여 = ANY (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)', '③ WHERE 급여 = (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)', '④ WHERE 급여 >= ALL (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)']}
+  correctAnswer={3}
+  explanation="서브쿼리가 다중행(4000000, 3500000)을 반환하는데 단일행 연산자(=)를 사용했습니다. 단일행 연산자(=, &gt;, &lt;, &gt;=, &lt;=, &lt;&gt;)는 서브쿼리가 정확히 1행을 반환할 때만 사용 가능합니다. ①IN, ②ANY, ④ALL은 모두 다중행 연산자입니다."
+  optionExplanations={['①은 IN이 다중행 연산자이므로 정상입니다.', '②는 ANY가 다중행 연산자이므로 정상입니다.', '정답. = 단일행 연산자인데 서브쿼리가 다중행을 반환하므로 ORA-01427 오류가 발생합니다.', '④는 ALL이 다중행 연산자이므로 정상입니다.']}
+/>
 
 ---
 
@@ -97,33 +74,18 @@ WHERE 급여 > (SELECT AVG(급여) FROM 직원);
 
 ---
 
-**[예제 2-1]** 다음 쿼리의 결과 행 수는?
+2024년_수강 테이블: 학번 A001, A002, A003 (3행)
 
-```sql
--- 2024년_수강 테이블: 학번 A001, A002, A003
--- 2025년_수강 테이블: 학번 A002, A003, A004
+2025년_수강 테이블: 학번 A002, A003, A004 (3행)
 
-SELECT 학번 FROM 2024년_수강
-UNION ALL
-SELECT 학번 FROM 2025년_수강;
-
--- 별도로:
-SELECT 학번 FROM 2024년_수강
-UNION
-SELECT 학번 FROM 2025년_수강;
-```
-
-1. UNION ALL: 6행, UNION: 6행
-2. UNION ALL: 6행, UNION: 4행
-3. UNION ALL: 4행, UNION: 4행
-4. UNION ALL: 6행, UNION: 3행
-
-<Callout type="success">
-  **정답: 2번 (UNION ALL: 6행, UNION: 4행)**
-
-  - **UNION ALL**: 두 결과를 단순 합치기 → 3 + 3 = **6행** (A001, A002, A003, A002, A003, A004)
-  - **UNION**: 중복 제거 → A001, A002, A003, A004 → **4행** (A002, A003 중복 제거)
-</Callout>
+<Quiz
+  questionNumber={3}
+  question="위 두 테이블에 대해 UNION ALL과 UNION을 각각 실행했을 때 결과 행 수는?"
+  options={['① UNION ALL: 6행, UNION: 6행', '② UNION ALL: 6행, UNION: 4행', '③ UNION ALL: 4행, UNION: 4행', '④ UNION ALL: 6행, UNION: 3행']}
+  correctAnswer={2}
+  explanation="UNION ALL: 두 결과를 단순 합치기 → 3+3=6행 (A001, A002, A003, A002, A003, A004). UNION: 중복 제거 → A001, A002, A003, A004 → 4행 (A002, A003 중복 제거)."
+  optionExplanations={['①은 UNION도 6행으로 잘못 계산했습니다. UNION은 중복을 제거합니다.', '정답. UNION ALL은 6행, UNION은 중복 제거 후 4행입니다.', '③은 UNION ALL을 4행으로 잘못 계산했습니다. UNION ALL은 중복 포함 전체입니다.', '④는 UNION을 3행으로 잘못 계산했습니다. 4개의 고유값이 반환됩니다.']}
+/>
 
 ---
 
@@ -139,16 +101,17 @@ SELECT 학번 FROM 2025년_수강;
 
 ---
 
-**[예제 3-1]** 다음 테이블에서 쿼리를 실행했을 때 RANK, DENSE_RANK, ROW_NUMBER 결과를 올바르게 설명한 것은?
+성적 테이블 데이터:
 
+| 학번 | 점수 |
+|------|------|
+| S001 | 95 |
+| S002 | 88 |
+| S003 | 95 |
+| S004 | 80 |
+
+쿼리:
 ```sql
--- 성적 테이블
--- 학번 | 점수
--- S001 | 95
--- S002 | 88
--- S003 | 95
--- S004 | 80
-
 SELECT 학번, 점수,
        RANK() OVER (ORDER BY 점수 DESC) AS R,
        DENSE_RANK() OVER (ORDER BY 점수 DESC) AS DR,
@@ -156,50 +119,25 @@ SELECT 학번, 점수,
 FROM 성적;
 ```
 
-S001(95점)의 R, DR, RN 값과 S002(88점)의 R, DR, RN 값을 고르세요.
-
-1. S001: R=1, DR=1, RN=1 / S002: R=3, DR=2, RN=3
-2. S001: R=1, DR=1, RN=1 / S002: R=2, DR=2, RN=3
-3. S001: R=1, DR=1, RN=2 / S002: R=3, DR=3, RN=3
-4. S001: R=2, DR=1, RN=1 / S002: R=3, DR=2, RN=3
-
-<Callout type="success">
-  **정답: 1번**
-
-  점수 내림차순: S001(95), S003(95), S002(88), S004(80)
-
-  **S001/S003 (공동 1위, 95점)**:
-  - RANK: **1** (1위)
-  - DENSE_RANK: **1** (1위)
-  - ROW_NUMBER: 1 또는 2 (행 처리 순서에 따라 다름)
-
-  **S002 (88점)**:
-  - RANK: **3** (1위가 2명이므로 2위 없이 3위로 건너뜀)
-  - DENSE_RANK: **2** (연속 순위, 건너뛰지 않음)
-  - ROW_NUMBER: **3** (S001, S003 다음 3번째 행)
-
-  따라서 S001: R=1, DR=1 / S002: R=3, DR=2, RN=3 → **1번 정답**
-</Callout>
+<Quiz
+  questionNumber={4}
+  question="S001(95점)의 R, DR 값과 S002(88점)의 R, DR, RN 값을 올바르게 설명한 것은?"
+  options={['① S001: R=1, DR=1 / S002: R=3, DR=2, RN=3', '② S001: R=1, DR=1 / S002: R=2, DR=2, RN=3', '③ S001: R=1, DR=1, RN=2 / S002: R=3, DR=3, RN=3', '④ S001: R=2, DR=1 / S002: R=3, DR=2, RN=3']}
+  correctAnswer={1}
+  explanation="점수 내림차순: S001(95), S003(95), S002(88), S004(80). S001/S003은 공동 1위: RANK=1, DENSE_RANK=1. S002(88점): RANK=3(1위가 2명이므로 2위 없이 3위), DENSE_RANK=2(연속 순위), ROW_NUMBER=3(세 번째 행)."
+  optionExplanations={['정답. RANK는 동점 인원만큼 건너뛰고, DENSE_RANK는 연속 순위를 부여합니다.', '②는 S002의 RANK를 2로 잘못 계산했습니다. 1위가 2명이면 RANK는 3으로 건너뜁니다.', '③은 S002의 DENSE_RANK를 3으로 잘못 계산했습니다. DENSE_RANK는 연속이므로 2입니다.', '④는 S001의 RANK를 2로 잘못 계산했습니다. 95점은 최고점이므로 RANK=1입니다.']}
+/>
 
 ---
 
-**[예제 3-2]** 다음 중 윈도우 함수의 PARTITION BY에 대한 설명으로 올바른 것은?
-
-1. PARTITION BY는 GROUP BY와 동일하게 집계 행 수를 줄인다.
-2. PARTITION BY는 지정된 컬럼 기준으로 그룹을 나누되, 원래 행 수를 유지한다.
-3. PARTITION BY 없이 윈도우 함수를 사용하면 오류가 발생한다.
-4. PARTITION BY는 ORDER BY 절 없이 사용할 수 없다.
-
-<Callout type="success">
-  **정답: 2번**
-
-  윈도우 함수의 핵심 특성: **원본 행 수를 유지하면서** 그룹 내 순위/집계를 계산합니다.
-
-  - **GROUP BY**: 그룹별로 행을 축약 → 결과 행 수 감소
-  - **PARTITION BY (윈도우 함수)**: 그룹을 나누어 계산하되 각 원본 행에 결과를 부여 → 행 수 동일
-
-  PARTITION BY는 선택 사항입니다(생략 시 전체를 하나의 파티션으로 처리). ORDER BY도 생략 가능합니다(함수에 따라 다름).
-</Callout>
+<Quiz
+  questionNumber={5}
+  question="윈도우 함수의 PARTITION BY에 대한 설명으로 올바른 것은?"
+  options={['① PARTITION BY는 GROUP BY와 동일하게 집계 행 수를 줄인다.', '② PARTITION BY는 지정된 컬럼 기준으로 그룹을 나누되, 원래 행 수를 유지한다.', '③ PARTITION BY 없이 윈도우 함수를 사용하면 오류가 발생한다.', '④ PARTITION BY는 ORDER BY 절 없이 사용할 수 없다.']}
+  correctAnswer={2}
+  explanation="윈도우 함수의 핵심 특성: 원본 행 수를 유지하면서 그룹 내 순위/집계를 계산합니다. GROUP BY는 그룹별로 행을 축약하여 결과 행 수가 감소하지만, PARTITION BY는 그룹을 나누어 계산하되 각 원본 행에 결과를 부여하므로 행 수가 동일합니다."
+  optionExplanations={['①은 틀렸습니다. GROUP BY는 행 수를 줄이지만, PARTITION BY는 원본 행 수를 유지합니다.', '정답. PARTITION BY는 그룹을 나눠 계산하되 원본 행 수를 그대로 유지합니다.', '③은 틀렸습니다. PARTITION BY는 선택 사항으로, 생략 시 전체를 하나의 파티션으로 처리합니다.', '④는 틀렸습니다. ORDER BY도 선택 사항입니다(함수에 따라 다름).']}
+/>
 
 ---
 
@@ -221,38 +159,23 @@ GROUP BY CUBE(A, B)
 
 ---
 
-**[예제 4-1]** 다음 쿼리에서 반환되는 총 행 수는?
+판매 테이블: 지역(서울, 부산), 분기(1분기, 2분기), 각 조합당 1행 → 기본 4행 존재
 
+쿼리:
 ```sql
--- 판매 테이블: 지역(서울, 부산), 분기(1분기, 2분기)
--- 각 조합당 1행 → 기본 4행 존재
-
 SELECT 지역, 분기, SUM(매출)
 FROM 판매
 GROUP BY ROLLUP(지역, 분기);
 ```
 
-1. 4행
-2. 6행
-3. 7행
-4. 8행
-
-<Callout type="success">
-  **정답: 3번 (7행)**
-
-  ROLLUP(지역, 분기) 생성 행:
-  - (서울, 1분기) → 1행
-  - (서울, 2분기) → 1행
-  - **(서울, NULL) → 서울 소계** → 1행
-  - (부산, 1분기) → 1행
-  - (부산, 2분기) → 1행
-  - **(부산, NULL) → 부산 소계** → 1행
-  - **(NULL, NULL) → 전체 합계** → 1행
-
-  총 **7행**
-
-  공식: ROLLUP(A, B)에서 A의 종류 × (B의 종류 + 1) + 1 = 2 × (2+1) + 1 = **7**
-</Callout>
+<Quiz
+  questionNumber={6}
+  question="위 ROLLUP 쿼리에서 반환되는 총 행 수는?"
+  options={['① 4행', '② 6행', '③ 7행', '④ 8행']}
+  correctAnswer={3}
+  explanation="ROLLUP(지역, 분기) 생성 행: (서울,1분기), (서울,2분기), (서울,NULL-서울소계), (부산,1분기), (부산,2분기), (부산,NULL-부산소계), (NULL,NULL-전체합계) = 총 7행. 공식: A종류×(B종류+1)+1 = 2×(2+1)+1 = 7."
+  optionExplanations={['①은 ROLLUP 없이 기본 GROUP BY 결과 행 수입니다.', '②는 소계 행을 일부만 계산했습니다. 전체 합계 행도 포함해야 합니다.', '정답. 기본 4행 + 지역별 소계 2행 + 전체 합계 1행 = 7행입니다.', '④는 CUBE(2×2=4가지 조합+원본)의 경우에 가까운 수입니다.']}
+/>
 
 ---
 
@@ -269,11 +192,10 @@ GROUP BY ROLLUP(지역, 분기);
 
 ---
 
-**[예제 5-1]** 다음 트랜잭션 수행 후 최종 테이블 상태는?
+초기 상태: 직원 테이블에 급여 3000000인 E001 존재
 
+트랜잭션:
 ```sql
--- 초기: 직원 테이블에 급여 3000000인 E001 존재
-
 UPDATE 직원 SET 급여 = 3500000 WHERE 직원번호 = 'E001';
 SAVEPOINT SP1;
 UPDATE 직원 SET 급여 = 4000000 WHERE 직원번호 = 'E001';
@@ -283,25 +205,14 @@ ROLLBACK TO SP1;
 COMMIT;
 ```
 
-1. 급여 = 3000000 (초기 상태)
-2. 급여 = 3500000
-3. 급여 = 4000000
-4. 급여 = 5000000
-
-<Callout type="success">
-  **정답: 2번 (급여 = 3500000)**
-
-  단계별 추적:
-  1. UPDATE: 급여 → 3500000
-  2. SAVEPOINT SP1: 현재 상태(3500000)를 SP1에 저장
-  3. UPDATE: 급여 → 4000000
-  4. SAVEPOINT SP2: 현재 상태(4000000)를 SP2에 저장
-  5. UPDATE: 급여 → 5000000
-  6. **ROLLBACK TO SP1**: SP1 이후의 모든 변경 취소 → 급여가 **3500000**으로 복원 (SP1 이전 변경인 3000000→3500000은 유지)
-  7. COMMIT: 현재 상태(3500000)를 확정
-
-  최종: **3500000**
-</Callout>
+<Quiz
+  questionNumber={7}
+  question="위 트랜잭션 수행 후 최종 테이블 상태는?"
+  options={['① 급여 = 3000000 (초기 상태)', '② 급여 = 3500000', '③ 급여 = 4000000', '④ 급여 = 5000000']}
+  correctAnswer={2}
+  explanation="1) UPDATE: 3500000. 2) SAVEPOINT SP1: 3500000 저장. 3) UPDATE: 4000000. 4) SAVEPOINT SP2: 4000000 저장. 5) UPDATE: 5000000. 6) ROLLBACK TO SP1: SP1 이후 모든 변경 취소 → 3500000으로 복원(SP1 이전 변경인 3000000→3500000은 유지). 7) COMMIT: 3500000 확정."
+  optionExplanations={['①은 ROLLBACK TO SP1이 SP1 이전 변경(3000000→3500000)까지 취소하지 않습니다.', '정답. ROLLBACK TO SP1으로 SP1 시점(3500000)으로 복원 후 COMMIT됩니다.', '③은 SP2 시점의 값입니다. ROLLBACK TO SP1으로 SP2까지 취소됩니다.', '④는 마지막 UPDATE 값입니다. ROLLBACK TO SP1으로 이 변경이 취소됩니다.']}
+/>
 
 ---
 
@@ -320,20 +231,14 @@ COMMIT;
 
 ---
 
-**[예제 6-1]** 다음 중 TRUNCATE와 DELETE의 차이점으로 올바르지 않은 것은?
-
-1. TRUNCATE는 DDL이므로 자동으로 COMMIT되어 ROLLBACK할 수 없다.
-2. DELETE는 WHERE 조건으로 특정 행만 삭제할 수 있다.
-3. TRUNCATE는 WHERE 조건 없이 테이블의 모든 데이터를 삭제한다.
-4. DELETE는 자동 COMMIT되므로 ROLLBACK이 불가능하다.
-
-<Callout type="success">
-  **정답: 4번 (틀린 설명)**
-
-  DELETE는 DML(Data Manipulation Language)이므로 트랜잭션 내에서 실행되고, 자동 COMMIT되지 않습니다. 따라서 `ROLLBACK`으로 취소할 수 있습니다.
-
-  반면 TRUNCATE는 DDL(Data Definition Language)이므로 실행 즉시 자동 COMMIT되어 ROLLBACK이 불가능합니다.
-</Callout>
+<Quiz
+  questionNumber={8}
+  question="다음 중 TRUNCATE와 DELETE의 차이점으로 올바르지 않은 것은?"
+  options={['① TRUNCATE는 DDL이므로 자동으로 COMMIT되어 ROLLBACK할 수 없다.', '② DELETE는 WHERE 조건으로 특정 행만 삭제할 수 있다.', '③ TRUNCATE는 WHERE 조건 없이 테이블의 모든 데이터를 삭제한다.', '④ DELETE는 자동 COMMIT되므로 ROLLBACK이 불가능하다.']}
+  correctAnswer={4}
+  explanation="DELETE는 DML(Data Manipulation Language)이므로 트랜잭션 내에서 실행되고, 자동 COMMIT되지 않습니다. 따라서 ROLLBACK으로 취소할 수 있습니다. 반면 TRUNCATE는 DDL이므로 실행 즉시 자동 COMMIT되어 ROLLBACK이 불가능합니다."
+  optionExplanations={['①은 올바른 설명입니다. TRUNCATE는 DDL로 자동 COMMIT됩니다.', '②는 올바른 설명입니다. DELETE는 WHERE 조건으로 특정 행만 삭제 가능합니다.', '③은 올바른 설명입니다. TRUNCATE는 WHERE 조건 없이 전체 삭제합니다.', '정답(틀린 설명). DELETE는 DML로 자동 COMMIT되지 않으며 ROLLBACK이 가능합니다.']}
+/>
 
 ---
 
@@ -352,14 +257,11 @@ WHEN NOT MATCHED THEN
 
 ---
 
-**[예제 7-1]** 다음 MERGE 문 실행 후 TARGET 테이블의 상태는?
+TARGET(상품재고): P001-100, P002-30
+
+SOURCE(입고내역): P001-50, P003-20
 
 ```sql
--- TARGET (상품재고)     SOURCE (입고내역)
--- 상품코드 | 재고수량   상품코드 | 입고수량
---   P001  |   100      P001   |   50
---   P002  |    30      P003   |   20
-
 MERGE INTO 상품재고 T
 USING 입고내역 S ON (T.상품코드 = S.상품코드)
 WHEN MATCHED THEN
@@ -368,48 +270,35 @@ WHEN NOT MATCHED THEN
     INSERT (상품코드, 재고수량) VALUES (S.상품코드, S.입고수량);
 ```
 
-1. P001: 100, P002: 30 (변경 없음)
-2. P001: 150, P002: 30, P003: 20
-3. P001: 50, P002: 30, P003: 20
-4. P001: 150, P003: 20 (P002 삭제)
-
-<Callout type="success">
-  **정답: 2번**
-
-  MERGE 처리 과정:
-  - SOURCE의 P001 → TARGET에 P001 **존재** → MATCHED → `UPDATE: 재고수량 = 100 + 50 = 150`
-  - SOURCE의 P003 → TARGET에 P003 **없음** → NOT MATCHED → `INSERT: (P003, 20)`
-  - TARGET의 P002 → SOURCE에 없음 → MERGE 대상 아님 → **변경 없이 유지**
-
-  최종: P001(150), P002(30), P003(20)
-</Callout>
+<Quiz
+  questionNumber={9}
+  question="위 MERGE 문 실행 후 TARGET 테이블의 상태는?"
+  options={['① P001: 100, P002: 30 (변경 없음)', '② P001: 150, P002: 30, P003: 20', '③ P001: 50, P002: 30, P003: 20', '④ P001: 150, P003: 20 (P002 삭제)']}
+  correctAnswer={2}
+  explanation="SOURCE의 P001 → TARGET에 존재 → MATCHED → UPDATE: 재고수량=100+50=150. SOURCE의 P003 → TARGET에 없음 → NOT MATCHED → INSERT: (P003, 20). TARGET의 P002 → SOURCE에 없음 → MERGE 대상 아님 → 변경 없이 유지. 최종: P001(150), P002(30), P003(20)."
+  optionExplanations={['①은 P001이 UPDATE되지 않은 잘못된 결과입니다.', '정답. P001 UPDATE(150), P003 INSERT(20), P002는 그대로 유지(30)됩니다.', '③은 P001 재고수량을 입고수량(50)으로 대체했습니다. 실제로는 기존 재고에 입고수량을 더합니다.', '④는 P002가 삭제된 잘못된 결과입니다. SOURCE에 없는 TARGET 행은 그대로 유지됩니다.']}
+/>
 
 ---
 
-**[예제 7-2]** MERGE 문에 대한 설명으로 올바르지 않은 것은?
-
-1. WHEN MATCHED THEN 절에서 UPDATE와 DELETE를 모두 사용할 수 있다.
-2. WHEN NOT MATCHED THEN 절에서 INSERT를 수행할 수 있다.
-3. ON 조건에 일치하지 않는 TARGET 행은 자동으로 삭제된다.
-4. MERGE는 DML문으로 트랜잭션 내에서 ROLLBACK이 가능하다.
-
-<Callout type="success">
-  **정답: 3번 (올바르지 않은 설명)**
-
-  MERGE 문에서 ON 조건에 일치하지 않는 TARGET 행은 **그대로 유지**됩니다. 삭제되지 않습니다. 위 예제에서 P002가 그대로 유지된 것처럼, SOURCE에 없는 TARGET 행은 MERGE의 영향을 받지 않습니다.
-
-  WHEN MATCHED THEN DELETE를 명시적으로 작성해야만 삭제됩니다.
-</Callout>
+<Quiz
+  questionNumber={10}
+  question="MERGE 문에 대한 설명으로 올바르지 않은 것은?"
+  options={['① WHEN MATCHED THEN 절에서 UPDATE와 DELETE를 모두 사용할 수 있다.', '② WHEN NOT MATCHED THEN 절에서 INSERT를 수행할 수 있다.', '③ ON 조건에 일치하지 않는 TARGET 행은 자동으로 삭제된다.', '④ MERGE는 DML문으로 트랜잭션 내에서 ROLLBACK이 가능하다.']}
+  correctAnswer={3}
+  explanation="MERGE 문에서 ON 조건에 일치하지 않는 TARGET 행은 그대로 유지됩니다. 삭제되지 않습니다. WHEN MATCHED THEN DELETE를 명시적으로 작성해야만 삭제됩니다."
+  optionExplanations={['①은 올바른 설명입니다. WHEN MATCHED THEN 절에서 UPDATE와 DELETE 모두 가능합니다.', '②는 올바른 설명입니다. WHEN NOT MATCHED THEN INSERT가 기본 패턴입니다.', '정답(틀린 설명). SOURCE에 없는 TARGET 행은 MERGE의 영향을 받지 않고 그대로 유지됩니다.', '④는 올바른 설명입니다. MERGE는 DML로 ROLLBACK이 가능합니다.']}
+/>
 
 ---
 
 ## 마무리 복습
 
-<Quiz questionNumber={1} question="다음 중 RANK()와 DENSE_RANK()의 차이를 올바르게 설명한 것은?" options={["RANK()는 동점자가 없고, DENSE_RANK()는 동점자를 허용한다.", "RANK()는 동점 시 순위를 건너뛰지만(1,1,3), DENSE_RANK()는 건너뛰지 않는다(1,1,2).", "RANK()는 PARTITION BY 없이 사용 불가하고, DENSE_RANK()는 가능하다.", "두 함수의 차이는 없고 동의어이다."]} correctAnswer={2} explanation="핵심 차이: 동점자가 있을 때 RANK()는 동점 인원만큼 다음 순위를 건너뜁니다(1위가 2명이면 다음은 3위). DENSE_RANK()는 동점이어도 다음 순위가 연속됩니다(1위가 2명이어도 다음은 2위). ROW_NUMBER()는 동점도 각기 다른 번호를 부여합니다." optionExplanations={["동점 허용 여부는 두 함수 모두 동일합니다. 차이는 다음 순위 처리 방식입니다.", "정답. RANK()는 건너뜀(1,1,3), DENSE_RANK()는 연속(1,1,2)입니다.", "두 함수 모두 PARTITION BY 없이 사용 가능합니다(전체를 하나의 파티션으로 처리).", "두 함수는 동점 처리에서 명확히 다릅니다."]} />
+<Quiz questionNumber={11} question="다음 중 RANK()와 DENSE_RANK()의 차이를 올바르게 설명한 것은?" options={['① RANK()는 동점자가 없고, DENSE_RANK()는 동점자를 허용한다.', '② RANK()는 동점 시 순위를 건너뛰지만(1,1,3), DENSE_RANK()는 건너뛰지 않는다(1,1,2).', '③ RANK()는 PARTITION BY 없이 사용 불가하고, DENSE_RANK()는 가능하다.', '④ 두 함수의 차이는 없고 동의어이다.']} correctAnswer={2} explanation="핵심 차이: 동점자가 있을 때 RANK()는 동점 인원만큼 다음 순위를 건너뜁니다(1위가 2명이면 다음은 3위). DENSE_RANK()는 동점이어도 다음 순위가 연속됩니다(1위가 2명이어도 다음은 2위). ROW_NUMBER()는 동점도 각기 다른 번호를 부여합니다." optionExplanations={['동점 허용 여부는 두 함수 모두 동일합니다. 차이는 다음 순위 처리 방식입니다.', '정답. RANK()는 건너뜀(1,1,3), DENSE_RANK()는 연속(1,1,2)입니다.', '두 함수 모두 PARTITION BY 없이 사용 가능합니다(전체를 하나의 파티션으로 처리).', '두 함수는 동점 처리에서 명확히 다릅니다.']} />
 
-<Quiz questionNumber={2} question="TRUNCATE TABLE 명령에 대한 설명으로 올바른 것은?" options={["TRUNCATE는 DML이므로 ROLLBACK으로 취소할 수 있다.", "TRUNCATE는 WHERE 조건을 사용하여 일부 행만 삭제할 수 있다.", "TRUNCATE는 DDL이며 자동 COMMIT되어 ROLLBACK이 불가능하다.", "TRUNCATE 후에도 테이블 구조(스키마)가 삭제된다."]} correctAnswer={3} explanation="TRUNCATE는 DDL(Data Definition Language)로 분류되며, 실행 즉시 자동 COMMIT됩니다. 따라서 ROLLBACK으로 취소할 수 없습니다. WHERE 조건을 사용할 수 없어 항상 테이블의 모든 데이터를 삭제하지만, 테이블 구조(스키마)는 유지됩니다. 구조까지 삭제하려면 DROP TABLE을 사용해야 합니다." optionExplanations={["TRUNCATE는 DML이 아니라 DDL입니다.", "TRUNCATE는 WHERE 조건 없이 테이블 전체를 삭제합니다. 조건부 삭제는 DELETE를 사용합니다.", "정답. TRUNCATE는 DDL로 자동 COMMIT되며 ROLLBACK이 불가합니다.", "TRUNCATE는 데이터만 삭제하고 테이블 구조(스키마)는 유지합니다. 구조 삭제는 DROP입니다."]} />
+<Quiz questionNumber={12} question="TRUNCATE TABLE 명령에 대한 설명으로 올바른 것은?" options={['① TRUNCATE는 DML이므로 ROLLBACK으로 취소할 수 있다.', '② TRUNCATE는 WHERE 조건을 사용하여 일부 행만 삭제할 수 있다.', '③ TRUNCATE는 DDL이며 자동 COMMIT되어 ROLLBACK이 불가능하다.', '④ TRUNCATE 후에도 테이블 구조(스키마)가 삭제된다.']} correctAnswer={3} explanation="TRUNCATE는 DDL(Data Definition Language)로 분류되며, 실행 즉시 자동 COMMIT됩니다. 따라서 ROLLBACK으로 취소할 수 없습니다. WHERE 조건을 사용할 수 없어 항상 테이블의 모든 데이터를 삭제하지만, 테이블 구조(스키마)는 유지됩니다. 구조까지 삭제하려면 DROP TABLE을 사용해야 합니다." optionExplanations={['TRUNCATE는 DML이 아니라 DDL입니다.', 'TRUNCATE는 WHERE 조건 없이 테이블 전체를 삭제합니다. 조건부 삭제는 DELETE를 사용합니다.', '정답. TRUNCATE는 DDL로 자동 COMMIT되며 ROLLBACK이 불가합니다.', 'TRUNCATE는 데이터만 삭제하고 테이블 구조(스키마)는 유지합니다. 구조 삭제는 DROP입니다.']} />
 
-<Quiz questionNumber={3} question="다음 MERGE 문에서 'WHEN NOT MATCHED THEN' 절이 실행되는 조건은?" options={["TARGET 테이블에 SOURCE와 일치하는 키가 있을 때", "SOURCE 테이블에 TARGET과 일치하는 키가 없을 때", "TARGET과 SOURCE 모두에 해당 키가 없을 때", "ON 조건이 NULL일 때"]} correctAnswer={2} explanation="MERGE의 ON 절 조건 결과에 따라 실행 분기가 결정됩니다. WHEN MATCHED: ON 조건이 참(TARGET에 SOURCE와 일치하는 행이 있음) → UPDATE/DELETE 가능. WHEN NOT MATCHED: ON 조건이 거짓(SOURCE 행에 해당하는 TARGET 행이 없음) → INSERT 수행. 즉 SOURCE 기준으로 TARGET에 없는 데이터를 새로 삽입하는 것이 NOT MATCHED 절입니다." optionExplanations={["이 경우 WHEN MATCHED THEN 절이 실행됩니다.", "정답. SOURCE에는 있지만 TARGET에 일치하는 키가 없을 때 NOT MATCHED 절이 실행됩니다.", "SOURCE에 없는 행은 MERGE 처리 자체의 대상이 되지 않습니다.", "ON 조건이 NULL이면 UNKNOWN이 되어 NOT MATCHED처럼 처리되나, 이는 일반적인 동작이 아닙니다."]} />
+<Quiz questionNumber={13} question="다음 MERGE 문에서 'WHEN NOT MATCHED THEN' 절이 실행되는 조건은?" options={['① TARGET 테이블에 SOURCE와 일치하는 키가 있을 때', '② SOURCE 테이블에 TARGET과 일치하는 키가 없을 때', '③ TARGET과 SOURCE 모두에 해당 키가 없을 때', '④ ON 조건이 NULL일 때']} correctAnswer={2} explanation="MERGE의 ON 절 조건 결과에 따라 실행 분기가 결정됩니다. WHEN MATCHED: ON 조건이 참(TARGET에 SOURCE와 일치하는 행이 있음) → UPDATE/DELETE 가능. WHEN NOT MATCHED: ON 조건이 거짓(SOURCE 행에 해당하는 TARGET 행이 없음) → INSERT 수행. 즉 SOURCE 기준으로 TARGET에 없는 데이터를 새로 삽입하는 것이 NOT MATCHED 절입니다." optionExplanations={['이 경우 WHEN MATCHED THEN 절이 실행됩니다.', '정답. SOURCE에는 있지만 TARGET에 일치하는 키가 없을 때 NOT MATCHED 절이 실행됩니다.', 'SOURCE에 없는 행은 MERGE 처리 자체의 대상이 되지 않습니다.', 'ON 조건이 NULL이면 UNKNOWN이 되어 NOT MATCHED처럼 처리되나, 이는 일반적인 동작이 아닙니다.']} />
 
 ## 참고 자료
 

@@ -483,7 +483,7 @@
   --junction-x: -50%;
   --junction-y: -50%;
   position: absolute;
-  z-index: 20;
+  z-index: 30;
   width: 6px;
   height: 6px;
   background: var(--junction);
@@ -680,6 +680,7 @@
 
 .group::before {
   position: absolute;
+  z-index: 1;
   top: 0;
   left: 50%;
   width: 100vw;

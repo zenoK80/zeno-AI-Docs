@@ -25,56 +25,37 @@ NULL은 "알 수 없는 값"입니다. **NULL과의 산술 연산 결과는 항�
 
 ---
 
-**[예제 1-1]** 다음 테이블에서 쿼리 결과로 올바른 것은?
+직원(직원번호, 이름, 보너스) 테이블 데이터:
+- 1001 | 김민준 | 500000
+- 1002 | 이서연 | NULL
+- 1003 | 박지호 | 300000
+- 1004 | 최유나 | NULL
 
-```sql
--- 테이블: 직원(직원번호, 이름, 보너스)
--- 데이터:
--- 1001 | 김민준 | 500000
--- 1002 | 이서연 | NULL
--- 1003 | 박지호 | 300000
--- 1004 | 최유나 | NULL
+쿼리: `SELECT COUNT(*), COUNT(보너스), SUM(보너스) FROM 직원;`
 
-SELECT COUNT(*), COUNT(보너스), SUM(보너스)
-FROM 직원;
-```
-
-1. `4, 4, 800000`
-2. `4, 2, 800000`
-3. `2, 2, 800000`
-4. `4, 2, NULL`
-
-<Callout type="success">
-  **정답: 2번**
-
-  - `COUNT(*)`: NULL 포함 전체 행 수 = **4**
-  - `COUNT(보너스)`: NULL이 있는 1002, 1004 행 제외 = **2**
-  - `SUM(보너스)`: NULL을 무시하고 500000 + 300000 = **800000**
-
-  SUM, AVG, MAX, MIN 등 집계 함수는 모두 NULL을 무시하고 계산합니다(AVG도 NULL 행을 분모에서 제외함).
-</Callout>
+<Quiz
+  questionNumber={1}
+  question="위 테이블에서 쿼리 실행 결과로 올바른 것은?"
+  options={['① 4, 4, 800000', '② 4, 2, 800000', '③ 2, 2, 800000', '④ 4, 2, NULL']}
+  correctAnswer={2}
+  explanation="COUNT(*)는 NULL 포함 전체 행 수 = 4. COUNT(보너스)는 NULL인 1002, 1004 행 제외 = 2. SUM(보너스)는 NULL을 무시하고 500000 + 300000 = 800000. SUM, AVG, MAX, MIN 등 집계 함수는 모두 NULL을 무시하고 계산합니다."
+  optionExplanations={['①은 COUNT(보너스)를 4로 잘못 계산했습니다. NULL 행은 제외됩니다.', '정답. COUNT(*)=4, COUNT(보너스)=2, SUM(보너스)=800000입니다.', '③은 COUNT(*)를 2로 잘못 계산했습니다. COUNT(*)는 NULL 포함 전체 행 수입니다.', '④는 SUM(보너스)를 NULL로 잘못 계산했습니다. SUM은 NULL을 무시하고 계산합니다.']}
+/>
 
 ---
 
-**[예제 1-2]** 다음 쿼리의 실행 결과 행 수는?
+주문(주문번호, 고객등급) 테이블 데이터: 'A', 'B', NULL, 'A', NULL (총 5행)
 
-```sql
--- 테이블: 주문(주문번호, 고객등급)
--- 데이터: 'A', 'B', NULL, 'A', NULL  (총 5행)
+쿼리: `SELECT * FROM 주문 WHERE 고객등급 = NULL;`
 
-SELECT * FROM 주문 WHERE 고객등급 = NULL;
-```
-
-1. 0행
-2. 1행
-3. 2행
-4. 5행
-
-<Callout type="success">
-  **정답: 1번 (0행)**
-
-  NULL은 등호(=)로 비교할 수 없습니다. `컬럼 = NULL`은 항상 UNKNOWN을 반환하고, WHERE 조건에서 UNKNOWN은 거짓으로 처리되어 아무 행도 반환하지 않습니다. NULL인 행을 조회하려면 반드시 `WHERE 고객등급 IS NULL`을 사용해야 합니다.
-</Callout>
+<Quiz
+  questionNumber={2}
+  question="위 쿼리의 실행 결과 행 수는?"
+  options={['① 0행', '② 1행', '③ 2행', '④ 5행']}
+  correctAnswer={1}
+  explanation="NULL은 등호(=)로 비교할 수 없습니다. 컬럼 = NULL은 항상 UNKNOWN을 반환하고, WHERE 조건에서 UNKNOWN은 거짓으로 처리되어 아무 행도 반환하지 않습니다. NULL인 행을 조회하려면 반드시 WHERE 고객등급 IS NULL을 사용해야 합니다."
+  optionExplanations={['정답. = NULL은 항상 UNKNOWN으로 처리되어 0행이 반환됩니다.', '②는 틀렸습니다. = NULL로는 어떤 행도 매칭되지 않습니다.', '③은 틀렸습니다. NULL인 행이 2개이지만 = NULL로는 매칭되지 않습니다.', '④는 틀렸습니다. WHERE 조건이 항상 거짓이므로 전체 행이 반환되지 않습니다.']}
+/>
 
 ---
 
@@ -88,55 +69,33 @@ SELECT * FROM 주문 WHERE 고객등급 = NULL;
 
 ---
 
-**[예제 2-1]** 다음 쿼리의 결과 행 수는?
+상품(상품코드, 카테고리코드) 테이블 데이터:
+- P001 | 10
+- P002 | 20
+- P003 | NULL
+- P004 | 30
 
-```sql
--- 테이블: 상품(상품코드, 카테고리코드)
--- 데이터:
--- P001 | 10
--- P002 | 20
--- P003 | NULL
--- P004 | 30
+쿼리: `SELECT * FROM 상품 WHERE 카테고리코드 NOT IN (10, 20, NULL);`
 
-SELECT * FROM 상품 WHERE 카테고리코드 NOT IN (10, 20, NULL);
-```
-
-1. 0행
-2. 1행 (P004)
-3. 2행 (P003, P004)
-4. 3행 (P002, P003, P004)
-
-<Callout type="success">
-  **정답: 1번 (0행)**
-
-  `NOT IN` 목록에 NULL이 포함되면 결과가 항상 0건입니다.
-  - `카테고리코드 NOT IN (10, 20, NULL)`은 `카테고리코드 <> 10 AND 카테고리코드 <> 20 AND 카테고리코드 <> NULL`로 전개됩니다.
-  - `카테고리코드 <> NULL`은 항상 UNKNOWN → AND 조건 전체가 UNKNOWN → 0건 반환.
-  - NULL을 제외하고 처리하려면 `WHERE 카테고리코드 NOT IN (10, 20) AND 카테고리코드 IS NOT NULL`을 사용해야 합니다.
-</Callout>
+<Quiz
+  questionNumber={3}
+  question="위 쿼리의 결과 행 수는?"
+  options={['① 0행', '② 1행 (P004)', '③ 2행 (P003, P004)', '④ 3행 (P002, P003, P004)']}
+  correctAnswer={1}
+  explanation="NOT IN 목록에 NULL이 포함되면 결과가 항상 0건입니다. 카테고리코드 NOT IN (10, 20, NULL)은 카테고리코드 &lt;> 10 AND 카테고리코드 &lt;> 20 AND 카테고리코드 &lt;> NULL로 전개되고, 마지막 조건이 항상 UNKNOWN이므로 전체 조건이 UNKNOWN → 0건 반환."
+  optionExplanations={['정답. NOT IN 목록에 NULL이 포함되면 항상 0건이 반환됩니다.', '②는 NULL이 없다고 가정했을 때의 결과입니다. NULL 포함 시 0건입니다.', '③은 틀렸습니다. NULL이 포함된 NOT IN은 0건을 반환합니다.', '④는 틀렸습니다. NULL이 포함된 NOT IN은 0건을 반환합니다.']}
+/>
 
 ---
 
-**[예제 2-2]** 다음 LIKE 조건 중 '김_수' 패턴이 매칭하는 값으로 올바른 것은?
-
-1. '김민준수'
-2. '김수'
-3. '김준수'
-4. '김민수학생'
-
-<Callout type="success">
-  **정답: 3번 ('김준수')**
-
-  LIKE 와일드카드:
-  - `%`: 0개 이상의 임의 문자
-  - `_`: 정확히 1개의 임의 문자
-
-  `'김_수'` 패턴은 "김"으로 시작, 정확히 1글자 임의 문자, "수"로 끝나는 3글자 문자열을 매칭합니다.
-  - '김민준수': 4글자 → 매칭 X
-  - '김수': 2글자 → 매칭 X
-  - **'김준수': 3글자, "김"+"준"(임의 1자)+"수" → 매칭 O**
-  - '김민수학생': "수" 다음에 "학생"이 있으므로 → 매칭 X
-</Callout>
+<Quiz
+  questionNumber={4}
+  question="LIKE 조건 '김_수' 패턴이 매칭하는 값으로 올바른 것은?"
+  options={['① 김민준수', '② 김수', '③ 김준수', '④ 김민수학생']}
+  correctAnswer={3}
+  explanation="LIKE 와일드카드: %는 0개 이상의 임의 문자, _는 정확히 1개의 임의 문자입니다. '김_수' 패턴은 '김'으로 시작, 정확히 1글자 임의 문자, '수'로 끝나는 3글자 문자열을 매칭합니다."
+  optionExplanations={['①은 4글자로 _ 하나로는 매칭되지 않습니다.', '②는 2글자로 _ 자리에 해당하는 문자가 없습니다.', '정답. 3글자로 김+(임의1자 준)+수 패턴에 정확히 맞습니다.', '④는 수 다음에 학생이 추가로 있어 매칭되지 않습니다.']}
+/>
 
 ---
 
@@ -161,50 +120,31 @@ SELECT * FROM 상품 WHERE 카테고리코드 NOT IN (10, 20, NULL);
 
 ---
 
-**[예제 3-1]** 다음 쿼리의 결과값은?
+쿼리: `SELECT ROUND(SUBSTR('3.14159', 1, 4), 1) FROM DUAL;`
 
-```sql
-SELECT ROUND(SUBSTR('3.14159', 1, 4), 1) FROM DUAL;
-```
-
-1. 3.1
-2. 3.14
-3. 3.2
-4. 오류 발생
-
-<Callout type="success">
-  **정답: 1번 (3.1)**
-
-  단계별 계산:
-  1. `SUBSTR('3.14159', 1, 4)` → 1번째부터 4글자: `'3.14'`
-  2. `ROUND('3.14', 1)` → 소수점 1자리로 반올림: `3.1` (소수점 2자리인 4를 반올림하면 3.1)
-
-  ROUND(3.14, 1): 소수점 둘째 자리인 4를 반올림 → 3.1
-</Callout>
+<Quiz
+  questionNumber={5}
+  question="위 쿼리의 결과값은?"
+  options={['① 3.1', '② 3.14', '③ 3.2', '④ 오류 발생']}
+  correctAnswer={1}
+  explanation="단계별 계산: 1) SUBSTR('3.14159', 1, 4) → 1번째부터 4글자: '3.14'. 2) ROUND('3.14', 1) → 소수점 1자리로 반올림: 3.1 (소수점 둘째 자리인 4를 반올림하면 3.1)."
+  optionExplanations={['정답. SUBSTR로 3.14를 추출한 뒤 ROUND로 소수 1자리 반올림하면 3.1입니다.', '②는 ROUND를 적용하지 않은 SUBSTR 결과입니다.', '③은 잘못된 반올림 결과입니다. 3.14에서 소수 둘째 자리 4는 반올림 기준(5)에 미달합니다.', '④는 틀렸습니다. SUBSTR 결과 문자열을 ROUND에 전달해도 숫자로 자동 변환됩니다.']}
+/>
 
 ---
 
-**[예제 3-2]** 다음 쿼리의 결과는?
+급여(사원번호, 급여, 수당) 테이블 데이터: 1001 | 3000000 | NULL
 
-```sql
--- 테이블: 급여(사원번호, 급여, 수당)
--- 데이터: 1001 | 3000000 | NULL
+쿼리: `SELECT NVL(수당, 0) + 급여 AS 총급여 FROM 급여 WHERE 사원번호 = 1001;`
 
-SELECT NVL(수당, 0) + 급여 AS 총급여 FROM 급여 WHERE 사원번호 = 1001;
-```
-
-1. NULL
-2. 0
-3. 3000000
-4. 오류 발생
-
-<Callout type="success">
-  **정답: 3번 (3000000)**
-
-  `NVL(수당, 0)` → 수당이 NULL이므로 0으로 대체 → `0 + 3000000 = 3000000`
-
-  만약 NVL을 사용하지 않고 `수당 + 급여`를 했다면 `NULL + 3000000 = NULL`이 됩니다. NVL이 NULL 처리를 해주기 때문에 정상적인 합계를 구할 수 있습니다.
-</Callout>
+<Quiz
+  questionNumber={6}
+  question="위 쿼리의 결과는?"
+  options={['① NULL', '② 0', '③ 3000000', '④ 오류 발생']}
+  correctAnswer={3}
+  explanation="NVL(수당, 0)은 수당이 NULL이므로 0으로 대체합니다. 0 + 3000000 = 3000000. NVL을 사용하지 않고 수당 + 급여를 했다면 NULL + 3000000 = NULL이 됩니다."
+  optionExplanations={['①은 NVL을 사용하지 않았을 때의 결과입니다. NVL이 NULL을 0으로 대체합니다.', '②는 NVL 결과(0)만 반환한 것으로 급여를 더하지 않았습니다.', '정답. NVL(수당, 0) = 0이므로 0 + 3000000 = 3000000입니다.', '④는 틀렸습니다. NVL은 NULL 처리를 위한 함수로 오류가 발생하지 않습니다.']}
+/>
 
 ---
 
@@ -218,60 +158,45 @@ SELECT NVL(수당, 0) + 급여 AS 총급여 FROM 급여 WHERE 사원번호 = 100
 
 ---
 
-**[예제 4-1]** 다음 중 올바른 SQL은?
+주문(고객번호, 주문금액) 테이블 기준
 
-```sql
--- 테이블: 주문(고객번호, 주문금액)
-```
-
-1. `SELECT 고객번호, 주문금액 FROM 주문 GROUP BY 고객번호`
-2. `SELECT 고객번호, SUM(주문금액) FROM 주문 GROUP BY 고객번호 HAVING SUM(주문금액) > 100000`
-3. `SELECT 고객번호, SUM(주문금액) FROM 주문 WHERE SUM(주문금액) > 100000 GROUP BY 고객번호`
-4. `SELECT 고객번호, AVG(주문금액) FROM 주문 GROUP BY 고객번호, 주문금액`
-
-<Callout type="success">
-  **정답: 2번**
-
-  - **①**: GROUP BY에 고객번호만 있는데 SELECT에 주문금액(집계 함수 없이)을 사용 → 오류
-  - **②**: GROUP BY 후 집계 값으로 HAVING 필터링 → **정상**
-  - **③**: WHERE 절에 집계 함수(SUM) 사용 → 오류 (WHERE는 GROUP BY 이전에 실행)
-  - **④**: GROUP BY에 주문금액을 추가하면 행마다 그룹이 생겨 AVG가 의미 없어짐 (문법 오류는 아니지만 의도와 다른 결과)
-</Callout>
+<Quiz
+  questionNumber={7}
+  question="다음 중 올바른 SQL은?"
+  options={['① SELECT 고객번호, 주문금액 FROM 주문 GROUP BY 고객번호', '② SELECT 고객번호, SUM(주문금액) FROM 주문 GROUP BY 고객번호 HAVING SUM(주문금액) > 100000', '③ SELECT 고객번호, SUM(주문금액) FROM 주문 WHERE SUM(주문금액) > 100000 GROUP BY 고객번호', '④ SELECT 고객번호, AVG(주문금액) FROM 주문 GROUP BY 고객번호, 주문금액']}
+  correctAnswer={2}
+  explanation="①은 GROUP BY에 고객번호만 있는데 SELECT에 주문금액(집계 없이)을 사용해 오류. ②는 GROUP BY 후 집계 값으로 HAVING 필터링 → 정상. ③은 WHERE 절에 집계 함수(SUM) 사용 → 오류(WHERE는 GROUP BY 이전 실행). ④는 문법 오류는 아니지만 GROUP BY에 주문금액을 추가하면 의도와 다른 결과."
+  optionExplanations={['①은 GROUP BY에 포함되지 않은 주문금액을 집계 없이 SELECT에 사용해 오류입니다.', '정답. GROUP BY 후 HAVING으로 집계 필터링하는 올바른 패턴입니다.', '③은 WHERE 절에 집계 함수를 사용할 수 없습니다. HAVING을 사용해야 합니다.', '④는 문법 오류는 없지만 GROUP BY에 주문금액을 추가하면 행별로 그룹이 생겨 AVG가 의미 없어집니다.']}
+/>
 
 ---
 
-**[예제 4-2]** 다음 테이블에서 쿼리 결과로 반환되는 고객번호와 합계는?
+주문 테이블 데이터:
 
+| 고객번호 | 주문금액 |
+|----------|----------|
+| C001 | 50000 |
+| C001 | 30000 |
+| C002 | 20000 |
+| C002 | 10000 |
+| C003 | 80000 |
+
+쿼리:
 ```sql
--- 주문 테이블
--- 고객번호 | 주문금액
---   C001  | 50000
---   C001  | 30000
---   C002  | 20000
---   C002  | 10000
---   C003  | 80000
-
 SELECT 고객번호, SUM(주문금액) AS 합계
 FROM 주문
 GROUP BY 고객번호
 HAVING SUM(주문금액) >= 50000;
 ```
 
-1. C001(80000), C002(30000), C003(80000)
-2. C001(80000), C003(80000)
-3. C003(80000)
-4. C001(80000), C002(30000)
-
-<Callout type="success">
-  **정답: 2번**
-
-  각 그룹의 합계:
-  - C001: 50000 + 30000 = **80000** → 50000 이상 → 포함
-  - C002: 20000 + 10000 = **30000** → 50000 미만 → 제외
-  - C003: **80000** → 50000 이상 → 포함
-
-  결과: C001(80000), C003(80000)
-</Callout>
+<Quiz
+  questionNumber={8}
+  question="위 쿼리의 결과로 반환되는 고객번호와 합계는?"
+  options={['① C001(80000), C002(30000), C003(80000)', '② C001(80000), C003(80000)', '③ C003(80000)', '④ C001(80000), C002(30000)']}
+  correctAnswer={2}
+  explanation="C001: 50000+30000=80000 → 50000 이상 → 포함. C002: 20000+10000=30000 → 50000 미만 → 제외. C003: 80000 → 50000 이상 → 포함. 결과: C001(80000), C003(80000)."
+  optionExplanations={['①은 C002(30000)가 50000 미만이므로 HAVING 조건에서 제외됩니다.', '정답. C001(80000)과 C003(80000)만 50000 이상 조건을 만족합니다.', '③은 C001(80000)도 조건을 만족하므로 포함되어야 합니다.', '④는 C002(30000)가 50000 미만이므로 제외됩니다.']}
+/>
 
 ---
 
@@ -291,46 +216,18 @@ JOIN 유형별로 반환되는 행 수를 빠르게 계산하는 연습이 필�
 
 ---
 
-**[예제 5-1]** 다음 두 테이블을 각 JOIN으로 조인할 때 결과 행 수를 구하세요.
+고객 테이블 (3행): C001 김민준, C002 이서연, C003 박지호
 
-```
--- 고객 테이블 (3행)
-고객번호 | 고객명
-  C001  | 김민준
-  C002  | 이서연
-  C003  | 박지호
+주문 테이블 (4행): O001-C001, O002-C001, O003-C002, O004-C099 (C099는 고객 테이블에 없음)
 
--- 주문 테이블 (4행)
-주문번호 | 고객번호
-  O001  |   C001
-  O002  |   C001
-  O003  |   C002
-  O004  |   C099  ← 고객 테이블에 없는 고객번호
-```
-
-| JOIN 종류 | 결과 행 수 |
-|-----------|-----------|
-| INNER JOIN on 고객.고객번호 = 주문.고객번호 | ? |
-| LEFT OUTER JOIN (고객 기준) | ? |
-| FULL OUTER JOIN | ? |
-
-1. INNER: 3행, LEFT: 4행, FULL: 5행
-2. INNER: 3행, LEFT: 3행, FULL: 4행
-3. INNER: 4행, LEFT: 4행, FULL: 5행
-4. INNER: 2행, LEFT: 3행, FULL: 5행
-
-<Callout type="success">
-  **정답: 1번**
-
-  **INNER JOIN**: 양쪽에 모두 존재하는 매칭만
-  - C001-O001, C001-O002, C002-O003 → **3행** (C099는 고객 테이블에 없으므로 제외, C003은 주문 없으므로 제외)
-
-  **LEFT OUTER JOIN** (고객 기준, 왼쪽 테이블 전체 보존):
-  - C001-O001, C001-O002, C002-O003, C003-NULL → **4행** (C003은 주문 없지만 왼쪽 테이블에 있으므로 포함, NULL로 채움)
-
-  **FULL OUTER JOIN** (양쪽 모두 보존):
-  - 위 4행 + C099(O004, 고객명 NULL) → **5행**
-</Callout>
+<Quiz
+  questionNumber={9}
+  question="위 두 테이블을 각 JOIN으로 조인할 때 결과 행 수로 올바른 것은?"
+  options={['① INNER: 3행, LEFT: 4행, FULL: 5행', '② INNER: 3행, LEFT: 3행, FULL: 4행', '③ INNER: 4행, LEFT: 4행, FULL: 5행', '④ INNER: 2행, LEFT: 3행, FULL: 5행']}
+  correctAnswer={1}
+  explanation="INNER JOIN: C001-O001, C001-O002, C002-O003 = 3행(C099는 고객 없음, C003은 주문 없음). LEFT OUTER JOIN(고객 기준): 위 3행 + C003-NULL = 4행. FULL OUTER JOIN: 4행 + O004(C099, 고객명NULL) = 5행."
+  optionExplanations={['정답. INNER 3행, LEFT 4행, FULL 5행입니다.', '②는 LEFT JOIN 행 수를 3행으로 잘못 계산했습니다. C003도 왼쪽에 있어 NULL로 포함됩니다.', '③은 INNER JOIN 행 수를 4행으로 잘못 계산했습니다. C099는 고객 테이블에 없어 매칭 안 됩니다.', '④는 INNER JOIN 행 수를 2행으로 잘못 계산했습니다. C001 관련 2건 + C002 관련 1건 = 3행입니다.']}
+/>
 
 ---
 
@@ -355,8 +252,7 @@ SQL 실행 순서는 많은 문제의 핵심 판단 근거입니다.
 
 ---
 
-**[예제 6-1]** 다음 쿼리에서 오류가 발생하는 이유로 올바른 것은?
-
+오류 쿼리:
 ```sql
 SELECT 고객번호, SUM(주문금액) AS 총주문금액
 FROM 주문
@@ -364,33 +260,18 @@ WHERE 총주문금액 > 50000
 GROUP BY 고객번호;
 ```
 
-1. SUM은 WHERE 절에서 사용할 수 없다.
-2. 총주문금액이라는 별칭은 WHERE 절에서 사용할 수 없다.
-3. GROUP BY 없이 SUM을 사용했다.
-4. ①과 ②가 모두 오류 원인이다.
-
-<Callout type="success">
-  **정답: 4번**
-
-  이 쿼리에는 두 가지 문제가 동시에 있습니다.
-
-  **오류 원인 ①**: WHERE는 GROUP BY 이전에 실행되므로 아직 집계되지 않았습니다 → `SUM(주문금액)` 같은 집계 함수는 WHERE에 쓸 수 없습니다.
-
-  **오류 원인 ②**: `총주문금액`은 SELECT에서 정의한 별칭인데, SELECT는 WHERE보다 나중에 실행됩니다 → WHERE 단계에서 별칭을 아직 모릅니다.
-
-  **올바른 쿼리:**
-  ```sql
-  SELECT 고객번호, SUM(주문금액) AS 총주문금액
-  FROM 주문
-  GROUP BY 고객번호
-  HAVING SUM(주문금액) > 50000;
-  ```
-</Callout>
+<Quiz
+  questionNumber={10}
+  question="위 쿼리에서 오류가 발생하는 이유로 올바른 것은?"
+  options={['① SUM은 WHERE 절에서 사용할 수 없다.', '② 총주문금액이라는 별칭은 WHERE 절에서 사용할 수 없다.', '③ GROUP BY 없이 SUM을 사용했다.', '④ ①과 ②가 모두 오류 원인이다.']}
+  correctAnswer={4}
+  explanation="이 쿼리에는 두 가지 문제가 있습니다. 오류 원인 ①: WHERE는 GROUP BY 이전에 실행되므로 집계 함수를 쓸 수 없습니다. 오류 원인 ②: 총주문금액은 SELECT에서 정의한 별칭인데, SELECT는 WHERE보다 나중에 실행되므로 WHERE 단계에서 별칭을 알 수 없습니다. 올바른 쿼리는 WHERE 대신 HAVING을 사용해야 합니다."
+  optionExplanations={['①만으로는 불완전한 답입니다. 별칭 문제도 함께 오류 원인입니다.', '②만으로는 불완전한 답입니다. 집계 함수 문제도 함께 오류 원인입니다.', '③은 틀렸습니다. GROUP BY는 있습니다. 문제는 WHERE와 별칭 사용입니다.', '정답. WHERE에 집계 함수 사용 불가 + WHERE에 SELECT 별칭 사용 불가, 두 가지 모두 오류 원인입니다.']}
+/>
 
 ---
 
-**[예제 6-2]** 다음 쿼리의 실행 순서를 올바르게 나열한 것은?
-
+쿼리:
 ```sql
 SELECT 부서코드, AVG(급여) AS 평균급여
 FROM 직원
@@ -400,33 +281,24 @@ HAVING AVG(급여) > 3000000
 ORDER BY 평균급여 DESC;
 ```
 
-1. SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY
-2. FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY
-3. FROM → GROUP BY → WHERE → HAVING → SELECT → ORDER BY
-4. WHERE → FROM → GROUP BY → SELECT → HAVING → ORDER BY
-
-<Callout type="success">
-  **정답: 2번**
-
-  SQL 실행 순서: **FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY**
-
-  - FROM: 직원 테이블 로드
-  - WHERE: 입사년도 >= 2020 행 필터
-  - GROUP BY: 부서코드별 그룹화
-  - HAVING: 그룹 중 평균급여 > 3000000 필터
-  - SELECT: 부서코드, AVG(급여)를 '평균급여' 별칭으로 출력
-  - ORDER BY: '평균급여' 별칭으로 내림차순 정렬 (이 시점에 별칭 인식 가능)
-</Callout>
+<Quiz
+  questionNumber={11}
+  question="위 쿼리의 실행 순서를 올바르게 나열한 것은?"
+  options={['① SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY', '② FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY', '③ FROM → GROUP BY → WHERE → HAVING → SELECT → ORDER BY', '④ WHERE → FROM → GROUP BY → SELECT → HAVING → ORDER BY']}
+  correctAnswer={2}
+  explanation="SQL 실행 순서: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. FROM으로 테이블 로드, WHERE로 행 필터, GROUP BY로 그룹화, HAVING으로 그룹 필터, SELECT로 컬럼 선택 및 별칭 부여, ORDER BY로 정렬(이 시점에 별칭 인식 가능)."
+  optionExplanations={['①은 SELECT가 FROM보다 먼저 실행될 수 없습니다.', '정답. FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY 순서입니다.', '③은 GROUP BY가 WHERE보다 먼저 실행될 수 없습니다. WHERE로 행 필터 후 그룹화합니다.', '④는 WHERE가 FROM보다 먼저 실행될 수 없습니다. 테이블을 먼저 결정해야 합니다.']}
+/>
 
 ---
 
 ## 마무리 복습
 
-<Quiz questionNumber={1} question="다음 중 SQL 실행 결과가 나머지 셋과 다른 것은? (테이블 T: 컬럼 A에 1, 2, NULL, 3이 있음)" options={["SELECT COUNT(*) FROM T", "SELECT COUNT(A) FROM T", "SELECT COUNT(1) FROM T", "SELECT COUNT(*) FROM T WHERE A IS NOT NULL OR A IS NULL"]} correctAnswer={2} explanation="COUNT(*)는 NULL을 포함한 전체 행 수 4를 반환합니다. COUNT(A)는 A가 NULL인 행을 제외하므로 3을 반환합니다. COUNT(1)은 COUNT(*)와 동일하게 4를 반환합니다. ④의 WHERE 조건(IS NOT NULL OR IS NULL)은 항상 참이므로 4를 반환합니다. 따라서 결과가 다른 것은 COUNT(A)입니다." optionExplanations={["COUNT(*)는 NULL 포함 전체 행 수 4를 반환합니다.", "정답. COUNT(컬럼명)은 해당 컬럼이 NULL인 행을 제외하므로 3을 반환합니다.", "COUNT(1)은 COUNT(*)와 동일하게 NULL 포함 전체 행 수 4를 반환합니다.", "IS NOT NULL OR IS NULL은 모든 행에서 참이므로 WHERE가 전체 행을 통과시켜 COUNT(*) = 4입니다."]} />
+<Quiz questionNumber={12} question="다음 중 SQL 실행 결과가 나머지 셋과 다른 것은? (테이블 T: 컬럼 A에 1, 2, NULL, 3이 있음)" options={['① SELECT COUNT(*) FROM T', '② SELECT COUNT(A) FROM T', '③ SELECT COUNT(1) FROM T', '④ SELECT COUNT(*) FROM T WHERE A IS NOT NULL OR A IS NULL']} correctAnswer={2} explanation="COUNT(*)는 NULL을 포함한 전체 행 수 4를 반환합니다. COUNT(A)는 A가 NULL인 행을 제외하므로 3을 반환합니다. COUNT(1)은 COUNT(*)와 동일하게 4를 반환합니다. ④의 WHERE 조건(IS NOT NULL OR IS NULL)은 항상 참이므로 4를 반환합니다. 따라서 결과가 다른 것은 COUNT(A)입니다." optionExplanations={['COUNT(*)는 NULL 포함 전체 행 수 4를 반환합니다.', '정답. COUNT(컬럼명)은 해당 컬럼이 NULL인 행을 제외하므로 3을 반환합니다.', 'COUNT(1)은 COUNT(*)와 동일하게 NULL 포함 전체 행 수 4를 반환합니다.', 'IS NOT NULL OR IS NULL은 모든 행에서 참이므로 WHERE가 전체 행을 통과시켜 COUNT(*) = 4입니다.']} />
 
-<Quiz questionNumber={2} question="GROUP BY와 HAVING에 대한 설명 중 틀린 것은?" options={["HAVING은 GROUP BY 이후에 실행된다.", "HAVING 절에는 집계 함수를 사용할 수 있다.", "WHERE 절에는 집계 함수를 사용할 수 없다.", "HAVING 절에서 정의한 별칭은 WHERE 절에서 사용할 수 있다."]} correctAnswer={4} explanation="SQL 실행 순서는 FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY입니다. HAVING은 SELECT보다 먼저 실행되므로, 별칭(alias)은 아직 정의되지 않았습니다. 별칭은 ORDER BY 절에서만 사용할 수 있습니다." optionExplanations={["올바른 설명입니다. HAVING은 GROUP BY 이후에 그룹을 필터링합니다.", "올바른 설명입니다. HAVING에서는 SUM, COUNT 등 집계 함수를 사용할 수 있습니다.", "올바른 설명입니다. WHERE는 GROUP BY 이전 실행 단계이므로 집계 함수 사용이 불가합니다.", "정답(틀린 설명). 별칭은 SELECT에서 정의되는데, HAVING은 SELECT 이전에 실행되므로 HAVING에서 별칭을 쓸 수 없습니다. 별칭은 ORDER BY에서만 참조 가능합니다."]} />
+<Quiz questionNumber={13} question="GROUP BY와 HAVING에 대한 설명 중 틀린 것은?" options={['① HAVING은 GROUP BY 이후에 실행된다.', '② HAVING 절에는 집계 함수를 사용할 수 있다.', '③ WHERE 절에는 집계 함수를 사용할 수 없다.', '④ HAVING 절에서 정의한 별칭은 WHERE 절에서 사용할 수 있다.']} correctAnswer={4} explanation="SQL 실행 순서는 FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY입니다. HAVING은 SELECT보다 먼저 실행되므로, 별칭(alias)은 아직 정의되지 않았습니다. 별칭은 ORDER BY 절에서만 사용할 수 있습니다." optionExplanations={['올바른 설명입니다. HAVING은 GROUP BY 이후에 그룹을 필터링합니다.', '올바른 설명입니다. HAVING에서는 SUM, COUNT 등 집계 함수를 사용할 수 있습니다.', '올바른 설명입니다. WHERE는 GROUP BY 이전 실행 단계이므로 집계 함수 사용이 불가합니다.', '정답(틀린 설명). 별칭은 SELECT에서 정의되는데, HAVING은 SELECT 이전에 실행되므로 HAVING에서 별칭을 쓸 수 없습니다. 별칭은 ORDER BY에서만 참조 가능합니다.']} />
 
-<Quiz questionNumber={3} question="LEFT OUTER JOIN에 대한 설명으로 올바른 것은?" options={["왼쪽 테이블에서 오른쪽 테이블과 일치하는 행만 반환한다.", "왼쪽 테이블의 모든 행을 반환하고, 오른쪽 테이블에 일치하는 행이 없으면 NULL로 채운다.", "오른쪽 테이블의 모든 행을 반환하고, 왼쪽 테이블에 일치하는 행이 없으면 NULL로 채운다.", "양쪽 테이블의 모든 행을 반환한다."]} correctAnswer={2} explanation="LEFT OUTER JOIN은 왼쪽(FROM 뒤에 오는) 테이블의 모든 행을 보존합니다. 오른쪽 테이블에 매칭 행이 없으면 오른쪽 컬럼들을 NULL로 채워서 반환합니다. ①은 INNER JOIN, ③은 RIGHT OUTER JOIN, ④는 FULL OUTER JOIN의 설명입니다." optionExplanations={["INNER JOIN의 설명입니다. 양쪽 모두 일치하는 행만 반환합니다.", "정답. LEFT OUTER JOIN은 왼쪽 테이블 전체를 보존하고, 오른쪽 불일치는 NULL 처리합니다.", "RIGHT OUTER JOIN의 설명입니다.", "FULL OUTER JOIN의 설명입니다."]} />
+<Quiz questionNumber={14} question="LEFT OUTER JOIN에 대한 설명으로 올바른 것은?" options={['① 왼쪽 테이블에서 오른쪽 테이블과 일치하는 행만 반환한다.', '② 왼쪽 테이블의 모든 행을 반환하고, 오른쪽 테이블에 일치하는 행이 없으면 NULL로 채운다.', '③ 오른쪽 테이블의 모든 행을 반환하고, 왼쪽 테이블에 일치하는 행이 없으면 NULL로 채운다.', '④ 양쪽 테이블의 모든 행을 반환한다.']} correctAnswer={2} explanation="LEFT OUTER JOIN은 왼쪽(FROM 뒤에 오는) 테이블의 모든 행을 보존합니다. 오른쪽 테이블에 매칭 행이 없으면 오른쪽 컬럼들을 NULL로 채워서 반환합니다. ①은 INNER JOIN, ③은 RIGHT OUTER JOIN, ④는 FULL OUTER JOIN의 설명입니다." optionExplanations={['INNER JOIN의 설명입니다. 양쪽 모두 일치하는 행만 반환합니다.', '정답. LEFT OUTER JOIN은 왼쪽 테이블 전체를 보존하고, 오른쪽 불일치는 NULL 처리합니다.', 'RIGHT OUTER JOIN의 설명입니다.', 'FULL OUTER JOIN의 설명입니다.']} />
 
 ## 참고 자료
 

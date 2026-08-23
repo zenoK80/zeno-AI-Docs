@@ -25,6 +25,10 @@ const meta = {
   '24_sql-utilization-question-types': '24. SQL 활용 기출 유형',
   '25_mock-exam-1': '25. 실전 모의 1회',
   '26_mock-exam-2': '26. 실전 모의 2회',
+  '27_기출-practice-round-1': '27. 기출 유형 연습 1회 — 데이터 모델링',
+  '28_기출-practice-round-2': '28. 기출 유형 연습 2회 — SQL 기본',
+  '29_기출-practice-round-3': '29. 기출 유형 연습 3회 — SQL 활용',
+  '30_기출-practice-round-4': '30. 최종 실전 40문항',
 }
 
 export default meta
