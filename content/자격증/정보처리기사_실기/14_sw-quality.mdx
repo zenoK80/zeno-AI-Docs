@@ -1,0 +1,117 @@
+---
+title: '14. 소프트웨어 품질과 표준'
+description: 'ISO/IEC 25010 품질 특성, CMMI, 소프트웨어 측정을 학습합니다.'
+---
+
+<Callout type="info">
+  실기 시험에서 ISO 9126 / ISO 25010 품질 특성의 이름과 설명, CMMI 단계, 소프트웨어 메트릭을 서술하는 문제가 출제됩니다.
+</Callout>
+
+## ISO/IEC 25010 소프트웨어 품질 특성
+
+| 특성 | 영문 | 설명 |
+|------|------|------|
+| 기능 적합성 | Functional Suitability | 요구 기능을 정확히 제공 |
+| 성능 효율성 | Performance Efficiency | 자원 대비 성능 |
+| 호환성 | Compatibility | 다른 시스템과 공존/상호운용 |
+| 사용성 | Usability | 사용 용이성 |
+| 신뢰성 | Reliability | 지정 기간 동안 결함 없이 동작 |
+| 보안성 | Security | 허가된 접근만 허용 |
+| 유지보수성 | Maintainability | 수정/개선 용이성 |
+| 이식성 | Portability | 다른 환경으로 이전 용이성 |
+
+---
+
+## CMMI (Capability Maturity Model Integration)
+
+소프트웨어 프로세스 성숙도를 5단계로 평가합니다.
+
+| 레벨 | 이름 | 설명 |
+|------|------|------|
+| 1 | 초기(Initial) | 프로세스 없음, 혼돈 |
+| 2 | 관리(Managed) | 기본 프로세스 관리 |
+| 3 | 정의(Defined) | 표준화된 프로세스 |
+| 4 | 정량적 관리(Quantitatively Managed) | 성과 데이터로 관리 |
+| 5 | 최적화(Optimizing) | 지속적 프로세스 개선 |
+
+---
+
+## 소프트웨어 측정 메트릭
+
+| 메트릭 | 설명 |
+|--------|------|
+| LOC (Lines of Code) | 코드 라인 수 |
+| McCabe의 복잡도 | V(G) = E - N + 2P (제어 흐름 복잡도) |
+| 결함 밀도 | 결함 수 / 소프트웨어 크기 |
+| 테스트 커버리지 | 테스트된 코드 비율 |
+
+### 맥케이브(McCabe) 순환 복잡도
+
+```
+V(G) = E - N + 2P
+  E: 엣지(간선) 수
+  N: 노드(정점) 수
+  P: 연결 컴포넌트 수 (보통 1)
+```
+
+복잡도가 낮을수록 테스트·유지보수가 용이합니다. 일반적으로 10 이하를 권장합니다.
+
+---
+
+## 소프트웨어 품질 활동
+
+| 활동 | 설명 |
+|------|------|
+| SQA (소프트웨어 품질 보증) | 개발 프로세스 전반의 품질 활동 |
+| 검증(Verification) | 올바르게 만들고 있는가? (개발 중 확인) |
+| 확인(Validation) | 올바른 것을 만들고 있는가? (최종 요구사항 부합 확인) |
+| 형상 관리(SCM) | 변경 통제, 버전 관리 |
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="소프트웨어 품질 특성 중 명시된 조건에서 정해진 기간 동안 결함 없이 기능을 수행하는 능력으로 알맞은 것은?"
+  options={['① 기능 적합성', '② 성능 효율성', '③ 신뢰성', '④ 사용성']}
+  correctAnswer={3}
+  explanation="신뢰성(Reliability)은 소프트웨어가 명시된 조건과 기간 동안 요구된 기능을 수행하는 능력입니다. MTBF(평균 장애 간격)가 높을수록 신뢰성이 높습니다."
+  optionExplanations={['기능 적합성은 요구 기능을 정확하게 제공하는 능력입니다.', '성능 효율성은 자원 사용 대비 성능 수준입니다.', '정답입니다. 신뢰성은 지정 기간 동안 결함 없이 동작하는 능력입니다.', '사용성은 이해하고 사용하기 쉬운 정도입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="CMMI 성숙도 모델의 5단계 중 측정 및 분석을 통해 성과 데이터로 프로세스를 정량적으로 관리하는 레벨로 알맞은 것은?"
+  options={['① 레벨 2 - 관리(Managed)', '② 레벨 3 - 정의(Defined)', '③ 레벨 4 - 정량적 관리(Quantitatively Managed)', '④ 레벨 5 - 최적화(Optimizing)']}
+  correctAnswer={3}
+  explanation="CMMI 레벨 4(정량적 관리)는 프로세스를 정량적으로 측정하고 통계 데이터로 관리합니다. 레벨 5는 지속적인 프로세스 개선을 목표로 합니다."
+  optionExplanations={['레벨 2는 기본 프로세스를 계획하고 수행합니다.', '레벨 3은 표준화된 프로세스를 조직 전체에 적용합니다.', '정답입니다. 레벨 4는 성과 데이터로 정량적 프로세스 관리를 합니다.', '레벨 5는 지속적인 프로세스 개선을 수행합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="소프트웨어 품질 활동 중 '올바른 제품을 만들고 있는가(Are we building the right product)?'를 확인하는 활동으로 알맞은 것은?"
+  options={['① 검증(Verification)', '② 확인(Validation)', '③ 리뷰(Review)', '④ 감사(Audit)']}
+  correctAnswer={2}
+  explanation="확인(Validation)은 최종 제품이 고객의 요구사항을 실제로 충족하는지 확인합니다. 검증(Verification)은 각 개발 단계의 산출물이 이전 단계 사양을 올바르게 구현했는지 확인합니다."
+  optionExplanations={['검증은 올바르게 만들고 있는가(Are we building the product right?)를 확인합니다.', '정답입니다. 확인은 올바른 제품을 만들고 있는가를 확인합니다.', '리뷰는 산출물을 검토하는 활동입니다.', '감사는 프로세스 준수 여부를 확인하는 활동입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="맥케이브(McCabe) 순환 복잡도 계산식으로 알맞은 것은?"
+  options={['① V(G) = N - E + 2P', '② V(G) = E - N + 2P', '③ V(G) = E + N - 2P', '④ V(G) = N + E - P']}
+  correctAnswer={2}
+  explanation="맥케이브 순환 복잡도는 V(G) = E - N + 2P입니다. E는 엣지(간선) 수, N은 노드(정점) 수, P는 연결 컴포넌트 수(단순 프로그램에서 1)입니다."
+  optionExplanations={['N - E + 2P는 잘못된 공식입니다.', '정답입니다. V(G) = E - N + 2P가 올바른 공식입니다.', 'E + N - 2P는 잘못된 공식입니다.', 'N + E - P는 잘못된 공식입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="소프트웨어 품질 특성 중 소프트웨어가 다른 환경(하드웨어, OS)으로 이전될 수 있는 능력으로 알맞은 것은?"
+  options={['① 유지보수성(Maintainability)', '② 신뢰성(Reliability)', '③ 이식성(Portability)', '④ 호환성(Compatibility)']}
+  correctAnswer={3}
+  explanation="이식성(Portability)은 소프트웨어를 다른 하드웨어, 운영체제, 환경으로 이전할 수 있는 능력입니다. 호환성은 다른 시스템과 공존하거나 상호운용하는 능력입니다."
+  optionExplanations={['유지보수성은 수정·개선의 용이성입니다.', '신뢰성은 지정 기간 동안 결함 없이 동작하는 능력입니다.', '정답입니다. 이식성은 다른 환경으로 이전하는 능력입니다.', '호환성은 다른 시스템과의 공존 및 상호운용입니다.']}
+/>

@@ -1,0 +1,165 @@
+---
+title: '15. SQL DDL·DCL과 트랜잭션'
+description: 'DDL(CREATE/ALTER/DROP), DCL(GRANT/REVOKE), 트랜잭션(ACID) 개념을 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** DDL·DCL 명령어와 트랜잭션의 ACID 특성, TCL 명령어를 정확히 이해할 수 있습니다.
+</Callout>
+
+## DDL (Data Definition Language)
+
+데이터 구조(스키마)를 정의·변경·삭제하는 언어입니다.
+
+### CREATE
+
+```sql
+CREATE TABLE employee (
+  emp_id   INT PRIMARY KEY,
+  name     VARCHAR(50) NOT NULL,
+  dept_id  INT,
+  salary   DECIMAL(10, 2) DEFAULT 0,
+  hire_date DATE,
+  FOREIGN KEY (dept_id) REFERENCES department(dept_id)
+);
+```
+
+### ALTER
+
+```sql
+-- 컬럼 추가
+ALTER TABLE employee ADD email VARCHAR(100);
+
+-- 컬럼 수정
+ALTER TABLE employee MODIFY name VARCHAR(100) NOT NULL;
+
+-- 컬럼 삭제
+ALTER TABLE employee DROP COLUMN email;
+```
+
+### DROP vs TRUNCATE vs DELETE
+
+| 명령 | 분류 | 데이터 삭제 | 구조 삭제 | 롤백 |
+|------|------|------------|----------|------|
+| DROP | DDL | O (전체) | O | 불가 |
+| TRUNCATE | DDL | O (전체) | X | 불가 |
+| DELETE | DML | O (선택) | X | 가능 |
+
+---
+
+## 제약 조건 (Constraint)
+
+| 제약 조건 | 설명 |
+|-----------|------|
+| PRIMARY KEY | 기본키, NOT NULL + UNIQUE |
+| FOREIGN KEY | 외래키, 참조 무결성 |
+| UNIQUE | 중복 불허, NULL 허용 |
+| NOT NULL | NULL 불허 |
+| CHECK | 허용 값 범위 제한 |
+| DEFAULT | 기본값 설정 |
+
+---
+
+## DCL (Data Control Language)
+
+데이터 접근 권한을 제어합니다.
+
+```sql
+-- 권한 부여
+GRANT SELECT, INSERT ON employee TO user1;
+GRANT ALL PRIVILEGES ON employee TO admin WITH GRANT OPTION;
+
+-- 권한 회수
+REVOKE SELECT ON employee FROM user1;
+```
+
+---
+
+## 트랜잭션 (Transaction)
+
+하나의 논리적 작업 단위로 여러 SQL을 묶어 처리합니다.
+
+### ACID 특성
+
+| 특성 | 설명 |
+|------|------|
+| 원자성 (Atomicity) | 전부 성공하거나 전부 실패 (All or Nothing) |
+| 일관성 (Consistency) | 트랜잭션 전후 데이터 일관성 유지 |
+| 격리성 (Isolation) | 동시 실행 트랜잭션이 서로 영향 안 줌 |
+| 지속성 (Durability) | 커밋된 트랜잭션은 영구 반영 |
+
+### TCL (Transaction Control Language)
+
+| 명령 | 설명 |
+|------|------|
+| COMMIT | 트랜잭션 변경 사항 확정·저장 |
+| ROLLBACK | 트랜잭션 변경 사항 취소 |
+| SAVEPOINT | 트랜잭션 내 저장점 설정 |
+| SET TRANSACTION | 트랜잭션 격리 수준 설정 |
+
+### 트랜잭션 격리 수준
+
+| 수준 | 설명 | 문제 |
+|------|------|------|
+| READ UNCOMMITTED | 커밋 안 된 데이터 읽기 허용 | Dirty Read |
+| READ COMMITTED | 커밋된 데이터만 읽기 | Non-Repeatable Read |
+| REPEATABLE READ | 같은 데이터 반복 읽기 보장 | Phantom Read |
+| SERIALIZABLE | 완전 직렬 실행 | 성능 저하 |
+
+---
+
+## 핵심 정리
+
+- DROP: 테이블 구조·데이터 삭제 / TRUNCATE: 데이터만 전체 삭제 / DELETE: 조건 삭제
+- ACID: 원자성, 일관성, 격리성, 지속성
+- GRANT: 권한 부여 / REVOKE: 권한 회수
+- COMMIT: 확정 / ROLLBACK: 취소
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="SQL 명령어 중 테이블의 구조와 데이터를 모두 삭제하는 DDL 명령으로 알맞은 것은?"
+  options={['① DELETE', '② TRUNCATE', '③ DROP', '④ REMOVE']}
+  correctAnswer={3}
+  explanation="DROP TABLE은 테이블의 구조(스키마)와 모든 데이터를 함께 삭제합니다. TRUNCATE는 구조는 유지하고 데이터만 전체 삭제, DELETE는 조건에 따라 선택적으로 데이터만 삭제합니다."
+  optionExplanations={['DELETE는 DML로 조건에 따른 선택적 데이터 삭제이며 롤백 가능합니다.', 'TRUNCATE는 DDL로 구조는 유지하고 데이터만 전체 삭제합니다. 롤백 불가.', '정답입니다. DROP TABLE은 테이블 구조와 데이터를 모두 삭제합니다.', 'REMOVE는 SQL 표준 명령어가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="트랜잭션의 ACID 특성 중 '트랜잭션 내의 모든 연산이 성공하거나 모두 실패해야 한다'는 특성으로 알맞은 것은?"
+  options={['① 일관성(Consistency)', '② 원자성(Atomicity)', '③ 격리성(Isolation)', '④ 지속성(Durability)']}
+  correctAnswer={2}
+  explanation="원자성(Atomicity)은 트랜잭션의 연산이 모두 성공(COMMIT)하거나 모두 실패(ROLLBACK)해야 한다는 All-or-Nothing 특성입니다. 일부만 실행되는 상태는 허용되지 않습니다."
+  optionExplanations={['일관성은 트랜잭션 전후 데이터의 일관성이 유지되어야 한다는 특성입니다.', '정답입니다. 원자성은 All-or-Nothing으로 전부 성공하거나 전부 실패해야 합니다.', '격리성은 동시 실행 트랜잭션들이 서로 영향을 주지 않는 특성입니다.', '지속성은 커밋된 트랜잭션 결과가 영구적으로 저장되는 특성입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="SQL DCL에서 사용자에게 권한을 부여하는 명령으로 알맞은 것은?"
+  options={['① GRANT', '② REVOKE', '③ COMMIT', '④ ROLLBACK']}
+  correctAnswer={1}
+  explanation="GRANT는 데이터베이스 사용자에게 테이블 접근 권한(SELECT, INSERT, UPDATE, DELETE 등)을 부여하는 DCL 명령입니다. REVOKE는 부여한 권한을 회수합니다."
+  optionExplanations={['정답입니다. GRANT는 사용자에게 권한을 부여하는 DCL 명령입니다.', 'REVOKE는 부여된 권한을 회수하는 DCL 명령입니다.', 'COMMIT은 트랜잭션 변경 사항을 확정하는 TCL 명령입니다.', 'ROLLBACK은 트랜잭션 변경 사항을 취소하는 TCL 명령입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="트랜잭션 격리 수준 중 가장 높은 수준으로 동시에 실행되는 트랜잭션들이 완전히 직렬로 실행되는 것처럼 처리하는 수준으로 알맞은 것은?"
+  options={['① READ UNCOMMITTED', '② READ COMMITTED', '③ REPEATABLE READ', '④ SERIALIZABLE']}
+  correctAnswer={4}
+  explanation="SERIALIZABLE은 가장 높은 격리 수준으로 동시에 실행되는 트랜잭션들이 순차적으로 실행되는 것과 동일한 결과를 보장합니다. Dirty Read, Non-Repeatable Read, Phantom Read 모두 방지하지만 성능이 저하됩니다."
+  optionExplanations={['READ UNCOMMITTED는 가장 낮은 격리 수준으로 Dirty Read가 발생할 수 있습니다.', 'READ COMMITTED는 Dirty Read를 방지하지만 Non-Repeatable Read가 발생합니다.', 'REPEATABLE READ는 Dirty Read와 Non-Repeatable Read를 방지하지만 Phantom Read가 발생합니다.', '정답입니다. SERIALIZABLE은 가장 높은 격리 수준으로 모든 이상 현상을 방지합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="ALTER TABLE 명령으로 기존 테이블에 새로운 컬럼을 추가하는 구문으로 알맞은 것은?"
+  options={['① ALTER TABLE emp ADD email VARCHAR(100);', '② ALTER TABLE emp CREATE email VARCHAR(100);', '③ ALTER TABLE emp INSERT email VARCHAR(100);', '④ ALTER TABLE emp COLUMN ADD email VARCHAR(100);']}
+  correctAnswer={1}
+  explanation="테이블에 새 컬럼을 추가할 때는 'ALTER TABLE 테이블명 ADD 컬럼명 데이터타입' 구문을 사용합니다. Oracle에서는 ADD, MySQL/PostgreSQL에서도 동일하게 사용합니다."
+  optionExplanations={['정답입니다. ALTER TABLE ... ADD ... 구문으로 컬럼을 추가합니다.', 'CREATE는 DDL에서 새 객체를 생성할 때 사용하며 ALTER와 함께 쓰지 않습니다.', 'INSERT는 DML로 데이터를 삽입하는 명령이며 컬럼 추가와 무관합니다.', 'COLUMN ADD는 올바른 DDL 구문이 아닙니다.']}
+/>

@@ -1,0 +1,143 @@
+---
+title: '21. 단답형 집중 훈련'
+description: '정보처리기사 실기 단답형·서술형 문제 집중 훈련 (15문항)'
+---
+
+<Callout type="info">
+  정보처리기사 실기는 단답형과 서술형으로 출제됩니다. 핵심 용어와 개념을 정확하게 서술할 수 있도록 훈련합니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="소프트웨어 개발에서 '기술 부채(Technical Debt)'란 무엇인가?"
+  options={['① 개발에 사용된 총 비용', '② 빠른 개발을 위해 임시방편으로 작성한 코드가 나중에 유발하는 추가 작업', '③ 프로젝트의 예산 초과 금액', '④ 외부 라이브러리 라이선스 비용']}
+  correctAnswer={2}
+  explanation="기술 부채(Technical Debt)는 소프트웨어 개발 시 적절한 설계나 구현 대신 빠른 개발을 위해 임시방편(Quick Fix)을 선택할 때 발생하는 추가적인 재작업 비용을 의미합니다. 방치하면 점점 누적됩니다."
+  optionExplanations={['총 개발 비용은 TCO(Total Cost of Ownership)입니다.', '정답입니다. 기술 부채는 임시방편 코드가 나중에 유발하는 추가 작업입니다.', '예산 초과 금액은 Cost Variance(CV)입니다.', '라이선스 비용은 기술 부채와 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="데이터베이스 트랜잭션의 ACID 속성 중 '격리성(Isolation)'의 의미로 알맞은 것은?"
+  options={['① 트랜잭션이 완료되면 영구적으로 저장', '② 동시 실행 중인 트랜잭션이 서로 간섭하지 않음', '③ 트랜잭션 중 오류 발생 시 이전 상태로 복원', '④ 모든 연산이 모두 완료되거나 모두 취소됨']}
+  correctAnswer={2}
+  explanation="격리성(Isolation)은 동시에 실행되는 여러 트랜잭션들이 서로의 중간 결과를 볼 수 없고 간섭하지 않는다는 속성입니다. 격리 수준(Isolation Level)에 따라 허용 범위가 달라집니다."
+  optionExplanations={['영구적 저장은 지속성(Durability)입니다.', '정답입니다. 격리성은 동시 트랜잭션 간 간섭이 없는 속성입니다.', '이전 상태로 복원은 원자성(Atomicity)의 롤백 특성입니다.', '모두 완료되거나 모두 취소는 원자성(Atomicity)입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="소프트웨어 테스트에서 '등가 분할(Equivalence Partitioning)' 기법의 개념으로 알맞은 것은?"
+  options={['① 모든 경계값을 테스트하는 기법', '② 입력 데이터를 유사한 동작을 하는 그룹으로 나누어 대표 값을 테스트', '③ 소스 코드의 모든 경로를 테스트', '④ 사용자 시나리오 기반으로 테스트']}
+  correctAnswer={2}
+  explanation="등가 분할(Equivalence Partitioning)은 블랙박스 테스트 기법으로 입력 데이터를 유사한 결과를 내는 그룹(파티션)으로 나누고 각 그룹에서 대표 값 하나만 테스트합니다. 테스트 케이스 수를 줄이면서 효율적으로 테스트할 수 있습니다."
+  optionExplanations={['경계값 테스트는 경계값 분석(Boundary Value Analysis) 기법입니다.', '정답입니다. 등가 분할은 입력을 동일 동작 그룹으로 나누어 대표 값을 테스트합니다.', '코드 경로 테스트는 경로 커버리지(Path Coverage) 기법입니다.', '사용자 시나리오 기반은 시나리오 테스트입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="네트워크에서 ARP(Address Resolution Protocol)의 역할로 알맞은 것은?"
+  options={['① IP 주소를 도메인 이름으로 변환', '② IP 주소를 MAC 주소로 변환', '③ 도메인 이름을 IP 주소로 변환', '④ 포트 번호를 프로세스 ID로 변환']}
+  correctAnswer={2}
+  explanation="ARP(Address Resolution Protocol)는 IP 주소를 MAC(하드웨어) 주소로 변환하는 프로토콜입니다. LAN에서 특정 IP를 가진 호스트의 물리 주소를 알아낼 때 브로드캐스트로 ARP 요청을 보냅니다."
+  optionExplanations={['IP→도메인 변환은 역방향 DNS(rDNS)입니다.', '정답입니다. ARP는 IP 주소를 MAC 주소로 변환합니다.', '도메인→IP 변환은 DNS입니다.', '포트→프로세스 변환은 OS 내부 매핑입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="객체지향 설계에서 '다형성(Polymorphism)'의 설명으로 알맞은 것은?"
+  options={['① 하나의 클래스에서 여러 인스턴스를 생성할 수 있는 특성', '② 같은 이름의 메서드가 객체 유형에 따라 다르게 동작하는 특성', '③ 클래스의 내부 데이터를 외부에서 직접 접근하지 못하도록 하는 특성', '④ 부모 클래스의 특성을 자식 클래스가 물려받는 특성']}
+  correctAnswer={2}
+  explanation="다형성(Polymorphism)은 동일한 메서드 이름이 객체의 타입에 따라 다른 동작을 하는 것입니다. 오버라이딩(Overriding)으로 구현됩니다. '하나의 인터페이스, 여러 구현'이 핵심입니다."
+  optionExplanations={['인스턴스 생성은 클래스의 기본 특성입니다.', '정답입니다. 다형성은 같은 이름의 메서드가 타입에 따라 다르게 동작합니다.', '내부 데이터 보호는 캡슐화(Encapsulation)입니다.', '부모 특성을 물려받는 것은 상속(Inheritance)입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="암호화 알고리즘 중 RSA의 분류로 알맞은 것은?"
+  options={['① 대칭키 암호화', '② 비대칭키 암호화', '③ 해시 함수', '④ 스트림 암호화']}
+  correctAnswer={2}
+  explanation="RSA는 공개키(Public Key) 기반의 비대칭키 암호화 알고리즘입니다. 수학적으로 큰 소수의 인수분해 어려움에 기반합니다. 공개키로 암호화하고 개인키로 복호화합니다."
+  optionExplanations={['대칭키 암호화는 AES, DES, 3DES 등이 있습니다.', '정답입니다. RSA는 비대칭키(공개키) 암호화 알고리즘입니다.', '해시 함수는 SHA-256, MD5 등이 있습니다.', '스트림 암호화는 RC4 등이 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="Agile 방법론에서 스프린트 회고(Sprint Retrospective)의 목적으로 알맞은 것은?"
+  options={['① 다음 스프린트 백로그 결정', '② 팀의 작업 프로세스를 개선하기 위한 논의', '③ 완성된 제품을 이해관계자에게 시연', '④ 개발 요구사항 구체화']}
+  correctAnswer={2}
+  explanation="스프린트 회고(Sprint Retrospective)는 스프린트가 끝날 때 팀이 모여 '무엇이 잘 되었나', '무엇이 개선되어야 하나'를 논의하고 다음 스프린트에서 프로세스를 개선하는 회의입니다."
+  optionExplanations={['다음 스프린트 백로그 결정은 스프린트 계획(Sprint Planning)에서 합니다.', '정답입니다. 스프린트 회고는 팀 프로세스 개선을 위한 논의입니다.', '이해관계자 시연은 스프린트 리뷰(Sprint Review)에서 합니다.', '요구사항 구체화는 백로그 정제(Backlog Refinement)에서 합니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="정보 시스템에서 '가용성(Availability)'을 계산하는 공식으로 알맞은 것은?"
+  options={['① MTBF / (MTBF + MTTR)', '② MTTR / (MTBF + MTTR)', '③ MTBF - MTTR', '④ MTBF × MTTR']}
+  correctAnswer={1}
+  explanation="가용성(Availability) = MTBF / (MTBF + MTTR). MTBF(평균 고장 간격)가 길수록, MTTR(평균 복구 시간)이 짧을수록 가용성이 높습니다. 가용성 99.9%는 연간 약 8.7시간 다운타임입니다."
+  optionExplanations={['정답입니다. 가용성 = MTBF / (MTBF + MTTR)입니다.', '이 공식은 비가용성(Unavailability)에 해당합니다.', '단순 차이는 가용성 공식이 아닙니다.', '곱은 가용성 공식이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="소프트웨어 버전 관리에서 '브랜치(Branch) 전략' 중 기능 개발, 배포, 핫픽스를 위한 브랜치를 명확히 구분하는 Git 워크플로우로 알맞은 것은?"
+  options={['① GitHub Flow', '② GitLab Flow', '③ Git Flow', '④ Trunk-based Development']}
+  correctAnswer={3}
+  explanation="Git Flow는 main(master), develop, feature, release, hotfix 브랜치를 명확히 구분하는 브랜치 전략입니다. 릴리즈 주기가 명확한 대규모 프로젝트에 적합합니다."
+  optionExplanations={['GitHub Flow는 main과 feature 브랜치만 사용하는 단순한 전략입니다.', 'GitLab Flow는 환경별 브랜치를 추가한 전략입니다.', '정답입니다. Git Flow는 기능/배포/핫픽스 브랜치를 명확히 구분합니다.', 'Trunk-based Development는 모든 개발이 main 브랜치에서 이루어집니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="데이터 마이닝에서 '분류(Classification)'와 '군집화(Clustering)'의 차이로 알맞은 것은?"
+  options={['① 분류는 비지도 학습이고 군집화는 지도 학습이다.', '② 분류는 지도 학습이고 군집화는 비지도 학습이다.', '③ 둘 다 지도 학습이다.', '④ 둘 다 비지도 학습이다.']}
+  correctAnswer={2}
+  explanation="분류(Classification)는 사전에 정의된 클래스 레이블을 사용하는 지도 학습(Supervised Learning)입니다. 군집화(Clustering)는 레이블 없이 데이터를 유사한 그룹으로 나누는 비지도 학습(Unsupervised Learning)입니다."
+  optionExplanations={['분류가 지도 학습이고 군집화가 비지도 학습입니다.', '정답입니다. 분류는 지도 학습, 군집화는 비지도 학습입니다.', '군집화는 비지도 학습입니다.', '분류는 지도 학습입니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="네트워크 프로토콜에서 TCP의 흐름 제어 기법 중 수신 측이 처리할 수 있는 데이터 양을 송신 측에 알려주는 방법으로 알맞은 것은?"
+  options={['① 슬라이딩 윈도우(Sliding Window)', '② 혼잡 제어(Congestion Control)', '③ 오류 제어(Error Control)', '④ 흐름 제어(Stop-and-Wait)']}
+  correctAnswer={1}
+  explanation="슬라이딩 윈도우(Sliding Window)는 수신 측이 자신의 버퍼 크기(윈도우 크기)를 송신 측에 알려 한 번에 보낼 수 있는 데이터 양을 조절하는 흐름 제어 기법입니다."
+  optionExplanations={['정답입니다. 슬라이딩 윈도우는 수신 측이 처리 가능한 데이터 양을 알려주는 흐름 제어 기법입니다.', '혼잡 제어는 네트워크 혼잡 상태에 따라 전송량을 조절합니다.', '오류 제어는 데이터 손상이나 손실을 감지하고 수정합니다.', 'Stop-and-Wait는 프레임 전송 후 확인 응답을 받을 때까지 기다리는 단순한 방법입니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="소프트웨어 아키텍처 문서에서 '뷰(View)' 개념을 도입한 4+1 뷰 모델에서 포함되지 않는 뷰로 알맞은 것은?"
+  options={['① 논리 뷰(Logical View)', '② 프로세스 뷰(Process View)', '③ 배포 뷰(Deployment View)', '④ 데이터 뷰(Data View)']}
+  correctAnswer={4}
+  explanation="Kruchten의 4+1 뷰 모델은 논리 뷰, 프로세스 뷰, 구현 뷰, 배포 뷰의 4개 뷰와 시나리오(Use Case View) 뷰로 구성됩니다. 데이터 뷰는 4+1 뷰 모델에 포함되지 않습니다."
+  optionExplanations={['논리 뷰는 4+1 뷰 모델에 포함됩니다.', '프로세스 뷰는 4+1 뷰 모델에 포함됩니다.', '배포 뷰는 4+1 뷰 모델에 포함됩니다.', '정답입니다. 데이터 뷰는 4+1 뷰 모델에 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="개인정보보호법에서 민감정보로 분류되지 않는 항목으로 알맞은 것은?"
+  options={['① 건강에 관한 정보', '② 정치적 견해', '③ 주민등록번호', '④ 유전정보']}
+  correctAnswer={3}
+  explanation="주민등록번호는 고유식별정보(Unique Identification Information)로 별도 관리됩니다. 민감정보에는 사상·신념, 노동조합·정당 가입 여부, 정치적 견해, 건강·성생활 정보, 유전정보, 범죄경력 등이 포함됩니다."
+  optionExplanations={['건강 정보는 민감정보에 해당합니다.', '정치적 견해는 민감정보에 해당합니다.', '정답입니다. 주민등록번호는 민감정보가 아닌 고유식별정보입니다.', '유전정보는 민감정보에 해당합니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="소프트웨어 품질 모델 ISO 25010에서 '유지보수성(Maintainability)'의 하위 특성이 아닌 것으로 알맞은 것은?"
+  options={['① 분석성(Analysability)', '② 수정성(Modifiability)', '③ 이식성(Portability)', '④ 시험성(Testability)']}
+  correctAnswer={3}
+  explanation="ISO 25010의 유지보수성(Maintainability) 하위 특성은 모듈성(Modularity), 재사용성(Reusability), 분석성(Analysability), 수정성(Modifiability), 시험성(Testability)입니다. 이식성(Portability)은 유지보수성과 별개의 품질 특성입니다."
+  optionExplanations={['분석성은 유지보수성의 하위 특성입니다.', '수정성은 유지보수성의 하위 특성입니다.', '정답입니다. 이식성은 유지보수성이 아닌 별도의 품질 특성입니다.', '시험성은 유지보수성의 하위 특성입니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="운영체제에서 '세마포어(Semaphore)'의 주요 용도로 알맞은 것은?"
+  options={['① CPU 스케줄링 순서 결정', '② 프로세스 간 동기화 및 임계 구역 보호', '③ 가상 메모리 관리', '④ 입출력 버퍼링']}
+  correctAnswer={2}
+  explanation="세마포어(Semaphore)는 E.W. Dijkstra가 제안한 동기화 도구입니다. P(wait) 연산과 V(signal) 연산으로 프로세스 간 동기화와 임계 구역(Critical Section) 보호를 위해 사용됩니다."
+  optionExplanations={['CPU 스케줄링은 스케줄러가 담당합니다.', '정답입니다. 세마포어는 프로세스 간 동기화와 임계 구역 보호에 사용됩니다.', '가상 메모리는 페이징/세그멘테이션으로 관리합니다.', '입출력 버퍼링은 별도의 I/O 시스템이 담당합니다.']}
+/>

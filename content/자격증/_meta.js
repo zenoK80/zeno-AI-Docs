@@ -19,6 +19,18 @@ const meta = {
     title: 'PC정비사 2급 실기',
     type: 'page',
   },
+  정보처리기사_필기: {
+    title: '정보처리기사 필기',
+    type: 'page',
+  },
+  정보처리기사_실기: {
+    title: '정보처리기사 실기',
+    type: 'page',
+  },
+  서비스경험디자인기사_실기: {
+    title: '서비스경험디자인기사 실기',
+    type: 'page',
+  },
 }
 
 export default meta

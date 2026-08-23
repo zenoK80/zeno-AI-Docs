@@ -1,0 +1,143 @@
+---
+title: '18. 3과목 예상 기출문제 Quiz'
+description: '데이터베이스 활용 과목의 예상 기출문제 15문항을 풀며 실력을 점검합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 3과목(데이터베이스 활용) 핵심 개념을 문제로 점검하고 취약 부분을 파악합니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="관계형 데이터베이스에서 기본키(Primary Key)의 특성으로 옳지 않은 것은?"
+  options={['① 중복 값이 허용되지 않는다.', '② NULL 값을 가질 수 없다.', '③ 한 테이블에 여러 개의 기본키를 지정할 수 있다.', '④ 최소한의 속성으로 개체를 유일하게 식별해야 한다.']}
+  correctAnswer={3}
+  explanation="기본키(Primary Key)는 테이블당 하나만 지정할 수 있습니다. 복합 기본키는 여러 속성으로 구성될 수 있지만 기본키 자체는 하나입니다."
+  optionExplanations={['기본키는 유일성을 가지므로 중복 값이 허용되지 않습니다. 올바른 설명.', '기본키는 개체 무결성에 의해 NULL이 허용되지 않습니다. 올바른 설명.', '정답입니다(틀린 설명). 기본키는 테이블당 하나만 지정할 수 있습니다.', '기본키는 후보키 중 선택되므로 최소성을 만족합니다. 올바른 설명.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="SQL에서 사원 테이블(employee)에서 부서별 평균 급여가 3,000,000 이상인 부서를 조회하는 SQL로 알맞은 것은?"
+  options={['① SELECT dept_id FROM employee WHERE AVG(salary) >= 3000000;', '② SELECT dept_id, AVG(salary) FROM employee GROUP BY dept_id HAVING AVG(salary) >= 3000000;', '③ SELECT dept_id FROM employee GROUP BY dept_id WHERE AVG(salary) >= 3000000;', '④ SELECT dept_id FROM employee HAVING AVG(salary) >= 3000000;']}
+  correctAnswer={2}
+  explanation="부서별 평균 급여 조건은 GROUP BY로 그룹화 후 HAVING 절에 집계 함수 조건을 적용합니다. WHERE 절에는 집계 함수를 사용할 수 없으며, HAVING은 GROUP BY 다음에 작성합니다."
+  optionExplanations={['WHERE 절에 집계 함수(AVG)를 사용할 수 없습니다.', '정답입니다. GROUP BY로 부서별 그룹화 후 HAVING으로 평균 급여 조건을 적용합니다.', 'WHERE 절은 GROUP BY 앞에 위치해야 하며 집계 함수를 사용할 수 없습니다.', 'GROUP BY 없이 HAVING만 사용할 수 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="정규화 단계 중 BCNF(보이스-코드 정규형)에 대한 설명으로 알맞은 것은?"
+  options={['① 모든 속성이 원자값을 가져야 한다.', '② 부분 함수 종속을 제거한다.', '③ 이행적 함수 종속을 제거한다.', '④ 모든 결정자가 후보키여야 한다.']}
+  correctAnswer={4}
+  explanation="BCNF(Boyce-Codd Normal Form)는 3NF보다 강한 정규형으로 모든 결정자(Determinant)가 후보키(Candidate Key)여야 합니다. 3NF를 만족하지만 BCNF를 위반하는 경우가 존재합니다."
+  optionExplanations={['원자값 조건은 1NF입니다.', '부분 함수 종속 제거는 2NF입니다.', '이행적 함수 종속 제거는 3NF입니다.', '정답입니다. BCNF는 모든 결정자가 후보키여야 하는 조건입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="SQL에서 LEFT JOIN을 사용했을 때 결과 집합의 특성으로 알맞은 것은?"
+  options={['① 두 테이블에서 조인 조건을 만족하는 행만 반환한다.', '② 오른쪽 테이블의 모든 행과 왼쪽 테이블의 일치 행을 반환한다.', '③ 왼쪽 테이블의 모든 행과 오른쪽 테이블의 일치 행을 반환한다.', '④ 두 테이블의 모든 행을 반환한다.']}
+  correctAnswer={3}
+  explanation="LEFT (OUTER) JOIN은 왼쪽 테이블의 모든 행을 반환하고, 오른쪽 테이블에서 조인 조건을 만족하는 행을 함께 반환합니다. 오른쪽 테이블에 일치하는 행이 없으면 NULL로 채워집니다."
+  optionExplanations={['조인 조건을 만족하는 행만 반환하는 것은 INNER JOIN입니다.', '오른쪽 테이블 전체를 반환하는 것은 RIGHT JOIN입니다.', '정답입니다. LEFT JOIN은 왼쪽 테이블 전체와 오른쪽 일치 행을 반환합니다.', '두 테이블 전체를 반환하는 것은 FULL OUTER JOIN입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="3단계 스키마에서 물리적 독립성을 지원하는 것은 어느 스키마 간의 관계인가?"
+  options={['① 외부 스키마와 개념 스키마', '② 개념 스키마와 내부 스키마', '③ 외부 스키마와 내부 스키마', '④ 개념 스키마와 외부 스키마']}
+  correctAnswer={2}
+  explanation="물리적 독립성은 내부 스키마(물리적 저장 구조)가 변경되어도 개념 스키마에 영향을 주지 않는 특성입니다. 논리적 독립성은 개념 스키마가 변경되어도 외부 스키마에 영향을 주지 않는 특성입니다."
+  optionExplanations={['외부-개념 스키마 간은 논리적 독립성과 관련됩니다.', '정답입니다. 개념-내부 스키마 간이 물리적 독립성을 지원합니다.', '외부-내부 스키마 직접 관계는 3단계 스키마에서 다루지 않습니다.', '개념-외부 스키마는 논리적 독립성 관련입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="트랜잭션의 ACID 중 커밋된 트랜잭션의 결과는 시스템 장애가 발생해도 영구적으로 반영되어야 한다는 특성으로 알맞은 것은?"
+  options={['① 원자성(Atomicity)', '② 일관성(Consistency)', '③ 격리성(Isolation)', '④ 지속성(Durability)']}
+  correctAnswer={4}
+  explanation="지속성(Durability)은 커밋이 완료된 트랜잭션의 결과는 시스템 오류나 장애가 발생해도 영구적으로 데이터베이스에 반영되어야 한다는 특성입니다. WAL(Write-Ahead Log) 등으로 구현합니다."
+  optionExplanations={['원자성은 All-or-Nothing 특성입니다.', '일관성은 트랜잭션 전후 데이터 일관성 유지 특성입니다.', '격리성은 동시 실행 트랜잭션 간 독립성 특성입니다.', '정답입니다. 지속성은 커밋된 결과가 영구적으로 저장되는 특성입니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="NoSQL 유형 중 소셜 네트워크처럼 노드(Node)와 엣지(Edge)로 데이터 간 관계를 표현하는 유형으로 알맞은 것은?"
+  options={['① 키-값(Key-Value) 유형', '② 문서(Document) 유형', '③ 칼럼(Column Family) 유형', '④ 그래프(Graph) 유형']}
+  correctAnswer={4}
+  explanation="그래프(Graph) 유형 NoSQL은 데이터를 노드(개체)와 엣지(관계)로 표현합니다. 소셜 네트워크 분석, 추천 시스템, 지식 그래프 등에 적합합니다. Neo4j가 대표적인 제품입니다."
+  optionExplanations={['키-값 유형은 단순 키-값 쌍 저장 방식입니다.', '문서 유형은 JSON/BSON 형태 문서를 저장합니다.', '칼럼 유형은 열 기반 저장 방식입니다.', '정답입니다. 그래프 유형은 노드와 엣지로 관계를 표현합니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="SQL DDL에서 TRUNCATE TABLE 명령의 특성으로 알맞은 것은?"
+  options={['① 조건을 지정하여 특정 행만 삭제할 수 있다.', '② 테이블 구조(스키마)도 함께 삭제된다.', '③ 트랜잭션 롤백이 가능하다.', '④ 테이블의 모든 데이터를 삭제하되 구조는 유지된다.']}
+  correctAnswer={4}
+  explanation="TRUNCATE TABLE은 DDL 명령으로 테이블의 모든 데이터를 빠르게 삭제하지만 테이블 구조(스키마)는 유지합니다. DELETE와 달리 롤백이 불가능하고 조건 지정도 불가합니다."
+  optionExplanations={['조건 지정은 DELETE의 특성입니다. TRUNCATE는 전체 삭제만 가능합니다.', '테이블 구조까지 삭제하는 것은 DROP TABLE입니다.', 'TRUNCATE는 DDL로 자동 커밋되어 롤백이 불가능합니다.', '정답입니다. TRUNCATE는 데이터 전체 삭제, 구조 유지, 롤백 불가입니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="데이터 마이닝 기법 중 구매 이력 데이터에서 '기저귀를 사는 사람은 맥주도 산다'처럼 항목 간 동시 발생 패턴을 찾는 기법으로 알맞은 것은?"
+  options={['① 군집화(Clustering)', '② 분류(Classification)', '③ 연관 규칙(Association Rule)', '④ 이상 탐지(Anomaly Detection)']}
+  correctAnswer={3}
+  explanation="연관 규칙(Association Rule Mining)은 장바구니 분석이라고도 하며 데이터에서 항목들의 동시 발생 패턴과 규칙을 찾는 기법입니다. Apriori, FP-Growth 알고리즘이 대표적입니다."
+  optionExplanations={['군집화는 유사한 데이터를 그룹화하는 비지도 학습 기법입니다.', '분류는 미리 정의된 클래스로 데이터를 분류하는 기법입니다.', '정답입니다. 연관 규칙은 항목 간 동시 발생 패턴(장바구니 분석)을 찾습니다.', '이상 탐지는 비정상적인 패턴을 식별하는 기법입니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="ERD에서 학생과 과목의 관계가 N:M(다대다)일 때 이를 관계형 데이터베이스로 변환하는 방법으로 알맞은 것은?"
+  options={['① 학생 테이블에 과목 컬럼을 추가한다.', '② 과목 테이블에 학생 컬럼을 추가한다.', '③ 두 엔터티의 기본키를 포함하는 연결 테이블(교차 테이블)을 생성한다.', '④ 두 테이블을 하나의 테이블로 합친다.']}
+  correctAnswer={3}
+  explanation="N:M 관계는 직접 관계형 DB로 표현할 수 없습니다. 두 엔터티의 기본키를 외래키로 포함하는 교차(연결) 테이블을 생성하여 1:N과 N:1로 분해합니다. 예: 학생-수강신청-과목"
+  optionExplanations={['학생 테이블에 과목 컬럼을 추가하면 다중값 속성 문제가 발생합니다.', '과목 테이블에 학생 컬럼을 추가해도 다중값 속성 문제가 발생합니다.', '정답입니다. 교차(연결) 테이블로 N:M 관계를 1:N과 N:1로 분해합니다.', '두 테이블을 합치면 데이터 중복과 이상 현상이 심해집니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="SQL에서 특정 컬럼에 대한 중복을 허용하지 않으면서 NULL은 허용하는 제약 조건으로 알맞은 것은?"
+  options={['① PRIMARY KEY', '② FOREIGN KEY', '③ UNIQUE', '④ CHECK']}
+  correctAnswer={3}
+  explanation="UNIQUE 제약 조건은 컬럼의 중복 값을 허용하지 않으면서 NULL 값은 허용합니다(여러 NULL 허용 여부는 DBMS마다 다름). PRIMARY KEY는 UNIQUE + NOT NULL입니다."
+  optionExplanations={['PRIMARY KEY는 중복과 NULL 모두 불허합니다.', 'FOREIGN KEY는 다른 테이블의 기본키를 참조하는 제약 조건입니다.', '정답입니다. UNIQUE는 중복 불허하되 NULL은 허용합니다.', 'CHECK는 허용 값 범위를 지정하는 제약 조건입니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="데이터베이스에서 뷰(View)를 사용하는 주요 목적으로 거리가 먼 것은?"
+  options={['① 복잡한 쿼리를 단순화하여 사용 편의성을 높인다.', '② 민감한 데이터에 대한 접근을 제한하여 보안을 강화한다.', '③ 기반 테이블 변경에도 응용 프로그램의 변경을 최소화한다.', '④ 대용량 데이터를 분산 저장하여 처리 성능을 향상시킨다.']}
+  correctAnswer={4}
+  explanation="뷰는 가상 테이블로 단순화, 보안, 데이터 독립성 제공이 목적입니다. 분산 저장은 뷰의 기능이 아니라 분산 데이터베이스나 NoSQL의 기능입니다."
+  optionExplanations={['뷰는 복잡한 쿼리를 단순화합니다. 맞는 설명입니다.', '뷰로 민감한 컬럼을 숨겨 보안을 강화합니다. 맞는 설명입니다.', '뷰는 기반 테이블과 응용 프로그램 간 논리적 독립성을 제공합니다. 맞는 설명입니다.', '정답입니다. 대용량 분산 저장은 뷰의 목적이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="SQL에서 집계 함수 중 컬럼의 NULL을 제외한 행 수를 반환하는 함수로 알맞은 것은?"
+  options={['① COUNT(*)', '② COUNT(컬럼명)', '③ SUM(컬럼명)', '④ AVG(컬럼명)']}
+  correctAnswer={2}
+  explanation="COUNT(컬럼명)은 해당 컬럼에서 NULL이 아닌 값의 수를 반환합니다. COUNT(*)는 NULL을 포함한 전체 행 수를 반환합니다. SUM은 합계, AVG는 평균을 반환합니다."
+  optionExplanations={['COUNT(*)는 NULL 포함 전체 행 수를 반환합니다.', '정답입니다. COUNT(컬럼명)은 NULL을 제외한 행 수를 반환합니다.', 'SUM은 컬럼의 합계를 반환합니다.', 'AVG는 컬럼의 평균을 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="트랜잭션 격리 수준 중 'Dirty Read'가 발생할 수 있는 가장 낮은 격리 수준으로 알맞은 것은?"
+  options={['① READ COMMITTED', '② REPEATABLE READ', '③ READ UNCOMMITTED', '④ SERIALIZABLE']}
+  correctAnswer={3}
+  explanation="READ UNCOMMITTED는 가장 낮은 격리 수준으로 커밋되지 않은 다른 트랜잭션의 데이터를 읽을 수 있습니다. 이로 인해 Dirty Read(더러운 읽기) 이상 현상이 발생할 수 있습니다."
+  optionExplanations={['READ COMMITTED는 Dirty Read를 방지하지만 Non-Repeatable Read가 발생합니다.', 'REPEATABLE READ는 Dirty Read와 Non-Repeatable Read를 방지합니다.', '정답입니다. READ UNCOMMITTED는 Dirty Read가 발생하는 가장 낮은 격리 수준입니다.', 'SERIALIZABLE은 모든 이상 현상을 방지하는 가장 높은 격리 수준입니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="다음 SQL의 실행 결과에 대한 설명으로 알맞은 것은? SELECT dept_id, COUNT(*) FROM employee GROUP BY dept_id;"
+  options={['① 전체 직원의 수를 반환한다.', '② 부서별 직원 수를 반환한다.', '③ 가장 직원이 많은 부서를 반환한다.', '④ NULL dept_id를 가진 직원만 반환한다.']}
+  correctAnswer={2}
+  explanation="GROUP BY dept_id로 부서별 그룹화 후 COUNT(*)로 각 그룹(부서)의 행 수를 계산합니다. 따라서 결과는 각 dept_id와 그에 해당하는 직원 수가 반환됩니다."
+  optionExplanations={['GROUP BY 없이 COUNT(*)만 사용하면 전체 직원 수를 반환합니다.', '정답입니다. GROUP BY dept_id + COUNT(*)는 부서별 직원 수를 반환합니다.', '가장 직원이 많은 부서를 찾으려면 MAX나 ORDER BY + LIMIT을 사용해야 합니다.', 'NULL dept_id 필터링은 WHERE dept_id IS NULL을 사용해야 합니다.']}
+/>

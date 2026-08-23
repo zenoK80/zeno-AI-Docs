@@ -1,0 +1,378 @@
+---
+title: '31. 최종 모의고사 1회'
+description: '5개 과목 전체 범위의 최종 모의고사 1회입니다. (40문항)'
+---
+
+<Callout type="info">
+  **최종 모의고사 1회** — 5개 과목에서 각 8문항씩 총 40문항입니다. 실제 시험과 동일한 형식으로 풀어보세요.
+</Callout>
+
+## 1과목: 소프트웨어 설계
+
+<Quiz
+  questionNumber={1}
+  question="소프트웨어 개발 방법론 중 요구사항 변화에 유연하게 대응하고 짧은 반복 주기(스프린트)로 개발하는 방법론으로 알맞은 것은?"
+  options={['① 폭포수 모델', '② 나선형 모델', '③ 애자일 방법론', '④ V 모델']}
+  correctAnswer={3}
+  explanation="애자일(Agile) 방법론은 짧은 반복 주기(이터레이션/스프린트)로 동작하는 소프트웨어를 지속적으로 제공합니다. Scrum, XP 등이 대표적입니다."
+  optionExplanations={['폭포수 모델은 순차적 단계 진행으로 유연성이 낮습니다.', '나선형 모델은 위험 분석을 반복하는 모델입니다.', '정답입니다. 애자일은 짧은 반복 주기와 변화 수용을 특징으로 합니다.', 'V 모델은 검증과 확인을 강조한 순차적 모델입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="UML 다이어그램 중 시스템의 정적 구조를 나타내며 클래스 간의 관계를 표현하는 다이어그램으로 알맞은 것은?"
+  options={['① 시퀀스 다이어그램', '② 클래스 다이어그램', '③ 유스케이스 다이어그램', '④ 상태 다이어그램']}
+  correctAnswer={2}
+  explanation="클래스 다이어그램은 UML의 구조 다이어그램으로 클래스의 속성, 메서드, 클래스 간의 관계(상속, 연관, 의존 등)를 나타냅니다."
+  optionExplanations={['시퀀스 다이어그램은 객체 간의 시간 순서에 따른 메시지 흐름을 나타냅니다.', '정답입니다. 클래스 다이어그램은 시스템의 정적 구조를 표현합니다.', '유스케이스 다이어그램은 사용자와 시스템 간의 상호작용을 표현합니다.', '상태 다이어그램은 객체의 상태 변화를 나타냅니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="소프트웨어 설계 원칙 중 응집도(Cohesion)가 높고 결합도(Coupling)가 낮은 설계가 좋은 이유로 알맞은 것은?"
+  options={['① 코드 재사용성이 낮아지기 때문이다.', '② 유지보수가 어려워지기 때문이다.', '③ 모듈 독립성이 높아지기 때문이다.', '④ 시스템 성능이 낮아지기 때문이다.']}
+  correctAnswer={3}
+  explanation="높은 응집도와 낮은 결합도는 모듈 독립성을 높입니다. 독립성이 높으면 한 모듈의 수정이 다른 모듈에 영향을 주지 않아 유지보수가 쉽고 재사용성이 높아집니다."
+  optionExplanations={['높은 응집도/낮은 결합도는 재사용성을 높입니다.', '이 설계 원칙은 유지보수를 쉽게 합니다.', '정답입니다. 모듈 독립성이 높아져 유지보수와 재사용이 용이합니다.', '성능과는 직접적인 관계가 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="디자인 패턴 중 생성 패턴에 해당하는 것으로 알맞은 것은?"
+  options={['① 옵서버(Observer)', '② 싱글턴(Singleton)', '③ 데코레이터(Decorator)', '④ 어댑터(Adapter)']}
+  correctAnswer={2}
+  explanation="싱글턴(Singleton)은 클래스의 인스턴스가 오직 하나만 생성되도록 보장하는 생성 패턴입니다. 생성 패턴에는 싱글턴, 팩토리 메서드, 추상 팩토리, 빌더, 프로토타입이 있습니다."
+  optionExplanations={['옵서버는 행위 패턴으로 이벤트 처리에 사용됩니다.', '정답입니다. 싱글턴은 대표적인 생성 패턴입니다.', '데코레이터는 구조 패턴으로 객체에 동적으로 기능을 추가합니다.', '어댑터는 구조 패턴으로 인터페이스 호환성을 제공합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="요구사항 분석 기법 중 시스템의 기능을 액터(Actor)와 유스케이스(Use Case)로 모델링하는 기법으로 알맞은 것은?"
+  options={['① 데이터 흐름도(DFD)', '② 유스케이스 다이어그램', '③ 개체-관계 다이어그램(ERD)', '④ 상태 전이 다이어그램']}
+  correctAnswer={2}
+  explanation="유스케이스 다이어그램은 시스템과 외부 행위자(Actor) 간의 상호작용을 유스케이스 단위로 표현합니다. 기능 요구사항을 시각화하는 데 효과적입니다."
+  optionExplanations={['DFD는 데이터 흐름과 처리를 나타냅니다.', '정답입니다. 유스케이스 다이어그램은 액터와 유스케이스로 시스템 기능을 모델링합니다.', 'ERD는 데이터 간의 관계를 나타냅니다.', '상태 전이 다이어그램은 시스템의 상태 변화를 나타냅니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="인터페이스 설계에서 닐슨(Nielsen)의 10가지 사용성 원칙 중 시스템이 현재 상태를 사용자에게 알려야 한다는 원칙으로 알맞은 것은?"
+  options={['① 오류 방지(Error Prevention)', '② 시스템 상태 가시성(Visibility of System Status)', '③ 사용자 제어(User Control)', '④ 일관성(Consistency)']}
+  correctAnswer={2}
+  explanation="시스템 상태 가시성(Visibility of System Status)은 시스템이 합리적인 시간 내에 적절한 피드백을 통해 사용자에게 현재 상태를 알려야 한다는 원칙입니다."
+  optionExplanations={['오류 방지는 오류가 발생하지 않도록 설계하는 원칙입니다.', '정답입니다. 시스템 상태 가시성은 현재 상태를 사용자에게 알리는 원칙입니다.', '사용자 제어는 사용자가 원하지 않는 상태를 쉽게 빠져나갈 수 있어야 한다는 원칙입니다.', '일관성은 동일한 단어, 상황, 행동이 같은 의미를 가져야 한다는 원칙입니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="소프트웨어 아키텍처 패턴 중 클라이언트-서버 구조에서 계층을 추가한 형태로, 프레젠테이션-비즈니스 로직-데이터 계층으로 나뉘는 패턴으로 알맞은 것은?"
+  options={['① MVC 패턴', '② 파이프-필터 패턴', '③ 3티어 아키텍처', '④ 이벤트 기반 아키텍처']}
+  correctAnswer={3}
+  explanation="3티어 아키텍처는 프레젠테이션 계층(클라이언트), 비즈니스 로직 계층(애플리케이션 서버), 데이터 계층(DB 서버)으로 구성됩니다. 각 계층이 독립적으로 확장 가능합니다."
+  optionExplanations={['MVC는 Model-View-Controller로 UI 설계 패턴입니다.', '파이프-필터는 데이터를 단계적으로 처리하는 아키텍처입니다.', '정답입니다. 3티어는 프레젠테이션-비즈니스-데이터 3계층 구조입니다.', '이벤트 기반 아키텍처는 이벤트 발생-처리 중심의 구조입니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="SOLID 원칙 중 클래스는 확장에는 열려 있고 수정에는 닫혀 있어야 한다는 원칙으로 알맞은 것은?"
+  options={['① 단일 책임 원칙(SRP)', '② 개방-폐쇄 원칙(OCP)', '③ 리스코프 치환 원칙(LSP)', '④ 인터페이스 분리 원칙(ISP)']}
+  correctAnswer={2}
+  explanation="개방-폐쇄 원칙(OCP: Open-Closed Principle)은 소프트웨어 개체는 확장에는 열려 있어야 하고 수정에는 닫혀 있어야 한다는 원칙입니다. 상속과 인터페이스를 통해 구현합니다."
+  optionExplanations={['단일 책임 원칙은 클래스는 하나의 책임만 가져야 한다는 원칙입니다.', '정답입니다. 개방-폐쇄 원칙은 확장에 열려있고 수정에 닫혀있어야 합니다.', '리스코프 치환 원칙은 자식 클래스는 부모 클래스를 대체할 수 있어야 합니다.', '인터페이스 분리 원칙은 클라이언트가 필요한 인터페이스만 사용해야 합니다.']}
+/>
+
+## 2과목: 소프트웨어 개발
+
+<Quiz
+  questionNumber={9}
+  question="소프트웨어 테스트 기법 중 내부 코드 구조를 알고 테스트하는 기법으로 알맞은 것은?"
+  options={['① 블랙박스 테스트', '② 화이트박스 테스트', '③ 회귀 테스트', '④ 통합 테스트']}
+  correctAnswer={2}
+  explanation="화이트박스 테스트(White-box Test)는 소스코드의 내부 구조를 알고 수행하는 테스트입니다. 구문 커버리지, 결정 커버리지, 조건 커버리지 등이 포함됩니다."
+  optionExplanations={['블랙박스 테스트는 내부 구조를 모르고 입출력만으로 테스트합니다.', '정답입니다. 화이트박스 테스트는 내부 코드 구조를 기반으로 합니다.', '회귀 테스트는 수정 후 기존 기능이 정상인지 재확인하는 테스트입니다.', '통합 테스트는 모듈 간 인터페이스를 테스트합니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="Git에서 브랜치를 생성하고 해당 브랜치로 전환하는 명령어로 알맞은 것은?"
+  options={['① git branch feature', '② git checkout -b feature', '③ git merge feature', '④ git clone feature']}
+  correctAnswer={2}
+  explanation="git checkout -b [브랜치명]은 새 브랜치를 생성하고 동시에 해당 브랜치로 전환(체크아웃)합니다. 최신 Git에서는 git switch -c [브랜치명]도 사용합니다."
+  optionExplanations={['git branch feature는 브랜치를 생성하지만 전환하지 않습니다.', '정답입니다. git checkout -b는 브랜치 생성과 전환을 동시에 수행합니다.', 'git merge feature는 현재 브랜치에 feature 브랜치를 병합합니다.', 'git clone은 원격 저장소를 복사합니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="소프트웨어 패키징 방법 중 애플리케이션과 그 의존성을 컨테이너로 묶어 배포하는 기술로 알맞은 것은?"
+  options={['① 가상머신(VM)', '② Docker 컨테이너', '③ 물리 서버', '④ FTP 배포']}
+  correctAnswer={2}
+  explanation="Docker는 애플리케이션과 모든 의존성을 컨테이너 이미지로 패키징하여 어디서나 동일하게 실행할 수 있게 합니다. 가상머신보다 가볍고 빠릅니다."
+  optionExplanations={['가상머신은 OS 전체를 가상화하여 컨테이너보다 무겁습니다.', '정답입니다. Docker 컨테이너는 앱과 의존성을 패키징하여 이식성이 뛰어납니다.', '물리 서버는 컨테이너 기술이 아닙니다.', 'FTP 배포는 파일 전송 방식입니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="정렬 알고리즘 중 최악, 최선, 평균 모든 경우에 O(n log n)의 시간 복잡도를 보장하는 알고리즘으로 알맞은 것은?"
+  options={['① 버블 정렬(Bubble Sort)', '② 삽입 정렬(Insertion Sort)', '③ 퀵 정렬(Quick Sort)', '④ 합병 정렬(Merge Sort)']}
+  correctAnswer={4}
+  explanation="합병 정렬(Merge Sort)은 분할 정복 알고리즘으로 최악, 최선, 평균 모든 경우에 O(n log n)을 보장합니다. 퀵 정렬은 평균 O(n log n)이지만 최악의 경우 O(n²)입니다."
+  optionExplanations={['버블 정렬은 O(n²)입니다.', '삽입 정렬은 최선 O(n), 최악 O(n²)입니다.', '퀵 정렬은 평균 O(n log n)이지만 최악은 O(n²)입니다.', '정답입니다. 합병 정렬은 항상 O(n log n)을 보장합니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="CI/CD 파이프라인에서 CI(Continuous Integration)의 주요 목적으로 알맞은 것은?"
+  options={['① 완성된 제품을 운영 환경에 자동 배포', '② 개발자 코드를 정기적으로 통합하고 자동 빌드/테스트', '③ 사용자 요구사항을 자동으로 분석', '④ 데이터베이스를 자동으로 백업']}
+  correctAnswer={2}
+  explanation="CI(Continuous Integration, 지속적 통합)는 개발자들이 코드를 자주(하루에도 여러 번) 공유 저장소에 통합하고 자동으로 빌드·테스트하여 통합 오류를 조기에 발견합니다."
+  optionExplanations={['운영 환경 자동 배포는 CD(Continuous Deployment)의 목적입니다.', '정답입니다. CI는 코드 통합과 자동 빌드/테스트를 목적으로 합니다.', '요구사항 분석은 CI/CD와 관련 없습니다.', 'DB 백업은 CI/CD의 목적이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="소프트웨어 개발 생명주기(SDLC) 단계 중 완성된 시스템을 실제 운영 환경에 설치하고 사용자가 사용할 수 있게 하는 단계로 알맞은 것은?"
+  options={['① 요구사항 분석', '② 설계', '③ 구현', '④ 배포(설치)']}
+  correctAnswer={4}
+  explanation="배포(설치) 단계는 개발 및 테스트를 완료한 소프트웨어를 실제 운영 환경에 설치하고 사용자가 이용할 수 있도록 하는 단계입니다."
+  optionExplanations={['요구사항 분석은 사용자 요구를 파악하는 초기 단계입니다.', '설계는 요구사항을 기반으로 시스템 구조를 설계하는 단계입니다.', '구현은 설계를 바탕으로 코드를 작성하는 단계입니다.', '정답입니다. 배포는 완성된 시스템을 운영 환경에 설치하는 단계입니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="소프트웨어 테스트 레벨 중 개별 모듈 또는 컴포넌트를 독립적으로 테스트하는 레벨로 알맞은 것은?"
+  options={['① 단위 테스트(Unit Test)', '② 통합 테스트(Integration Test)', '③ 시스템 테스트(System Test)', '④ 인수 테스트(Acceptance Test)']}
+  correctAnswer={1}
+  explanation="단위 테스트(Unit Test)는 소프트웨어의 가장 작은 단위인 개별 모듈, 함수, 클래스를 독립적으로 테스트합니다. 개발자가 주로 수행합니다."
+  optionExplanations={['정답입니다. 단위 테스트는 개별 모듈을 독립적으로 테스트합니다.', '통합 테스트는 모듈 간의 인터페이스와 상호작용을 테스트합니다.', '시스템 테스트는 전체 시스템이 요구사항에 맞는지 테스트합니다.', '인수 테스트는 사용자가 시스템을 인수할 준비가 되었는지 확인합니다.']}
+/>
+
+<Quiz
+  questionNumber={16}
+  question="재사용 가능한 컴포넌트 기반 개발에서 스텁(Stub)의 역할로 알맞은 것은?"
+  options={['① 테스트 드라이버를 호출하는 임시 모듈', '② 상위 모듈로부터 호출당하는 임시 하위 모듈', '③ 실제 컴포넌트의 완성된 버전', '④ 테스트 데이터를 자동 생성하는 도구']}
+  correctAnswer={2}
+  explanation="스텁(Stub)은 하향식 통합 테스트에서 아직 개발되지 않은 하위 모듈을 대체하는 임시 모듈입니다. 상위 모듈의 테스트를 위해 최소한의 기능만 구현합니다. 반대로 드라이버(Driver)는 하위 모듈을 테스트하기 위한 임시 상위 모듈입니다."
+  optionExplanations={['드라이버는 하위 모듈을 테스트하기 위해 상위 역할을 하는 임시 모듈입니다.', '정답입니다. 스텁은 하향식 테스트에서 하위 모듈을 대체하는 임시 모듈입니다.', '스텁은 실제 구현이 아닌 임시 모듈입니다.', '스텁은 테스트 데이터 생성 도구가 아닙니다.']}
+/>
+
+## 3과목: 데이터베이스 구축
+
+<Quiz
+  questionNumber={17}
+  question="데이터베이스에서 트랜잭션이 완전히 실행되거나 전혀 실행되지 않아야 한다는 ACID 속성으로 알맞은 것은?"
+  options={['① 일관성(Consistency)', '② 원자성(Atomicity)', '③ 격리성(Isolation)', '④ 지속성(Durability)']}
+  correctAnswer={2}
+  explanation="원자성(Atomicity)은 트랜잭션의 모든 연산이 완전히 실행되거나(Commit) 전혀 실행되지 않아야(Rollback) 한다는 특성입니다. '전부 아니면 전무(All or Nothing)'라고도 합니다."
+  optionExplanations={['일관성은 트랜잭션 실행 전후에 데이터베이스가 일관된 상태를 유지하는 특성입니다.', '정답입니다. 원자성은 트랜잭션이 전부 실행되거나 전혀 실행되지 않아야 합니다.', '격리성은 트랜잭션 실행 중 다른 트랜잭션의 영향을 받지 않는 특성입니다.', '지속성은 완료된 트랜잭션의 결과가 영구 저장되는 특성입니다.']}
+/>
+
+<Quiz
+  questionNumber={18}
+  question="관계형 데이터베이스에서 두 테이블의 공통 컬럼을 기준으로 매칭되는 행만 반환하는 조인 유형으로 알맞은 것은?"
+  options={['① LEFT OUTER JOIN', '② RIGHT OUTER JOIN', '③ INNER JOIN', '④ CROSS JOIN']}
+  correctAnswer={3}
+  explanation="INNER JOIN(내부 조인)은 두 테이블에서 조인 조건을 만족하는 행만 반환합니다. 매칭되지 않는 행은 결과에서 제외됩니다."
+  optionExplanations={['LEFT OUTER JOIN은 왼쪽 테이블의 모든 행을 반환하고 매칭 없으면 NULL입니다.', 'RIGHT OUTER JOIN은 오른쪽 테이블의 모든 행을 반환합니다.', '정답입니다. INNER JOIN은 두 테이블에서 매칭되는 행만 반환합니다.', 'CROSS JOIN은 두 테이블의 카르테시안 곱을 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={19}
+  question="데이터베이스 정규화에서 부분 함수 종속을 제거하여 달성하는 정규형으로 알맞은 것은?"
+  options={['① 제1정규형(1NF)', '② 제2정규형(2NF)', '③ 제3정규형(3NF)', '④ 보이스-코드 정규형(BCNF)']}
+  correctAnswer={2}
+  explanation="제2정규형(2NF)은 제1정규형을 만족하면서 부분 함수 종속을 제거한 형태입니다. 부분 함수 종속은 기본키가 복합키일 때 복합키의 일부에만 의존하는 속성이 있는 경우입니다."
+  optionExplanations={['1NF는 모든 속성이 원자값인 상태입니다.', '정답입니다. 2NF는 1NF + 부분 함수 종속 제거입니다.', '3NF는 2NF + 이행 함수 종속 제거입니다.', 'BCNF는 3NF보다 강화된 정규형입니다.']}
+/>
+
+<Quiz
+  questionNumber={20}
+  question="SQL에서 그룹별 집계 결과를 필터링할 때 사용하는 절로 알맞은 것은?"
+  options={['① WHERE', '② HAVING', '③ ORDER BY', '④ GROUP BY']}
+  correctAnswer={2}
+  explanation="HAVING 절은 GROUP BY로 그룹화한 결과에 조건을 적용합니다. WHERE는 개별 행을 필터링하고 HAVING은 그룹화된 결과를 필터링합니다."
+  optionExplanations={['WHERE는 GROUP BY 이전에 개별 행을 필터링합니다.', '정답입니다. HAVING은 GROUP BY 이후 그룹 결과를 필터링합니다.', 'ORDER BY는 결과를 정렬합니다.', 'GROUP BY는 행을 그룹으로 묶습니다.']}
+/>
+
+<Quiz
+  questionNumber={21}
+  question="NoSQL 데이터베이스의 특징으로 옳지 않은 것은?"
+  options={['① 스키마가 유연하거나 없다.', '② 수평 확장(Scale-out)이 용이하다.', '③ 엄격한 ACID 트랜잭션을 모두 지원한다.', '④ 대용량 데이터 처리에 적합하다.']}
+  correctAnswer={3}
+  explanation="전통적인 NoSQL 데이터베이스는 완전한 ACID 트랜잭션보다 BASE(Basically Available, Soft state, Eventually consistent)를 따릅니다. 최근에는 일부 NoSQL이 ACID를 지원하기도 합니다."
+  optionExplanations={['NoSQL은 스키마가 유연합니다. 올바른 설명.', 'NoSQL은 수평 확장(샤딩)이 용이합니다. 올바른 설명.', '정답입니다(틀린 설명). 전통적 NoSQL은 BASE를 따르며 완전한 ACID를 보장하지 않습니다.', 'NoSQL은 대용량 데이터 처리에 적합합니다. 올바른 설명.']}
+/>
+
+<Quiz
+  questionNumber={22}
+  question="DDL(Data Definition Language) 명령어에 해당하는 것으로 알맞은 것은?"
+  options={['① SELECT', '② INSERT', '③ CREATE', '④ GRANT']}
+  correctAnswer={3}
+  explanation="CREATE는 데이터베이스 객체(테이블, 뷰, 인덱스 등)를 생성하는 DDL 명령어입니다. DDL에는 CREATE, ALTER, DROP, TRUNCATE가 있습니다."
+  optionExplanations={['SELECT는 데이터 조회를 위한 DML 명령어입니다.', 'INSERT는 데이터 삽입을 위한 DML 명령어입니다.', '정답입니다. CREATE는 객체 생성을 위한 DDL 명령어입니다.', 'GRANT는 권한 부여를 위한 DCL 명령어입니다.']}
+/>
+
+<Quiz
+  questionNumber={23}
+  question="인덱스(Index)에 대한 설명으로 옳지 않은 것은?"
+  options={['① 검색 속도를 향상시킨다.', '② 인덱스가 많을수록 INSERT/UPDATE 성능이 향상된다.', '③ B-Tree 구조가 일반적으로 사용된다.', '④ 자주 검색되는 컬럼에 생성하는 것이 효율적이다.']}
+  correctAnswer={2}
+  explanation="인덱스가 많을수록 INSERT/UPDATE/DELETE 시 인덱스도 함께 업데이트해야 하므로 쓰기 성능이 저하됩니다. 인덱스는 읽기 성능을 높이지만 쓰기 성능과 저장 공간은 증가합니다."
+  optionExplanations={['인덱스는 검색(SELECT) 속도를 향상시킵니다. 올바른 설명.', '정답입니다(틀린 설명). 인덱스가 많을수록 INSERT/UPDATE 성능이 저하됩니다.', 'B-Tree 인덱스가 가장 일반적으로 사용됩니다. 올바른 설명.', '자주 검색되는 컬럼에 인덱스를 생성하는 것이 효율적입니다. 올바른 설명.']}
+/>
+
+<Quiz
+  questionNumber={24}
+  question="빅데이터의 3V 특성으로 알맞은 것은?"
+  options={['① 규모(Volume), 다양성(Variety), 속도(Velocity)', '② 규모(Volume), 정확성(Veracity), 가치(Value)', '③ 속도(Velocity), 다양성(Variety), 가시성(Visibility)', '④ 가치(Value), 규모(Volume), 검증(Verification)']}
+  correctAnswer={1}
+  explanation="빅데이터의 3V는 Volume(규모: 데이터의 양), Variety(다양성: 정형/반정형/비정형 데이터), Velocity(속도: 데이터 생성 및 처리 속도)입니다. 이후 Veracity(정확성), Value(가치)를 추가한 5V도 있습니다."
+  optionExplanations={['정답입니다. 빅데이터 3V: 규모(Volume), 다양성(Variety), 속도(Velocity)', '5V에는 Veracity, Value가 포함되지만 기본 3V가 아닙니다.', '가시성(Visibility)은 빅데이터 3V에 포함되지 않습니다.', '올바른 3V 조합이 아닙니다.']}
+/>
+
+## 4과목: 프로그래밍 언어 활용
+
+<Quiz
+  questionNumber={25}
+  question="다음 C 코드의 실행 결과로 알맞은 것은? int a = 5; int *p = &a; *p = 10; printf('%d', a);"
+  options={['① 5', '② 10', '③ 주소값', '④ 컴파일 오류']}
+  correctAnswer={2}
+  explanation="p는 a의 주소를 가리키는 포인터입니다. *p = 10은 p가 가리키는 메모리(a)에 10을 저장합니다. 따라서 a의 값이 10이 됩니다."
+  optionExplanations={['*p = 10이 a의 값을 5에서 10으로 변경합니다.', '정답입니다. 포인터 역참조 *p = 10으로 a의 값이 10이 됩니다.', 'printf를 통해 주소가 아닌 a의 값이 출력됩니다.', '문법적으로 올바른 코드입니다.']}
+/>
+
+<Quiz
+  questionNumber={26}
+  question="파이썬에서 딕셔너리(Dictionary)를 생성하는 올바른 방법으로 알맞은 것은?"
+  options={['① [1: \"a\", 2: \"b\"]', '② {\"a\", \"b\", \"c\"}', '③ {\"name\": \"홍길동\", \"age\": 25}', '④ (\"a\": 1, \"b\": 2)']}
+  correctAnswer={3}
+  explanation="파이썬 딕셔너리는 중괄호 {}를 사용하며 키:값 쌍으로 구성됩니다. {}만 사용하면 빈 딕셔너리가 생성됩니다. {\"a\", \"b\"}는 집합(Set)입니다."
+  optionExplanations={['[ ]는 리스트를 생성하며 딕셔너리에 사용하지 않습니다.', '{\"a\", \"b\", \"c\"}는 집합(Set)입니다.', '정답입니다. {key: value} 형식이 딕셔너리 생성 방법입니다.', '( )는 튜플을 생성하며 딕셔너리에 사용하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={27}
+  question="자바에서 예외 처리 시 예외 발생 여부와 관계없이 항상 실행되는 블록으로 알맞은 것은?"
+  options={['① try 블록', '② catch 블록', '③ finally 블록', '④ throw 블록']}
+  correctAnswer={3}
+  explanation="finally 블록은 예외 발생 여부와 관계없이 항상 실행됩니다. 파일 닫기, 연결 해제 등 정리 작업에 사용됩니다. try나 catch에서 return이 있어도 finally는 실행됩니다."
+  optionExplanations={['try 블록은 예외가 발생할 수 있는 코드를 포함합니다.', 'catch 블록은 예외가 발생했을 때만 실행됩니다.', '정답입니다. finally는 예외 여부에 관계없이 항상 실행됩니다.', 'throw는 예외를 던지는 키워드입니다.']}
+/>
+
+<Quiz
+  questionNumber={28}
+  question="객체지향 프로그래밍의 4대 특성 중 내부 구현을 숨기고 필요한 인터페이스만 외부에 공개하는 특성으로 알맞은 것은?"
+  options={['① 상속(Inheritance)', '② 캡슐화(Encapsulation)', '③ 다형성(Polymorphism)', '④ 추상화(Abstraction)']}
+  correctAnswer={2}
+  explanation="캡슐화(Encapsulation)는 객체의 속성과 메서드를 하나로 묶고 내부 구현을 숨겨 외부에서 직접 접근하지 못하게 합니다. 접근 제한자(private, public, protected)로 구현합니다."
+  optionExplanations={['상속은 부모 클래스의 속성과 메서드를 자식 클래스가 물려받는 특성입니다.', '정답입니다. 캡슐화는 내부 구현을 숨기고 인터페이스만 공개합니다.', '다형성은 같은 이름의 메서드가 다른 동작을 하는 특성입니다.', '추상화는 복잡한 현실을 단순화하여 모델링하는 특성입니다.']}
+/>
+
+<Quiz
+  questionNumber={29}
+  question="HTTP 메서드 중 멱등성(Idempotent)을 가지지 않는 메서드로 알맞은 것은?"
+  options={['① GET', '② PUT', '③ POST', '④ DELETE']}
+  correctAnswer={3}
+  explanation="POST는 멱등성이 없습니다. 동일한 POST 요청을 여러 번 보내면 여러 개의 리소스가 생성됩니다. GET, PUT, DELETE는 멱등성을 가집니다."
+  optionExplanations={['GET은 동일 요청 반복 시 항상 같은 결과를 반환합니다(멱등).', 'PUT은 전체 교체이므로 반복해도 결과가 같습니다(멱등).', '정답입니다. POST는 매 요청마다 새 리소스를 생성하므로 비멱등입니다.', 'DELETE는 반복해도 리소스가 없는 상태가 됩니다(멱등).']}
+/>
+
+<Quiz
+  questionNumber={30}
+  question="셸 스크립트에서 변수 NUM=10일 때, 출력값이 10보다 큰지 확인하는 조건문으로 알맞은 것은?"
+  options={['① if [ $NUM > 10 ]', '② if [ $NUM -gt 10 ]', '③ if ($NUM > 10)', '④ if [ $NUM >= 10 ]']}
+  correctAnswer={2}
+  explanation="셸 스크립트에서 숫자 비교 시 -gt(greater than)를 사용합니다. > 기호는 셸에서 출력 리다이렉션으로 해석됩니다. 숫자 비교 연산자: -eq(=), -ne(!=), -gt(>), -ge(>=), -lt(<), -le(<=)"
+  optionExplanations={['[ $NUM > 10 ]에서 >는 리다이렉션으로 해석됩니다.', '정답입니다. -gt는 셸 스크립트의 숫자 초과 비교 연산자입니다.', '( )는 서브셸을 실행하며 조건문 구문이 아닙니다.', '-ge는 이상(>=)이며 >가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={31}
+  question="REST API 설계에서 사용자 ID가 1인 게시글 목록을 조회하는 URI 설계로 가장 알맞은 것은?"
+  options={['① GET /getUserPosts?id=1', '② GET /users/1/posts', '③ POST /users/posts/get', '④ GET /getPostsByUserId/1']}
+  correctAnswer={2}
+  explanation="RESTful URI 설계 원칙에 따르면 리소스는 명사로 표현하고 계층 구조를 사용합니다. /users/1/posts는 ID가 1인 사용자의 게시글 컬렉션을 의미하며 REST 설계 원칙에 부합합니다."
+  optionExplanations={['GET /getUserPosts는 동사를 URI에 포함하여 REST 원칙에 위반됩니다.', '정답입니다. /users/1/posts는 리소스를 계층 구조로 표현한 RESTful URI입니다.', 'POST는 생성 메서드로 조회에 적합하지 않습니다.', 'getPostsByUserId는 동사를 포함하여 REST 원칙에 위반됩니다.']}
+/>
+
+<Quiz
+  questionNumber={32}
+  question="파이썬에서 리스트 [1, 2, 3, 4, 5]의 슬라이싱 [1:4]의 결과로 알맞은 것은?"
+  options={['① [1, 2, 3]', '② [2, 3, 4]', '③ [1, 2, 3, 4]', '④ [2, 3, 4, 5]']}
+  correctAnswer={2}
+  explanation="파이썬 리스트 슬라이싱 [start:end]는 인덱스 start부터 end-1까지 반환합니다. [1:4]는 인덱스 1, 2, 3의 요소를 반환하므로 [2, 3, 4]입니다."
+  optionExplanations={['[0:3]의 결과가 [1, 2, 3]입니다.', '정답입니다. [1:4]는 인덱스 1~3이므로 [2, 3, 4]입니다.', '[0:4]의 결과가 [1, 2, 3, 4]입니다.', '[1:5]의 결과가 [2, 3, 4, 5]입니다.']}
+/>
+
+## 5과목: 정보시스템 구축관리
+
+<Quiz
+  questionNumber={33}
+  question="TCP 연결 해제 과정으로 알맞은 것은?"
+  options={['① 2-way handshake', '② 3-way handshake', '③ 4-way handshake', '④ 1-way handshake']}
+  correctAnswer={3}
+  explanation="TCP 연결 해제는 4-way handshake를 사용합니다: FIN → ACK → FIN → ACK 순서로 진행됩니다. 연결 설정은 3-way handshake(SYN → SYN-ACK → ACK)를 사용합니다."
+  optionExplanations={['2-way는 TCP 핸드셰이크에 사용되지 않습니다.', '3-way handshake는 TCP 연결 설정에 사용됩니다.', '정답입니다. TCP 연결 해제는 4-way handshake를 사용합니다.', '1-way는 TCP 핸드셰이크에 사용되지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={34}
+  question="클라우드 서비스 모델 중 운영체제, 미들웨어, 런타임 환경을 제공하고 사용자는 애플리케이션 코드만 개발하면 되는 모델로 알맞은 것은?"
+  options={['① IaaS (Infrastructure as a Service)', '② PaaS (Platform as a Service)', '③ SaaS (Software as a Service)', '④ FaaS (Function as a Service)']}
+  correctAnswer={2}
+  explanation="PaaS(Platform as a Service)는 운영체제, 미들웨어, 런타임, 개발 도구 등 플랫폼을 제공합니다. 개발자는 애플리케이션 코드만 작성하면 됩니다. Heroku, Google App Engine이 대표적입니다."
+  optionExplanations={['IaaS는 가상 서버, 네트워크, 스토리지 등 인프라를 제공합니다.', '정답입니다. PaaS는 플랫폼(OS, 미들웨어, 런타임)을 제공합니다.', 'SaaS는 완성된 소프트웨어 애플리케이션을 서비스로 제공합니다.', 'FaaS는 함수 단위로 실행하는 서버리스 컴퓨팅입니다.']}
+/>
+
+<Quiz
+  questionNumber={35}
+  question="소프트웨어 품질 특성 중 시스템이 요구되는 기능을 수행할 수 있는 정도를 나타내는 특성으로 알맞은 것은?"
+  options={['① 신뢰성(Reliability)', '② 기능성(Functionality)', '③ 효율성(Efficiency)', '④ 유지보수성(Maintainability)']}
+  correctAnswer={2}
+  explanation="기능성(Functionality)은 소프트웨어가 명시된 기능 요구사항을 충족하는 능력입니다. ISO/IEC 9126의 소프트웨어 품질 특성 중 하나입니다."
+  optionExplanations={['신뢰성은 지정된 기간 동안 결함 없이 동작하는 능력입니다.', '정답입니다. 기능성은 요구되는 기능을 수행할 수 있는 정도입니다.', '효율성은 자원 사용 대비 성능 수준입니다.', '유지보수성은 수정 및 개선의 용이성입니다.']}
+/>
+
+<Quiz
+  questionNumber={36}
+  question="정보보안에서 사회공학(Social Engineering) 공격의 설명으로 알맞은 것은?"
+  options={['① 네트워크 취약점을 기술적으로 공격하는 방법', '② 사람의 심리를 이용하여 정보를 획득하는 공격', '③ 암호화된 데이터를 해독하는 기술', '④ 물리적 장비를 파괴하는 공격']}
+  correctAnswer={2}
+  explanation="사회공학(Social Engineering) 공격은 기술적 취약점이 아닌 사람의 심리나 신뢰를 이용하여 정보를 획득하는 공격입니다. 피싱 이메일, 전화 사기, 직원 위장 등이 해당됩니다."
+  optionExplanations={['기술적 취약점 공격은 해킹, 익스플로잇 등입니다.', '정답입니다. 사회공학은 사람의 심리를 이용한 공격입니다.', '암호 해독은 암호 분석(Cryptanalysis)입니다.', '물리적 파괴는 사회공학이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={37}
+  question="소프트웨어 형상 관리(SCM)에서 기준선(Baseline)의 의미로 알맞은 것은?"
+  options={['① 개발팀의 성과 측정 기준', '② 공식적으로 검토·승인된 소프트웨어 구성 항목', '③ 테스트 통과 기준', '④ 최종 배포 버전']}
+  correctAnswer={2}
+  explanation="기준선(Baseline)은 형상 관리에서 공식적으로 검토되고 승인된 소프트웨어 구성 항목(CI: Configuration Item)의 집합입니다. 변경 통제 절차 없이는 수정할 수 없습니다."
+  optionExplanations={['기준선은 성과 측정 기준이 아닙니다.', '정답입니다. 기준선은 공식 검토·승인된 소프트웨어 구성 항목입니다.', '기준선은 테스트 통과 기준이 아닙니다.', '기준선은 최종 배포만을 의미하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={38}
+  question="위험 관리에서 위험 발생 확률이 낮고 영향도가 높은 경우에 적합한 대응 전략으로 알맞은 것은?"
+  options={['① 회피(Avoidance)', '② 전가(Transfer)', '③ 완화(Mitigation)', '④ 수용(Acceptance)']}
+  correctAnswer={2}
+  explanation="보험 가입과 같이 발생 확률은 낮지만 영향이 큰 위험에는 전가(Transfer) 전략이 적합합니다. 위험이 실현되면 제3자(보험사, 협력업체 등)가 책임을 지게 됩니다."
+  optionExplanations={['회피는 위험을 유발하는 활동 자체를 제거합니다.', '정답입니다. 전가는 발생 확률은 낮지만 영향이 큰 위험에 적합합니다.', '완화는 위험 발생 확률이나 영향을 줄입니다.', '수용은 위험 발생 가능성과 결과를 인정하는 전략입니다.']}
+/>
+
+<Quiz
+  questionNumber={39}
+  question="IT 거버넌스 BSC에서 IT 서비스의 처리 시간 단축, 시스템 가용성 향상과 같은 지표가 해당하는 관점으로 알맞은 것은?"
+  options={['① 재무 관점', '② 고객 관점', '③ 내부 프로세스 관점', '④ 학습/성장 관점']}
+  correctAnswer={3}
+  explanation="처리 시간 단축, 불량률 감소, 시스템 가용성과 같은 내부 업무 효율 지표는 BSC의 내부 프로세스 관점에 해당합니다."
+  optionExplanations={['재무 관점은 ROI, 비용 절감 등 재무 성과 지표입니다.', '고객 관점은 고객 만족도, 시장 점유율 등의 지표입니다.', '정답입니다. 내부 프로세스 관점은 처리 효율, 시스템 가용성 등이 포함됩니다.', '학습/성장 관점은 직원 교육 시간, 기술 역량 등이 포함됩니다.']}
+/>
+
+<Quiz
+  questionNumber={40}
+  question="개인정보보호법에서 개인정보의 처리를 위탁하는 경우 위탁자의 의무로 옳지 않은 것은?"
+  options={['① 수탁자에 대한 교육 및 감독 의무', '② 위탁 사실을 정보주체에게 공개', '③ 위탁 계약서에 개인정보 처리 제한사항 명시', '④ 수탁자에게 모든 개인정보 처리 권한 위임']}
+  correctAnswer={4}
+  explanation="위탁자는 수탁자에게 필요한 업무 범위 내의 처리만 허용해야 합니다. 모든 처리 권한을 위임하는 것은 허용되지 않습니다. 위탁자는 수탁자 교육·감독, 위탁 사실 공개, 계약서 작성 의무 등을 집니다."
+  optionExplanations={['위탁자는 수탁자를 교육하고 감독할 의무가 있습니다. 올바른 설명.', '위탁 사실은 정보주체에게 알려야 합니다. 올바른 설명.', '위탁 계약서에 처리 제한사항을 명시해야 합니다. 올바른 설명.', '정답입니다(틀린 설명). 모든 처리 권한 위임은 허용되지 않습니다.']}
+/>

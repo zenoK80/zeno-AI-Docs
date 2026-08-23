@@ -32,6 +32,9 @@ const meta = {
   '31_기출-practice-round-1': '31. 1차 기출 연습 1회 — 시스템 관리',
   '32_기출-practice-round-2': '32. 1차 기출 연습 2회 — 네트워크·서비스',
   '33_기출-practice-round-3': '33. 1차 최종 실전 50문항',
+  '34_practical-mock-1': '34. 2차 실기 모의 1회',
+  '35_practical-mock-2': '35. 2차 실기 모의 2회',
+  '36_practical-exam-checklist': '36. 2차 실기 핵심 암기 체크리스트',
 }
 
 export default meta

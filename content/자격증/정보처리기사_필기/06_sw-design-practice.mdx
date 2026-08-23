@@ -1,0 +1,143 @@
+---
+title: '06. 1과목 예상 기출문제 Quiz'
+description: '소프트웨어 설계 과목의 예상 기출문제 15문항을 풀며 실력을 점검합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 1과목(소프트웨어 설계) 핵심 개념을 문제로 점검하고 취약 부분을 파악합니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="다음 소프트웨어 생명주기 모델 중 계획·위험 분석·개발·평가를 반복하는 모델로 알맞은 것은?"
+  options={['① 폭포수 모델', '② 프로토타이핑 모델', '③ 나선형 모델', '④ RAD 모델']}
+  correctAnswer={3}
+  explanation="나선형(Spiral) 모델은 Boehm이 제안한 것으로 계획 → 위험 분석 → 개발(프로토타입) → 평가를 반복하는 구조입니다. 대규모·고위험 프로젝트에 적합합니다."
+  optionExplanations={['폭포수 모델은 순차적 단계로 진행합니다.', '프로토타이핑은 시제품을 만들어 요구사항을 확인합니다.', '정답입니다. 나선형 모델은 위험 분석을 중심으로 반복합니다.', 'RAD 모델은 빠른 개발과 재사용을 강조합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="스크럼(Scrum)에서 제품 전체 기능 목록을 우선순위별로 관리하는 산출물로 알맞은 것은?"
+  options={['① Sprint Backlog', '② Product Backlog', '③ Burndown Chart', '④ Daily Scrum']}
+  correctAnswer={2}
+  explanation="Product Backlog는 제품에서 개발해야 할 기능 전체 목록을 우선순위 순으로 관리합니다. Sprint Backlog는 현재 스프린트에서 수행할 항목, Burndown Chart는 남은 작업량 추적 도구입니다."
+  optionExplanations={['Sprint Backlog는 현재 스프린트에서 수행할 작업 목록입니다.', '정답입니다. Product Backlog는 전체 기능 목록을 우선순위별로 관리합니다.', 'Burndown Chart는 스프린트 남은 작업량을 시각화합니다.', 'Daily Scrum은 매일 15분 진행하는 팀 진행 상황 공유 회의입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="모듈 간 결합도 유형 중 한 모듈이 다른 모듈의 내부 코드나 데이터를 직접 참조·수정하는 가장 강한 결합도로 알맞은 것은?"
+  options={['① 자료 결합(Data Coupling)', '② 제어 결합(Control Coupling)', '③ 공통 결합(Common Coupling)', '④ 내용 결합(Content Coupling)']}
+  correctAnswer={4}
+  explanation="내용 결합(Content Coupling)은 가장 강한 결합도로, 한 모듈이 다른 모듈의 내부 데이터나 코드를 직접 참조하거나 수정합니다. 이는 가장 피해야 할 결합도 유형입니다."
+  optionExplanations={['자료 결합은 단순 자료형 매개변수만 교환하는 가장 약한 결합도입니다.', '제어 결합은 제어 신호(플래그)를 전달하는 중간 수준 결합도입니다.', '공통 결합은 전역 변수를 공유하는 강한 결합도입니다.', '정답입니다. 내용 결합은 내부 코드를 직접 참조·수정하는 가장 강한 결합도입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="소프트웨어 아키텍처 패턴 중 데이터 흐름을 순차적인 처리 단계로 변환하는 패턴으로 알맞은 것은?"
+  options={['① MVC 패턴', '② 계층형 패턴', '③ 파이프-필터 패턴', '④ 이벤트 기반 패턴']}
+  correctAnswer={3}
+  explanation="파이프-필터(Pipe-Filter) 패턴은 데이터를 일련의 처리 단계(필터)를 통해 변환하며, 필터 간 데이터 흐름은 파이프로 연결됩니다. 컴파일러, 데이터 변환 시스템에 적합합니다."
+  optionExplanations={['MVC는 Model-View-Controller로 UI 분리 패턴입니다.', '계층형은 기능을 계층으로 분리하는 패턴입니다.', '정답입니다. 파이프-필터는 순차적 처리 단계로 데이터를 변환합니다.', '이벤트 기반은 이벤트 발생 시 핸들러가 실행되는 패턴입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="유스케이스 다이어그램에서 <<extend>> 관계에 대한 설명으로 알맞은 것은?"
+  options={['① 기본 유스케이스가 실행될 때 항상 함께 실행된다.', '② 특정 조건이 만족될 때만 선택적으로 실행된다.', '③ 두 Actor 간의 상속 관계를 나타낸다.', '④ 유스케이스와 Actor의 연결 관계를 나타낸다.']}
+  correctAnswer={2}
+  explanation="Extend 관계는 특정 조건이 만족될 때만 기본 유스케이스에서 확장 유스케이스가 선택적으로 실행됩니다. Include와 달리 항상 실행되지 않습니다."
+  optionExplanations={['항상 함께 실행되는 것은 Include 관계입니다.', '정답입니다. Extend는 조건 만족 시에만 선택적으로 실행됩니다.', 'Actor 간 상속 관계는 Generalization으로 표현합니다.', 'Actor와 유스케이스 연결은 Association(연관)입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="UML 다이어그램에서 클래스의 속성(attribute) 앞에 '-' 기호가 붙는 경우 의미하는 것으로 알맞은 것은?"
+  options={['① public', '② private', '③ protected', '④ static']}
+  correctAnswer={2}
+  explanation="UML 클래스 다이어그램에서 -(마이너스)는 private 접근 제한자를 의미합니다. +(플러스)는 public, #(샵)은 protected, ~(틸드)는 package를 나타냅니다."
+  optionExplanations={['+가 public을 나타냅니다.', '정답입니다. -는 private 접근 제한자를 나타냅니다.', '#이 protected를 나타냅니다.', 'static은 UML에서 밑줄로 표기합니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="요구사항 분석 기법 중 요구사항이 불명확할 때 시제품을 먼저 만들어 사용자에게 확인을 받는 기법으로 알맞은 것은?"
+  options={['① 인터뷰', '② 프로토타이핑', '③ 관찰', '④ 카드소팅']}
+  correctAnswer={2}
+  explanation="프로토타이핑(Prototyping)은 요구사항이 불명확할 때 시제품(prototype)을 빠르게 만들어 사용자에게 확인받고 피드백을 반영하는 기법입니다."
+  optionExplanations={['인터뷰는 이해관계자와 직접 대화로 요구사항을 수집합니다.', '정답입니다. 프로토타이핑은 시제품을 만들어 요구사항을 확인합니다.', '관찰은 사용자의 실제 행동을 직접 관찰하는 기법입니다.', '카드소팅은 정보 분류와 구조화를 위한 기법입니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="모듈 설계에서 팬아웃(Fan-out)에 대한 설명으로 알맞은 것은?"
+  options={['① 해당 모듈을 호출하는 상위 모듈의 수', '② 해당 모듈이 호출하는 하위 모듈의 수', '③ 모듈 내부의 코드 라인 수', '④ 모듈이 처리하는 입력 데이터의 수']}
+  correctAnswer={2}
+  explanation="팬아웃(Fan-out)은 해당 모듈이 호출하는 하위 모듈의 수입니다. 팬아웃은 낮을수록 좋으며 일반적으로 4 이하를 권장합니다. 팬인(Fan-in)은 해당 모듈을 호출하는 상위 모듈의 수로 높을수록 재사용성이 좋습니다."
+  optionExplanations={['해당 모듈을 호출하는 상위 모듈의 수는 팬인(Fan-in)입니다.', '정답입니다. 팬아웃은 해당 모듈이 호출하는 하위 모듈의 수입니다.', '코드 라인 수는 팬인·팬아웃과 다른 지표입니다.', '입력 데이터의 수는 팬인·팬아웃과 관련이 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="응집도 유형 중 모듈 내 요소들이 순서적으로 처리되며 이전 처리 결과가 다음 처리의 입력이 되는 유형으로 알맞은 것은?"
+  options={['① 기능적 응집', '② 순차적 응집', '③ 교환적 응집', '④ 시간적 응집']}
+  correctAnswer={2}
+  explanation="순차적 응집(Sequential Cohesion)은 한 요소의 출력이 다음 요소의 입력으로 사용되는 데이터 흐름 형태의 응집도입니다. 기능적 응집 다음으로 높은 수준입니다."
+  optionExplanations={['기능적 응집은 모든 요소가 단일 기능만 수행하는 최고 수준입니다.', '정답입니다. 순차적 응집은 이전 처리 결과가 다음 입력이 되는 흐름입니다.', '교환적 응집은 동일 데이터에 여러 기능을 수행합니다.', '시간적 응집은 같은 시간에 실행되는 기능을 묶은 것입니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="XP(Extreme Programming)의 핵심 실천 방법으로 코드 개선을 위해 기능 변경 없이 내부 구조를 재구성하는 기법으로 알맞은 것은?"
+  options={['① 페어 프로그래밍', '② 지속적 통합', '③ 리팩토링', '④ 테스트 주도 개발']}
+  correctAnswer={3}
+  explanation="리팩토링(Refactoring)은 코드의 외부 동작은 변경하지 않으면서 내부 구조를 개선하는 기법입니다. 마틴 파울러가 체계화했으며 XP의 핵심 실천 방법 중 하나입니다."
+  optionExplanations={['페어 프로그래밍은 두 명이 한 컴퓨터로 함께 코딩하는 XP 실천법입니다.', '지속적 통합은 코드 변경을 자주 통합하고 빌드·테스트하는 실천법입니다.', '정답입니다. 리팩토링은 기능 변경 없이 내부 구조를 개선하는 기법입니다.', '테스트 주도 개발(TDD)은 테스트 코드를 먼저 작성한 뒤 개발하는 기법입니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="시스템 인터페이스 방식 중 비동기 메시지 전달을 통해 시스템 간 느슨한 결합을 지원하는 방식으로 알맞은 것은?"
+  options={['① REST API', '② DB 연계', '③ SOAP', '④ 메시지 큐(Message Queue)']}
+  correctAnswer={4}
+  explanation="메시지 큐(Message Queue)는 생산자(Producer)가 메시지를 보내면 큐에 저장되고 소비자(Consumer)가 비동기로 처리합니다. RabbitMQ, Kafka 등이 대표적이며 시스템 간 느슨한 결합을 지원합니다."
+  optionExplanations={['REST API는 HTTP 기반 동기 방식 인터페이스입니다.', 'DB 연계는 공유 데이터베이스를 통한 연동 방식입니다.', 'SOAP는 XML 기반의 동기 프로토콜입니다.', '정답입니다. 메시지 큐는 비동기 메시지 전달로 느슨한 결합을 지원합니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="소프트웨어 개발 방법론 중 애자일 기반의 프레임워크가 아닌 것으로 알맞은 것은?"
+  options={['① 스크럼(Scrum)', '② 칸반(Kanban)', '③ XP(Extreme Programming)', '④ 폭포수(Waterfall)']}
+  correctAnswer={4}
+  explanation="폭포수(Waterfall) 모델은 순차적·계획 중심 방법론으로 애자일 방법론이 아닙니다. 스크럼, 칸반, XP는 모두 애자일 기반 프레임워크 또는 방법론입니다."
+  optionExplanations={['스크럼은 대표적인 애자일 프레임워크입니다.', '칸반은 작업 흐름 시각화를 강조하는 애자일 방식입니다.', 'XP는 기술적 실천법을 강조하는 애자일 방법론입니다.', '정답입니다. 폭포수는 순차적 계획 중심의 전통적 방법론입니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="UML 시퀀스 다이어그램에서 동기 메시지(Synchronous Message)의 표기로 알맞은 것은?"
+  options={['① 점선 화살표', '② 속이 찬(채워진) 화살표', '③ 속이 빈 화살표', '④ 양방향 화살표']}
+  correctAnswer={2}
+  explanation="시퀀스 다이어그램에서 동기 메시지는 속이 찬(채워진) 화살표로 표기하며, 발신자가 응답을 기다립니다. 비동기 메시지는 속이 빈 화살표, 반환 메시지는 점선 화살표로 표기합니다."
+  optionExplanations={['점선 화살표는 반환 메시지(Return Message)를 표기합니다.', '정답입니다. 속이 찬 화살표는 동기 메시지를 표기합니다.', '속이 빈 화살표는 비동기 메시지를 표기합니다.', '양방향 화살표는 시퀀스 다이어그램의 기본 표기가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="닐슨(Nielsen)의 휴리스틱 평가 원칙 중 '오류 메시지는 이해하기 쉬운 언어로 작성되어야 하며 복구 방법을 제안해야 한다'는 원칙으로 알맞은 것은?"
+  options={['① 오류 예방', '② 오류 인식·진단·복구 지원', '③ 시스템 상태 가시성', '④ 도움말과 문서']}
+  correctAnswer={2}
+  explanation="오류 인식·진단·복구 지원(Help Users Recognize, Diagnose, and Recover from Errors) 원칙은 오류 메시지를 평이한 언어로 작성하고, 문제를 정확히 설명하며 해결 방법을 제안해야 한다는 원칙입니다."
+  optionExplanations={['오류 예방은 오류가 발생하기 전에 방지하는 원칙입니다.', '정답입니다. 오류 인식·진단·복구 지원은 이해하기 쉬운 오류 메시지와 복구 방법 제안을 요구합니다.', '시스템 상태 가시성은 현재 상태를 사용자에게 알려주는 원칙입니다.', '도움말과 문서는 검색 가능한 도움말 제공에 관한 원칙입니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="소프트웨어 설계에서 추상화(Abstraction)의 개념으로 가장 알맞은 것은?"
+  options={['① 모듈을 동일한 기능끼리 묶는 것', '② 세부 구현을 숨기고 중요한 특징만 표현하는 것', '③ 모듈을 계층 구조로 분해하는 것', '④ 유사한 기능을 가진 모듈을 재사용하는 것']}
+  correctAnswer={2}
+  explanation="추상화(Abstraction)는 복잡한 시스템에서 불필요한 세부 사항을 숨기고 중요한 특징만을 표현하는 기법입니다. 사용자가 내부 구현을 알지 못해도 인터페이스를 통해 기능을 사용할 수 있게 합니다."
+  optionExplanations={['동일 기능끼리 묶는 것은 응집도(Cohesion)와 관련된 개념입니다.', '정답입니다. 추상화는 세부 구현을 숨기고 중요한 특징만 표현합니다.', '계층 구조로 분해하는 것은 분할 정복(Divide and Conquer)이나 계층화입니다.', '유사 기능 재사용은 재사용성(Reusability) 개념입니다.']}
+/>

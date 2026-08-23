@@ -1,0 +1,143 @@
+---
+title: '24. 4과목 예상 기출문제 Quiz'
+description: '프로그래밍 언어 활용 과목의 예상 기출문제 15문항을 풀며 실력을 점검합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 4과목(프로그래밍 언어 활용) 핵심 개념을 문제로 점검하고 취약 부분을 파악합니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="C언어에서 포인터 변수를 선언할 때 사용하는 기호로 알맞은 것은?"
+  options={['① &', '② *', '③ @', '④ #']}
+  correctAnswer={2}
+  explanation="C언어에서 포인터 변수는 자료형 뒤에 *를 붙여 선언합니다. 예: int *p; &는 변수의 주소를 얻는 연산자입니다."
+  optionExplanations={['&는 변수의 주소를 반환하는 주소 연산자입니다.', '정답입니다. *는 포인터 변수를 선언하거나 역참조할 때 사용합니다.', '@는 C언어에서 특별한 의미가 없습니다.', '#은 C 전처리기 지시문에 사용합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="파이썬에서 딕셔너리(Dictionary)에 대한 설명으로 옳지 않은 것은?"
+  options={['① 키-값 쌍으로 데이터를 저장한다.', '② 키는 중복될 수 없다.', '③ 순서를 보장하지 않는다(Python 3.6 이전).', '④ 변경 불가능(immutable)한 자료형이다.']}
+  correctAnswer={4}
+  explanation="파이썬 딕셔너리는 변경 가능(mutable)한 자료형입니다. 요소 추가, 수정, 삭제가 가능합니다. 변경 불가능한 자료형은 튜플, 문자열, 숫자입니다."
+  optionExplanations={['딕셔너리는 키-값 쌍으로 데이터를 저장합니다. 올바른 설명.', '딕셔너리의 키는 중복될 수 없습니다. 올바른 설명.', 'Python 3.6 이전에는 딕셔너리가 순서를 보장하지 않았습니다. 올바른 설명.', '정답입니다(틀린 설명). 딕셔너리는 변경 가능(mutable)합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="자바에서 다음 코드의 출력 결과로 알맞은 것은? int[] arr = {1,2,3}; System.out.println(arr[3]);"
+  options={['① 0', '② null', '③ ArrayIndexOutOfBoundsException 발생', '④ 3']}
+  correctAnswer={3}
+  explanation="arr의 인덱스는 0~2까지입니다. arr[3]은 범위를 벗어난 접근으로 런타임에 ArrayIndexOutOfBoundsException이 발생합니다."
+  optionExplanations={['존재하지 않는 인덱스는 0을 반환하지 않습니다.', 'null은 객체가 아닌 배열 요소에는 해당하지 않습니다.', '정답입니다. 배열 범위를 벗어난 접근 시 ArrayIndexOutOfBoundsException이 발생합니다.', 'arr[2]는 3이지만 arr[3]은 범위를 벗어납니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="셸 스크립트에서 변수 $#이 나타내는 것으로 알맞은 것은?"
+  options={['① 스크립트 이름', '② 모든 인수 목록', '③ 인수의 개수', '④ 마지막 명령의 종료 상태']}
+  correctAnswer={3}
+  explanation="셸 스크립트에서 $#은 전달된 인수의 개수를 나타냅니다. $0은 스크립트명, $1~$9는 각 인수, $@는 모든 인수, $?는 마지막 명령의 종료 상태(exit status)입니다."
+  optionExplanations={['$0은 스크립트 이름입니다.', '$@는 모든 인수 목록입니다.', '정답입니다. $#은 전달된 인수의 개수입니다.', '$?는 마지막 명령의 종료 상태(0=성공, 1=실패)입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="HTTP 메서드 중 멱등성(Idempotent)을 가지는 메서드가 아닌 것으로 알맞은 것은?"
+  options={['① GET', '② PUT', '③ DELETE', '④ POST']}
+  correctAnswer={4}
+  explanation="멱등성은 같은 요청을 여러 번 수행해도 결과가 동일한 특성입니다. GET, PUT, DELETE는 멱등성이 있지만 POST는 매번 새로운 리소스를 생성하므로 멱등성이 없습니다."
+  optionExplanations={['GET은 데이터 조회만 하므로 멱등성이 있습니다.', 'PUT은 동일한 요청을 여러 번 해도 결과가 같으므로 멱등성이 있습니다.', 'DELETE는 이미 삭제된 리소스에 다시 요청해도 결과가 같으므로 멱등성이 있습니다.', '정답입니다. POST는 요청마다 새 리소스를 생성하므로 멱등성이 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="파이썬에서 클래스 상속 시 부모 클래스의 메서드를 호출하는 함수로 알맞은 것은?"
+  options={['① parent()', '② base()', '③ super()', '④ this()']}
+  correctAnswer={3}
+  explanation="파이썬에서 super()는 부모 클래스를 참조하여 부모 메서드를 호출합니다. 예: super().__init__()으로 부모 생성자를 호출합니다."
+  optionExplanations={['parent()는 파이썬에서 사용하지 않는 함수입니다.', 'base()는 파이썬에서 사용하지 않는 함수입니다.', '정답입니다. super()는 부모 클래스에 접근하여 메서드를 호출합니다.', 'this()는 자바에서 현재 인스턴스를 참조하는 키워드입니다. 파이썬은 self를 사용합니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="C언어에서 구조체 멤버에 접근할 때 포인터를 사용하지 않고 직접 변수로 접근하는 연산자로 알맞은 것은?"
+  options={['① ->', '② ::', '③ .', '④ *']}
+  correctAnswer={3}
+  explanation="C언어에서 구조체 변수(포인터 아님)의 멤버에 접근할 때는 .(점) 연산자를 사용합니다. 포인터를 통한 접근은 -> 연산자를 사용합니다."
+  optionExplanations={['->는 구조체 포인터를 통해 멤버에 접근할 때 사용합니다.', '::는 C++의 범위 지정 연산자입니다.', '정답입니다. .은 구조체 변수를 통해 멤버에 직접 접근하는 연산자입니다.', '*는 포인터 선언이나 역참조에 사용합니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="자바에서 List 인터페이스의 구현 클래스로 인덱스 기반의 빠른 접근이 가능한 것으로 알맞은 것은?"
+  options={['① LinkedList', '② HashSet', '③ ArrayList', '④ TreeMap']}
+  correctAnswer={3}
+  explanation="ArrayList는 배열 기반의 List 구현으로 인덱스를 통한 O(1) 접근이 가능합니다. LinkedList는 연결 리스트 기반으로 삽입·삭제가 빠릅니다. HashSet은 Set, TreeMap은 Map 구현입니다."
+  optionExplanations={['LinkedList는 삽입·삭제가 빠르지만 인덱스 접근은 O(n)입니다.', 'HashSet은 Set 인터페이스 구현으로 List가 아닙니다.', '정답입니다. ArrayList는 배열 기반으로 인덱스 접근이 O(1)로 빠릅니다.', 'TreeMap은 Map 인터페이스 구현으로 List가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="파이썬에서 try-except 구문에서 예외 발생 여부와 관계없이 항상 실행되는 블록으로 알맞은 것은?"
+  options={['① else', '② except', '③ finally', '④ default']}
+  correctAnswer={3}
+  explanation="finally 블록은 try-except 구문에서 예외 발생 여부와 상관없이 항상 실행됩니다. 파일 닫기, 데이터베이스 연결 해제 등 정리 작업에 사용합니다. else는 예외가 없을 때 실행됩니다."
+  optionExplanations={['else는 예외가 발생하지 않을 때 실행되는 블록입니다.', 'except는 예외가 발생했을 때 처리하는 블록입니다.', '정답입니다. finally는 예외 발생 여부와 상관없이 항상 실행됩니다.', 'default는 파이썬 예외 처리 구문에 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="웹 보안 공격 중 공격자가 인증된 사용자의 세션을 이용하여 사용자 의도와 다른 요청을 서버에 전송하는 공격으로 알맞은 것은?"
+  options={['① XSS', '② CSRF', '③ SQL 인젝션', '④ 클릭재킹']}
+  correctAnswer={2}
+  explanation="CSRF(Cross-Site Request Forgery)는 인증된 사용자의 세션을 악용하여 사용자가 의도하지 않은 요청을 서버에 전송하는 공격입니다. CSRF 토큰이나 SameSite 쿠키 속성으로 방어합니다."
+  optionExplanations={['XSS는 악성 스크립트를 삽입하여 브라우저에서 실행시키는 공격입니다.', '정답입니다. CSRF는 인증된 사용자의 세션을 이용한 위조 요청 공격입니다.', 'SQL 인젝션은 악성 SQL을 입력하여 데이터베이스를 조작하는 공격입니다.', '클릭재킹은 iframe을 이용해 사용자의 클릭을 가로채는 공격입니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="자바에서 Set 컬렉션의 특성으로 알맞은 것은?"
+  options={['① 순서가 있고 중복을 허용한다.', '② 순서가 없고 중복을 허용하지 않는다.', '③ 키-값 쌍으로 저장하고 키 중복을 허용한다.', '④ FIFO 순서로 처리된다.']}
+  correctAnswer={2}
+  explanation="Set은 순서를 보장하지 않고 중복 요소를 허용하지 않는 컬렉션입니다. HashSet, TreeSet, LinkedHashSet이 주요 구현 클래스입니다."
+  optionExplanations={['순서 있고 중복 허용은 List의 특성입니다.', '정답입니다. Set은 순서 없고 중복 불허의 컬렉션입니다.', '키-값 쌍 저장은 Map의 특성입니다.', 'FIFO 처리는 Queue의 특성입니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="C언어에서 다음 코드의 출력값으로 알맞은 것은? int a=10, b=3; printf('%d', a%b);"
+  options={['① 3', '② 1', '③ 0', '④ 10']}
+  correctAnswer={2}
+  explanation="% 연산자는 나머지(모듈로)를 구합니다. 10 % 3 = 1 (10 = 3*3 + 1). 나머지 1이 출력됩니다."
+  optionExplanations={['3은 10 / 3의 몫입니다.', '정답입니다. 10 % 3 = 1 (나머지)입니다.', '10이 3으로 나누어 떨어지지 않으므로 0이 아닙니다.', '10은 a 자체의 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="파이썬에서 문자열 포매팅 방법 중 f-string의 사용 예로 알맞은 것은?"
+  options={['① '이름: %s' % name', '② '이름: {}'.format(name)', '③ f'이름: {name}'', '④ '이름: ' + name']}
+  correctAnswer={3}
+  explanation="f-string(f-문자열)은 Python 3.6부터 지원하며 문자열 앞에 f를 붙이고 중괄호 안에 변수나 표현식을 직접 삽입합니다. 가장 간결하고 가독성이 높은 방법입니다."
+  optionExplanations={['%s % name은 구형 % 포매팅 방식입니다.', "'{}'.format(name)은 str.format() 방식입니다.", "정답입니다. f'이름: {name}'은 f-string 포매팅 방식입니다.", '문자열 연결(+)은 타입 변환이 필요하고 비효율적입니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="자바에서 메서드 오버로딩(Overloading)의 조건으로 알맞은 것은?"
+  options={['① 메서드명이 다르고 매개변수가 동일해야 한다.', '② 메서드명이 같고 매개변수(타입 또는 개수)가 달라야 한다.', '③ 메서드명이 같고 반환 타입만 달라야 한다.', '④ 상속 관계에서 부모 메서드를 재정의해야 한다.']}
+  correctAnswer={2}
+  explanation="메서드 오버로딩(Overloading)은 동일한 클래스 내에서 같은 메서드명을 가지되 매개변수의 타입, 개수, 순서가 달라야 합니다. 반환 타입만 다른 것은 오버로딩이 아닙니다."
+  optionExplanations={['오버로딩은 메서드명이 같고 매개변수가 달라야 합니다. 설명이 반대.', '정답입니다. 오버로딩은 같은 이름에 다른 매개변수(타입/개수)를 가집니다.', '반환 타입만 다른 것은 오버로딩이 아닙니다.', '부모 메서드 재정의는 오버라이딩(Overriding)입니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="HTML, CSS, JavaScript의 역할로 올바르게 연결된 것으로 알맞은 것은?"
+  options={['① HTML: 스타일, CSS: 구조, JS: 동작', '② HTML: 구조, CSS: 스타일, JS: 동작', '③ HTML: 동작, CSS: 구조, JS: 스타일', '④ HTML: 구조, CSS: 동작, JS: 스타일']}
+  correctAnswer={2}
+  explanation="HTML은 웹 페이지의 구조(뼈대)를 정의하고, CSS는 스타일(외형, 레이아웃)을 담당하며, JavaScript는 동적 동작과 인터랙션을 구현합니다."
+  optionExplanations={['HTML이 구조, CSS가 스타일입니다. 설명이 반대.', '정답입니다. HTML: 구조, CSS: 스타일, JavaScript: 동작입니다.', '각 역할이 모두 잘못 연결되었습니다.', 'CSS는 스타일을, JS는 동작을 담당합니다.']}
+/>

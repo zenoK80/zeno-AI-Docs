@@ -1,0 +1,195 @@
+---
+title: '22. 셸 스크립팅'
+description: '셸 변수, 조건문, 반복문, 함수를 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 배시 셸 스크립트의 기본 문법과 제어 구조를 이해하고 간단한 스크립트를 작성할 수 있습니다.
+</Callout>
+
+## 셸 스크립트 기본
+
+```bash
+#!/bin/bash
+# 첫 줄: 인터프리터 지정 (shebang)
+# #으로 시작하는 줄은 주석
+
+echo "Hello, World!"
+```
+
+---
+
+## 변수
+
+```bash
+# 변수 대입 (= 양쪽에 공백 없음!)
+name="홍길동"
+age=25
+
+# 변수 사용
+echo "이름: $name"
+echo "나이: ${age}세"
+
+# 읽기 전용
+readonly PI=3.14
+
+# 환경 변수
+export PATH="$PATH:/usr/local/bin"
+
+# 명령 치환
+today=$(date +%Y-%m-%d)
+files=$(ls -l | wc -l)
+```
+
+---
+
+## 조건문
+
+```bash
+# if-elif-else
+if [ "$age" -ge 18 ]; then
+    echo "성인입니다."
+elif [ "$age" -ge 13 ]; then
+    echo "청소년입니다."
+else
+    echo "어린이입니다."
+fi
+
+# 비교 연산자
+# 숫자: -eq, -ne, -gt, -ge, -lt, -le
+# 문자열: =, !=, -z(빈 문자열), -n(비어 있지 않음)
+# 파일: -f(파일 존재), -d(디렉토리), -r(읽기 가능)
+
+# case 문
+case "$day" in
+    "Mon") echo "월요일" ;;
+    "Fri") echo "금요일" ;;
+    *) echo "다른 날" ;;
+esac
+```
+
+---
+
+## 반복문
+
+```bash
+# for 문
+for i in 1 2 3 4 5; do
+    echo "번호: $i"
+done
+
+# C 스타일 for
+for ((i=1; i<=5; i++)); do
+    echo $i
+done
+
+# while 문
+count=1
+while [ $count -le 5 ]; do
+    echo "count: $count"
+    ((count++))
+done
+
+# until 문 (조건이 거짓인 동안 반복)
+until [ $count -gt 5 ]; do
+    echo $count
+    ((count++))
+done
+```
+
+---
+
+## 함수
+
+```bash
+# 함수 정의
+greet() {
+    local name=$1    # 첫 번째 인수
+    echo "안녕하세요, $name!"
+}
+
+# 함수 호출
+greet "홍길동"
+
+# 반환값 (exit status만 반환 가능)
+add() {
+    result=$(( $1 + $2 ))
+    echo $result
+}
+sum=$(add 3 5)
+echo "합계: $sum"    # 합계: 8
+```
+
+---
+
+## 배열
+
+```bash
+arr=("사과" "바나나" "포도")
+echo ${arr[0]}        # 사과
+echo ${arr[@]}        # 전체 요소
+echo ${#arr[@]}       # 배열 길이 3
+
+# 배열 순회
+for fruit in "${arr[@]}"; do
+    echo $fruit
+done
+```
+
+---
+
+## 핵심 정리
+
+- 변수 대입 시 = 양쪽에 공백 없어야 함
+- 조건문 `[ ]` 안에 공백 필요
+- 숫자 비교: -eq/-ne/-gt/-ge/-lt/-le
+- 함수 인수: $1, $2, ... / 모든 인수: $@ / 인수 수: $#
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="배시 셸 스크립트에서 변수 name에 '홍길동'을 대입하는 올바른 방법으로 알맞은 것은?"
+  options={['① name = "홍길동"', '② name="홍길동"', '③ $name="홍길동"', '④ set name="홍길동"']}
+  correctAnswer={2}
+  explanation="셸 스크립트에서 변수 대입 시 = 양쪽에 공백이 없어야 합니다. 'name = \"홍길동\"'처럼 공백이 있으면 name을 명령으로 인식하여 오류가 발생합니다."
+  optionExplanations={['= 양쪽에 공백이 있으면 name을 명령어로 인식하여 오류가 발생합니다.', '정답입니다. 변수 대입 시 = 양쪽에 공백이 없어야 합니다.', '$name은 변수를 참조할 때 사용하며 대입 시에는 $ 없이 사용합니다.', 'set은 셸 옵션 설정 명령어이며 변수 대입에 사용하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="셸 스크립트에서 숫자 비교 시 같음을 확인하는 연산자로 알맞은 것은?"
+  options={['① ==', '② =', '③ -eq', '④ -ne']}
+  correctAnswer={3}
+  explanation="[ ] 테스트 명령에서 숫자 비교 연산자는 -eq(같음), -ne(다름), -gt(초과), -ge(이상), -lt(미만), -le(이하)를 사용합니다. ==는 [[ ]]에서 사용하거나 문자열 비교에 주로 사용됩니다."
+  optionExplanations={['==는 [[ ]] 확장 테스트나 문자열 비교에 사용합니다.', '=는 [ ] 안에서 문자열 비교에 사용합니다.', '정답입니다. -eq는 숫자 같음 비교 연산자입니다.', '-ne는 숫자 다름(not equal) 비교 연산자입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="배시 셸 스크립트에서 함수의 첫 번째 매개변수를 참조하는 변수로 알맞은 것은?"
+  options={['① $0', '② $1', '③ $@', '④ $#']}
+  correctAnswer={2}
+  explanation="$1은 함수 또는 스크립트의 첫 번째 인수입니다. $0은 스크립트 이름, $@는 모든 인수, $#은 인수의 개수를 나타냅니다."
+  optionExplanations={['$0은 스크립트 파일명을 나타냅니다.', '정답입니다. $1은 첫 번째 인수(매개변수)입니다.', '$@는 모든 인수 목록을 나타냅니다.', '$#은 전달된 인수의 개수를 나타냅니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="셸 스크립트의 case 문에서 패턴이 매치되지 않을 때 사용하는 기본 케이스로 알맞은 것은?"
+  options={['① default)', '② else)', '③ *)', '④ else if)']}
+  correctAnswer={3}
+  explanation="셸 스크립트의 case 문에서 어느 패턴에도 해당하지 않을 때의 기본 케이스는 *)를 사용합니다. 각 케이스는 ;;로 끝나고 case 문은 esac로 종료됩니다."
+  optionExplanations={['default)는 case 문의 기본 케이스로 사용하지 않습니다.', 'else)는 case 문의 기본 케이스로 사용하지 않습니다.', '정답입니다. *)는 case 문에서 어느 패턴에도 매칭되지 않을 때의 기본 케이스입니다.', 'else if)는 case 문에서 사용하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="배시 셸에서 명령의 출력 결과를 변수에 저장하는 명령 치환(Command Substitution) 방법으로 알맞은 것은?"
+  options={['① today=$date', '② today=(date)', '③ today=$(date)', '④ today=date']}
+  correctAnswer={3}
+  explanation="명령 치환(Command Substitution)은 $(명령) 형식을 사용합니다. 명령 실행 결과가 문자열로 변수에 저장됩니다. 구형 방식인 백틱(`명령`)도 사용 가능하지만 $()가 권장됩니다."
+  optionExplanations={['today=$date는 date라는 변수의 값을 대입합니다.', 'today=(date)는 배열 초기화 문법입니다.', '정답입니다. today=$(date)는 date 명령의 실행 결과를 변수에 저장합니다.', 'today=date는 date라는 문자열을 변수에 대입합니다.']}
+/>

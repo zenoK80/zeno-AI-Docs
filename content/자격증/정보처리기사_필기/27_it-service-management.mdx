@@ -1,0 +1,147 @@
+---
+title: '27. IT 서비스 관리'
+description: 'ITIL, SLA, IT 거버넌스를 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** IT 서비스 관리 프레임워크(ITIL)와 서비스 수준 협약(SLA)의 개념을 이해할 수 있습니다.
+</Callout>
+
+## ITIL (IT Infrastructure Library)
+
+IT 서비스 관리(ITSM)를 위한 모범 사례(Best Practice) 프레임워크입니다.
+
+### ITIL 4 주요 구성
+
+| 구성 요소 | 설명 |
+|----------|------|
+| 서비스 가치 시스템(SVS) | IT 서비스가 가치를 창출하는 방식 |
+| 서비스 가치 체인(SVC) | 계획-개선-참여-설계/전환-제공/지원-획득/구축 |
+| 거버넌스 | 조직 지도, 평가, 통제 |
+| 지속적 개선 | 서비스 지속 개선 |
+
+### ITIL 핵심 프로세스
+
+| 프로세스 | 설명 |
+|----------|------|
+| 인시던트 관리 | 서비스 중단 최소화, 신속 복구 |
+| 문제 관리 | 인시던트 근본 원인 파악 및 제거 |
+| 변경 관리 | IT 환경 변경 통제 및 승인 |
+| 릴리즈 관리 | 변경사항의 배포 및 배치 관리 |
+| 구성 관리 | IT 인프라 구성 요소(CI) 관리 |
+| 서비스 데스크 | 사용자 단일 접점(SPOC) |
+
+---
+
+## SLA (Service Level Agreement, 서비스 수준 협약)
+
+서비스 제공자와 고객 간의 서비스 수준을 명시한 계약입니다.
+
+### 주요 SLA 지표
+
+| 지표 | 설명 |
+|------|------|
+| 가용성(Availability) | 서비스가 정상 운영되는 비율 (예: 99.9%) |
+| 응답 시간(Response Time) | 요청에 대한 응답 속도 |
+| 해결 시간(Resolution Time) | 문제 해결까지 걸리는 시간 |
+| 처리량(Throughput) | 단위 시간당 처리 건수 |
+
+### 가용성 계산
+
+```
+가용성(%) = (MTBF / (MTBF + MTTR)) × 100
+
+MTBF: 평균 장애 간격 (Mean Time Between Failures)
+MTTR: 평균 복구 시간 (Mean Time To Repair)
+```
+
+---
+
+## IT 거버넌스
+
+### COBIT (Control Objectives for Information and Related Technologies)
+
+- IT 거버넌스와 관리를 위한 프레임워크
+- 목표: IT 위험 관리, 컴플라이언스, 가치 창출
+
+### IT 거버넌스 5대 원칙
+
+| 원칙 | 설명 |
+|------|------|
+| 전략 연계 | IT와 비즈니스 목표 정렬 |
+| 가치 전달 | IT 투자 효과 최대화 |
+| 위험 관리 | IT 관련 위험 식별 및 관리 |
+| 자원 관리 | IT 자원의 효율적 배분 |
+| 성과 측정 | IT 성과 지표(KPI) 측정 |
+
+---
+
+## BSC (Balanced Scorecard, 균형 성과 관리)
+
+4가지 관점에서 성과를 측정하는 경영 관리 도구입니다.
+
+| 관점 | 설명 | 예시 지표 |
+|------|------|----------|
+| 재무 관점 | 주주 가치, 수익성 | ROI, 비용 절감 |
+| 고객 관점 | 고객 만족도 | 고객 만족 점수, 시장 점유율 |
+| 내부 프로세스 관점 | 핵심 업무 효율 | 처리 시간, 불량률 |
+| 학습/성장 관점 | 역량, 인프라 | 교육 시간, 시스템 가용성 |
+
+---
+
+## 핵심 정리
+
+- ITIL: IT 서비스 관리 모범 사례 프레임워크
+- 인시던트: 신속 복구 / 문제: 근본 원인 제거
+- SLA: 서비스 제공자-고객 간 수준 협약
+- MTBF: 장애 간 평균 시간 / MTTR: 평균 복구 시간
+- COBIT: IT 거버넌스 프레임워크
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="ITIL에서 서비스 장애 발생 시 근본 원인을 파악하고 재발을 방지하는 프로세스로 알맞은 것은?"
+  options={['① 인시던트 관리', '② 문제 관리', '③ 변경 관리', '④ 릴리즈 관리']}
+  correctAnswer={2}
+  explanation="문제 관리(Problem Management)는 인시던트의 근본 원인을 파악하고 제거하여 재발을 방지합니다. 인시던트 관리는 장애 발생 시 신속한 복구에 초점을 맞춥니다."
+  optionExplanations={['인시던트 관리는 서비스 중단을 최소화하고 신속히 복구하는 프로세스입니다.', '정답입니다. 문제 관리는 인시던트의 근본 원인을 파악하고 재발을 방지합니다.', '변경 관리는 IT 환경 변경을 통제하고 승인하는 프로세스입니다.', '릴리즈 관리는 변경사항을 배포 및 배치하는 프로세스입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="SLA(서비스 수준 협약)에서 사용하는 가용성 계산 공식으로 알맞은 것은?"
+  options={['① MTBF / (MTBF + MTTR) × 100', '② MTTR / (MTBF + MTTR) × 100', '③ (MTBF - MTTR) / MTBF × 100', '④ MTBF × MTTR × 100']}
+  correctAnswer={1}
+  explanation="가용성(%) = MTBF / (MTBF + MTTR) × 100. MTBF(Mean Time Between Failures)는 평균 장애 간격이며 MTTR(Mean Time To Repair)은 평균 복구 시간입니다."
+  optionExplanations={['정답입니다. 가용성 = MTBF / (MTBF + MTTR) × 100', 'MTTR / (MTBF + MTTR)은 비가용성(불가용성) 비율입니다.', '다른 공식이므로 오답입니다.', 'MTBF × MTTR은 의미 없는 계산입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="IT 거버넌스 프레임워크 중 IT 위험 관리, 컴플라이언스, 가치 창출을 목표로 하는 프레임워크로 알맞은 것은?"
+  options={['① ITIL', '② COBIT', '③ CMMI', '④ ISO 27001']}
+  correctAnswer={2}
+  explanation="COBIT(Control Objectives for Information and Related Technologies)은 IT 거버넌스와 관리를 위한 프레임워크로 ISACA에서 개발했습니다. IT 위험 관리, 컴플라이언스, 가치 창출을 목표로 합니다."
+  optionExplanations={['ITIL은 IT 서비스 관리(ITSM)를 위한 모범 사례 프레임워크입니다.', '정답입니다. COBIT은 IT 거버넌스와 관리를 위한 프레임워크입니다.', 'CMMI는 소프트웨어 프로세스 성숙도 모델입니다.', 'ISO 27001은 정보보안 관리 체계 표준입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="BSC(균형 성과 관리)의 4가지 관점에 해당하지 않는 것은?"
+  options={['① 재무 관점', '② 고객 관점', '③ 내부 프로세스 관점', '④ 경쟁자 관점']}
+  correctAnswer={4}
+  explanation="BSC의 4가지 관점은 재무, 고객, 내부 프로세스, 학습/성장입니다. 경쟁자 관점은 BSC에 포함되지 않습니다."
+  optionExplanations={['재무 관점은 BSC의 4가지 관점 중 하나입니다.', '고객 관점은 BSC의 4가지 관점 중 하나입니다.', '내부 프로세스 관점은 BSC의 4가지 관점 중 하나입니다.', '정답입니다. 경쟁자 관점은 BSC의 관점이 아닙니다. 4번째 관점은 학습/성장입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="ITIL에서 사용자가 IT 서비스 관련 문의나 신청을 하기 위한 단일 접점 역할을 하는 기능으로 알맞은 것은?"
+  options={['① 인시던트 관리', '② 문제 관리', '③ 서비스 데스크(Service Desk)', '④ 변경 관리']}
+  correctAnswer={3}
+  explanation="서비스 데스크(Service Desk)는 ITIL에서 사용자와 IT 조직 사이의 단일 접점(SPOC: Single Point Of Contact) 역할을 합니다. 인시던트 접수, 서비스 요청 처리, 사용자 문의 응대를 담당합니다."
+  optionExplanations={['인시던트 관리는 장애를 신속히 복구하는 프로세스입니다.', '문제 관리는 근본 원인을 분석하는 프로세스입니다.', '정답입니다. 서비스 데스크는 사용자의 단일 접점(SPOC) 역할을 합니다.', '변경 관리는 IT 변경을 통제하는 프로세스입니다.']}
+/>

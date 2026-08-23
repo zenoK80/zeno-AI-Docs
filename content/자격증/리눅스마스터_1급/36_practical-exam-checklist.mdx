@@ -1,0 +1,129 @@
+---
+title: '36. 2차 실기 핵심 암기 체크리스트'
+description: '리눅스마스터 1급 2차 실기 시험 전 반드시 암기해야 할 핵심 내용 정리'
+---
+
+<Callout type="info">
+  시험 전날 최종 점검을 위한 핵심 암기 사항 모음입니다. 각 항목을 확인하며 모르는 부분을 집중 복습하세요.
+</Callout>
+
+## 파일 권한과 특수 권한
+
+| 권한 | 의미 | 8진수 |
+|------|------|------|
+| SUID | 소유자 권한으로 실행 | 4000 |
+| SGID | 그룹 권한으로 실행 | 2000 |
+| Sticky Bit | 소유자만 삭제 가능 | 1000 |
+
+**umask**: 기본 권한에서 빼는 마스크. 파일=666-umask, 디렉터리=777-umask
+
+---
+
+## 핵심 설정 파일 경로
+
+| 파일 | 설명 |
+|------|------|
+| /etc/passwd | 사용자 계정 정보 |
+| /etc/shadow | 암호화된 비밀번호 |
+| /etc/group | 그룹 정보 |
+| /etc/hosts | 로컬 호스트명-IP 매핑 |
+| /etc/resolv.conf | DNS 서버 주소 |
+| /etc/fstab | 자동 마운트 설정 |
+| /etc/crontab | 시스템 cron 설정 |
+| /etc/sshd/sshd_config | SSH 서버 설정 |
+| /etc/samba/smb.conf | Samba 설정 |
+| /etc/exports | NFS 공유 설정 |
+| /etc/httpd/conf/httpd.conf | Apache 설정 |
+| /etc/nginx/nginx.conf | Nginx 설정 |
+
+---
+
+## 핵심 명령어 요약
+
+### 프로세스 관리
+```
+ps aux              # 전체 프로세스
+kill -9 PID         # SIGKILL 강제 종료
+kill -15 PID        # SIGTERM 정상 종료
+nice -n 10 명령     # 우선순위 낮춰 실행
+renice 5 -p PID     # 실행 중 우선순위 변경
+```
+
+### 네트워크
+```
+ip addr show        # IP 주소 확인
+ip route show       # 라우팅 테이블
+ss -tuln            # 열린 포트 확인
+tcpdump -i eth0     # 패킷 캡처
+nmap 192.168.1.0/24 # 포트 스캔
+```
+
+### 디스크 관리
+```
+df -h               # 파일 시스템 사용량
+du -sh /경로        # 디렉터리 사용량
+lsblk               # 블록 디바이스 목록
+fdisk -l            # 파티션 정보
+mkfs.ext4 /dev/sdb1 # ext4 포맷
+mount /dev/sdb1 /mnt # 마운트
+```
+
+---
+
+## 시그널 번호
+
+| 번호 | 이름 | 동작 |
+|------|------|------|
+| 1 | SIGHUP | 재시작 |
+| 2 | SIGINT | Ctrl+C |
+| 9 | SIGKILL | 강제 종료 (무시 불가) |
+| 15 | SIGTERM | 정상 종료 요청 |
+| 18 | SIGCONT | 프로세스 재개 |
+| 19 | SIGSTOP | 프로세스 중지 (무시 불가) |
+
+---
+
+<Quiz
+  questionNumber={1}
+  question="리눅스에서 umask 값이 022일 때 새로 생성되는 파일의 기본 권한으로 알맞은 것은?"
+  options={['① 755', '② 644', '③ 666', '④ 600']}
+  correctAnswer={2}
+  explanation="파일 기본 권한 = 666 - umask = 666 - 022 = 644. 디렉터리 기본 권한 = 777 - umask = 777 - 022 = 755. 파일은 실행 권한이 없는 666이 기본값입니다."
+  optionExplanations={['755는 디렉터리의 기본 권한(777-022)입니다.', '정답입니다. 666(파일 기본) - 022(umask) = 644입니다.', '666은 umask 적용 전 파일 기본값입니다.', '600은 umask 077 적용 시 나오는 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="Sticky Bit(1000)가 설정된 /tmp 디렉터리에서의 특징으로 알맞은 것은?"
+  options={['① 모든 사용자가 파일을 삭제할 수 없다.', '② 파일을 생성한 소유자와 root만 해당 파일을 삭제할 수 있다.', '③ 그룹 권한으로 파일이 실행된다.', '④ 디렉터리를 공유 라이브러리로 사용한다.']}
+  correctAnswer={2}
+  explanation="Sticky Bit가 설정된 디렉터리(/tmp 등)에서는 파일 소유자(파일을 생성한 사용자)와 root만 해당 파일을 삭제할 수 있습니다. 그 디렉터리에 쓰기 권한이 있어도 다른 사용자의 파일은 삭제할 수 없습니다."
+  optionExplanations={['파일 생성은 가능하고 삭제는 소유자만 가능합니다.', '정답입니다. Sticky Bit는 파일 소유자와 root만 삭제를 허용합니다.', '그룹 권한 실행은 SGID의 기능입니다.', '공유 라이브러리와 관련 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="/etc/passwd 파일의 각 필드 순서로 알맞은 것은?"
+  options={['① 사용자명:비밀번호:UID:GID:주석:홈디렉터리:쉘', '② 사용자명:UID:GID:비밀번호:홈디렉터리:주석:쉘', '③ UID:사용자명:비밀번호:GID:주석:홈디렉터리:쉘', '④ 사용자명:비밀번호:홈디렉터리:UID:GID:주석:쉘']}
+  correctAnswer={1}
+  explanation="/etc/passwd 7개 필드: 사용자명:비밀번호(x):UID:GID:주석(GECOS):홈디렉터리:기본쉘. 현재 비밀번호는 /etc/shadow에 저장되므로 x로 표시됩니다. 예: root:x:0:0:root:/root:/bin/bash"
+  optionExplanations={['정답입니다. 사용자명:비밀번호:UID:GID:주석:홈디렉터리:쉘 순서입니다.', 'UID와 비밀번호 순서가 바뀌었습니다.', 'UID가 먼저 오는 것은 잘못된 순서입니다.', '홈디렉터리가 중간에 오는 것은 잘못된 순서입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="crontab에서 매주 월요일 오전 9시에 실행되도록 설정하는 형식으로 알맞은 것은?"
+  options={['① 0 9 * * 1 command', '② 9 0 * * 1 command', '③ 0 9 * * MON command', '④ 1번과 3번 모두 가능']}
+  correctAnswer={4}
+  explanation="crontab 형식: 분 시 일 월 요일(0=일요일, 1=월요일 ... 7=일요일). 0 9 * * 1은 9시 0분 매주 월요일입니다. 요일에 MON 등 이름을 사용할 수도 있습니다. 두 형식 모두 유효합니다."
+  optionExplanations={['0 9 * * 1 형식으로 올바른 설정입니다.', '9 0은 0시 9분으로 잘못된 설정입니다.', 'MON을 사용한 형식도 유효합니다.', '정답입니다. 1번과 3번 형식 모두 유효합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="iptables에서 현재 설정된 방화벽 규칙을 조회하는 명령으로 알맞은 것은?"
+  options={['① iptables -L -n -v', '② iptables -A -L', '③ iptables --show', '④ firewall-cmd --list-all']}
+  correctAnswer={1}
+  explanation="iptables -L -n -v: -L(List, 규칙 목록 표시), -n(숫자로 표시, DNS 조회 없음), -v(verbose, 자세한 정보). 특정 체인만 보려면 iptables -L INPUT -n -v로 사용합니다."
+  optionExplanations={['정답입니다. iptables -L -n -v로 방화벽 규칙을 조회합니다.', '-A는 규칙 추가 명령이며 -L과 함께 사용하지 않습니다.', '--show는 iptables 옵션이 아닙니다.', 'firewall-cmd는 firewalld에서 사용하는 명령입니다.']}
+/>

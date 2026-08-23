@@ -1,0 +1,172 @@
+---
+title: '05. SQL 작성과 데이터베이스 설계'
+description: 'SELECT, JOIN, 서브쿼리, DDL, DCL, DML 작성 실습을 합니다.'
+---
+
+<Callout type="info">
+  실기 시험에서 SQL은 거의 매 회 출제됩니다. SELECT문, JOIN, 서브쿼리, 집계 함수 작성을 반드시 연습하세요.
+</Callout>
+
+## SQL 분류
+
+| 분류 | 명령어 | 설명 |
+|------|--------|------|
+| DDL | CREATE, ALTER, DROP, TRUNCATE | 테이블 구조 정의 |
+| DML | SELECT, INSERT, UPDATE, DELETE | 데이터 조작 |
+| DCL | GRANT, REVOKE | 권한 제어 |
+| TCL | COMMIT, ROLLBACK, SAVEPOINT | 트랜잭션 제어 |
+
+---
+
+## SELECT 기본 구조
+
+```sql
+SELECT 컬럼명
+FROM 테이블명
+WHERE 조건
+GROUP BY 그룹핑 컬럼
+HAVING 그룹 조건
+ORDER BY 정렬 컬럼 [ASC|DESC];
+```
+
+### SELECT 실행 순서
+
+```
+FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY
+```
+
+---
+
+## 집계 함수
+
+| 함수 | 설명 |
+|------|------|
+| COUNT(*) | 전체 행 수 |
+| COUNT(컬럼) | NULL 제외 행 수 |
+| SUM(컬럼) | 합계 |
+| AVG(컬럼) | 평균 |
+| MAX(컬럼) | 최대값 |
+| MIN(컬럼) | 최소값 |
+
+---
+
+## JOIN 유형
+
+```sql
+-- INNER JOIN (교집합)
+SELECT a.name, b.dept_name
+FROM employees a
+INNER JOIN departments b ON a.dept_id = b.dept_id;
+
+-- LEFT OUTER JOIN (왼쪽 테이블 모두 포함)
+SELECT a.name, b.dept_name
+FROM employees a
+LEFT OUTER JOIN departments b ON a.dept_id = b.dept_id;
+```
+
+---
+
+## 서브쿼리
+
+```sql
+-- WHERE 절 서브쿼리
+SELECT name, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);
+
+-- IN 서브쿼리
+SELECT name FROM employees
+WHERE dept_id IN (SELECT dept_id FROM departments WHERE location = '서울');
+
+-- EXISTS 서브쿼리
+SELECT name FROM employees e
+WHERE EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);
+```
+
+---
+
+## DDL 예시
+
+```sql
+-- 테이블 생성
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    grade CHAR(1),
+    created_at DATE DEFAULT CURRENT_DATE
+);
+
+-- 컬럼 추가
+ALTER TABLE students ADD COLUMN email VARCHAR(100);
+
+-- 테이블 삭제
+DROP TABLE students;
+```
+
+---
+
+## 실기 출제 유형 예시
+
+```sql
+-- 문제: 급여가 300만원 이상인 직원의 이름과 부서명을 조회하시오
+SELECT e.name, d.dept_name
+FROM employees e
+JOIN departments d ON e.dept_id = d.dept_id
+WHERE e.salary >= 3000000
+ORDER BY e.salary DESC;
+
+-- 문제: 부서별 평균 급여를 조회하되 평균이 250만원 이상인 부서만
+SELECT dept_id, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY dept_id
+HAVING AVG(salary) >= 2500000;
+```
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="SQL SELECT 구문의 실행 순서로 알맞은 것은?"
+  options={['① SELECT - FROM - WHERE - GROUP BY - HAVING - ORDER BY', '② FROM - WHERE - GROUP BY - HAVING - SELECT - ORDER BY', '③ FROM - SELECT - WHERE - GROUP BY - HAVING - ORDER BY', '④ WHERE - FROM - SELECT - GROUP BY - HAVING - ORDER BY']}
+  correctAnswer={2}
+  explanation="SQL의 논리적 실행 순서는 FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY입니다. 이 순서를 알면 각 절에서 사용할 수 있는 별칭(alias) 등을 파악할 수 있습니다."
+  optionExplanations={['SELECT는 실행 순서가 다섯 번째입니다.', '정답입니다. FROM-WHERE-GROUP BY-HAVING-SELECT-ORDER BY 순입니다.', 'SELECT는 FROM과 WHERE 이후에 처리됩니다.', 'WHERE는 FROM 이후에 처리됩니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="SQL에서 그룹화된 결과에 조건을 적용할 때 사용하는 절로 알맞은 것은?"
+  options={['① WHERE', '② FILTER', '③ HAVING', '④ CONDITION']}
+  correctAnswer={3}
+  explanation="HAVING 절은 GROUP BY로 그룹화한 결과에 조건을 적용합니다. WHERE는 GROUP BY 이전에 개별 행을 필터링하고 HAVING은 GROUP BY 이후 그룹 결과를 필터링합니다."
+  optionExplanations={['WHERE는 그룹화 이전에 행을 필터링합니다.', 'FILTER는 SQL 표준 절이 아닙니다.', '정답입니다. HAVING은 GROUP BY 이후 그룹 결과를 필터링합니다.', 'CONDITION은 SQL 표준 절이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="두 테이블에서 조인 조건을 만족하는 행만 결과에 포함하는 JOIN 유형으로 알맞은 것은?"
+  options={['① LEFT OUTER JOIN', '② RIGHT OUTER JOIN', '③ FULL OUTER JOIN', '④ INNER JOIN']}
+  correctAnswer={4}
+  explanation="INNER JOIN은 두 테이블에서 조인 조건을 만족하는 행만 반환합니다. 조건을 만족하지 않는 행은 결과에서 제외됩니다."
+  optionExplanations={['LEFT OUTER JOIN은 왼쪽 테이블 전체와 매칭되는 오른쪽 행을 반환합니다.', 'RIGHT OUTER JOIN은 오른쪽 테이블 전체와 매칭되는 왼쪽 행을 반환합니다.', 'FULL OUTER JOIN은 양쪽 테이블 전체를 반환합니다.', '정답입니다. INNER JOIN은 조건을 만족하는 행만 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="다음 SQL의 실행 결과 설명으로 알맞은 것은? SELECT dept_id, COUNT(*) FROM employees GROUP BY dept_id HAVING COUNT(*) >= 3;"
+  options={['① 전체 직원 수가 3명 이상인 경우만 출력', '② 부서별 직원 수가 3명 이상인 부서의 부서ID와 직원 수를 출력', '③ 급여가 3 이상인 직원의 부서별 수를 출력', '④ 3개 이상의 부서가 있는 직원을 출력']}
+  correctAnswer={2}
+  explanation="이 SQL은 employees 테이블을 부서(dept_id)로 그룹화하여 부서별 직원 수를 계산하고(COUNT(*)), 그 수가 3명 이상인 부서만 필터링(HAVING COUNT(*) >= 3)합니다."
+  optionExplanations={['전체 직원 수가 아닌 부서별 직원 수를 기준으로 합니다.', '정답입니다. 부서별 직원 수가 3명 이상인 부서의 결과를 출력합니다.', '급여 조건은 없습니다.', '3개 이상의 부서가 있는 직원이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="SQL에서 테이블의 모든 행을 빠르게 삭제하며 DDL로 분류되는 명령어로 알맞은 것은?"
+  options={['① DELETE FROM 테이블', '② DROP TABLE 테이블', '③ TRUNCATE TABLE 테이블', '④ REMOVE FROM 테이블']}
+  correctAnswer={3}
+  explanation="TRUNCATE TABLE은 테이블의 모든 데이터를 삭제하는 DDL 명령입니다. DELETE는 DML로 WHERE 조건 없이 사용하면 모든 행을 삭제하지만 ROLLBACK이 가능합니다. TRUNCATE는 빠르지만 ROLLBACK이 불가능합니다."
+  optionExplanations={['DELETE는 DML로 트랜잭션 처리가 가능합니다.', 'DROP TABLE은 테이블 구조 자체를 삭제합니다.', '정답입니다. TRUNCATE는 DDL로 모든 행을 빠르게 삭제합니다.', 'REMOVE는 SQL 표준 명령어가 아닙니다.']}
+/>
