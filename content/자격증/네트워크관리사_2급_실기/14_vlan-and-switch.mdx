@@ -1,0 +1,190 @@
+---
+title: '14. VLAN과 스위치 설정'
+description: 'VLAN 생성, Access/Trunk 포트 설정, Inter-VLAN 라우팅, STP 개념을 Cisco IOS 명령으로 완전히 다룹니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** VLAN을 생성하고 Access/Trunk 포트를 설정하며 Router-on-a-Stick 방식의 Inter-VLAN 라우팅까지 구현합니다.
+</Callout>
+
+## VLAN 개념
+
+VLAN(Virtual LAN)은 물리적 네트워크를 논리적으로 분리하는 기술입니다.
+
+- **브로드캐스트 도메인 분리:** VLAN 간 브로드캐스트가 전파되지 않음
+- **보안 강화:** 다른 VLAN 간 기본적으로 통신 불가 (라우터 필요)
+- **유연한 구성:** 물리적 위치와 관계없이 같은 VLAN에 배치 가능
+- **VLAN ID:** 1~4094 범위, 기본 VLAN은 VLAN 1
+
+## VLAN 생성
+
+```cisco
+! VLAN 10 생성 및 이름 지정
+Switch(config)# vlan 10
+Switch(config-vlan)# name Sales
+Switch(config-vlan)# exit
+
+! VLAN 20 생성
+Switch(config)# vlan 20
+Switch(config-vlan)# name Engineering
+Switch(config-vlan)# exit
+
+! VLAN 30 생성
+Switch(config)# vlan 30
+Switch(config-vlan)# name HR
+Switch(config-vlan)# exit
+
+! VLAN 목록 확인
+Switch# show vlan brief
+```
+
+## Access 포트 설정
+
+Access 포트는 단일 VLAN에 속하며 일반 PC·서버를 연결합니다.
+
+```cisco
+! Fa0/1을 VLAN 10 (Sales) Access 포트로 설정
+Switch(config)# interface fastethernet 0/1
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+Switch(config-if)# exit
+
+! Fa0/2를 VLAN 20 Access 포트로 설정
+Switch(config)# interface fastethernet 0/2
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 20
+Switch(config-if)# exit
+
+! 여러 포트 동시 설정
+Switch(config)# interface range fastethernet 0/3 - 5
+Switch(config-if-range)# switchport mode access
+Switch(config-if-range)# switchport access vlan 10
+Switch(config-if-range)# exit
+```
+
+## Trunk 포트 설정
+
+Trunk 포트는 여러 VLAN 트래픽을 IEEE 802.1Q 태깅으로 전송합니다. 스위치 간, 스위치-라우터 간 연결에 사용합니다.
+
+```cisco
+! Gi0/1을 Trunk 포트로 설정
+Switch(config)# interface gigabitethernet 0/1
+Switch(config-if)# switchport trunk encapsulation dot1q
+Switch(config-if)# switchport mode trunk
+
+! 허용할 VLAN 지정 (지정하지 않으면 모든 VLAN 허용)
+Switch(config-if)# switchport trunk allowed vlan 10,20,30
+
+! 네이티브 VLAN 변경 (기본은 VLAN 1)
+Switch(config-if)# switchport trunk native vlan 99
+Switch(config-if)# exit
+
+! Trunk 상태 확인
+Switch# show interfaces trunk
+Switch# show interfaces gigabitethernet 0/1 trunk
+```
+
+## VLAN 확인 명령어
+
+```cisco
+! 전체 VLAN 목록 (간략)
+Switch# show vlan brief
+
+! 특정 VLAN 상세 정보
+Switch# show vlan id 10
+
+! Trunk 인터페이스 정보
+Switch# show interfaces trunk
+
+! 포트별 VLAN 할당 확인
+Switch# show interfaces fastethernet 0/1 switchport
+```
+
+## Inter-VLAN 라우팅 — Router-on-a-Stick
+
+라우터의 단일 인터페이스에 서브인터페이스를 생성하여 여러 VLAN 간 라우팅을 제공합니다.
+
+### 스위치 설정 (Trunk 포트)
+
+```cisco
+! 라우터 연결 포트를 Trunk로 설정
+Switch(config)# interface gigabitethernet 0/0
+Switch(config-if)# switchport trunk encapsulation dot1q
+Switch(config-if)# switchport mode trunk
+Switch(config-if)# exit
+```
+
+### 라우터 설정 (서브인터페이스)
+
+```cisco
+! 물리 인터페이스 활성화 (IP 없음)
+Router(config)# interface fastethernet 0/0
+Router(config-if)# no shutdown
+Router(config-if)# exit
+
+! VLAN 10용 서브인터페이스
+Router(config)# interface fastethernet 0/0.10
+Router(config-subif)# encapsulation dot1q 10
+Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+Router(config-subif)# exit
+
+! VLAN 20용 서브인터페이스
+Router(config)# interface fastethernet 0/0.20
+Router(config-subif)# encapsulation dot1q 20
+Router(config-subif)# ip address 192.168.20.1 255.255.255.0
+Router(config-subif)# exit
+
+! VLAN 30용 서브인터페이스
+Router(config)# interface fastethernet 0/0.30
+Router(config-subif)# encapsulation dot1q 30
+Router(config-subif)# ip address 192.168.30.1 255.255.255.0
+Router(config-subif)# exit
+```
+
+각 VLAN의 게이트웨이:
+- VLAN 10: 192.168.10.1
+- VLAN 20: 192.168.20.1
+- VLAN 30: 192.168.30.1
+
+## STP(Spanning Tree Protocol)
+
+STP는 스위치 네트워크에서 루프를 방지하는 프로토콜입니다.
+
+- **루프 문제:** 스위치가 여러 경로로 연결되면 브로드캐스트 폭풍 발생
+- **Root Bridge:** STP가 선출하는 기준 스위치 (Bridge ID = 우선순위 + MAC)
+- **포트 상태:** Blocking → Listening → Learning → Forwarding
+
+```cisco
+! STP Root Bridge 우선순위 낮추기 (숫자가 낮을수록 높은 우선순위)
+Switch(config)# spanning-tree vlan 10 priority 4096
+
+! Root Bridge로 강제 지정
+Switch(config)# spanning-tree vlan 10 root primary
+
+! STP 상태 확인
+Switch# show spanning-tree vlan 10
+
+! STP 요약 확인
+Switch# show spanning-tree summary
+```
+
+## 핵심 정리
+
+- VLAN 생성: `vlan 번호` → `name 이름`
+- Access 포트: `switchport mode access` → `switchport access vlan 번호`
+- Trunk 포트: `switchport mode trunk` → `switchport trunk allowed vlan 번호목록`
+- Router-on-a-Stick: 서브인터페이스 + `encapsulation dot1q VLAN번호`
+- 확인: `show vlan brief`, `show interfaces trunk`
+- STP Root: `spanning-tree vlan 번호 root primary`
+
+## 마무리 복습
+
+<Quiz questionNumber={1} question="스위치 포트를 VLAN 10에 Access 모드로 설정하는 명령 순서로 올바른 것은?" options={['switchport access vlan 10 → switchport mode access', 'switchport mode access → switchport access vlan 10', 'vlan 10 → switchport mode access', 'switchport trunk vlan 10 → switchport mode access']} correctAnswer={2} explanation="먼저 switchport mode access로 포트 모드를 설정한 후 switchport access vlan 10으로 VLAN을 지정합니다." optionExplanations={['순서가 반대이나 기능적으로는 동작하지만 권장 순서가 아닙니다.', 'switchport mode access 먼저 설정 후 switchport access vlan 10을 지정하는 올바른 순서입니다.', 'vlan 명령은 VLAN 생성 단계이며 포트 설정과 순서가 다릅니다.', 'trunk와 access는 상반된 모드로 함께 사용하지 않습니다.']} />
+
+<Quiz questionNumber={2} question="Router-on-a-Stick Inter-VLAN 라우팅에서 서브인터페이스에 반드시 설정해야 하는 명령은?" options={['vlan dot1q 번호', 'encapsulation dot1q VLAN번호', 'switchport trunk dot1q', 'ip vlan 번호']} correctAnswer={2} explanation="서브인터페이스에서 encapsulation dot1q VLAN번호 명령으로 IEEE 802.1Q 태깅을 활성화하여 해당 VLAN 트래픽을 처리합니다." optionExplanations={['vlan dot1q는 존재하지 않는 명령입니다.', 'encapsulation dot1q VLAN번호가 서브인터페이스에서 VLAN을 지정하는 올바른 명령입니다.', 'switchport trunk는 스위치 포트 명령이며 라우터에는 적용되지 않습니다.', 'ip vlan은 존재하지 않는 명령입니다.']} />
+
+<Quiz questionNumber={3} question="Cisco 스위치에서 전체 VLAN 목록을 간략하게 확인하는 명령은?" options={['show vlan all', 'show vlan brief', 'display vlan', 'show vlan summary']} correctAnswer={2} explanation="show vlan brief 명령으로 VLAN ID, 이름, 상태, 할당된 포트 목록을 간략하게 확인할 수 있습니다." optionExplanations={['show vlan all은 Cisco IOS에서 유효하지 않은 옵션입니다.', 'show vlan brief가 VLAN 목록을 간략히 보여주는 올바른 명령입니다.', 'display vlan은 Huawei VRP 명령입니다.', 'show vlan summary는 VLAN 개수 요약을 보여주는 명령입니다.']} />
+
+## 참고 자료
+
+- [한국정보통신자격협회(ICQA)](https://www.icqa.or.kr/cn/page/network)

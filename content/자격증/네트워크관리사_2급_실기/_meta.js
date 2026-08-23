@@ -1,0 +1,20 @@
+const meta = {
+  '01_osi-and-tcp-ip': '01. OSI 7계층과 TCP/IP',
+  '02_ip-address-and-subnet': '02. IP 주소와 서브넷 계산',
+  '03_windows-server-basics': '03. Windows Server 역할 설치',
+  '04_active-directory': '04. Active Directory 도메인 구성',
+  '05_dns-server-windows': '05. Windows DNS 서버 설정',
+  '06_dhcp-server-windows': '06. Windows DHCP 서버 설정',
+  '07_iis-web-server': '07. IIS 웹 서버 설정',
+  '08_ftp-server': '08. FTP 서버 설정',
+  '09_linux-network-config': '09. Linux 네트워크 인터페이스 설정',
+  '10_linux-dns-bind': '10. Linux BIND DNS 서버',
+  '11_linux-dhcp': '11. Linux DHCP 서버',
+  '12_linux-apache-web': '12. Linux Apache 웹 서버',
+  '13_cisco-router-basics': '13. Cisco 라우터 기본 명령어',
+  '14_vlan-and-switch': '14. VLAN과 스위치 설정',
+  '15_scenario-windows-work': '15. 실전 작업 A — Windows 시나리오',
+  '16_scenario-linux-work': '16. 실전 작업 B — Linux/Router 시나리오',
+  '17_exam-checklist': '17. 실기 합격 핵심 체크리스트',
+}
+export default meta

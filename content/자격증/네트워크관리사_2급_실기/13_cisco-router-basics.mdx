@@ -1,0 +1,196 @@
+---
+title: '13. Cisco 라우터 기본 명령어'
+description: 'Cisco IOS 명령 모드, 인터페이스 IP 설정, 정적 라우팅, vty 원격 접속 설정을 단계별로 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** Cisco 라우터의 IOS 명령 모드를 이해하고 인터페이스 설정, 정적 라우팅, 원격 접속 설정까지 시험 수준의 명령어를 완전히 익힙니다.
+</Callout>
+
+## IOS 명령 모드
+
+Cisco IOS에는 계층적 명령 모드가 있으며 각 모드에서 사용 가능한 명령이 다릅니다.
+
+| 모드 | 프롬프트 | 진입 방법 | 기능 |
+|------|----------|-----------|------|
+| 사용자 EXEC | `Router>` | 기본 접속 | 기본 확인 명령 |
+| 특권 EXEC | `Router#` | `enable` | 모든 확인, 저장 |
+| 전역 설정 | `Router(config)#` | `configure terminal` | 전체 설정 변경 |
+| 인터페이스 설정 | `Router(config-if)#` | `interface fa0/0` | 인터페이스 설정 |
+| 라인 설정 | `Router(config-line)#` | `line vty 0 4` | 원격 접속 설정 |
+
+모드 이동:
+- 상위 모드로: `exit` 또는 `Ctrl+Z`
+- 특권 EXEC로 즉시: `end` (어느 하위 모드에서나)
+
+## 필수 기본 설정 전체 흐름
+
+```cisco
+! 사용자 EXEC에서 특권 EXEC로 진입
+Router> enable
+
+! 전역 설정 모드 진입
+Router# configure terminal
+
+! 호스트 이름 설정
+Router(config)# hostname R1
+
+! 특권 EXEC 비밀번호 설정 (암호화)
+R1(config)# enable secret cisco123
+
+! FastEthernet 0/0 인터페이스 설정
+R1(config)# interface fastethernet 0/0
+R1(config-if)# ip address 192.168.1.1 255.255.255.0
+R1(config-if)# description LAN Interface
+R1(config-if)# no shutdown
+R1(config-if)# exit
+
+! FastEthernet 0/1 인터페이스 설정
+R1(config)# interface fastethernet 0/1
+R1(config-if)# ip address 10.0.0.1 255.255.255.252
+R1(config-if)# no shutdown
+R1(config-if)# exit
+
+! 기본 정적 경로 설정 (기본 게이트웨이)
+R1(config)# ip route 0.0.0.0 0.0.0.0 10.0.0.2
+
+! 설정 저장
+R1# copy running-config startup-config
+```
+
+## no shutdown 명령의 중요성
+
+Cisco 라우터 인터페이스는 기본적으로 **administratively down** 상태입니다. `no shutdown` 명령을 실행해야 인터페이스가 활성화됩니다.
+
+```cisco
+R1(config-if)# no shutdown
+! 출력: %LINK-5-CHANGED: Interface FastEthernet0/0, changed state to up
+```
+
+## 확인 명령어
+
+```cisco
+! 인터페이스 요약 정보
+R1# show ip interface brief
+
+! 출력 예시:
+! Interface         IP-Address      OK? Method Status    Protocol
+! FastEthernet0/0   192.168.1.1     YES manual up        up
+! FastEthernet0/1   10.0.0.1        YES manual up        up
+
+! 특정 인터페이스 상세 정보
+R1# show interface fastethernet 0/0
+
+! 현재 실행 중인 설정 확인
+R1# show running-config
+
+! 저장된 설정 확인
+R1# show startup-config
+
+! 라우팅 테이블 확인
+R1# show ip route
+
+! ARP 테이블 확인
+R1# show arp
+
+! CDP 이웃 장비 확인
+R1# show cdp neighbors detail
+```
+
+## 정적 라우팅
+
+```cisco
+! 정적 경로 추가
+! ip route [목적지 네트워크] [서브넷 마스크] [다음 홉 IP 또는 인터페이스]
+R1(config)# ip route 192.168.2.0 255.255.255.0 10.0.0.2
+
+! 기본 경로 (인터넷 게이트웨이)
+R1(config)# ip route 0.0.0.0 0.0.0.0 10.0.0.2
+
+! 정적 경로 삭제
+R1(config)# no ip route 192.168.2.0 255.255.255.0 10.0.0.2
+
+! 라우팅 테이블 확인
+R1# show ip route
+! S  = 정적 경로, C = 직접 연결, * = 기본 경로
+```
+
+## vty 원격 접속 설정 (Telnet/SSH)
+
+```cisco
+! Telnet 설정
+R1(config)# line vty 0 4
+R1(config-line)# password cisco
+R1(config-line)# login
+R1(config-line)# exit
+
+! SSH 설정 (보안 강화)
+R1(config)# ip domain-name exam.local
+R1(config)# crypto key generate rsa modulus 1024
+R1(config)# ip ssh version 2
+R1(config)# line vty 0 4
+R1(config-line)# transport input ssh
+R1(config-line)# login local
+R1(config-line)# exit
+
+! SSH용 로컬 사용자 생성
+R1(config)# username admin privilege 15 secret cisco123
+```
+
+## 콘솔 접속 비밀번호
+
+```cisco
+R1(config)# line console 0
+R1(config-line)# password cisco
+R1(config-line)# login
+R1(config-line)# exit
+```
+
+## 설정 저장 및 초기화
+
+```cisco
+! 실행 중 설정을 NVRAM에 저장 (단축 명령)
+R1# copy run start
+
+! 또는 완전한 형태
+R1# copy running-config startup-config
+
+! 저장된 설정 삭제 (초기화)
+R1# erase startup-config
+
+! 재부팅
+R1# reload
+
+! 현재 설정과 저장 설정 비교 없이 빠른 저장
+R1# wr     (write memory 축약)
+```
+
+## 배너 메시지 설정
+
+```cisco
+R1(config)# banner motd #
+   *** Authorized Access Only ***
+   Unauthorized access is prohibited.
+#
+```
+
+## 핵심 정리
+
+- 특권 모드 진입: `enable`, 전역 설정: `configure terminal`
+- 인터페이스 IP: `ip address IP 마스크` → 반드시 `no shutdown`
+- 정적 경로: `ip route 목적지 마스크 넥스트홉`
+- 기본 경로: `ip route 0.0.0.0 0.0.0.0 넥스트홉`
+- 저장: `copy run start` 또는 `wr`
+- 확인: `show ip interface brief`, `show ip route`, `show running-config`
+
+## 마무리 복습
+
+<Quiz questionNumber={1} question="Cisco 라우터에서 인터페이스를 활성화하는 명령은?" options={['enable interface', 'no shutdown', 'interface up', 'activate']} correctAnswer={2} explanation="Cisco 인터페이스는 기본적으로 비활성(shutdown) 상태이므로 no shutdown 명령으로 활성화해야 합니다." optionExplanations={['enable interface는 존재하지 않는 명령입니다.', 'no shutdown이 인터페이스를 활성화하는 올바른 명령입니다.', 'interface up은 존재하지 않는 명령입니다.', 'activate는 Cisco IOS에서 인터페이스 활성화 명령이 아닙니다.']} />
+
+<Quiz questionNumber={2} question="Cisco 라우터에서 현재 실행 중인 설정을 저장하는 명령은?" options={['save config', 'copy running-config startup-config', 'write file', 'store config']} correctAnswer={2} explanation="copy running-config startup-config 또는 단축형 copy run start, wr 명령으로 RAM의 실행 설정을 NVRAM에 저장합니다." optionExplanations={['save config는 Cisco IOS 명령이 아닙니다.', 'copy running-config startup-config가 설정을 저장하는 올바른 명령입니다.', 'write file은 구버전 IOS 명령이며 현재는 copy run start를 권장합니다.', 'store config는 Cisco IOS 명령이 아닙니다.']} />
+
+<Quiz questionNumber={3} question="Cisco 라우터에서 라우팅 테이블을 확인하는 명령은?" options={['show route', 'show ip route', 'display ip routing-table', 'get ip route']} correctAnswer={2} explanation="show ip route 명령으로 라우팅 테이블을 확인할 수 있으며 S(정적), C(직접연결), O(OSPF) 등의 코드로 경로 유형을 표시합니다." optionExplanations={['show route는 Cisco IOS의 올바른 명령이 아닙니다.', 'show ip route가 라우팅 테이블 확인에 사용하는 올바른 명령입니다.', 'display ip routing-table은 Huawei VRP 명령입니다.', 'get ip route는 Cisco IOS 명령이 아닙니다.']} />
+
+## 참고 자료
+
+- [한국정보통신자격협회(ICQA)](https://www.icqa.or.kr/cn/page/network)

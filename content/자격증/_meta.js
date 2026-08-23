@@ -11,6 +11,14 @@ const meta = {
     title: '빅데이터분석기사 필기',
     type: 'page',
   },
+  네트워크관리사_2급_실기: {
+    title: '네트워크관리사 2급 실기',
+    type: 'page',
+  },
+  PC정비사_2급_실기: {
+    title: 'PC정비사 2급 실기',
+    type: 'page',
+  },
 }
 
 export default meta

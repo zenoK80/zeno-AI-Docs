@@ -1,0 +1,183 @@
+---
+title: '10. 소프트웨어 문제 해결'
+description: '블루스크린 분석, 부팅 불가 복구, 시스템 파일 복구 명령어와 악성코드 대응법을 익힌다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 블루스크린 원인을 분석하고 sfc, DISM 명령으로 시스템을 복구하며 악성코드 제거 절차를 수행할 수 있다.
+</Callout>
+
+## 블루스크린(BSOD) 분석
+
+블루스크린은 Windows 커널 수준의 치명적 오류가 발생했을 때 나타난다.
+
+### 주요 BSOD 오류 코드
+
+| 오류 코드 | 주요 원인 |
+|-----------|----------|
+| IRQL_NOT_LESS_OR_EQUAL | 드라이버 오류, RAM 불량 |
+| DRIVER_IRQL_NOT_LESS_OR_EQUAL | 특정 드라이버 버그 |
+| MEMORY_MANAGEMENT | RAM 불량, 메모리 손상 |
+| PAGE_FAULT_IN_NONPAGED_AREA | RAM 또는 드라이버 오류 |
+| CRITICAL_PROCESS_DIED | 시스템 핵심 프로세스 종료 |
+| INACCESSIBLE_BOOT_DEVICE | 저장장치 인식 실패, 드라이버 누락 |
+| KERNEL_SECURITY_CHECK_FAILURE | 드라이버 충돌, 과열, RAM 불량 |
+| NTFS_FILE_SYSTEM | 저장장치 파일 시스템 오류 |
+
+### 미니 덤프 파일 확인
+
+BSOD 발생 시 Windows는 오류 정보를 덤프 파일로 저장한다.
+
+- 저장 위치: `C:\Windows\Minidump\*.dmp`
+- 전체 덤프: `C:\Windows\MEMORY.DMP`
+
+덤프 분석 도구:
+- **WinDbg:** Microsoft 공식 디버거, 상세 분석 가능
+- **WhoCrashed:** 덤프 파일을 자동 분석하여 원인 드라이버를 알기 쉽게 표시
+
+## 부팅 불가 시 복구 방법
+
+### Windows 복구 환경(WinRE) 진입
+
+1. 전원 버튼으로 2~3회 강제 종료 → Windows가 자동으로 WinRE 진입 시도
+2. USB 부팅 미디어로 부팅 → 컴퓨터 복구 선택
+3. 설치 화면에서 Shift+F10으로 명령 프롬프트 직접 실행
+4. 설정 → 업데이트 및 보안 → 복구 → 지금 다시 시작
+
+### WinRE 메뉴 구성
+
+- **시동 복구:** 부트로더와 시작 파일 자동 복구
+- **시스템 복원:** 복원 지점으로 되돌리기
+- **명령 프롬프트:** 직접 명령으로 복구 작업
+- **시스템 이미지 복구:** 백업 이미지로 전체 복원
+- **PC 초기화:** Windows 재설치(파일 유지 또는 삭제 선택)
+
+## 시스템 파일 복구 명령어
+
+### sfc /scannow (시스템 파일 검사기)
+
+```
+# 관리자 권한 명령 프롬프트
+sfc /scannow
+```
+
+- Windows 시스템 파일의 무결성을 검사하고 손상된 파일을 자동 복구
+- 실행 시간: 10~30분
+- WinRE 명령 프롬프트에서 실행 시: `sfc /scannow /offbootdir=C:\ /offwindir=C:\Windows`
+
+### DISM (배포 이미지 서비스 및 관리)
+
+```
+# 시스템 이미지 상태 확인
+DISM /Online /Cleanup-Image /CheckHealth
+
+# 더 자세한 상태 확인
+DISM /Online /Cleanup-Image /ScanHealth
+
+# 시스템 이미지 복구 (Windows Update에서 파일 다운로드)
+DISM /Online /Cleanup-Image /RestoreHealth
+```
+
+sfc /scannow가 실패할 때 먼저 DISM /RestoreHealth를 실행하여 이미지를 복구한 후 다시 sfc를 실행한다.
+
+### 부트로더 복구
+
+```
+# WinRE 명령 프롬프트에서 실행
+bootrec /fixmbr       # MBR 복구
+bootrec /fixboot      # 부트 섹터 복구
+bootrec /rebuildbcd   # BCD(부팅 구성 데이터) 재생성
+
+# 또는
+bcdboot C:\Windows /s C: /f UEFI
+```
+
+## 악성코드 대응
+
+### 안전 모드 부팅
+
+악성코드로 인해 정상 부팅이 안 될 때 안전 모드에서 작업한다.
+
+```
+# 방법 1: WinRE
+문제 해결 → 고급 옵션 → 시작 설정 → 다시 시작 → F4(안전 모드) 또는 F5(네트워킹 포함)
+
+# 방법 2: 정상 부팅 시
+Win + R → msconfig → 부팅 탭 → 안전 부팅 체크
+
+# 방법 3: Windows 설정
+설정 → 업데이트 및 보안 → 복구 → 지금 다시 시작 → 문제 해결 → 고급 옵션 → 시작 설정
+```
+
+### Windows Defender 전체 검사
+
+```powershell
+# PowerShell (관리자 권한)
+Start-MpScan -ScanType FullScan
+
+# 오프라인 검사 (부팅 시 검사, 강력)
+Start-MpWDOScan
+```
+
+### 의심 시작 프로그램 비활성화
+
+```
+# 작업 관리자
+Ctrl + Shift + Esc → 시작 프로그램 탭 → 의심스러운 항목 우클릭 → 사용 안 함
+
+# 레지스트리 시작 프로그램 위치 (참고용)
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
+```
+
+## 프로그램 설치/제거
+
+```
+# 제어판
+제어판 → 프로그램 → 프로그램 제거
+
+# 설정 앱
+설정 → 앱 → 앱 및 기능
+
+# winget (명령줄 패키지 관리자)
+winget list                    # 설치된 앱 목록
+winget uninstall "프로그램명"  # 제거
+winget install "프로그램명"    # 설치
+```
+
+## 레지스트리 수정
+
+```
+# 레지스트리 편집기 열기
+Win + R → regedit → Enter
+
+# 레지스트리 백업 (수정 전 필수)
+파일 → 내보내기 → 전체 선택 → 저장
+
+# 특정 키 백업
+해당 키 우클릭 → 내보내기
+```
+
+<Callout type="warning">
+  레지스트리를 잘못 수정하면 OS가 정상 부팅되지 않을 수 있다. 반드시 수정 전에 백업하자.
+</Callout>
+
+## 핵심 정리
+
+- BSOD 덤프 파일 위치: `C:\Windows\Minidump\*.dmp`
+- `sfc /scannow`: 시스템 파일 손상 검사 및 복구
+- `DISM /Online /Cleanup-Image /RestoreHealth`: 시스템 이미지 복구
+- 안전 모드: WinRE → 시작 설정 → F4
+- Defender 검사: `Start-MpScan -ScanType FullScan`
+
+## 마무리 복습
+
+<Quiz questionNumber={1} question="Windows 시스템 파일 손상을 검사하고 복구하는 명령은?" options={['chkdsk /f', 'sfc /scannow', 'DISM /ScanHealth', 'bootrec /fixmbr']} correctAnswer={2} explanation="'sfc /scannow'는 Windows 시스템 파일 검사기(System File Checker)로 손상된 시스템 파일을 자동으로 찾아 복구한다." optionExplanations={["'chkdsk /f'는 디스크 파일 시스템 오류를 검사하고 수정하는 명령이다.", "'sfc /scannow'는 Windows 시스템 파일 무결성을 검사하고 손상된 파일을 복구한다.", "'DISM /ScanHealth'는 시스템 이미지 손상 여부를 상세히 스캔하지만 복구는 /RestoreHealth가 담당한다.", "'bootrec /fixmbr'은 MBR(마스터 부트 레코드)을 복구하는 명령으로 부팅 불가 시 사용한다."]} />
+
+<Quiz questionNumber={2} question="BSOD 미니 덤프 파일이 저장되는 기본 위치는?" options={['C:\\Windows\\System32', 'C:\\Windows\\Minidump', 'C:\\Users\\Public', 'C:\\ProgramData']} correctAnswer={2} explanation="BSOD 발생 시 생성되는 미니 덤프 파일은 기본적으로 C:\\Windows\\Minidump 폴더에 날짜_시간.dmp 형식으로 저장된다." optionExplanations={['C:\\Windows\\System32는 Windows 핵심 시스템 파일이 저장된 폴더이다.', 'C:\\Windows\\Minidump는 BSOD 발생 시 미니 덤프 파일이 저장되는 기본 경로이다.', 'C:\\Users\\Public은 모든 사용자가 공유하는 공용 폴더이다.', 'C:\\ProgramData는 설치된 프로그램의 공용 데이터 폴더이다.']} />
+
+<Quiz questionNumber={3} question="sfc /scannow가 실패할 때 먼저 실행해야 할 명령은?" options={['bootrec /rebuildbcd', 'DISM /Online /Cleanup-Image /RestoreHealth', 'chkdsk /r', 'netsh winsock reset']} correctAnswer={2} explanation="sfc가 실패하면 Windows Update에서 시스템 이미지를 복구하는 'DISM /Online /Cleanup-Image /RestoreHealth'를 먼저 실행한 후 sfc를 다시 실행해야 한다." optionExplanations={["'bootrec /rebuildbcd'는 부팅 구성 데이터(BCD)를 재생성하는 명령으로 부팅 불가 시 사용한다.", "'DISM /Online /Cleanup-Image /RestoreHealth'는 Windows Update에서 정상 파일을 받아 시스템 이미지를 복구하며 sfc 실패 시 선행 실행한다.", "'chkdsk /r'은 디스크 불량 섹터를 검사하고 복구하는 명령이다.", "'netsh winsock reset'은 네트워크 Winsock 카탈로그를 초기화하는 명령이다."]} />
+
+## 참고 자료
+
+- [한국정보통신자격협회(ICQA)](https://www.icqa.or.kr/cn/page/pcmaster)

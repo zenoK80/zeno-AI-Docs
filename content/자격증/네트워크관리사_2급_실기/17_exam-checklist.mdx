@@ -1,0 +1,183 @@
+---
+title: '17. 실기 합격 핵심 체크리스트'
+description: '시험 당일 순서, Windows·Linux·Cisco 작업 체크리스트, 자주 실수하는 항목과 최종 확인 명령어를 정리합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 시험 당일 놓치는 항목 없이 체계적으로 작업을 완료하고 60점 이상으로 합격합니다.
+</Callout>
+
+## 시험 당일 기본 작업 순서
+
+모든 시험 문제에서 공통으로 적용되는 기본 순서입니다.
+
+1. **로그인 확인** — Administrator 또는 root로 접속
+2. **현재 상태 파악** — IP 확인, 기존 서비스 상태 확인
+3. **IP 고정 설정** — 문제 조건에 맞게 서버 IP 설정
+4. **역할/패키지 설치** — 필요한 서비스 설치
+5. **서비스 구성** — 설정 파일 작성 또는 명령어 실행
+6. **방화벽 규칙 추가** — 서비스 포트 허용
+7. **서비스 시작 및 자동 등록** — 재부팅 후에도 유지되도록
+8. **동작 테스트** — nslookup, curl, ping, ftp 등으로 검증
+9. **설정 저장 확인** — Cisco는 `copy run start`, Linux는 영구 설정 확인
+
+## Windows 작업 체크리스트 (20항목)
+
+### 기본 설정
+
+- [ ] 1. `Get-NetAdapter`로 네트워크 어댑터 이름 확인
+- [ ] 2. `New-NetIPAddress`로 서버 고정 IP 설정
+- [ ] 3. `Set-DnsClientServerAddress`로 DNS 서버 IP 설정
+- [ ] 4. 컴퓨터 이름 변경 (`Rename-Computer -NewName`)
+- [ ] 5. `Install-WindowsFeature`로 필요한 역할 설치
+
+### DNS 서버
+
+- [ ] 6. 정방향 조회 영역 생성 (`Add-DnsServerPrimaryZone`)
+- [ ] 7. 역방향 조회 영역 생성 (`-NetworkId` 사용)
+- [ ] 8. A 레코드 추가 (`Add-DnsServerResourceRecordA`)
+- [ ] 9. PTR 레코드 추가 (`Add-DnsServerResourceRecordPtr`)
+- [ ] 10. `nslookup`으로 DNS 해석 테스트
+
+### DHCP 서버
+
+- [ ] 11. 스코프 생성 (`Add-DhcpServerv4Scope`)
+- [ ] 12. 제외 범위 설정 (`Add-DhcpServerv4ExclusionRange`)
+- [ ] 13. 옵션 설정 게이트웨이·DNS (`Set-DhcpServerv4OptionValue`)
+- [ ] 14. AD 환경이면 `Add-DhcpServerInDC` 권한 부여
+
+### IIS / FTP
+
+- [ ] 15. 웹 루트 디렉터리 생성 및 index.html 작성
+- [ ] 16. `New-Website` 또는 `New-WebFtpSite`로 사이트 생성
+- [ ] 17. 인증 방법 설정 (익명/Windows/기본)
+- [ ] 18. 방화벽 규칙 추가 (80, 443, 21 포트)
+
+### Active Directory
+
+- [ ] 19. `New-ADOrganizationalUnit`으로 OU 생성
+- [ ] 20. `New-ADUser -Enabled $true`로 사용자 생성 (활성화 필수!)
+
+## Linux 작업 체크리스트 (15항목)
+
+### 기본 설정
+
+- [ ] 1. `ip addr show`로 현재 IP 확인
+- [ ] 2. `/etc/sysconfig/network-scripts/ifcfg-eth0` 영구 IP 설정 (RHEL)
+- [ ] 3. `systemctl restart NetworkManager`로 설정 적용
+- [ ] 4. `hostnamectl set-hostname`으로 호스트명 설정
+
+### BIND DNS
+
+- [ ] 5. `yum install bind bind-utils -y` 설치
+- [ ] 6. `/etc/named.conf`에 영역 선언 추가
+- [ ] 7. `/var/named/영역파일.zone` 정방향 영역 파일 작성
+- [ ] 8. `/var/named/역방향.zone` 역방향 영역 파일 작성
+- [ ] 9. `chown root:named`, `chmod 640`으로 권한 설정
+- [ ] 10. `named-checkconf`, `named-checkzone`으로 검증
+- [ ] 11. `systemctl enable --now named` 서비스 시작
+
+### Apache
+
+- [ ] 12. `yum install httpd -y` 설치
+- [ ] 13. `/etc/httpd/conf.d/vhost.conf` 가상 호스트 작성
+- [ ] 14. `chcon -R -t httpd_sys_content_t` SELinux 컨텍스트 설정
+- [ ] 15. `firewall-cmd --permanent --add-service=http` 방화벽 허용
+
+## Cisco IOS 체크리스트 (10항목)
+
+- [ ] 1. `enable` → `configure terminal` 모드 진입
+- [ ] 2. `hostname`으로 장비 이름 설정
+- [ ] 3. `enable secret`으로 특권 모드 비밀번호 설정
+- [ ] 4. 각 인터페이스에 `ip address IP 마스크` 설정
+- [ ] 5. 반드시 `no shutdown`으로 인터페이스 활성화
+- [ ] 6. `ip route`로 정적 경로 설정
+- [ ] 7. `line vty 0 4`에 `password`와 `login` 설정
+- [ ] 8. VLAN 작업 시 `switchport mode`와 `vlan` 번호 지정
+- [ ] 9. Trunk 포트에 `encapsulation dot1q` 및 `mode trunk`
+- [ ] 10. `copy running-config startup-config`로 반드시 저장
+
+## 자주 실수하는 항목
+
+### Windows 자주 실수
+
+| 실수 | 원인 | 해결 |
+|------|------|------|
+| DNS 해석 안 됨 | 방화벽 53 포트 미허용 | `New-NetFirewallRule` DNS 포트 허용 |
+| DHCP 서비스 안 됨 | AD 환경에서 권한 부여 누락 | `Add-DhcpServerInDC` 실행 |
+| 사용자 로그인 안 됨 | `-Enabled $true` 누락 | 사용자 생성 시 반드시 포함 |
+| IIS 접속 안 됨 | 방화벽 80 포트 미허용 | HTTP 방화벽 규칙 추가 |
+| FTP 접속 안 됨 | 익명 인증 비활성화 후 기본 인증 미활성화 | 기본 인증 명시적 활성화 |
+
+### Linux 자주 실수
+
+| 실수 | 원인 | 해결 |
+|------|------|------|
+| DNS 응답 없음 | named.conf에서 `allow-query { any; }` 누락 | named.conf 수정 후 재시작 |
+| 영역 파일 오류 | SOA 레코드 형식 오류 | `named-checkzone`으로 검증 |
+| Apache 403 오류 | SELinux 컨텍스트 미설정 | `chcon -R -t httpd_sys_content_t` 실행 |
+| 서비스 재부팅 후 중단 | `enable` 없이 `start`만 실행 | `systemctl enable --now` 사용 |
+| 방화벽 차단 | `firewall-cmd --reload` 누락 | reload 후 확인 |
+
+### Cisco 자주 실수
+
+| 실수 | 원인 | 해결 |
+|------|------|------|
+| 인터페이스 DOWN | `no shutdown` 누락 | 인터페이스 설정 후 반드시 실행 |
+| 라우팅 안 됨 | 반대편 라우터에 경로 미설정 | 양방향 정적 경로 모두 설정 |
+| 재부팅 후 설정 초기화 | `copy run start` 미실행 | 설정 완료 후 반드시 저장 |
+| Trunk 안 됨 | `encapsulation dot1q` 누락 (L3 스위치) | Trunk 전 encapsulation 설정 |
+| VLAN 간 통신 안 됨 | 서브인터페이스 `encapsulation dot1q` 누락 | 각 서브인터페이스에 설정 |
+
+## 시험 직전 확인 명령어 모음
+
+### Windows 최종 확인
+
+```powershell
+# 전체 상태 한 번에 확인
+Get-NetIPAddress | Select-Object InterfaceAlias, IPAddress, PrefixLength
+Get-Service DNS, DHCP, W3SVC | Select-Object Name, Status
+Get-DnsServerZone
+Get-DhcpServerv4Scope
+Get-Website
+nslookup 도메인이름 서버IP
+```
+
+### Linux 최종 확인
+
+```bash
+# 전체 상태 확인
+ip addr show
+systemctl status named httpd dhcpd
+firewall-cmd --list-all
+dig @localhost www.도메인이름
+curl http://localhost
+cat /var/lib/dhcpd/dhcpd.leases
+```
+
+### Cisco 최종 확인
+
+```cisco
+show ip interface brief
+show ip route
+show running-config
+show vlan brief
+show interfaces trunk
+show spanning-tree summary
+```
+
+## 마무리 복습
+
+<Quiz questionNumber={1} question="Linux에서 named 서비스를 시작하고 부팅 시 자동 시작을 동시에 등록하는 명령은?" options={['service named start && chkconfig named on', 'systemctl start named && systemctl enable named', 'systemctl enable --now named', 'named -start -autostart']} correctAnswer={3} explanation="systemctl enable --now named는 서비스를 즉시 시작(--now)하면서 동시에 자동 시작을 등록(enable)합니다. 한 명령으로 두 가지를 처리하는 가장 효율적인 방법입니다." optionExplanations={['SysV init 방식이며 systemd 환경에서는 권장하지 않습니다.', '동작은 하지만 두 명령을 분리해서 실행합니다.', 'systemctl enable --now가 시작과 자동 등록을 한 번에 처리하는 가장 효율적인 명령입니다.', 'named -start는 존재하지 않는 옵션입니다.']} />
+
+<Quiz questionNumber={2} question="Cisco 라우터에서 설정 완료 후 재부팅해도 설정이 유지되도록 저장하는 명령은?" options={['save startup', 'copy running-config startup-config', 'write config startup', 'backup config']} correctAnswer={2} explanation="copy running-config startup-config 또는 단축형 copy run start 명령으로 RAM의 실행 설정을 NVRAM에 저장합니다." optionExplanations={['save startup은 Cisco IOS 명령이 아닙니다.', 'copy running-config startup-config가 설정을 영구 저장하는 올바른 명령입니다.', 'write config startup은 Cisco IOS 명령이 아닙니다.', 'backup config는 Cisco IOS 명령이 아닙니다.']} />
+
+<Quiz questionNumber={3} question="Windows DHCP 서버를 AD 도메인 환경에서 정상 작동시키기 위해 반드시 해야 하는 작업은?" options={['DHCP 서비스 재설치', 'Add-DhcpServerInDC로 권한 부여', 'DHCP 감사 로그 활성화', 'DHCP 스코프 재생성']} correctAnswer={2} explanation="AD 환경에서 승인되지 않은 DHCP 서버는 IP 배포가 차단됩니다. Add-DhcpServerInDC 명령으로 도메인 컨트롤러에 DHCP 서버를 권한 부여해야 합니다." optionExplanations={['DHCP 서비스 재설치는 권한 부여 문제를 해결하지 못합니다.', 'Add-DhcpServerInDC가 AD 환경에서 DHCP 서버 활성화를 위한 필수 작업입니다.', '감사 로그는 선택 사항으로 서비스 동작과 무관합니다.', '스코프 재생성은 권한 부여 문제를 해결하지 못합니다.']} />
+
+<Quiz questionNumber={4} question="Linux Apache에서 SELinux가 활성화된 환경의 커스텀 웹 루트에 접근 권한을 부여하는 명령은?" options={['chmod 755 /var/www/exam', 'chcon -R -t httpd_sys_content_t /var/www/exam', 'setenforce 0', 'iptables -A INPUT -p tcp --dport 80 -j ACCEPT']} correctAnswer={2} explanation="SELinux에서 Apache가 파일에 접근하려면 httpd_sys_content_t 컨텍스트가 필요합니다. chcon 명령으로 해당 컨텍스트를 재귀적으로 적용합니다." optionExplanations={['chmod는 일반 권한 변경으로 SELinux 컨텍스트와 무관합니다.', 'chcon -R -t httpd_sys_content_t가 Apache 접근을 위한 SELinux 컨텍스트 설정 명령입니다.', 'setenforce 0은 SELinux를 Permissive 모드로 변경하는 임시 해결책이며 권장하지 않습니다.', 'iptables는 방화벽 명령으로 SELinux 컨텍스트와 무관합니다.']} />
+
+<Quiz questionNumber={5} question="Cisco 스위치에서 특정 포트가 어느 VLAN에 속하는지 확인하는 명령은?" options={['show vlan status', 'show vlan brief', 'show interface vlan', 'show vlan port']} correctAnswer={2} explanation="show vlan brief 명령은 VLAN ID, 이름, 상태, 각 VLAN에 할당된 포트 목록을 간략하게 표시합니다." optionExplanations={['show vlan status는 유효한 Cisco IOS 명령이 아닙니다.', 'show vlan brief가 VLAN별 할당 포트를 확인하는 올바른 명령입니다.', 'show interface vlan은 VLAN 인터페이스(SVI) 정보를 보여주는 명령입니다.', 'show vlan port는 유효한 Cisco IOS 명령이 아닙니다.']} />
+
+## 참고 자료
+
+- [한국정보통신자격협회(ICQA)](https://www.icqa.or.kr/cn/page/network)
