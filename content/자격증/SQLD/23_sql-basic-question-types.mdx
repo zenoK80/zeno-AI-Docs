@@ -1,61 +1,433 @@
 ---
 title: '23. SQL 기본 기출 유형'
-description: '조회·조건·집계·정렬의 기출 유형을 점검합니다.'
+description: 'NULL 처리·JOIN·집계·실행 순서 등 SQL 기본 파트 핵심 유형을 예제로 완전 정복합니다.'
 ---
 
 <Callout type="info">
-  **이번 문서의 목표:** NULL 비교에는 등호 대신 IS NULL을 사용합니다.
+  **이번 문서의 목표:** SQL 기본 파트에서 반복 출제되는 6가지 유형을 실제 쿼리와 데이터로 연습하여 정답 도출 과정을 자동화합니다.
 </Callout>
 
-## 먼저 작은 상황을 봅니다
+## 유형 1. NULL 연산 — 가장 많이 틀리는 유형
 
-**실행 순서와 NULL 처리 규칙을 함께 확인해야 합니다.**을(를) 다룰 때는 용어를 먼저 외우기보다, 무엇을 확인하고 어떤 결정을 내려야 하는지부터 잡는 편이 좋습니다.
+NULL은 "알 수 없는 값"입니다. **NULL과의 산술 연산 결과는 항상 NULL**, **NULL 비교는 = 대신 IS NULL을 사용**합니다.
 
-| 확인할 항목 | 작은 사례 |
-| --- | --- |
-| 문제 상황 | 실행 순서와 NULL 처리 규칙을 함께 확인해야 합니다. |
-| 핵심 개념 | NULL 비교에는 등호 대신 IS NULL을 사용합니다. |
-| 적용 예 | 핵심 개념을 문제의 조건과 결과에 연결해 판단합니다. |
+**핵심 규칙 정리**
 
-## 핵심 뜻
+| 표현 | 결과 |
+|------|------|
+| `NULL + 10` | NULL |
+| `NULL * 0` | NULL |
+| `'A' \|\| NULL` | NULL (Oracle 문자 연결) |
+| `COUNT(컬럼명)` | NULL 제외한 행 수 |
+| `COUNT(*)` | NULL 포함 전체 행 수 |
+| `WHERE 컬럼 = NULL` | 항상 거짓(0건 반환) |
+| `WHERE 컬럼 IS NULL` | NULL인 행 반환 |
 
-NULL 비교에는 등호 대신 IS NULL을 사용합니다.
+---
 
-처음에는 낯선 말처럼 보여도 핵심은 간단합니다. 문제의 대상, 조건, 결과를 나누어 읽고 서로 어떻게 연결되는지 확인하는 것입니다.
+**[예제 1-1]** 다음 테이블에서 쿼리 결과로 올바른 것은?
 
-## 예시를 한 단계씩 읽어 봅니다
+```sql
+-- 테이블: 직원(직원번호, 이름, 보너스)
+-- 데이터:
+-- 1001 | 김민준 | 500000
+-- 1002 | 이서연 | NULL
+-- 1003 | 박지호 | 300000
+-- 1004 | 최유나 | NULL
 
-핵심 개념을 문제의 조건과 결과에 연결해 판단합니다.
+SELECT COUNT(*), COUNT(보너스), SUM(보너스)
+FROM 직원;
+```
 
-1. 먼저 어떤 값 또는 규칙이 기준인지 확인합니다.
-2. 그 기준이 결과를 어떻게 바꾸는지 봅니다.
-3. 결과를 실제 업무 상황이나 표의 행으로 다시 해석합니다.
+1. `4, 4, 800000`
+2. `4, 2, 800000`
+3. `2, 2, 800000`
+4. `4, 2, NULL`
+
+<Callout type="success">
+  **정답: 2번**
+
+  - `COUNT(*)`: NULL 포함 전체 행 수 = **4**
+  - `COUNT(보너스)`: NULL이 있는 1002, 1004 행 제외 = **2**
+  - `SUM(보너스)`: NULL을 무시하고 500000 + 300000 = **800000**
+
+  SUM, AVG, MAX, MIN 등 집계 함수는 모두 NULL을 무시하고 계산합니다(AVG도 NULL 행을 분모에서 제외함).
+</Callout>
+
+---
+
+**[예제 1-2]** 다음 쿼리의 실행 결과 행 수는?
+
+```sql
+-- 테이블: 주문(주문번호, 고객등급)
+-- 데이터: 'A', 'B', NULL, 'A', NULL  (총 5행)
+
+SELECT * FROM 주문 WHERE 고객등급 = NULL;
+```
+
+1. 0행
+2. 1행
+3. 2행
+4. 5행
+
+<Callout type="success">
+  **정답: 1번 (0행)**
+
+  NULL은 등호(=)로 비교할 수 없습니다. `컬럼 = NULL`은 항상 UNKNOWN을 반환하고, WHERE 조건에서 UNKNOWN은 거짓으로 처리되어 아무 행도 반환하지 않습니다. NULL인 행을 조회하려면 반드시 `WHERE 고객등급 IS NULL`을 사용해야 합니다.
+</Callout>
+
+---
+
+## 유형 2. WHERE 조건 — NOT IN과 LIKE 함정
+
+**NOT IN에 NULL이 포함된 경우**
+
+`NOT IN (값1, 값2, NULL)` → 결과는 항상 0건
+
+이유: `컬럼 NOT IN (NULL 포함 목록)` 은 내부적으로 `컬럼 <> 값1 AND 컬럼 <> 값2 AND 컬럼 <> NULL`로 전개되는데, `컬럼 <> NULL`은 항상 UNKNOWN이므로 전체 조건이 UNKNOWN → 어떤 행도 반환하지 않음.
+
+---
+
+**[예제 2-1]** 다음 쿼리의 결과 행 수는?
+
+```sql
+-- 테이블: 상품(상품코드, 카테고리코드)
+-- 데이터:
+-- P001 | 10
+-- P002 | 20
+-- P003 | NULL
+-- P004 | 30
+
+SELECT * FROM 상품 WHERE 카테고리코드 NOT IN (10, 20, NULL);
+```
+
+1. 0행
+2. 1행 (P004)
+3. 2행 (P003, P004)
+4. 3행 (P002, P003, P004)
+
+<Callout type="success">
+  **정답: 1번 (0행)**
+
+  `NOT IN` 목록에 NULL이 포함되면 결과가 항상 0건입니다.
+  - `카테고리코드 NOT IN (10, 20, NULL)`은 `카테고리코드 <> 10 AND 카테고리코드 <> 20 AND 카테고리코드 <> NULL`로 전개됩니다.
+  - `카테고리코드 <> NULL`은 항상 UNKNOWN → AND 조건 전체가 UNKNOWN → 0건 반환.
+  - NULL을 제외하고 처리하려면 `WHERE 카테고리코드 NOT IN (10, 20) AND 카테고리코드 IS NOT NULL`을 사용해야 합니다.
+</Callout>
+
+---
+
+**[예제 2-2]** 다음 LIKE 조건 중 '김_수' 패턴이 매칭하는 값으로 올바른 것은?
+
+1. '김민준수'
+2. '김수'
+3. '김준수'
+4. '김민수학생'
+
+<Callout type="success">
+  **정답: 3번 ('김준수')**
+
+  LIKE 와일드카드:
+  - `%`: 0개 이상의 임의 문자
+  - `_`: 정확히 1개의 임의 문자
+
+  `'김_수'` 패턴은 "김"으로 시작, 정확히 1글자 임의 문자, "수"로 끝나는 3글자 문자열을 매칭합니다.
+  - '김민준수': 4글자 → 매칭 X
+  - '김수': 2글자 → 매칭 X
+  - **'김준수': 3글자, "김"+"준"(임의 1자)+"수" → 매칭 O**
+  - '김민수학생': "수" 다음에 "학생"이 있으므로 → 매칭 X
+</Callout>
+
+---
+
+## 유형 3. 단일행 함수 결과 — SUBSTR, ROUND, NVL
+
+단일행 함수는 행마다 값을 반환합니다. 파라미터 위치와 의미를 정확히 알아야 합니다.
+
+**자주 출제되는 함수 정리**
+
+| 함수 | 문법 | 예시 | 결과 |
+|------|------|------|------|
+| SUBSTR | SUBSTR(문자열, 시작, 길이) | SUBSTR('ABCDE', 2, 3) | 'BCD' |
+| INSTR | INSTR(문자열, 찾을값) | INSTR('ABCBA', 'B') | 2 |
+| ROUND | ROUND(숫자, 자릿수) | ROUND(3.456, 1) | 3.5 |
+| TRUNC | TRUNC(숫자, 자릿수) | TRUNC(3.456, 1) | 3.4 |
+| NVL | NVL(값, 대체값) | NVL(NULL, 0) | 0 |
+| COALESCE | COALESCE(값1, 값2, ...) | COALESCE(NULL, NULL, 5) | 5 |
 
 <Callout type="warning">
-  **헷갈리기 쉬운 점:** 비슷한 용어라도 역할이 다르면 같은 뜻으로 섞으면 안 됩니다. 문제의 대상과 조건을 먼저 표시하세요.
+  **주의:** Oracle의 SUBSTR 시작 위치는 1부터 시작합니다. 0을 넣으면 1로 처리됩니다.
 </Callout>
 
-## 시험에서 이렇게 확인합니다
+---
 
-- 정의 문제에서는 이 개념이 **무엇을 위한 것인지** 찾습니다.
-- 사례 문제에서는 필요한 조건이 실제로 충족되는지 확인합니다.
-- 선택지가 비슷하면 어떤 결과가 남거나 바뀌는지 끝까지 비교합니다.
+**[예제 3-1]** 다음 쿼리의 결과값은?
 
-## 핵심 정리
+```sql
+SELECT ROUND(SUBSTR('3.14159', 1, 4), 1) FROM DUAL;
+```
 
-- NULL 비교에는 등호 대신 IS NULL을 사용합니다.
-- 조건과 결과를 연결해 보면 같은 개념을 새 사례에도 적용할 수 있습니다.
-- 용어를 결과와 연결하면 처음 보는 사례에도 적용할 수 있습니다.
+1. 3.1
+2. 3.14
+3. 3.2
+4. 오류 발생
+
+<Callout type="success">
+  **정답: 1번 (3.1)**
+
+  단계별 계산:
+  1. `SUBSTR('3.14159', 1, 4)` → 1번째부터 4글자: `'3.14'`
+  2. `ROUND('3.14', 1)` → 소수점 1자리로 반올림: `3.1` (소수점 2자리인 4를 반올림하면 3.1)
+
+  ROUND(3.14, 1): 소수점 둘째 자리인 4를 반올림 → 3.1
+</Callout>
+
+---
+
+**[예제 3-2]** 다음 쿼리의 결과는?
+
+```sql
+-- 테이블: 급여(사원번호, 급여, 수당)
+-- 데이터: 1001 | 3000000 | NULL
+
+SELECT NVL(수당, 0) + 급여 AS 총급여 FROM 급여 WHERE 사원번호 = 1001;
+```
+
+1. NULL
+2. 0
+3. 3000000
+4. 오류 발생
+
+<Callout type="success">
+  **정답: 3번 (3000000)**
+
+  `NVL(수당, 0)` → 수당이 NULL이므로 0으로 대체 → `0 + 3000000 = 3000000`
+
+  만약 NVL을 사용하지 않고 `수당 + 급여`를 했다면 `NULL + 3000000 = NULL`이 됩니다. NVL이 NULL 처리를 해주기 때문에 정상적인 합계를 구할 수 있습니다.
+</Callout>
+
+---
+
+## 유형 4. GROUP BY + HAVING — SELECT 절 제한과 필터 위치
+
+**핵심 규칙**
+
+1. GROUP BY를 사용하면 SELECT 절에는 **GROUP BY에 포함된 컬럼** 또는 **집계 함수**만 올 수 있습니다.
+2. WHERE는 그룹화 전 행 필터링(집계 함수 사용 불가).
+3. HAVING은 그룹화 후 그룹 필터링(집계 함수 사용 가능).
+
+---
+
+**[예제 4-1]** 다음 중 올바른 SQL은?
+
+```sql
+-- 테이블: 주문(고객번호, 주문금액)
+```
+
+1. `SELECT 고객번호, 주문금액 FROM 주문 GROUP BY 고객번호`
+2. `SELECT 고객번호, SUM(주문금액) FROM 주문 GROUP BY 고객번호 HAVING SUM(주문금액) > 100000`
+3. `SELECT 고객번호, SUM(주문금액) FROM 주문 WHERE SUM(주문금액) > 100000 GROUP BY 고객번호`
+4. `SELECT 고객번호, AVG(주문금액) FROM 주문 GROUP BY 고객번호, 주문금액`
+
+<Callout type="success">
+  **정답: 2번**
+
+  - **①**: GROUP BY에 고객번호만 있는데 SELECT에 주문금액(집계 함수 없이)을 사용 → 오류
+  - **②**: GROUP BY 후 집계 값으로 HAVING 필터링 → **정상**
+  - **③**: WHERE 절에 집계 함수(SUM) 사용 → 오류 (WHERE는 GROUP BY 이전에 실행)
+  - **④**: GROUP BY에 주문금액을 추가하면 행마다 그룹이 생겨 AVG가 의미 없어짐 (문법 오류는 아니지만 의도와 다른 결과)
+</Callout>
+
+---
+
+**[예제 4-2]** 다음 테이블에서 쿼리 결과로 반환되는 고객번호와 합계는?
+
+```sql
+-- 주문 테이블
+-- 고객번호 | 주문금액
+--   C001  | 50000
+--   C001  | 30000
+--   C002  | 20000
+--   C002  | 10000
+--   C003  | 80000
+
+SELECT 고객번호, SUM(주문금액) AS 합계
+FROM 주문
+GROUP BY 고객번호
+HAVING SUM(주문금액) >= 50000;
+```
+
+1. C001(80000), C002(30000), C003(80000)
+2. C001(80000), C003(80000)
+3. C003(80000)
+4. C001(80000), C002(30000)
+
+<Callout type="success">
+  **정답: 2번**
+
+  각 그룹의 합계:
+  - C001: 50000 + 30000 = **80000** → 50000 이상 → 포함
+  - C002: 20000 + 10000 = **30000** → 50000 미만 → 제외
+  - C003: **80000** → 50000 이상 → 포함
+
+  결과: C001(80000), C003(80000)
+</Callout>
+
+---
+
+## 유형 5. JOIN 결과 — INNER / LEFT / FULL OUTER JOIN 행 수
+
+JOIN 유형별로 반환되는 행 수를 빠르게 계산하는 연습이 필요합니다.
+
+**JOIN 종류별 특성**
+
+| JOIN 종류 | 결과 |
+|-----------|------|
+| INNER JOIN | 양쪽 모두 일치하는 행만 |
+| LEFT OUTER JOIN | 왼쪽 테이블 전체 + 오른쪽 일치 행 |
+| RIGHT OUTER JOIN | 오른쪽 테이블 전체 + 왼쪽 일치 행 |
+| FULL OUTER JOIN | 양쪽 테이블 모두(불일치 포함) |
+| CROSS JOIN | 두 테이블의 카테시안 곱(M×N) |
+
+---
+
+**[예제 5-1]** 다음 두 테이블을 각 JOIN으로 조인할 때 결과 행 수를 구하세요.
+
+```
+-- 고객 테이블 (3행)
+고객번호 | 고객명
+  C001  | 김민준
+  C002  | 이서연
+  C003  | 박지호
+
+-- 주문 테이블 (4행)
+주문번호 | 고객번호
+  O001  |   C001
+  O002  |   C001
+  O003  |   C002
+  O004  |   C099  ← 고객 테이블에 없는 고객번호
+```
+
+| JOIN 종류 | 결과 행 수 |
+|-----------|-----------|
+| INNER JOIN on 고객.고객번호 = 주문.고객번호 | ? |
+| LEFT OUTER JOIN (고객 기준) | ? |
+| FULL OUTER JOIN | ? |
+
+1. INNER: 3행, LEFT: 4행, FULL: 5행
+2. INNER: 3행, LEFT: 3행, FULL: 4행
+3. INNER: 4행, LEFT: 4행, FULL: 5행
+4. INNER: 2행, LEFT: 3행, FULL: 5행
+
+<Callout type="success">
+  **정답: 1번**
+
+  **INNER JOIN**: 양쪽에 모두 존재하는 매칭만
+  - C001-O001, C001-O002, C002-O003 → **3행** (C099는 고객 테이블에 없으므로 제외, C003은 주문 없으므로 제외)
+
+  **LEFT OUTER JOIN** (고객 기준, 왼쪽 테이블 전체 보존):
+  - C001-O001, C001-O002, C002-O003, C003-NULL → **4행** (C003은 주문 없지만 왼쪽 테이블에 있으므로 포함, NULL로 채움)
+
+  **FULL OUTER JOIN** (양쪽 모두 보존):
+  - 위 4행 + C099(O004, 고객명 NULL) → **5행**
+</Callout>
+
+---
+
+## 유형 6. SQL 실행 순서 — FROM부터 ORDER BY까지
+
+SQL 실행 순서는 많은 문제의 핵심 판단 근거입니다.
+
+**실행 순서**
+
+```
+① FROM     → 테이블 결정
+② WHERE    → 행 필터링 (집계 함수 사용 불가)
+③ GROUP BY → 그룹화
+④ HAVING   → 그룹 필터링 (집계 함수 사용 가능)
+⑤ SELECT   → 컬럼 선택, 별칭 부여
+⑥ ORDER BY → 정렬 (별칭 사용 가능)
+```
+
+<Callout type="warning">
+  **핵심 포인트:** SELECT에서 만든 별칭은 ORDER BY에서만 사용 가능합니다. WHERE, GROUP BY, HAVING에서는 별칭을 사용할 수 없습니다(실행 순서가 SELECT보다 앞서기 때문).
+</Callout>
+
+---
+
+**[예제 6-1]** 다음 쿼리에서 오류가 발생하는 이유로 올바른 것은?
+
+```sql
+SELECT 고객번호, SUM(주문금액) AS 총주문금액
+FROM 주문
+WHERE 총주문금액 > 50000
+GROUP BY 고객번호;
+```
+
+1. SUM은 WHERE 절에서 사용할 수 없다.
+2. 총주문금액이라는 별칭은 WHERE 절에서 사용할 수 없다.
+3. GROUP BY 없이 SUM을 사용했다.
+4. ①과 ②가 모두 오류 원인이다.
+
+<Callout type="success">
+  **정답: 4번**
+
+  이 쿼리에는 두 가지 문제가 동시에 있습니다.
+
+  **오류 원인 ①**: WHERE는 GROUP BY 이전에 실행되므로 아직 집계되지 않았습니다 → `SUM(주문금액)` 같은 집계 함수는 WHERE에 쓸 수 없습니다.
+
+  **오류 원인 ②**: `총주문금액`은 SELECT에서 정의한 별칭인데, SELECT는 WHERE보다 나중에 실행됩니다 → WHERE 단계에서 별칭을 아직 모릅니다.
+
+  **올바른 쿼리:**
+  ```sql
+  SELECT 고객번호, SUM(주문금액) AS 총주문금액
+  FROM 주문
+  GROUP BY 고객번호
+  HAVING SUM(주문금액) > 50000;
+  ```
+</Callout>
+
+---
+
+**[예제 6-2]** 다음 쿼리의 실행 순서를 올바르게 나열한 것은?
+
+```sql
+SELECT 부서코드, AVG(급여) AS 평균급여
+FROM 직원
+WHERE 입사년도 >= 2020
+GROUP BY 부서코드
+HAVING AVG(급여) > 3000000
+ORDER BY 평균급여 DESC;
+```
+
+1. SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY
+2. FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY
+3. FROM → GROUP BY → WHERE → HAVING → SELECT → ORDER BY
+4. WHERE → FROM → GROUP BY → SELECT → HAVING → ORDER BY
+
+<Callout type="success">
+  **정답: 2번**
+
+  SQL 실행 순서: **FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY**
+
+  - FROM: 직원 테이블 로드
+  - WHERE: 입사년도 >= 2020 행 필터
+  - GROUP BY: 부서코드별 그룹화
+  - HAVING: 그룹 중 평균급여 > 3000000 필터
+  - SELECT: 부서코드, AVG(급여)를 '평균급여' 별칭으로 출력
+  - ORDER BY: '평균급여' 별칭으로 내림차순 정렬 (이 시점에 별칭 인식 가능)
+</Callout>
+
+---
 
 ## 마무리 복습
 
-<Quiz questionNumber={1} question="23. SQL 기본 기출 유형에서 가장 먼저 확인할 것은 무엇인가요?" options={['NULL 비교에는 등호 대신 IS NULL을 사용합니다.의 뜻과 역할', '글자 색상', '파일 이름만', '근거 없는 추측']} correctAnswer={1} explanation="NULL 비교에는 등호 대신 IS NULL을 사용합니다.의 역할을 사례와 연결해야 다음 문제에도 적용할 수 있습니다." optionExplanations={['맞습니다. 핵심 개념의 역할을 확인합니다.','디자인 요소입니다.','이름만으로 판단할 수 없습니다.','조건과 근거가 필요합니다.']} />
+<Quiz questionNumber={1} question="다음 중 SQL 실행 결과가 나머지 셋과 다른 것은? (테이블 T: 컬럼 A에 1, 2, NULL, 3이 있음)" options={["SELECT COUNT(*) FROM T", "SELECT COUNT(A) FROM T", "SELECT COUNT(1) FROM T", "SELECT COUNT(*) FROM T WHERE A IS NOT NULL OR A IS NULL"]} correctAnswer={2} explanation="COUNT(*)는 NULL을 포함한 전체 행 수 4를 반환합니다. COUNT(A)는 A가 NULL인 행을 제외하므로 3을 반환합니다. COUNT(1)은 COUNT(*)와 동일하게 4를 반환합니다. ④의 WHERE 조건(IS NOT NULL OR IS NULL)은 항상 참이므로 4를 반환합니다. 따라서 결과가 다른 것은 COUNT(A)입니다." optionExplanations={["COUNT(*)는 NULL 포함 전체 행 수 4를 반환합니다.", "정답. COUNT(컬럼명)은 해당 컬럼이 NULL인 행을 제외하므로 3을 반환합니다.", "COUNT(1)은 COUNT(*)와 동일하게 NULL 포함 전체 행 수 4를 반환합니다.", "IS NOT NULL OR IS NULL은 모든 행에서 참이므로 WHERE가 전체 행을 통과시켜 COUNT(*) = 4입니다."]} />
 
-<Quiz questionNumber={2} question="다음 사례를 가장 바르게 해석한 것은 무엇인가요? 문제의 조건과 결과를 함께 확인합니다." options={['조건과 결과를 함께 확인한다.', '모든 값을 같은 의미로 본다.', '검증 없이 결론을 확정한다.', '필요한 정보를 먼저 삭제한다.']} correctAnswer={1} explanation="사례의 조건을 읽고 NULL 비교에는 등호 대신 IS NULL을 사용합니다.의 관점에서 결과를 판단해야 합니다." optionExplanations={['맞습니다. 조건과 결과의 연결을 확인합니다.','값의 의미를 잃게 됩니다.','검증이 필요합니다.','판단 기준을 없애면 안 됩니다.']} />
+<Quiz questionNumber={2} question="GROUP BY와 HAVING에 대한 설명 중 틀린 것은?" options={["HAVING은 GROUP BY 이후에 실행된다.", "HAVING 절에는 집계 함수를 사용할 수 있다.", "WHERE 절에는 집계 함수를 사용할 수 없다.", "HAVING 절에서 정의한 별칭은 WHERE 절에서 사용할 수 있다."]} correctAnswer={4} explanation="SQL 실행 순서는 FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY입니다. HAVING은 SELECT보다 먼저 실행되므로, 별칭(alias)은 아직 정의되지 않았습니다. 별칭은 ORDER BY 절에서만 사용할 수 있습니다." optionExplanations={["올바른 설명입니다. HAVING은 GROUP BY 이후에 그룹을 필터링합니다.", "올바른 설명입니다. HAVING에서는 SUM, COUNT 등 집계 함수를 사용할 수 있습니다.", "올바른 설명입니다. WHERE는 GROUP BY 이전 실행 단계이므로 집계 함수 사용이 불가합니다.", "정답(틀린 설명). 별칭은 SELECT에서 정의되는데, HAVING은 SELECT 이전에 실행되므로 HAVING에서 별칭을 쓸 수 없습니다. 별칭은 ORDER BY에서만 참조 가능합니다."]} />
 
-<Quiz questionNumber={3} question="23. SQL 기본 기출 유형에서 피해야 할 실수는 무엇인가요?" options={['작은 예시로 확인한다.', '결과가 나온 이유를 설명한다.', '비슷한 개념을 구분하지 않고 섞는다.', '조건이 바뀌면 결과도 확인한다.']} correctAnswer={3} explanation="비슷한 개념도 역할과 적용 조건이 다르므로 구분해야 합니다." optionExplanations={['좋은 학습 방법입니다.','좋은 학습 방법입니다.','맞습니다. 시험에서 자주 묻는 함정입니다.','좋은 점검 방법입니다.']} />
+<Quiz questionNumber={3} question="LEFT OUTER JOIN에 대한 설명으로 올바른 것은?" options={["왼쪽 테이블에서 오른쪽 테이블과 일치하는 행만 반환한다.", "왼쪽 테이블의 모든 행을 반환하고, 오른쪽 테이블에 일치하는 행이 없으면 NULL로 채운다.", "오른쪽 테이블의 모든 행을 반환하고, 왼쪽 테이블에 일치하는 행이 없으면 NULL로 채운다.", "양쪽 테이블의 모든 행을 반환한다."]} correctAnswer={2} explanation="LEFT OUTER JOIN은 왼쪽(FROM 뒤에 오는) 테이블의 모든 행을 보존합니다. 오른쪽 테이블에 매칭 행이 없으면 오른쪽 컬럼들을 NULL로 채워서 반환합니다. ①은 INNER JOIN, ③은 RIGHT OUTER JOIN, ④는 FULL OUTER JOIN의 설명입니다." optionExplanations={["INNER JOIN의 설명입니다. 양쪽 모두 일치하는 행만 반환합니다.", "정답. LEFT OUTER JOIN은 왼쪽 테이블 전체를 보존하고, 오른쪽 불일치는 NULL 처리합니다.", "RIGHT OUTER JOIN의 설명입니다.", "FULL OUTER JOIN의 설명입니다."]} />
 
 ## 참고 자료
 
 - [KDATA 데이터자격시험 - SQL 개발자](https://www.dataq.or.kr/www/sub/a_04.do)
-- [Oracle Database SQL Language Reference](https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/)

@@ -1,59 +1,187 @@
 ---
 title: '18. TCL과 트랜잭션'
-description: 'COMMIT·ROLLBACK·SAVEPOINT로 작업 단위를 다룹니다.'
+description: 'COMMIT, ROLLBACK, SAVEPOINT로 트랜잭션을 관리하고 ACID 속성을 이해합니다.'
 ---
 
 <Callout type="info">
-  **이번 문서의 목표:** 계좌 이체의 출금과 입금은 함께 성공해야 합니다.
+  **이번 문서의 목표:** 트랜잭션의 ACID 속성을 이해하고, SAVEPOINT를 활용해 부분 롤백하는 방법을 익힙니다.
 </Callout>
 
-## 먼저 작은 상황을 봅니다
+## 트랜잭션이란?
 
-**트랜잭션은 여러 변경을 함께 확정하거나 함께 취소하는 단위입니다.**을(를) 다룰 때는 용어를 먼저 외우기보다, 무엇을 확인하고 어떤 결정을 내려야 하는지부터 잡는 편이 좋습니다.
+트랜잭션(Transaction)은 **하나의 논리적 작업 단위**로 처리되어야 하는 일련의 SQL 문장 집합입니다. 트랜잭션은 모두 성공하거나 모두 실패해야 합니다.
 
-| 확인할 항목 | 작은 사례 |
-| --- | --- |
-| 문제 상황 | 트랜잭션은 여러 변경을 함께 확정하거나 함께 취소하는 단위입니다. |
-| 핵심 개념 | 계좌 이체의 출금과 입금은 함께 성공해야 합니다. |
-| 적용 예 | 핵심 개념을 문제의 조건과 결과에 연결해 판단합니다. |
+**예시: 계좌 이체**
 
-## 핵심 뜻
+```
+1. A 계좌에서 10만원 차감  (UPDATE)
+2. B 계좌에 10만원 추가    (UPDATE)
+```
 
-계좌 이체의 출금과 입금은 함께 성공해야 합니다.
+1번만 성공하고 2번이 실패하면 10만원이 사라집니다. 이 두 작업은 반드시 하나의 트랜잭션으로 묶어야 합니다.
 
-처음에는 낯선 말처럼 보여도 핵심은 간단합니다. 문제의 대상, 조건, 결과를 나누어 읽고 서로 어떻게 연결되는지 확인하는 것입니다.
+## ACID 속성
 
-## 예시를 한 단계씩 읽어 봅니다
+트랜잭션이 보장해야 하는 4가지 성질입니다.
 
-핵심 개념을 문제의 조건과 결과에 연결해 판단합니다.
+| 속성             | 영문              | 의미                                                |
+| ---------------- | ----------------- | --------------------------------------------------- |
+| **원자성**       | Atomicity         | 트랜잭션의 모든 작업이 완전히 실행되거나 전혀 실행되지 않음 |
+| **일관성**       | Consistency       | 트랜잭션 전후로 데이터베이스는 항상 일관된 상태를 유지 |
+| **고립성(격리성)** | Isolation       | 동시에 실행되는 트랜잭션이 서로 영향을 주지 않음    |
+| **영속성(지속성)** | Durability      | COMMIT된 트랜잭션 결과는 영구적으로 저장됨          |
 
-1. 먼저 어떤 값 또는 규칙이 기준인지 확인합니다.
-2. 그 기준이 결과를 어떻게 바꾸는지 봅니다.
-3. 결과를 실제 업무 상황이나 표의 행으로 다시 해석합니다.
+## TCL 명령어
+
+TCL(Transaction Control Language)은 트랜잭션을 제어하는 명령입니다.
+
+| 명령       | 기능                              |
+| ---------- | --------------------------------- |
+| COMMIT     | 트랜잭션 변경 내용을 영구 저장    |
+| ROLLBACK   | 마지막 COMMIT 이후 변경 취소      |
+| SAVEPOINT  | 트랜잭션 내 부분 롤백 기준점 설정 |
+
+## COMMIT
+
+```sql
+UPDATE EMP SET 급여 = 5000000 WHERE 사원번호 = 1001;
+INSERT INTO EMP VALUES (1006, '한지수', 30, '사원', 2700000, 1001);
+COMMIT;  -- 두 변경 사항 모두 확정
+```
+
+COMMIT을 실행하면:
+- 변경 내용이 데이터베이스에 영구 저장됩니다.
+- 다른 세션(다른 사용자)에서도 변경 내용을 볼 수 있습니다.
+- 이전 COMMIT 이후의 모든 LOCK이 해제됩니다.
+
+## ROLLBACK
+
+```sql
+UPDATE EMP SET 급여 = 0;  -- 실수로 전체 급여를 0으로 변경
+ROLLBACK;                  -- 마지막 COMMIT 이후로 되돌림
+```
+
+ROLLBACK을 실행하면:
+- 마지막 COMMIT 이후의 모든 변경이 취소됩니다.
+- 변경 전 상태로 완전히 되돌아갑니다.
+
+## SAVEPOINT: 부분 롤백
+
+트랜잭션 중간에 저장점을 만들어 일부만 롤백할 수 있습니다.
+
+```sql
+-- 1단계: 사원 추가
+INSERT INTO EMP (사원번호, 이름, 급여) VALUES (1006, '한지수', 2700000);
+SAVEPOINT SP1;  -- 저장점 SP1 설정
+
+-- 2단계: 급여 수정
+UPDATE EMP SET 급여 = 9999999 WHERE 사원번호 = 1001;
+SAVEPOINT SP2;  -- 저장점 SP2 설정
+
+-- 3단계: 부서 추가
+INSERT INTO DEPT VALUES (50, '해외팀', '뉴욕');
+
+-- 2단계 이후 내용만 취소 (SP2로 롤백)
+ROLLBACK TO SAVEPOINT SP2;
+-- 이제 3단계(부서 추가)만 취소됨
+-- 1단계(사원 추가), 2단계(급여 수정)는 유지됨
+
+-- 전체 취소
+ROLLBACK;
+-- 또는 확정
+COMMIT;
+```
+
+**SAVEPOINT 활용 흐름**
+
+```
+BEGIN TRANSACTION
+  ↓
+  INSERT 사원      → SAVEPOINT SP1
+  ↓
+  UPDATE 급여      → SAVEPOINT SP2
+  ↓
+  INSERT 부서
+  ↓
+  ROLLBACK TO SP2  → 부서 추가만 취소
+  ↓
+  COMMIT           → 사원 추가, 급여 수정 확정
+```
+
+<Callout type="info">
+  `ROLLBACK TO SAVEPOINT 이름`은 해당 저장점 이후의 변경만 취소합니다. 저장점 이전 변경 내용은 유지됩니다.
+</Callout>
+
+## 트랜잭션 시작과 종료
+
+| 시작 조건                   | 종료 조건              |
+| --------------------------- | ---------------------- |
+| DML(INSERT/UPDATE/DELETE) 첫 실행 | COMMIT 실행            |
+| 이전 트랜잭션 종료 직후    | ROLLBACK 실행          |
+|                             | DDL/DCL 실행 (자동 COMMIT) |
+|                             | 정상 종료 (자동 COMMIT) |
+|                             | 비정상 종료 (자동 ROLLBACK) |
+
+## DDL/DCL 실행 시 자동 COMMIT
+
+```sql
+UPDATE EMP SET 급여 = 5000000 WHERE 사원번호 = 1001; -- 미커밋 상태
+
+CREATE TABLE TEMP (id NUMBER);  -- DDL 실행 → 자동 COMMIT 발생!
+-- 위의 UPDATE도 함께 COMMIT됨 → ROLLBACK 불가!
+```
 
 <Callout type="warning">
-  **헷갈리기 쉬운 점:** 비슷한 용어라도 역할이 다르면 같은 뜻으로 섞으면 안 됩니다. 문제의 대상과 조건을 먼저 표시하세요.
+  DDL(CREATE, ALTER, DROP, TRUNCATE) 또는 DCL(GRANT, REVOKE)을 실행하면 **그 시점까지 미커밋 DML이 자동으로 COMMIT**됩니다. 이는 SQLD 시험의 단골 함정 문제입니다.
 </Callout>
 
-## 시험에서 이렇게 확인합니다
+## 잠금(LOCK)과 동시성
 
-- 정의 문제에서는 이 개념이 **무엇을 위한 것인지** 찾습니다.
-- 사례 문제에서는 필요한 조건이 실제로 충족되는지 확인합니다.
-- 선택지가 비슷하면 어떤 결과가 남거나 바뀌는지 끝까지 비교합니다.
+한 세션이 DML로 행을 변경하면, 그 행에 **행 수준 잠금(Row-Level Lock)**이 걸립니다.
+
+- 다른 세션은 잠금된 행을 수정할 수 없음 (대기 상태)
+- COMMIT 또는 ROLLBACK 시 잠금 해제
+- 다른 세션의 **SELECT(읽기)는 잠금에 영향받지 않음** (Oracle 기준, MVCC 적용)
 
 ## 핵심 정리
 
-- 계좌 이체의 출금과 입금은 함께 성공해야 합니다.
-- 조건과 결과를 연결해 보면 같은 개념을 새 사례에도 적용할 수 있습니다.
-- 용어를 결과와 연결하면 처음 보는 사례에도 적용할 수 있습니다.
+- **원자성(A)**: 트랜잭션은 전부 성공 or 전부 실패
+- **일관성(C)**: 트랜잭션 전후 DB 무결성 유지
+- **고립성(I)**: 동시 트랜잭션 간 간섭 없음
+- **영속성(D)**: COMMIT 후 결과는 영구 보존
+- **COMMIT**: 변경 확정, 다른 세션도 볼 수 있음, LOCK 해제
+- **ROLLBACK**: 마지막 COMMIT 이후 모든 변경 취소
+- **SAVEPOINT**: 중간 저장점, `ROLLBACK TO SAVEPOINT`로 부분 취소
+- **자동 COMMIT 발생**: DDL 실행, DCL 실행, 정상 세션 종료
 
 ## 마무리 복습
 
-<Quiz questionNumber={1} question="18. TCL과 트랜잭션에서 가장 먼저 확인할 것은 무엇인가요?" options={['계좌 이체의 출금과 입금은 함께 성공해야 합니다.의 뜻과 역할', '글자 색상', '파일 이름만', '근거 없는 추측']} correctAnswer={1} explanation="계좌 이체의 출금과 입금은 함께 성공해야 합니다.의 역할을 사례와 연결해야 다음 문제에도 적용할 수 있습니다." optionExplanations={['맞습니다. 핵심 개념의 역할을 확인합니다.','디자인 요소입니다.','이름만으로 판단할 수 없습니다.','조건과 근거가 필요합니다.']} />
+<Quiz
+  questionNumber={1}
+  question="SAVEPOINT SP1을 설정 후 UPDATE, INSERT 작업을 한 다음 'ROLLBACK TO SAVEPOINT SP1'을 실행하면?"
+  options={['SP1 이전 변경까지 모두 취소된다', 'SP1 이후의 변경(UPDATE, INSERT)만 취소된다', '모든 변경이 COMMIT된다', 'SP1이 삭제되고 전체 ROLLBACK된다']}
+  correctAnswer={2}
+  explanation="ROLLBACK TO SAVEPOINT는 해당 저장점 이후에 발생한 변경만 취소합니다. SP1 이전의 변경 내용은 그대로 유지됩니다."
+  optionExplanations={['SP1 이전 변경은 유지됩니다.', '정답입니다. SP1 이후(UPDATE, INSERT)만 취소되고 SP1 이전 변경은 유지됩니다.', 'ROLLBACK TO SAVEPOINT는 COMMIT이 아닙니다.', 'SAVEPOINT는 삭제되지 않으며, SP1 이후 변경만 취소됩니다.']}
+/>
 
-<Quiz questionNumber={2} question="다음 사례를 가장 바르게 해석한 것은 무엇인가요? 문제의 조건과 결과를 함께 확인합니다." options={['조건과 결과를 함께 확인한다.', '모든 값을 같은 의미로 본다.', '검증 없이 결론을 확정한다.', '필요한 정보를 먼저 삭제한다.']} correctAnswer={1} explanation="사례의 조건을 읽고 계좌 이체의 출금과 입금은 함께 성공해야 합니다.의 관점에서 결과를 판단해야 합니다." optionExplanations={['맞습니다. 조건과 결과의 연결을 확인합니다.','값의 의미를 잃게 됩니다.','검증이 필요합니다.','판단 기준을 없애면 안 됩니다.']} />
+<Quiz
+  questionNumber={2}
+  question="트랜잭션의 ACID 속성 중 '동시에 실행되는 트랜잭션이 서로 영향을 주지 않아야 한다'는 속성은?"
+  options={['원자성(Atomicity)', '일관성(Consistency)', '고립성(Isolation)', '영속성(Durability)']}
+  correctAnswer={3}
+  explanation="고립성(Isolation)은 동시에 실행되는 트랜잭션이 서로의 중간 결과를 볼 수 없어야 한다는 속성입니다."
+  optionExplanations={['원자성은 트랜잭션이 전부 성공하거나 전부 실패해야 한다는 속성입니다.', '일관성은 트랜잭션 전후로 DB가 일관된 상태를 유지해야 한다는 속성입니다.', '정답입니다. 고립성(격리성)은 동시 트랜잭션 간 간섭이 없어야 한다는 속성입니다.', '영속성은 COMMIT된 결과가 영구적으로 저장되어야 한다는 속성입니다.']}
+/>
 
-<Quiz questionNumber={3} question="18. TCL과 트랜잭션에서 피해야 할 실수는 무엇인가요?" options={['작은 예시로 확인한다.', '결과가 나온 이유를 설명한다.', '비슷한 개념을 구분하지 않고 섞는다.', '조건이 바뀌면 결과도 확인한다.']} correctAnswer={3} explanation="비슷한 개념도 역할과 적용 조건이 다르므로 구분해야 합니다." optionExplanations={['좋은 학습 방법입니다.','좋은 학습 방법입니다.','맞습니다. 시험에서 자주 묻는 함정입니다.','좋은 점검 방법입니다.']} />
+<Quiz
+  questionNumber={3}
+  question="다음 중 자동 COMMIT(묵시적 커밋)이 발생하는 경우가 아닌 것은?"
+  options={['DDL(CREATE TABLE) 실행', 'DCL(GRANT) 실행', 'DML(UPDATE) 실행', '정상적인 세션 종료']}
+  correctAnswer={3}
+  explanation="DML(INSERT, UPDATE, DELETE, MERGE)은 자동 COMMIT이 발생하지 않습니다. DML은 명시적으로 COMMIT 또는 ROLLBACK을 실행해야 트랜잭션이 종료됩니다."
+  optionExplanations={['DDL 실행 시 자동 COMMIT이 발생합니다.', 'DCL 실행 시 자동 COMMIT이 발생합니다.', '정답입니다. DML은 자동 COMMIT이 없어 명시적 COMMIT/ROLLBACK이 필요합니다.', '정상 세션 종료 시 자동 COMMIT이 발생합니다.']}
+/>
 
 ## 참고 자료
 

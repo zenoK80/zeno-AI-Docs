@@ -1,0 +1,384 @@
+---
+title: '20. 웹 서비스와 DNS'
+description: 'Apache와 Nginx 웹 서버 설정, DNS 레코드 유형, BIND 설정 방법을 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** Apache(httpd)와 Nginx의 핵심 설정 지시자를 이해하고, DNS 레코드 유형을 구분하며, BIND를 이용해 DNS 서버를 구성하는 방법을 익힙니다.
+</Callout>
+
+## Apache(httpd) 웹 서버
+
+### 설치와 서비스 관리
+
+```bash
+# RHEL 계열
+dnf install httpd
+systemctl enable --now httpd
+systemctl status httpd
+
+# 방화벽 허용
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --add-service=https
+firewall-cmd --reload
+```
+
+### 주요 설정 파일
+
+```bash
+/etc/httpd/conf/httpd.conf          # 주 설정 파일
+/etc/httpd/conf.d/                  # 추가 설정 파일 디렉터리
+/etc/httpd/conf.modules.d/          # 모듈 설정 파일
+/var/www/html/                      # 기본 DocumentRoot
+/var/log/httpd/access_log           # 접근 로그
+/var/log/httpd/error_log            # 오류 로그
+```
+
+### /etc/httpd/conf/httpd.conf 주요 지시자
+
+```apache
+# 서버 기본 설정
+ServerName www.example.com:80
+ServerAdmin webmaster@example.com
+Listen 80
+Listen 443
+
+# 문서 루트
+DocumentRoot "/var/www/html"
+
+# 디렉터리 접근 제어
+<Directory "/var/www/html">
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+
+# 기본 문서 파일
+DirectoryIndex index.html index.php
+
+# 로그 설정
+ErrorLog "/var/log/httpd/error_log"
+CustomLog "/var/log/httpd/access_log" combined
+
+# keepalive 설정
+KeepAlive On
+MaxKeepAliveRequests 100
+KeepAliveTimeout 5
+```
+
+### 가상 호스트 설정
+
+하나의 서버에서 여러 도메인을 운영할 때 사용합니다.
+
+```apache
+# /etc/httpd/conf.d/vhost.conf
+
+# 이름 기반 가상 호스트 (포트 80)
+<VirtualHost *:80>
+    ServerName www.example.com
+    ServerAlias example.com
+    DocumentRoot /var/www/example
+    ErrorLog /var/log/httpd/example_error.log
+    CustomLog /var/log/httpd/example_access.log combined
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName www.another.com
+    DocumentRoot /var/www/another
+    ErrorLog /var/log/httpd/another_error.log
+    CustomLog /var/log/httpd/another_access.log combined
+</VirtualHost>
+```
+
+### SSL/TLS 설정 (HTTPS)
+
+```apache
+# /etc/httpd/conf.d/ssl.conf
+<VirtualHost *:443>
+    ServerName www.example.com
+    DocumentRoot /var/www/html
+
+    SSLEngine on
+    SSLCertificateFile /etc/ssl/certs/example.crt
+    SSLCertificateKeyFile /etc/ssl/private/example.key
+    SSLCertificateChainFile /etc/ssl/certs/ca-chain.crt
+</VirtualHost>
+```
+
+### 설정 문법 검사
+
+```bash
+httpd -t          # 설정 파일 문법 검사 (apachectl configtest와 동일)
+apachectl -t      # 동일한 문법 검사
+apachectl status  # 서버 상태 확인
+apachectl graceful # 무중단 재시작 (현재 연결 유지하며 재로드)
+```
+
+## Nginx 웹 서버
+
+### 설치와 서비스 관리
+
+```bash
+dnf install nginx
+systemctl enable --now nginx
+```
+
+### 주요 설정 파일
+
+```bash
+/etc/nginx/nginx.conf          # 주 설정 파일
+/etc/nginx/conf.d/             # 추가 설정 파일 디렉터리
+/var/log/nginx/access.log      # 접근 로그
+/var/log/nginx/error.log       # 오류 로그
+```
+
+### /etc/nginx/nginx.conf 구조
+
+```nginx
+# 전역 설정
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    # MIME 타입 설정
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    # 로그 형식
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent"';
+
+    access_log /var/log/nginx/access.log main;
+    sendfile on;
+    keepalive_timeout 65;
+
+    # 가상 호스트 설정 포함
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+
+### Nginx server 블록과 location 블록
+
+```nginx
+# /etc/nginx/conf.d/example.conf
+
+server {
+    listen 80;
+    server_name www.example.com example.com;
+    root /var/www/html;
+    index index.html index.php;
+
+    access_log /var/log/nginx/example_access.log;
+    error_log /var/log/nginx/example_error.log;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location ~* \.(jpg|jpeg|png|gif|css|js)$ {
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
+    # HTTPS 리다이렉트
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name www.example.com;
+
+    ssl_certificate /etc/ssl/certs/example.crt;
+    ssl_certificate_key /etc/ssl/private/example.key;
+
+    root /var/www/html;
+    index index.html;
+}
+```
+
+### 설정 문법 검사
+
+```bash
+nginx -t          # 설정 파일 문법 검사
+nginx -T          # 설정 파일 전체 내용 출력 및 검사
+nginx -s reload   # 무중단 재로드
+nginx -s stop     # 즉시 중지
+```
+
+## DNS 기초 개념
+
+### DNS 레코드 유형
+
+| 레코드 | 이름 | 용도 |
+|---|---|---|
+| A | Address | 도메인 → IPv4 주소 매핑 |
+| AAAA | IPv6 Address | 도메인 → IPv6 주소 매핑 |
+| CNAME | Canonical Name | 도메인 별칭 (다른 도메인으로 지정) |
+| MX | Mail Exchanger | 메일 서버 지정 (우선순위 포함) |
+| NS | Name Server | 해당 도메인의 권한 DNS 서버 |
+| PTR | Pointer | IP 주소 → 도메인 (역방향 조회) |
+| TXT | Text | 텍스트 정보 (SPF, DKIM, 도메인 인증 등) |
+| SOA | Start of Authority | 존의 권한 정보 (직렬 번호, TTL 등) |
+| SRV | Service | 서비스 위치 (포트, 프로토콜 포함) |
+
+### 로컬 DNS 설정 파일
+
+```bash
+# DNS 서버 지정
+cat /etc/resolv.conf
+# nameserver 8.8.8.8
+# nameserver 8.8.4.4
+# search example.com
+
+# 로컬 호스트 이름 매핑 (DNS보다 우선)
+cat /etc/hosts
+# 127.0.0.1   localhost
+# 192.168.1.10 webserver.example.com webserver
+
+# 이름 해석 순서
+cat /etc/nsswitch.conf | grep hosts
+# hosts: files dns   ← /etc/hosts 먼저, 그다음 DNS
+```
+
+## BIND — DNS 서버 구성
+
+### 설치와 서비스 관리
+
+```bash
+dnf install bind bind-utils
+systemctl enable --now named
+```
+
+### /etc/named.conf 구조
+
+```named
+// 전역 옵션
+options {
+    listen-on port 53 { 127.0.0.1; 192.168.1.0/24; };
+    directory "/var/named";
+    dump-file "/var/named/data/cache_dump.db";
+    allow-query { localhost; 192.168.1.0/24; };
+    recursion yes;
+    forwarders { 8.8.8.8; 8.8.4.4; };
+};
+
+// 로그 설정
+logging {
+    channel default_debug {
+        file "data/named_run";
+        severity dynamic;
+    };
+};
+
+// 정방향 존 (도메인 → IP)
+zone "example.com" IN {
+    type master;
+    file "/var/named/example.com.zone";
+    allow-update { none; };
+};
+
+// 역방향 존 (IP → 도메인)
+zone "1.168.192.in-addr.arpa" IN {
+    type master;
+    file "/var/named/192.168.1.rev";
+};
+```
+
+### 존 파일 예시
+
+```named
+; /var/named/example.com.zone
+$TTL 86400
+@   IN  SOA  ns1.example.com. admin.example.com. (
+            2025082301  ; Serial (날짜+순번)
+            3600        ; Refresh
+            900         ; Retry
+            604800      ; Expire
+            86400 )     ; Minimum TTL
+
+; 네임서버
+@       IN  NS   ns1.example.com.
+
+; A 레코드
+ns1     IN  A    192.168.1.1
+www     IN  A    192.168.1.10
+mail    IN  A    192.168.1.20
+
+; MX 레코드 (우선순위: 낮을수록 높음)
+@       IN  MX   10  mail.example.com.
+
+; CNAME
+ftp     IN  CNAME www.example.com.
+```
+
+### BIND 설정 검증
+
+```bash
+named-checkconf                           # named.conf 문법 검사
+named-checkconf /etc/named.conf           # 파일 지정 검사
+named-checkzone example.com /var/named/example.com.zone  # 존 파일 검사
+
+# DNS 조회 도구
+dig example.com A                         # A 레코드 조회
+dig example.com MX                        # MX 레코드 조회
+dig @192.168.1.1 example.com              # 특정 DNS 서버에 조회
+nslookup www.example.com                  # DNS 조회 (구버전 도구)
+host www.example.com                      # 간단한 DNS 조회
+```
+
+## 핵심 정리
+
+- Apache 주 설정: `/etc/httpd/conf/httpd.conf`, 문법 검사: `httpd -t`
+- 주요 지시자: `ServerName`, `DocumentRoot`, `Listen`, `<Directory>`, `<VirtualHost>`
+- 로그 경로: `/var/log/httpd/access_log`, `/var/log/httpd/error_log`
+- Nginx 설정: `/etc/nginx/nginx.conf`, 문법 검사: `nginx -t`, 재로드: `nginx -s reload`
+- DNS 레코드: A(IPv4), AAAA(IPv6), CNAME(별칭), MX(메일), NS(네임서버), PTR(역방향), TXT(텍스트)
+- `/etc/resolv.conf`: DNS 서버 지정, `/etc/hosts`: 로컬 이름 해석
+- BIND 설정: `/etc/named.conf`, 설정 검사: `named-checkconf`, 존 검사: `named-checkzone`
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Apache 설정 파일의 문법 오류를 사전에 확인하는 명령은?"
+  options={['httpd --check', 'httpd -t', 'apachectl start --test', 'httpd -v']}
+  correctAnswer={2}
+  explanation="httpd -t (또는 apachectl -t, apachectl configtest)로 Apache 설정 파일의 문법을 검사합니다. 'Syntax OK'가 출력되면 문법에 오류가 없습니다. httpd -v는 버전 정보를 출력합니다."
+  optionExplanations={['httpd --check 옵션은 없습니다.', '맞습니다. httpd -t로 설정 파일 문법을 검사합니다.', 'apachectl start --test 형식은 없습니다.', 'httpd -v는 버전 정보를 출력합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="도메인 이름을 IP 주소로 매핑하는 DNS 레코드 유형은? (IPv4 기준)"
+  options={['CNAME', 'MX', 'A', 'PTR']}
+  correctAnswer={3}
+  explanation="A 레코드는 도메인 이름을 IPv4 주소로 매핑합니다. IPv6는 AAAA 레코드를 사용합니다. CNAME은 도메인 별칭, MX는 메일 서버 지정, PTR은 IP에서 도메인으로의 역방향 조회에 사용됩니다."
+  optionExplanations={['CNAME은 도메인 별칭을 설정하는 레코드입니다.', 'MX는 메일 서버를 지정하는 레코드입니다.', '맞습니다. A 레코드는 도메인을 IPv4 주소로 매핑합니다.', 'PTR은 IP에서 도메인으로의 역방향 조회 레코드입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Nginx 설정 파일 변경 후 서비스를 중단하지 않고 설정을 재로드하는 명령은?"
+  options={['nginx -t', 'systemctl restart nginx', 'nginx -s reload', 'nginx --reload']}
+  correctAnswer={3}
+  explanation="nginx -s reload는 현재 연결을 유지하면서 설정 파일을 재로드합니다. systemctl restart nginx는 서비스를 완전히 재시작하므로 현재 연결이 끊길 수 있습니다. nginx -t는 문법 검사만 합니다."
+  optionExplanations={['nginx -t는 설정 문법 검사만 수행하고 재로드하지 않습니다.', 'systemctl restart는 완전한 재시작으로 현재 연결이 끊길 수 있습니다.', '맞습니다. nginx -s reload로 무중단 설정 재로드를 합니다.', 'nginx --reload 형식의 옵션은 없습니다.']}
+/>
+
+## 참고 자료
+
+- [KAIT 리눅스마스터 안내](https://kait.or.kr/user/MainMenuList.do?cateSeq=5&menuSeq=119)
+- [Linux man-pages project](https://man7.org/linux/man-pages/)

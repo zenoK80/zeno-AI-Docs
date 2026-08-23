@@ -1,59 +1,209 @@
 ---
 title: '17. DDL, DCL과 제약조건'
-description: '테이블 정의, 제약조건, 권한 제어의 역할을 구분합니다.'
+description: '테이블 구조를 정의하는 DDL, 권한을 관리하는 DCL, 그리고 데이터 무결성을 보장하는 제약조건을 익힙니다.'
 ---
 
 <Callout type="info">
-  **이번 문서의 목표:** NOT NULL은 빈 값을 막고 GRANT는 권한을 부여합니다.
+  **이번 문서의 목표:** CREATE TABLE로 제약조건을 설정하는 방법과 DDL이 자동으로 COMMIT된다는 특성을 이해합니다.
 </Callout>
 
-## 먼저 작은 상황을 봅니다
+## DDL이란?
 
-**DDL은 구조를 만들고 DCL은 사용자 권한을 관리합니다.**을(를) 다룰 때는 용어를 먼저 외우기보다, 무엇을 확인하고 어떤 결정을 내려야 하는지부터 잡는 편이 좋습니다.
+DDL(Data Definition Language)은 **데이터베이스 객체의 구조**를 정의하고 변경하는 명령입니다.
 
-| 확인할 항목 | 작은 사례 |
-| --- | --- |
-| 문제 상황 | DDL은 구조를 만들고 DCL은 사용자 권한을 관리합니다. |
-| 핵심 개념 | NOT NULL은 빈 값을 막고 GRANT는 권한을 부여합니다. |
-| 적용 예 | 핵심 개념을 문제의 조건과 결과에 연결해 판단합니다. |
-
-## 핵심 뜻
-
-NOT NULL은 빈 값을 막고 GRANT는 권한을 부여합니다.
-
-처음에는 낯선 말처럼 보여도 핵심은 간단합니다. 문제의 대상, 조건, 결과를 나누어 읽고 서로 어떻게 연결되는지 확인하는 것입니다.
-
-## 예시를 한 단계씩 읽어 봅니다
-
-핵심 개념을 문제의 조건과 결과에 연결해 판단합니다.
-
-1. 먼저 어떤 값 또는 규칙이 기준인지 확인합니다.
-2. 그 기준이 결과를 어떻게 바꾸는지 봅니다.
-3. 결과를 실제 업무 상황이나 표의 행으로 다시 해석합니다.
+| 명령     | 기능                        |
+| -------- | --------------------------- |
+| CREATE   | 객체 생성 (테이블, 인덱스 등) |
+| ALTER    | 객체 구조 변경              |
+| DROP     | 객체 삭제                   |
+| TRUNCATE | 테이블 데이터 전체 삭제     |
+| RENAME   | 객체 이름 변경              |
 
 <Callout type="warning">
-  **헷갈리기 쉬운 점:** 비슷한 용어라도 역할이 다르면 같은 뜻으로 섞으면 안 됩니다. 문제의 대상과 조건을 먼저 표시하세요.
+  **DDL은 실행 시 자동 COMMIT(묵시적 커밋)됩니다.** DDL 실행 전에 아직 COMMIT하지 않은 DML 변경 사항이 있다면, DDL 실행과 함께 그 DML도 자동 COMMIT됩니다.
 </Callout>
 
-## 시험에서 이렇게 확인합니다
+## CREATE TABLE과 제약조건
 
-- 정의 문제에서는 이 개념이 **무엇을 위한 것인지** 찾습니다.
-- 사례 문제에서는 필요한 조건이 실제로 충족되는지 확인합니다.
-- 선택지가 비슷하면 어떤 결과가 남거나 바뀌는지 끝까지 비교합니다.
+```sql
+CREATE TABLE EMP (
+  사원번호  NUMBER(4)     CONSTRAINT PK_EMP PRIMARY KEY,
+  이름      VARCHAR2(20)  NOT NULL,
+  부서번호  NUMBER(2),
+  직급      VARCHAR2(10),
+  급여      NUMBER(10)    CHECK (급여 > 0),
+  이메일    VARCHAR2(50)  UNIQUE,
+  관리자번호 NUMBER(4),
+  CONSTRAINT FK_EMP_DEPT
+    FOREIGN KEY (부서번호) REFERENCES DEPT(부서번호)
+);
+```
+
+### 주요 제약조건 정리
+
+| 제약조건    | 의미                                          | NULL 허용 |
+| ----------- | --------------------------------------------- | --------- |
+| PRIMARY KEY | 행을 유일하게 식별, NOT NULL + UNIQUE 효과    | 불가      |
+| FOREIGN KEY | 다른 테이블의 PK를 참조, 참조 무결성 유지     | 가능      |
+| UNIQUE      | 중복 값 불허, 여러 개 설정 가능              | 가능      |
+| NOT NULL    | NULL 값 불허                                  | 불가      |
+| CHECK       | 특정 조건을 만족하는 값만 허용               | 가능      |
+
+<Callout type="info">
+  PRIMARY KEY는 테이블당 **1개만** 설정할 수 있습니다. UNIQUE는 여러 개 설정 가능합니다. PRIMARY KEY는 자동으로 인덱스가 생성됩니다.
+</Callout>
+
+### 복합 PRIMARY KEY
+
+여러 컬럼을 합쳐 기본키로 설정하려면 테이블 레벨 제약조건을 사용합니다.
+
+```sql
+CREATE TABLE 수강(
+  학번    NUMBER(8),
+  과목코드 VARCHAR2(10),
+  성적    NUMBER(3),
+  CONSTRAINT PK_수강 PRIMARY KEY (학번, 과목코드)  -- 복합 PK
+);
+```
+
+## ALTER TABLE: 구조 변경
+
+### 컬럼 추가
+
+```sql
+ALTER TABLE EMP ADD (입사일 DATE);
+```
+
+### 컬럼 수정
+
+```sql
+-- 컬럼 크기 변경 (데이터가 없거나 크기를 늘릴 때만 가능)
+ALTER TABLE EMP MODIFY (이름 VARCHAR2(30));
+```
+
+### 컬럼 삭제
+
+```sql
+ALTER TABLE EMP DROP COLUMN 이메일;
+```
+
+### 제약조건 추가/삭제
+
+```sql
+-- 제약조건 추가
+ALTER TABLE EMP ADD CONSTRAINT UK_EMAIL UNIQUE (이메일);
+
+-- 제약조건 삭제
+ALTER TABLE EMP DROP CONSTRAINT UK_EMAIL;
+
+-- NOT NULL 제약조건 변경 (MODIFY 사용)
+ALTER TABLE EMP MODIFY (이름 VARCHAR2(20) NOT NULL);
+```
+
+## DROP TABLE
+
+```sql
+-- 테이블 삭제
+DROP TABLE EMP;
+
+-- 연관된 외래키 제약조건까지 함께 삭제
+DROP TABLE DEPT CASCADE CONSTRAINTS;
+```
+
+`CASCADE CONSTRAINTS`를 사용하면 해당 테이블을 참조하는 다른 테이블의 FOREIGN KEY 제약조건도 함께 삭제됩니다.
+
+## DCL이란?
+
+DCL(Data Control Language)은 데이터베이스 객체에 대한 **접근 권한**을 관리합니다.
+
+| 명령   | 기능                     |
+| ------ | ------------------------ |
+| GRANT  | 권한 부여                |
+| REVOKE | 권한 회수                |
+
+### 권한의 종류
+
+**시스템 권한**: 데이터베이스 전반에 걸친 권한
+
+```sql
+-- user01에게 테이블 생성 권한 부여
+GRANT CREATE TABLE TO user01;
+
+-- DBA 역할(role) 부여
+GRANT DBA TO user01;
+```
+
+**객체 권한**: 특정 객체(테이블, 뷰 등)에 대한 권한
+
+```sql
+-- user01에게 EMP 테이블 SELECT, INSERT 권한 부여
+GRANT SELECT, INSERT ON EMP TO user01;
+
+-- user02에게 EMP 테이블 UPDATE 권한 부여하고, 재부여 가능하게 설정
+GRANT UPDATE ON EMP TO user02 WITH GRANT OPTION;
+```
+
+`WITH GRANT OPTION`을 사용하면 권한을 받은 사용자가 다른 사용자에게 해당 권한을 다시 부여할 수 있습니다.
+
+### REVOKE: 권한 회수
+
+```sql
+-- user01의 EMP 테이블 SELECT 권한 회수
+REVOKE SELECT ON EMP FROM user01;
+```
+
+<Callout type="warning">
+  `WITH GRANT OPTION`으로 부여한 권한을 회수하면, 그 권한을 받은 사용자가 다른 사람에게 부여한 권한도 **연쇄적으로 회수(Cascade Revoke)**됩니다.
+</Callout>
+
+## DDL vs DML vs DCL 비교
+
+| 구분 | 명령            | 자동 COMMIT |
+| ---- | --------------- | ----------- |
+| DDL  | CREATE, ALTER, DROP, TRUNCATE, RENAME | **예** |
+| DML  | SELECT, INSERT, UPDATE, DELETE, MERGE | 아니오 |
+| DCL  | GRANT, REVOKE   | **예**      |
+| TCL  | COMMIT, ROLLBACK, SAVEPOINT | - |
 
 ## 핵심 정리
 
-- NOT NULL은 빈 값을 막고 GRANT는 권한을 부여합니다.
-- 조건과 결과를 연결해 보면 같은 개념을 새 사례에도 적용할 수 있습니다.
-- 용어를 결과와 연결하면 처음 보는 사례에도 적용할 수 있습니다.
+- **PRIMARY KEY**: NOT NULL + UNIQUE, 테이블당 1개, 자동 인덱스 생성
+- **FOREIGN KEY**: 참조 테이블의 PK 값만 허용, NULL 가능
+- **UNIQUE**: 중복 불허, NULL 가능, 여러 개 설정 가능
+- **CHECK**: 조건식으로 값의 범위/형식 제한
+- **ALTER TABLE**: 컬럼 추가(ADD), 수정(MODIFY), 삭제(DROP COLUMN), 제약조건 관리
+- **DDL 자동 COMMIT**: CREATE, ALTER, DROP, TRUNCATE 실행 시 자동 커밋
+- **CASCADE CONSTRAINTS**: 참조 관계에 있는 제약조건 연쇄 삭제
+- **WITH GRANT OPTION**: 권한을 재부여할 수 있는 권리도 함께 부여
 
 ## 마무리 복습
 
-<Quiz questionNumber={1} question="17. DDL, DCL과 제약조건에서 가장 먼저 확인할 것은 무엇인가요?" options={['NOT NULL은 빈 값을 막고 GRANT는 권한을 부여합니다.의 뜻과 역할', '글자 색상', '파일 이름만', '근거 없는 추측']} correctAnswer={1} explanation="NOT NULL은 빈 값을 막고 GRANT는 권한을 부여합니다.의 역할을 사례와 연결해야 다음 문제에도 적용할 수 있습니다." optionExplanations={['맞습니다. 핵심 개념의 역할을 확인합니다.','디자인 요소입니다.','이름만으로 판단할 수 없습니다.','조건과 근거가 필요합니다.']} />
+<Quiz
+  questionNumber={1}
+  question="다음 중 PRIMARY KEY 제약조건에 대한 설명으로 올바른 것은?"
+  options={['테이블에 여러 개 설정할 수 있다', 'NULL 값을 허용한다', 'NOT NULL과 UNIQUE 특성을 모두 가진다', '자동으로 인덱스가 생성되지 않는다']}
+  correctAnswer={3}
+  explanation="PRIMARY KEY는 NOT NULL(NULL 불허)과 UNIQUE(중복 불허) 특성을 모두 가지며, 자동으로 인덱스가 생성됩니다. 테이블당 1개만 설정할 수 있습니다."
+  optionExplanations={['PRIMARY KEY는 테이블당 1개만 설정할 수 있습니다.', 'PRIMARY KEY는 NULL을 허용하지 않습니다.', '정답입니다. PRIMARY KEY는 NOT NULL + UNIQUE 특성을 가집니다.', 'PRIMARY KEY는 자동으로 인덱스가 생성됩니다.']}
+/>
 
-<Quiz questionNumber={2} question="다음 사례를 가장 바르게 해석한 것은 무엇인가요? 문제의 조건과 결과를 함께 확인합니다." options={['조건과 결과를 함께 확인한다.', '모든 값을 같은 의미로 본다.', '검증 없이 결론을 확정한다.', '필요한 정보를 먼저 삭제한다.']} correctAnswer={1} explanation="사례의 조건을 읽고 NOT NULL은 빈 값을 막고 GRANT는 권한을 부여합니다.의 관점에서 결과를 판단해야 합니다." optionExplanations={['맞습니다. 조건과 결과의 연결을 확인합니다.','값의 의미를 잃게 됩니다.','검증이 필요합니다.','판단 기준을 없애면 안 됩니다.']} />
+<Quiz
+  questionNumber={2}
+  question="DML로 데이터를 수정하던 중 DDL을 실행하면 어떻게 됩니까?"
+  options={['DDL이 오류를 발생시킨다', 'DML 변경 내용이 ROLLBACK된다', 'DML 변경 내용이 자동으로 COMMIT된다', 'DDL은 DML에 영향을 주지 않는다']}
+  correctAnswer={3}
+  explanation="DDL은 실행 시 자동 COMMIT(묵시적 커밋)됩니다. DDL 실행 전에 커밋하지 않은 DML 변경 사항이 있으면, DDL과 함께 그 DML도 자동으로 COMMIT됩니다."
+  optionExplanations={['DDL은 정상 실행됩니다.', 'DML이 ROLLBACK되는 것이 아니라 자동 COMMIT됩니다.', '정답입니다. DDL 실행 시 미커밋 DML도 자동으로 COMMIT됩니다.', 'DDL은 묵시적 커밋을 유발하여 DML 트랜잭션을 종료시킵니다.']}
+/>
 
-<Quiz questionNumber={3} question="17. DDL, DCL과 제약조건에서 피해야 할 실수는 무엇인가요?" options={['작은 예시로 확인한다.', '결과가 나온 이유를 설명한다.', '비슷한 개념을 구분하지 않고 섞는다.', '조건이 바뀌면 결과도 확인한다.']} correctAnswer={3} explanation="비슷한 개념도 역할과 적용 조건이 다르므로 구분해야 합니다." optionExplanations={['좋은 학습 방법입니다.','좋은 학습 방법입니다.','맞습니다. 시험에서 자주 묻는 함정입니다.','좋은 점검 방법입니다.']} />
+<Quiz
+  questionNumber={3}
+  question="GRANT SELECT ON EMP TO user01 WITH GRANT OPTION; 을 실행한 후, user01이 user02에게 같은 권한을 부여했습니다. 이후 user01의 권한을 REVOKE하면?"
+  options={['user01의 권한만 회수된다', 'user01과 user02 모두 권한이 회수된다', 'user02의 권한은 유지된다', 'REVOKE가 실패한다']}
+  correctAnswer={2}
+  explanation="WITH GRANT OPTION으로 부여된 권한을 REVOKE하면, 해당 사용자가 다른 사람에게 재부여한 권한도 연쇄적으로 회수(Cascade Revoke)됩니다."
+  optionExplanations={['WITH GRANT OPTION이 있으면 연쇄 회수가 발생합니다.', '정답입니다. Cascade Revoke로 user01, user02 모두 권한이 회수됩니다.', '연쇄 회수로 인해 user02 권한도 함께 회수됩니다.', 'REVOKE는 정상 실행되며 연쇄 회수가 일어납니다.']}
+/>
 
 ## 참고 자료
 

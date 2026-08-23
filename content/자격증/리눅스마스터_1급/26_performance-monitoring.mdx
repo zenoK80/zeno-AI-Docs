@@ -1,88 +1,402 @@
 ---
 title: '26. 성능 모니터링과 자원 분석'
-description: 'CPU·메모리·디스크·네트워크 병목을 지표로 구분합니다.'
+description: 'CPU, 메모리, 디스크, 네트워크 자원을 분석하는 도구와 bottleneck 진단 방법을 학습합니다.'
 ---
 
 <Callout type="info">
-  **이번 문서의 목표:** 성능 문제는 CPU 사용률 하나로 판단하지 않습니다. 부하, 대기 시간, 메모리 부족, 디스크 I/O를 함께 보아야 합니다.
+  **이번 문서의 목표:** top, free, iostat, sar 등 핵심 성능 모니터링 도구의 출력을 해석하고, CPU → 메모리 → 디스크 → 네트워크 순으로 bottleneck을 찾는 체계적인 방법을 익힙니다.
 </Callout>
 
-## 서버가 느려졌을 때 어디부터 확인할지 정하는 상황
+## CPU 성능 분석
 
-리눅스 문제는 명령 하나를 외우는 것보다 **대상, 현재 상태, 바꿀 결과**를 순서대로 보는 편이 안전합니다. 이 상황에서 먼저 확인할 것은 무엇이 문제인지, 어떤 권한과 서비스가 관여하는지입니다.
+### top - 실시간 프로세스 모니터링
 
-| 확인 순서 | 질문 | 이 문서에서 보는 것 |
-| --- | --- | --- |
-| 1 | 대상은 무엇인가? | 파일, 계정, 서비스, 네트워크 중 대상을 고릅니다. |
-| 2 | 현재 상태는 어떤가? | 명령 결과와 로그를 먼저 확인합니다. |
-| 3 | 무엇을 바꿀까? | 필요한 설정만 최소 범위로 바꿉니다. |
+```bash
+# top 실행
+top
 
-## 핵심 뜻
+# 1초 간격 갱신, 배치 모드(스크립트에서 활용)
+top -d 1
+top -b -n 3    # 비대화형(-b), 3번 출력 후 종료(-n 3)
+```
 
-성능 문제는 CPU 사용률 하나로 판단하지 않습니다. 부하, 대기 시간, 메모리 부족, 디스크 I/O를 함께 보아야 합니다.
+**top 헤더 읽기:**
 
-여기서 중요한 것은 **명령의 이름**보다 실행 뒤에 무엇이 바뀌는지입니다. 명령은 상태를 확인하는 명령과 실제로 변경하는 명령으로 나누어 기억하면 실수가 줄어듭니다.
+```
+top - 14:32:01 up 5 days, 3:21,  2 users,  load average: 1.24, 0.87, 0.65
+Tasks: 215 total,   1 running, 214 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  23.5 us,  4.2 sy,  0.0 ni, 70.1 id,  1.8 wa,  0.0 hi,  0.4 si,  0.0 st
+MiB Mem :  15823.6 total,   2341.2 free,   8942.1 used,   4540.3 buff/cache
+MiB Swap:   4096.0 total,   4096.0 free,      0.0 used.   6312.4 avail Mem
+```
 
-## 직접 확인해 봅니다
+| 항목 | 설명 |
+|------|------|
+| `us` | 사용자 공간 CPU 사용률 |
+| `sy` | 커널(시스템) CPU 사용률 |
+| `id` | 유휴(idle) CPU - 낮을수록 CPU 부하 높음 |
+| `wa` | I/O 대기 - 높으면 디스크 병목 의심 |
+| `si` | 소프트웨어 인터럽트 |
+
+**top 인터랙티브 키:**
+
+| 키 | 동작 |
+|----|------|
+| `1` | CPU 코어별 사용률 표시 |
+| `M` | 메모리 사용량 순 정렬 |
+| `P` | CPU 사용률 순 정렬 |
+| `k` | 프로세스 종료 (PID 입력) |
+| `q` | 종료 |
+
+### htop - 개선된 대화형 모니터링
+
+```bash
+# htop 실행 (설치 필요: dnf install htop)
+htop
+
+# 특정 사용자의 프로세스만 표시
+htop -u nginx
+```
+
+htop은 컬러 막대 그래프로 CPU·메모리를 시각적으로 보여주며 마우스 조작도 지원합니다.
+
+### mpstat - CPU 코어별 통계
+
+```bash
+# 모든 CPU 코어의 1초 간격 통계 (sysstat 패키지 필요)
+mpstat -P ALL 1
+
+# 5회 측정
+mpstat -P ALL 1 5
+```
+
+출력 예시:
+
+```
+09:00:01 AM  CPU    %usr   %sys  %iowait  %idle
+09:00:02 AM  all   25.4    3.2     1.1    70.3
+09:00:02 AM    0   48.5    5.1     0.5    45.9
+09:00:02 AM    1    2.3    1.3     1.7    94.7
+```
+
+코어 0만 과부하이고 코어 1이 여유 있다면 **단일 스레드 프로그램이 병목**일 가능성이 높습니다.
+
+### sar - 시스템 활동 보고서
+
+```bash
+# CPU 사용률 1초 간격 5회 측정
+sar -u 1 5
+
+# 모든 통계 출력
+sar -A
+
+# 특정 날짜의 기록 데이터 조회 (/var/log/sa/ 에 저장됨)
+sar -u -f /var/log/sa/sa15    # 이달 15일 데이터
+```
+
+### uptime - 로드 애버리지 확인
 
 ```bash
 uptime
+# 출력: 14:32:01 up 5 days, 3:21,  2 users,  load average: 1.24, 0.87, 0.65
+```
+
+**로드 애버리지 해석:**
+
+- 세 숫자는 각각 **1분, 5분, 15분** 평균 실행 대기 프로세스 수입니다.
+- **CPU 코어 수 = 부하 한계**: 4코어 시스템에서 로드 4.0이면 100% 사용 중
+- **코어 수 초과 시 과부하**: 4코어에서 로드 8.0이면 200% 과부하
+- 1분 > 15분이면 부하가 증가 중, 1분 < 15분이면 부하가 줄어드는 중
+
+```bash
+# CPU 코어 수 확인
+nproc
+grep -c processor /proc/cpuinfo
+```
+
+<Callout type="warning">
+  **시험 포인트:** 로드 애버리지가 CPU 코어 수를 지속적으로 초과하면 과부하 상태입니다. 예: 2코어 시스템에서 load average가 4.0이면 프로세스가 CPU를 기다리며 대기하고 있습니다.
+</Callout>
+
+## 메모리 성능 분석
+
+### free - 메모리 사용량 개요
+
+```bash
+# 사람이 읽기 쉬운 단위로 출력
 free -h
-df -h
-top
+
+# MB 단위
+free -m
+
+# 1초 간격 3회 반복
+free -h -s 1 -c 3
+```
+
+출력 예시:
+
+```
+              total        used        free      shared  buff/cache   available
+Mem:           15Gi        8.7Gi       2.2Gi       512Mi       4.4Gi       6.1Gi
+Swap:         4.0Gi          0B       4.0Gi
+```
+
+| 항목 | 설명 |
+|------|------|
+| `total` | 전체 물리 메모리 |
+| `used` | 실제 사용 중인 메모리 |
+| `free` | 완전히 비어 있는 메모리 |
+| `buff/cache` | 버퍼·캐시로 사용 중 (필요 시 반환 가능) |
+| `available` | 실제로 새 프로세스가 사용 가능한 메모리 |
+
+<Callout type="info">
+  **중요:** `free`가 작아도 `available`이 충분하면 메모리 부족이 아닙니다. Linux는 남는 메모리를 디스크 캐시로 활용하므로 `free`가 항상 작습니다.
+</Callout>
+
+### vmstat - 가상 메모리 통계
+
+```bash
+# 1초 간격 5회 측정
 vmstat 1 5
 ```
 
-위 예시는 시험에서 자주 나오는 기본 흐름입니다. 실습 환경에서는 먼저 읽기 전용 확인 명령을 실행하고, 그 다음에 변경 명령을 실행하세요. 변경 전후 결과를 비교하면 옵션의 의미가 더 잘 남습니다.
+출력 예시:
+
+```
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 2  0      0 2287944  98312 4529124    0    0     5    12  142  287 23  4 72  1  0
+```
+
+| 항목 | 설명 |
+|------|------|
+| `r` | 실행 대기 중인 프로세스 수 (CPU 코어 수 초과 시 병목) |
+| `b` | I/O 대기로 블록된 프로세스 수 |
+| `si/so` | 스왑 in/out (0이 아니면 메모리 부족) |
+| `wa` | CPU I/O 대기 비율 |
+
+### /proc/meminfo - 상세 메모리 정보
+
+```bash
+cat /proc/meminfo
+
+# 주요 항목만 확인
+grep -E 'MemTotal|MemFree|MemAvailable|SwapTotal|SwapFree' /proc/meminfo
+```
+
+### 스왑 관리
+
+```bash
+# 스왑 사용 현황
+swapon -s
+swapon --show    # 현대적 문법
+
+# 스왑 비활성화 (메모리 여유 있을 때)
+swapoff -a
+
+# 스왑 재활성화
+swapon -a
+
+# 스왑 파일 생성 및 활성화
+dd if=/dev/zero of=/swapfile bs=1M count=2048
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+```
 
 <Callout type="warning">
-  **헷갈리기 쉬운 점:** CPU 사용률만 보고 디스크 대기나 메모리 부족을 놓치는 실수입니다. 운영 환경에서는 명령을 실행하기 전에 대상 경로·서비스 이름·권한 범위를 한 번 더 확인하세요.
+  **스왑 경보:** vmstat에서 `si`(swap in) 또는 `so`(swap out)이 지속적으로 0이 아니면 메모리가 부족하여 스왑을 사용하고 있는 것입니다. 이는 성능 저하의 주요 원인입니다.
 </Callout>
 
-## 시험에서는 이렇게 판단합니다
+## 디스크 I/O 분석
 
-- 보기에 나온 명령이 **조회**인지 **변경**인지 먼저 구분합니다.
-- 경로나 옵션이 하나라도 다르면 결과가 달라질 수 있으므로 끝까지 읽습니다.
-- 권한·보안 문제는 "무엇을 허용하고 무엇을 막는가"로 설명합니다.
-- 서술형은 명령만 적지 말고 실행 목적과 기대 결과를 한 문장으로 붙입니다.
+### iostat - 디스크 I/O 통계
+
+```bash
+# 확장 통계 (-x), 1초 간격 반복
+iostat -x 1
+
+# 특정 횟수만 측정
+iostat -x 1 5
+
+# 특정 디바이스만
+iostat -x sda 1 5
+```
+
+주요 출력 필드:
+
+| 필드 | 설명 |
+|------|------|
+| `%util` | 디스크 사용률 - **100%에 가까우면 I/O 병목** |
+| `await` | 평균 I/O 대기 시간 (ms) - 낮을수록 좋음 |
+| `r/s`, `w/s` | 초당 읽기/쓰기 요청 수 |
+| `rkB/s`, `wkB/s` | 초당 읽기/쓰기 처리량 (KB) |
+| `svctm` | 평균 I/O 서비스 시간 (ms) |
+
+### iotop - 프로세스별 I/O 사용량
+
+```bash
+# 실시간 I/O 사용 프로세스 (root 권한 필요)
+iotop
+
+# 실제 I/O 발생 프로세스만 표시
+iotop -o
+```
+
+### 디스크 용량 확인
+
+```bash
+# 파일 시스템별 사용량
+df -h
+
+# 특정 경로의 파일 시스템 정보
+df -h /var
+
+# 아이노드(inode) 사용량 (inode 고갈도 df -h에서는 안 보임)
+df -i
+
+# 디렉토리별 사용량 (대용량 소비 경로 찾기)
+du -sh /*
+du -sh /var/*
+
+# 상위 10개 대용량 디렉토리 찾기
+du -sh /* 2>/dev/null | sort -rh | head -10
+```
+
+<Callout type="info">
+  **inode 고갈 주의:** 디스크 용량이 남아 있어도 inode가 고갈되면 파일을 생성할 수 없습니다. 소형 파일이 수백만 개 있는 경우 `df -i`로 inode 사용률을 반드시 확인하세요.
+</Callout>
+
+## 네트워크 성능 분석
+
+### sar -n DEV - 네트워크 인터페이스 통계
+
+```bash
+# 네트워크 인터페이스별 1초 간격 측정
+sar -n DEV 1 5
+
+# TCP 소켓 통계
+sar -n TCP 1 5
+```
+
+### nethogs - 프로세스별 네트워크 사용량
+
+```bash
+# 설치: dnf install nethogs
+# 어떤 프로세스가 대역폭을 소비하는지 확인
+nethogs eth0
+```
+
+### iftop - 연결별 네트워크 대역폭
+
+```bash
+# 설치: dnf install iftop
+# 인터페이스별 송수신 대역폭 실시간 확인
+iftop -i eth0
+```
+
+### nload - 네트워크 트래픽 그래프
+
+```bash
+# 설치: dnf install nload
+nload eth0
+```
+
+## sar 종합 활용
+
+`sar`(System Activity Reporter)는 가장 강력한 종합 성능 분석 도구입니다.
+
+```bash
+# sysstat 서비스 활성화 (자동 수집 설정)
+systemctl enable sysstat
+systemctl start sysstat
+
+# /var/log/sa/ 에 일별 데이터 저장됨
+ls /var/log/sa/
+
+# CPU 사용률 과거 데이터 조회
+sar -u -f /var/log/sa/sa20    # 이달 20일
+
+# 메모리 통계
+sar -r 1 5
+
+# 디스크 I/O
+sar -d 1 5
+
+# 네트워크
+sar -n DEV 1 5
+
+# 모든 통계 출력
+sar -A
+```
+
+## dstat - 종합 통계 도구
+
+```bash
+# 설치: dnf install dstat
+# CPU, 메모리, 디스크, 네트워크를 한 화면에
+dstat
+
+# 1초 간격, 10회
+dstat 1 10
+
+# 특정 항목만 (cpu + memory + disk + net)
+dstat -cdmn
+
+# 프로세스 정보 포함
+dstat --top-cpu --top-mem --top-io
+```
+
+## 성능 분석 체계적 접근법
+
+병목(bottleneck)을 찾을 때는 **CPU → 메모리 → 디스크 → 네트워크** 순으로 분석합니다.
+
+```bash
+# 1단계: CPU 확인
+uptime                    # 로드 애버리지 확인
+top                       # CPU 사용률 높은 프로세스 파악
+mpstat -P ALL 1 3         # 코어별 사용률
+
+# 2단계: 메모리 확인
+free -h                   # 메모리/스왑 사용량
+vmstat 1 5                # si/so(스왑 I/O) 확인
+
+# 3단계: 디스크 I/O 확인
+iostat -x 1 5             # %util, await 확인
+iotop -o                  # I/O 유발 프로세스
+
+# 4단계: 네트워크 확인
+sar -n DEV 1 5            # 대역폭 사용량
+ss -s                     # 소켓 통계 요약
+```
+
+| 증상 | 의심 원인 | 확인 명령 |
+|------|---------|---------|
+| 로드 애버리지 높음 + CPU idle 낮음 | CPU 병목 | `top`, `mpstat` |
+| 로드 애버리지 높음 + wa 높음 | 디스크 병목 | `iostat -x`, `iotop` |
+| si/so 지속 발생 | 메모리 부족 | `free -h`, `vmstat` |
+| 네트워크 응답 느림 | 대역폭 포화 | `sar -n DEV`, `iftop` |
 
 ## 핵심 정리
 
-- 성능 문제는 CPU 사용률 하나로 판단하지 않습니다. 부하, 대기 시간, 메모리 부족, 디스크 I/O를 함께 보아야 합니다.
-- 상태 확인 후 필요한 변경만 적용합니다.
-- CPU 사용률만 보고 디스크 대기나 메모리 부족을 놓치는 실수을 피하고, 결과로 다시 검증합니다.
+- **uptime 로드 애버리지:** 1분/5분/15분, CPU 코어 수 초과 = 과부하
+- **top %wa:** I/O 대기 - 높으면 디스크 병목
+- **free -h available:** 실제 사용 가능 메모리 (buff/cache는 반환 가능)
+- **vmstat si/so:** 0이 아니면 스왑 사용 중 → 메모리 부족
+- **iostat %util:** 100% 근접 = 디스크 I/O 포화
+- **sar:** /var/log/sa/에 기록, 과거 데이터 분석 가능
+- **dstat:** CPU·메모리·디스크·네트워크 종합 통계
+- **분석 순서:** CPU → 메모리 → 디스크 → 네트워크
 
 ## 마무리 복습
 
-<Quiz
-  questionNumber={1}
-  question="26. 성능 모니터링과 자원 분석에서 가장 먼저 확인할 태도는 무엇인가요?"
-  options={["성능 문제는 CPU 사용률 하나로 판단하지 않습니다. 부하, 대기 시간, 메모리 부족, 디스크 I/O를 함께 보아야 합니다.의 목적과 적용 조건을 확인한다.","명령 이름만 외우고 결과는 보지 않는다.","CPU 사용률만 보고 디스크 대기나 메모리 부족을 놓치는 실수을 그대로 적용한다.","문제와 관계없는 설정부터 바꾼다."]}
-  correctAnswer={1}
-  explanation="리눅스 운영 문제는 개념의 목적과 적용 조건을 확인한 뒤 명령을 선택해야 합니다."
-  optionExplanations={['맞습니다. 목적과 조건을 먼저 확인합니다.','명령 이름만으로는 안전한 판단을 할 수 없습니다.','이 문서에서 짚은 흔한 실수입니다.','증거 없이 설정을 바꾸면 장애를 키울 수 있습니다.']}
-/>
+<Quiz questionNumber={1} question="4코어 CPU 시스템에서 uptime 명령의 로드 애버리지가 '8.0, 6.5, 4.2'로 출력되었다. 이 상황을 올바르게 설명한 것은?" options={["1분 평균 로드가 8.0으로 과부하 상태이며, 15분 전과 비교해 부하가 증가하고 있다", "로드 애버리지 8.0은 CPU가 8개 필요하다는 의미이며 현재는 정상 상태이다", "15분 평균이 4.2이므로 CPU 코어 수와 동일하여 부하가 없는 상태이다", "로드 애버리지는 메모리 사용량을 나타내므로 CPU와는 무관하다"]} correctAnswer={1} explanation="4코어에서 로드 애버리지 8.0은 코어 수의 2배로 심각한 과부하입니다. 1분(8.0) > 5분(6.5) > 15분(4.2)이므로 시간이 지날수록 부하가 증가하고 있습니다. 반대로 1분 < 15분이면 부하가 줄고 있는 것입니다." optionExplanations={["정답입니다. 4코어에서 8.0은 200% 과부하이며, 수치가 갈수록 커지므로 부하가 증가 중입니다.", "로드 8.0은 4코어에서 2배 과부하 상태입니다. 정상이 아닙니다.", "15분 평균 4.2도 코어 수(4)와 거의 같아 포화 상태이며, 1분 값이 훨씬 높습니다.", "로드 애버리지는 CPU 실행 대기 프로세스 수를 나타냅니다. 메모리와는 무관합니다."]} />
 
-<Quiz
-  questionNumber={2}
-  question="명령을 실행하기 전 가장 알맞은 순서는 무엇인가요?"
-  options={['현재 상태 확인 → 필요한 변경 → 결과 검증', '변경 → 로그 삭제 → 상태 확인', '재부팅 → 추측 → 변경', '모든 설정을 동시에 수정']}
-  correctAnswer={1}
-  explanation="현재 상태를 확인한 뒤 최소 범위로 바꾸고 결과를 검증해야 원인을 추적할 수 있습니다."
-  optionExplanations={['맞습니다. 안전한 운영 기본 순서입니다.','로그는 원인 파악의 근거입니다.','재부팅만으로 원인을 알 수 없습니다.','변경 범위가 넓으면 원인 추적이 어려워집니다.']}
-/>
+<Quiz questionNumber={2} question="iostat -x 1 명령의 출력에서 %util 항목이 98%로 지속될 때 의미하는 것은?" options={["CPU 사용률이 98%로 CPU 병목 상태임", "메모리 사용률이 98%로 스왑을 사용 중임", "해당 디스크 장치가 거의 포화 상태로 I/O 병목이 발생함", "네트워크 대역폭이 98% 사용 중임"]} correctAnswer={3} explanation="iostat의 %util은 해당 디스크 장치의 사용률입니다. 98%는 거의 포화 상태로, I/O 요청이 큐에 쌓여 응답 지연(await 증가)이 발생합니다. CPU 과부하는 top의 %id(idle)가 낮을 때 확인합니다." optionExplanations={["CPU 사용률은 top의 %us+%sy, mpstat으로 확인합니다.", "스왑 사용은 free -h의 Swap used, vmstat의 si/so로 확인합니다.", "정답입니다. %util이 100%에 근접하면 디스크 I/O가 병목입니다. await 값도 함께 확인합니다.", "네트워크 대역폭은 sar -n DEV, iftop으로 확인합니다."]} />
 
-<Quiz
-  questionNumber={3}
-  question="26. 성능 모니터링과 자원 분석에서 피해야 할 실수는 무엇인가요?"
-  options={['결과를 다시 확인한다.', '대상과 경로를 확인한다.', 'CPU 사용률만 보고 디스크 대기나 메모리 부족을 놓치는 실수', '로그를 근거로 판단한다.']}
-  correctAnswer={3}
-  explanation="CPU 사용률만 보고 디스크 대기나 메모리 부족을 놓치는 실수은 잘못된 변경이나 원인 오판으로 이어질 수 있습니다."
-  optionExplanations={['좋은 점검 방법입니다.','좋은 점검 방법입니다.','맞습니다. 이 문서의 주의점입니다.','좋은 점검 방법입니다.']}
-/>
+<Quiz questionNumber={3} question="free -h 출력에서 메모리 가용량을 판단할 때 봐야 할 올바른 항목은?" options={["free 항목 - 완전히 비어 있는 메모리만 계산", "used 항목 - 사용 중인 메모리를 total에서 뺀 값", "available 항목 - 실제로 새 프로세스에 할당 가능한 메모리", "buff/cache 항목 - 이 값이 0이어야 정상"]} correctAnswer={3} explanation="Linux는 남는 메모리를 버퍼·캐시로 활용하므로 free 값은 항상 작습니다. 실제 가용 메모리는 available 항목으로, buff/cache를 필요 시 반환한 후 새 프로세스가 사용할 수 있는 메모리를 나타냅니다." optionExplanations={["free는 완전히 비어 있는 메모리로, 실제 가용량과 다릅니다. Linux가 캐시로 활용하므로 항상 작습니다.", "used는 현재 사용 중인 메모리이며, 가용량은 total - used가 아닌 available로 봅니다.", "정답입니다. available은 buff/cache에서 반환 가능한 메모리를 포함한 실제 가용량입니다.", "buff/cache는 0이면 오히려 캐시가 없어 I/O 성능이 낮아집니다. 큰 값이 정상입니다."]} />
 
 ## 참고 자료
 
 - [KAIT 리눅스마스터 안내](https://kait.or.kr/user/MainMenuList.do?cateSeq=5&menuSeq=119)
-- [GNU Bash Reference Manual](https://www.gnu.org/software/bash/manual/)
 - [Linux man-pages project](https://man7.org/linux/man-pages/)

@@ -1,86 +1,349 @@
 ---
 title: '07. 패키지 관리와 소스 설치'
-description: '패키지 관리자로 설치·조회·업데이트하고 소스 설치와 차이를 구분합니다.'
+description: 'RPM, YUM/DNF, APT 패키지 관리 도구의 주요 옵션과 소스 컴파일 설치 3단계를 익힌다.'
 ---
 
 <Callout type="info">
-  **이번 문서의 목표:** 패키지 관리자는 의존성을 함께 처리합니다. 소스 설치는 버전을 세밀하게 고를 수 있지만 업데이트와 제거를 직접 관리해야 합니다.
+  **이번 문서의 목표:** RPM 옵션(설치/조회/삭제)을 정확히 구분하고, YUM/DNF와 RPM의 차이(의존성 자동 해결)를 설명하며, 소스 컴파일 설치의 3단계 순서를 숙지한다.
 </Callout>
 
-## 웹 서버 도구를 설치하기 전에 제공 패키지를 찾는 상황
+## 패키지 관리 개요
 
-리눅스 문제는 명령 하나를 외우는 것보다 **대상, 현재 상태, 바꿀 결과**를 순서대로 보는 편이 안전합니다. 이 상황에서 먼저 확인할 것은 무엇이 문제인지, 어떤 권한과 서비스가 관여하는지입니다.
+| 계열 | 패키지 형식 | 저수준 도구 | 고수준 도구 |
+|------|-------------|-------------|-------------|
+| Red Hat 계열 | `.rpm` | `rpm` | `yum`, `dnf` |
+| Debian 계열 | `.deb` | `dpkg` | `apt`, `apt-get` |
 
-| 확인 순서 | 질문 | 이 문서에서 보는 것 |
-| --- | --- | --- |
-| 1 | 대상은 무엇인가? | 파일, 계정, 서비스, 네트워크 중 대상을 고릅니다. |
-| 2 | 현재 상태는 어떤가? | 명령 결과와 로그를 먼저 확인합니다. |
-| 3 | 무엇을 바꿀까? | 필요한 설정만 최소 범위로 바꿉니다. |
+- **저수준 도구(rpm, dpkg):** 파일 직접 설치. 의존성 자동 해결 없음
+- **고수준 도구(yum, dnf, apt):** 저장소(repository)에서 패키지와 의존성을 자동으로 찾아 설치
 
-## 핵심 뜻
+## RPM (Red Hat Package Manager)
 
-패키지 관리자는 의존성을 함께 처리합니다. 소스 설치는 버전을 세밀하게 고를 수 있지만 업데이트와 제거를 직접 관리해야 합니다.
+RPM은 `.rpm` 패키지 파일을 직접 다루는 저수준 도구다. 의존성이 있을 경우 수동으로 해결해야 한다.
 
-여기서 중요한 것은 **명령의 이름**보다 실행 뒤에 무엇이 바뀌는지입니다. 명령은 상태를 확인하는 명령과 실제로 변경하는 명령으로 나누어 기억하면 실수가 줄어듭니다.
+### rpm 패키지 파일명 규칙
 
-## 직접 확인해 봅니다
-
-```bash
-dnf search httpd
-dnf install httpd
-rpm -q httpd
+```
+nginx-1.24.0-1.el9.x86_64.rpm
+ │      │     │    │      │
+ │      │     │    │      └─ 아키텍처 (x86_64, i686, noarch)
+ │      │     │    └─────── OS/배포판 (el9 = RHEL9)
+ │      │     └──────────── 릴리즈 번호
+ │      └────────────────── 버전
+ └───────────────────────── 패키지명
 ```
 
-위 예시는 시험에서 자주 나오는 기본 흐름입니다. 실습 환경에서는 먼저 읽기 전용 확인 명령을 실행하고, 그 다음에 변경 명령을 실행하세요. 변경 전후 결과를 비교하면 옵션의 의미가 더 잘 남습니다.
+### rpm 설치/업그레이드/삭제
 
-<Callout type="warning">
-  **헷갈리기 쉬운 점:** Debian 계열의 `apt`와 RPM 계열의 `dnf` 명령을 섞는 실수입니다. 운영 환경에서는 명령을 실행하기 전에 대상 경로·서비스 이름·권한 범위를 한 번 더 확인하세요.
+```bash
+# 패키지 설치 (-i: install, -v: verbose, -h: 진행률 표시)
+rpm -ivh nginx-1.24.0-1.el9.x86_64.rpm
+# 출력 예시
+Verifying...                          ################################# [100%]
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:nginx-1.24.0-1.el9               ################################# [100%]
+
+# 업그레이드 (-U: upgrade, 없으면 설치도 됨)
+rpm -Uvh nginx-1.25.0-1.el9.x86_64.rpm
+
+# 신버전이 있을 때만 업그레이드 (-F: freshen)
+rpm -Fvh nginx-*.rpm
+
+# 패키지 삭제 (-e: erase)
+rpm -e nginx
+```
+
+### rpm 조회(Query) 옵션
+
+조회 옵션은 반드시 `-q`를 붙인다.
+
+```bash
+# 설치된 모든 패키지 목록
+rpm -qa
+# 출력 예시 (일부)
+bash-5.1.8-6.el9.x86_64
+glibc-2.34-60.el9.x86_64
+nginx-1.24.0-1.el9.x86_64
+
+# 특정 패키지 설치 여부 확인
+rpm -q nginx
+# 출력 예시 (설치됨)
+nginx-1.24.0-1.el9.x86_64
+# 출력 예시 (미설치)
+package nginx is not installed
+
+# 패키지 상세 정보 (-qi: query info)
+rpm -qi nginx
+# 출력 예시
+Name        : nginx
+Version     : 1.24.0
+Release     : 1.el9
+Architecture: x86_64
+Install Date: Mon 15 Jan 2024 09:30:00 AM KST
+Group       : System Environment/Daemons
+Size        : 3012345
+License     : BSD
+Description : Nginx is a web server...
+
+# 패키지에 속한 파일 목록 (-ql: query list)
+rpm -ql nginx
+# 출력 예시
+/etc/logrotate.d/nginx
+/etc/nginx/nginx.conf
+/usr/sbin/nginx
+/var/log/nginx
+
+# 특정 파일이 어느 패키지에 속하는지 (-qf: query file)
+rpm -qf /usr/sbin/nginx
+# 출력 예시
+nginx-1.24.0-1.el9.x86_64
+
+# 패키지의 의존성 확인 (-qR: query requires)
+rpm -qR nginx
+# 출력 예시
+/bin/sh
+libc.so.6()(64bit)
+libcrypto.so.3()(64bit)
+```
+
+| 옵션 조합 | 설명 |
+|-----------|------|
+| `-qa` | 설치된 모든 패키지 |
+| `-q 패키지명` | 특정 패키지 설치 여부 |
+| `-qi 패키지명` | 패키지 상세 정보 |
+| `-ql 패키지명` | 패키지 파일 목록 |
+| `-qf 파일경로` | 파일이 속한 패키지 |
+| `-qR 패키지명` | 의존성 목록 |
+| `-ivh` | 설치 + 진행률 |
+| `-Uvh` | 업그레이드 |
+| `-e` | 삭제 |
+
+## YUM / DNF (의존성 자동 해결)
+
+YUM(Yellowdog Updater Modified)은 RPM 기반 고수준 패키지 관리자다. DNF는 YUM의 개선판으로 Fedora, Rocky Linux 9+에서 기본 사용한다. 명령어 문법은 거의 동일하다.
+
+```bash
+# 패키지 설치 (의존성 자동 해결)
+yum install nginx
+dnf install nginx
+# 출력 예시
+Dependencies resolved.
+==============================================
+ Package       Arch     Version    Repository Size
+==============================================
+Installing:
+ nginx         x86_64   1.24.0     appstream  587 k
+Installing dependencies:
+ nginx-core    x86_64   1.24.0     appstream  567 k
+ ...
+Is this ok [y/N]: y
+
+# 패키지 삭제
+yum remove nginx
+dnf remove nginx
+
+# 패키지 업데이트
+yum update nginx
+dnf update nginx
+
+# 모든 패키지 업데이트
+yum update
+dnf upgrade
+
+# 패키지 검색
+yum search web server
+dnf search nginx
+
+# 패키지 정보 조회
+yum info nginx
+dnf info nginx
+# 출력 예시
+Name         : nginx
+Version      : 1.24.0
+Release      : 1.el9
+Architecture : x86_64
+Summary      : A high performance web server
+...
+
+# 설치된 패키지 목록
+yum list installed
+dnf list installed
+
+# 사용 가능한 패키지 목록
+yum list available
+dnf list available
+
+# 저장소 목록 확인
+yum repolist
+dnf repolist
+# 출력 예시
+repo id          repo name                           status
+appstream        Rocky Linux 9 - AppStream           enabled
+baseos           Rocky Linux 9 - BaseOS              enabled
+```
+
+### YUM vs RPM 핵심 차이
+
+| 구분 | RPM | YUM/DNF |
+|------|-----|---------|
+| 의존성 해결 | 수동 | 자동 |
+| 패키지 소스 | 로컬 .rpm 파일 | 온라인 저장소 |
+| 사용 편의성 | 낮음 | 높음 |
+| 패키지 검색 | 불가 | 가능 |
+
+## APT (Debian 계열)
+
+```bash
+# 패키지 목록 업데이트 (설치 전 반드시 실행)
+apt-get update
+# 출력 예시
+Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease
+Get:2 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [119 kB]
+...
+
+# 패키지 설치
+apt-get install nginx
+
+# 패키지 삭제 (설정 파일 유지)
+apt-get remove nginx
+
+# 패키지 삭제 (설정 파일까지 삭제)
+apt-get purge nginx
+
+# 모든 패키지 업그레이드
+apt-get upgrade
+
+# 패키지 검색
+apt-cache search web server
+
+# 패키지 정보
+apt-cache show nginx
+
+# 설치된 패키지 목록 (dpkg)
+dpkg -l
+dpkg -l nginx
+
+# 파일이 속한 패키지 (dpkg)
+dpkg -S /usr/sbin/nginx
+# 출력 예시
+nginx: /usr/sbin/nginx
+```
+
+## 소스 컴파일 설치 (3단계)
+
+소스 코드에서 직접 컴파일하여 설치하는 방법. 패키지 저장소에 없거나 최신 버전이 필요할 때 사용한다.
+
+### 1단계: ./configure - 환경 설정 및 Makefile 생성
+
+```bash
+# 압축 풀기
+tar -xzf nginx-1.25.3.tar.gz
+cd nginx-1.25.3
+
+# configure 실행 (설치 경로, 활성화할 모듈 등 지정)
+./configure --prefix=/usr/local/nginx --with-http_ssl_module
+# 출력 예시
+checking for OS
+ + Linux 5.15.0-91-generic x86_64
+checking for C compiler ... found
+ + using GNU C compiler
+ + gcc version: 11.4.0
+...
+Configuration summary
+  + using system PCRE2 library
+  + OpenSSL library: /usr/lib/x86_64-linux-gnu
+nginx path prefix: "/usr/local/nginx"
+```
+
+`configure`는 시스템 환경(컴파일러, 라이브러리)을 확인하고 컴파일 설정이 담긴 `Makefile`을 생성한다.
+
+### 2단계: make - 컴파일
+
+```bash
+# 소스 컴파일 (CPU 코어 수만큼 병렬 처리 -j)
+make -j4
+# 출력 예시
+make -f objs/Makefile
+make[1]: Entering directory '/root/nginx-1.25.3'
+cc -c -pipe -O -W -Wall -Wpointer-arith ...
+...
+make[1]: Leaving directory '/root/nginx-1.25.3'
+```
+
+### 3단계: make install - 설치
+
+```bash
+# 컴파일된 파일을 시스템에 복사 (root 권한 필요)
+make install
+# 출력 예시
+make -f objs/Makefile install
+make[1]: Entering directory '/root/nginx-1.25.3'
+test -d '/usr/local/nginx' || mkdir -p '/usr/local/nginx'
+cp conf/nginx.conf '/usr/local/nginx/conf/nginx.conf'
+...
+```
+
+### 전체 소스 설치 흐름
+
+```bash
+# 완전한 소스 설치 예시
+wget https://nginx.org/download/nginx-1.25.3.tar.gz
+tar -xzf nginx-1.25.3.tar.gz
+cd nginx-1.25.3
+./configure --prefix=/usr/local/nginx
+make
+make install
+
+ls /usr/local/nginx/
+# 출력 예시
+conf/  html/  logs/  sbin/
+```
+
+<Callout type="info">
+  소스 설치 순서: **configure → make → make install** 이 순서는 반드시 암기해야 한다. configure 없이 make 실행 시 Makefile이 없어 오류가 발생한다.
 </Callout>
-
-## 시험에서는 이렇게 판단합니다
-
-- 보기에 나온 명령이 **조회**인지 **변경**인지 먼저 구분합니다.
-- 경로나 옵션이 하나라도 다르면 결과가 달라질 수 있으므로 끝까지 읽습니다.
-- 권한·보안 문제는 "무엇을 허용하고 무엇을 막는가"로 설명합니다.
-- 서술형은 명령만 적지 말고 실행 목적과 기대 결과를 한 문장으로 붙입니다.
 
 ## 핵심 정리
 
-- 패키지 관리자는 의존성을 함께 처리합니다. 소스 설치는 버전을 세밀하게 고를 수 있지만 업데이트와 제거를 직접 관리해야 합니다.
-- 상태 확인 후 필요한 변경만 적용합니다.
-- Debian 계열의 `apt`와 RPM 계열의 `dnf` 명령을 섞는 실수을 피하고, 결과로 다시 검증합니다.
+- RPM: 의존성 수동 해결. `-ivh`(설치), `-Uvh`(업그레이드), `-e`(삭제)
+- RPM 조회: `-qa`(전체목록), `-qi`(정보), `-ql`(파일목록), `-qf`(파일→패키지)
+- YUM/DNF: 의존성 자동 해결. `install/remove/update/search/info`
+- APT: Debian 계열. `apt-get update` → `apt-get install`
+- `dpkg -l`: 설치된 패키지 목록, `dpkg -S 파일`: 파일이 속한 패키지
+- 소스 설치 3단계: `./configure` → `make` → `make install`
 
 ## 마무리 복습
 
 <Quiz
   questionNumber={1}
-  question="07. 패키지 관리와 소스 설치에서 가장 먼저 확인할 태도는 무엇인가요?"
-  options={["패키지 관리자는 의존성을 함께 처리합니다. 소스 설치는 버전을 세밀하게 고를 수 있지만 업데이트와 제거를 직접 관리해야 합니다.의 목적과 적용 조건을 확인한다.","명령 이름만 외우고 결과는 보지 않는다.","Debian 계열의 `apt`와 RPM 계열의 `dnf` 명령을 섞는 실수을 그대로 적용한다.","문제와 관계없는 설정부터 바꾼다."]}
-  correctAnswer={1}
-  explanation="리눅스 운영 문제는 개념의 목적과 적용 조건을 확인한 뒤 명령을 선택해야 합니다."
-  optionExplanations={['맞습니다. 목적과 조건을 먼저 확인합니다.','명령 이름만으로는 안전한 판단을 할 수 없습니다.','이 문서에서 짚은 흔한 실수입니다.','증거 없이 설정을 바꾸면 장애를 키울 수 있습니다.']}
+  question="rpm 명령어에서 특정 파일(/usr/sbin/nginx)이 어느 패키지에 속하는지 확인하는 옵션은?"
+  options={['rpm -qi nginx', 'rpm -ql nginx', 'rpm -qf /usr/sbin/nginx', 'rpm -qa | grep nginx']}
+  correctAnswer={3}
+  explanation="-qf(query file)는 지정한 파일이 어느 패키지에 속하는지 역으로 조회합니다."
+  optionExplanations={['rpm -qi nginx는 nginx 패키지의 상세 정보를 조회합니다.', 'rpm -ql nginx는 nginx 패키지에 포함된 파일 목록을 조회합니다.', '맞습니다. -qf(query file)에 파일 경로를 지정하면 해당 파일이 속한 패키지명을 반환합니다.', 'rpm -qa | grep nginx는 설치된 패키지 중 nginx가 포함된 것을 찾습니다. 파일로 역조회는 아닙니다.']}
 />
 
 <Quiz
   questionNumber={2}
-  question="명령을 실행하기 전 가장 알맞은 순서는 무엇인가요?"
-  options={['현재 상태 확인 → 필요한 변경 → 결과 검증', '변경 → 로그 삭제 → 상태 확인', '재부팅 → 추측 → 변경', '모든 설정을 동시에 수정']}
-  correctAnswer={1}
-  explanation="현재 상태를 확인한 뒤 최소 범위로 바꾸고 결과를 검증해야 원인을 추적할 수 있습니다."
-  optionExplanations={['맞습니다. 안전한 운영 기본 순서입니다.','로그는 원인 파악의 근거입니다.','재부팅만으로 원인을 알 수 없습니다.','변경 범위가 넓으면 원인 추적이 어려워집니다.']}
+  question="YUM과 RPM의 가장 큰 차이점은?"
+  options={['YUM은 Debian 계열, RPM은 Red Hat 계열이다', 'YUM은 의존성을 자동으로 해결하고 RPM은 수동으로 해결해야 한다', 'RPM은 패키지 설치가 불가능하고 YUM만 가능하다', 'YUM은 로컬 파일만, RPM은 저장소에서 설치한다']}
+  correctAnswer={2}
+  explanation="YUM/DNF는 저장소에서 패키지와 의존성을 자동으로 찾아 설치하므로 의존성 문제가 없습니다. RPM은 .rpm 파일을 직접 지정하며 의존성을 수동으로 해결해야 합니다."
+  optionExplanations={['YUM과 RPM 모두 Red Hat 계열에서 사용합니다. Debian 계열은 dpkg/apt입니다.', '맞습니다. YUM/DNF는 의존성 자동 해결이 핵심 장점입니다.', 'RPM으로도 패키지 설치가 가능합니다 (rpm -ivh).', 'YUM이 저장소에서 설치하고, RPM이 로컬 파일을 사용합니다. 반대입니다.']}
 />
 
 <Quiz
   questionNumber={3}
-  question="07. 패키지 관리와 소스 설치에서 피해야 할 실수는 무엇인가요?"
-  options={['결과를 다시 확인한다.', '대상과 경로를 확인한다.', 'Debian 계열의 `apt`와 RPM 계열의 `dnf` 명령을 섞는 실수', '로그를 근거로 판단한다.']}
+  question="소스 코드에서 프로그램을 설치하는 올바른 순서는?"
+  options={['make → ./configure → make install', './configure → make install → make', './configure → make → make install', 'make install → ./configure → make']}
   correctAnswer={3}
-  explanation="Debian 계열의 `apt`와 RPM 계열의 `dnf` 명령을 섞는 실수은 잘못된 변경이나 원인 오판으로 이어질 수 있습니다."
-  optionExplanations={['좋은 점검 방법입니다.','좋은 점검 방법입니다.','맞습니다. 이 문서의 주의점입니다.','좋은 점검 방법입니다.']}
+  explanation="configure로 Makefile을 생성하고, make로 컴파일하며, make install로 시스템에 복사합니다. 이 순서는 고정입니다."
+  optionExplanations={['configure 없이 make를 실행하면 Makefile이 없어 오류가 발생합니다.', 'make 전에 make install을 실행할 수 없습니다. 컴파일된 파일이 없기 때문입니다.', '맞습니다. ./configure → make → make install 순서로 실행합니다.', 'make install은 마지막 단계입니다.']}
 />
 
 ## 참고 자료
 
 - [KAIT 리눅스마스터 안내](https://kait.or.kr/user/MainMenuList.do?cateSeq=5&menuSeq=119)
-- [GNU Bash Reference Manual](https://www.gnu.org/software/bash/manual/)
 - [Linux man-pages project](https://man7.org/linux/man-pages/)
+- [GNU Bash Reference Manual](https://www.gnu.org/software/bash/manual/)

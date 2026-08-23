@@ -1,85 +1,194 @@
 ---
 title: '01. 리눅스 구조와 배포판'
-description: '커널·셸·배포판이 각각 어떤 일을 하는지 구분합니다.'
+description: '리눅스 아키텍처 계층 구조와 주요 배포판 계열을 이해한다.'
 ---
 
 <Callout type="info">
-  **이번 문서의 목표:** 셸은 명령을 해석해 커널에 전달하고, 커널은 하드웨어 자원을 관리합니다.
+  **이번 문서의 목표:** 리눅스의 계층 구조(하드웨어 → 커널 → 셸 → 응용프로그램)와 배포판 계열을 구분하고, 커널 및 배포판 정보를 확인하는 명령어를 익힌다.
 </Callout>
 
-## 명령을 입력했을 때 셸, 커널, 하드웨어가 어떤 순서로 동작하는지
+## 리눅스 아키텍처 계층 구조
 
-리눅스 문제는 명령 하나를 외우는 것보다 **대상, 현재 상태, 바꿀 결과**를 순서대로 보는 편이 안전합니다. 이 상황에서 먼저 확인할 것은 무엇이 문제인지, 어떤 권한과 서비스가 관여하는지입니다.
+리눅스는 아래 4개 계층으로 구성된다. 상위 계층은 하위 계층의 서비스를 호출하며, 사용자는 셸을 통해 커널에 간접적으로 접근한다.
 
-| 확인 순서 | 질문 | 이 문서에서 보는 것 |
-| --- | --- | --- |
-| 1 | 대상은 무엇인가? | 파일, 계정, 서비스, 네트워크 중 대상을 고릅니다. |
-| 2 | 현재 상태는 어떤가? | 명령 결과와 로그를 먼저 확인합니다. |
-| 3 | 무엇을 바꿀까? | 필요한 설정만 최소 범위로 바꿉니다. |
-
-## 핵심 뜻
-
-셸은 명령을 해석해 커널에 전달하고, 커널은 하드웨어 자원을 관리합니다.
-
-여기서 중요한 것은 **명령의 이름**보다 실행 뒤에 무엇이 바뀌는지입니다. 명령은 상태를 확인하는 명령과 실제로 변경하는 명령으로 나누어 기억하면 실수가 줄어듭니다.
-
-## 직접 확인해 봅니다
-
-```bash
-uname -r
-cat /etc/os-release
+```mermaid
+flowchart TB
+  APP[응용프로그램<br/>웹 브라우저, 편집기, 서버 데몬]
+  SHELL[셸<br/>bash / zsh / sh / ksh / csh]
+  KERNEL[리눅스 커널<br/>프로세스 · 메모리 · 파일시스템 · 장치 드라이버 · 네트워크]
+  HW[하드웨어<br/>CPU · 메모리 · 디스크 · NIC]
+  APP --> SHELL --> KERNEL --> HW
 ```
 
-위 예시는 시험에서 자주 나오는 기본 흐름입니다. 실습 환경에서는 먼저 읽기 전용 확인 명령을 실행하고, 그 다음에 변경 명령을 실행하세요. 변경 전후 결과를 비교하면 옵션의 의미가 더 잘 남습니다.
+## 커널(Kernel)
 
-<Callout type="warning">
-  **헷갈리기 쉬운 점:** 셸과 터미널을 같은 뜻으로 외우는 실수입니다. 운영 환경에서는 명령을 실행하기 전에 대상 경로·서비스 이름·권한 범위를 한 번 더 확인하세요.
-</Callout>
+커널은 하드웨어와 소프트웨어 사이의 핵심 중간자다. 사용자 공간(User Space)과 커널 공간(Kernel Space)을 분리하여 시스템 안정성을 보장한다.
 
-## 시험에서는 이렇게 판단합니다
+| 기능 | 설명 |
+|------|------|
+| 프로세스 관리 | 프로세스 생성(fork), 스케줄링, 종료 |
+| 메모리 관리 | 가상 메모리, 페이징, 스왑 |
+| 파일시스템 | ext4, xfs, btrfs 등의 파일 I/O 추상화 |
+| 장치 드라이버 | 하드웨어 장치를 파일처럼 접근 |
+| 네트워크 스택 | TCP/IP, 소켓 인터페이스 |
 
-- 보기에 나온 명령이 **조회**인지 **변경**인지 먼저 구분합니다.
-- 경로나 옵션이 하나라도 다르면 결과가 달라질 수 있으므로 끝까지 읽습니다.
-- 권한·보안 문제는 "무엇을 허용하고 무엇을 막는가"로 설명합니다.
-- 서술형은 명령만 적지 말고 실행 목적과 기대 결과를 한 문장으로 붙입니다.
+## 셸(Shell)
+
+셸은 사용자의 명령을 해석하여 커널에 전달하는 **명령 해석기(Command Interpreter)**다.
+
+| 셸 | 특징 |
+|----|------|
+| bash | Bourne Again Shell. 리눅스 기본 셸, 스크립트 호환성 우수 |
+| zsh | bash 확장판. 자동완성, 플러그인 지원 강력 |
+| sh | 최초의 Bourne Shell. POSIX 표준 |
+| ksh | Korn Shell. 유닉스 환경에서 많이 사용 |
+| csh / tcsh | C 문법 기반 셸 |
+
+### 터미널 vs 셸
+
+- **터미널(Terminal):** 입출력을 처리하는 인터페이스. 물리적 단말기, 터미널 에뮬레이터(gnome-terminal, iTerm2), 가상 콘솔(tty) 등
+- **셸(Shell):** 터미널 안에서 실행되는 **명령 해석 프로그램**. 터미널이 없으면 셸도 입력을 받을 수 없다.
+
+현재 사용 중인 셸 확인:
+
+```bash
+echo $SHELL
+# 출력 예시
+/bin/bash
+
+cat /etc/shells
+# 출력 예시
+/bin/sh
+/bin/bash
+/usr/bin/bash
+/bin/zsh
+/usr/bin/zsh
+```
+
+## 배포판(Distribution)
+
+리눅스 배포판은 커널 + 패키지 관리자 + 기본 도구의 조합이다. 크게 3개 계열로 나뉜다.
+
+### Red Hat 계열
+
+패키지 형식: **RPM(.rpm)**, 패키지 관리: **YUM / DNF**
+
+| 배포판 | 특징 |
+|--------|------|
+| RHEL | Red Hat Enterprise Linux. 유료 기업용 |
+| CentOS | RHEL 무료 클론. CentOS 8 이후 Stream으로 전환 |
+| Fedora | Red Hat 실험적 최신 기능 배포판 |
+| Rocky Linux | CentOS 대체를 목적으로 만든 RHEL 클론 |
+| AlmaLinux | CentOS 대체, CloudLinux가 지원 |
+
+### Debian 계열
+
+패키지 형식: **DEB(.deb)**, 패키지 관리: **APT**
+
+| 배포판 | 특징 |
+|--------|------|
+| Debian | 안정성 중심. 장기 지원 사이클 |
+| Ubuntu | Debian 기반 가장 널리 쓰이는 배포판 |
+| Linux Mint | Ubuntu 기반. 데스크탑 친화적 |
+
+### Slackware 계열
+
+- 가장 오래된 배포판 계열 중 하나
+- 자동 의존성 해결 없음, 직접 패키지 관리
+- SUSE Linux는 Slackware에서 독립 발전
+
+## 커널 버전 확인 명령어
+
+```bash
+# 커널 버전만 확인
+uname -r
+# 출력 예시
+5.15.0-91-generic
+
+# 전체 시스템 정보 확인
+uname -a
+# 출력 예시
+Linux hostname 5.15.0-91-generic #101-Ubuntu SMP Tue Nov 14 13:30:08 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+```
+
+`uname -a` 출력 필드 해석:
+1. 운영체제 이름 (Linux)
+2. 호스트명
+3. 커널 버전
+4. 커널 빌드 정보
+5. 빌드 날짜
+6. 하드웨어 아키텍처 (x86_64)
+
+## 배포판 정보 확인
+
+```bash
+# 표준 배포판 정보 파일 (대부분의 배포판 지원)
+cat /etc/os-release
+# 출력 예시 (Ubuntu)
+NAME="Ubuntu"
+VERSION="22.04.3 LTS (Jammy Jellyfish)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 22.04.3 LTS"
+VERSION_ID="22.04"
+
+# Red Hat 계열 전용 파일
+cat /etc/redhat-release
+# 출력 예시 (Rocky Linux)
+Rocky Linux release 9.3 (Blue Onyx)
+
+# 로그인 사용자 확인
+whoami
+# 출력 예시
+root
+
+# 현재 로그인된 사용자 목록
+who
+# 출력 예시
+zenok    pts/0        2024-01-15 09:30 (192.168.1.10)
+```
 
 ## 핵심 정리
 
-- 셸은 명령을 해석해 커널에 전달하고, 커널은 하드웨어 자원을 관리합니다.
-- 상태 확인 후 필요한 변경만 적용합니다.
-- 셸과 터미널을 같은 뜻으로 외우는 실수을 피하고, 결과로 다시 검증합니다.
+- 리눅스 계층: 하드웨어 → 커널 → 셸 → 응용프로그램 (상위가 하위를 호출)
+- 커널은 프로세스·메모리·파일시스템·장치·네트워크를 관리
+- 셸은 명령 해석기이며, 터미널은 셸을 실행하는 입출력 인터페이스
+- Red Hat 계열: RPM/YUM, RHEL·CentOS·Fedora·Rocky Linux
+- Debian 계열: DEB/APT, Debian·Ubuntu
+- `uname -r`: 커널 버전, `uname -a`: 전체 시스템 정보
+- `cat /etc/os-release`: 배포판 정보 확인
 
 ## 마무리 복습
 
 <Quiz
   questionNumber={1}
-  question="01. 리눅스 구조와 배포판에서 가장 먼저 확인할 태도는 무엇인가요?"
-  options={["셸은 명령을 해석해 커널에 전달하고, 커널은 하드웨어 자원을 관리합니다.의 목적과 적용 조건을 확인한다.","명령 이름만 외우고 결과는 보지 않는다.","셸과 터미널을 같은 뜻으로 외우는 실수을 그대로 적용한다.","문제와 관계없는 설정부터 바꾼다."]}
-  correctAnswer={1}
-  explanation="리눅스 운영 문제는 개념의 목적과 적용 조건을 확인한 뒤 명령을 선택해야 합니다."
-  optionExplanations={['맞습니다. 목적과 조건을 먼저 확인합니다.','명령 이름만으로는 안전한 판단을 할 수 없습니다.','이 문서에서 짚은 흔한 실수입니다.','증거 없이 설정을 바꾸면 장애를 키울 수 있습니다.']}
+  question="리눅스 커널의 주요 기능이 아닌 것은?"
+  options={['프로세스 관리', '메모리 관리', 'HTML 렌더링', '장치 드라이버 관리']}
+  correctAnswer={3}
+  explanation="HTML 렌더링은 웹 브라우저(응용프로그램)가 수행하는 작업이며, 커널의 역할이 아닙니다."
+  optionExplanations={['커널은 프로세스 생성(fork), 스케줄링, 종료를 관리합니다.', '커널은 가상 메모리, 페이징, 스왑을 관리합니다.', '맞습니다. HTML 렌더링은 응용프로그램 계층의 역할입니다.', '커널은 하드웨어 장치를 파일처럼 추상화하여 관리합니다.']}
 />
 
 <Quiz
   questionNumber={2}
-  question="명령을 실행하기 전 가장 알맞은 순서는 무엇인가요?"
-  options={['현재 상태 확인 → 필요한 변경 → 결과 검증', '변경 → 로그 삭제 → 상태 확인', '재부팅 → 추측 → 변경', '모든 설정을 동시에 수정']}
-  correctAnswer={1}
-  explanation="현재 상태를 확인한 뒤 최소 범위로 바꾸고 결과를 검증해야 원인을 추적할 수 있습니다."
-  optionExplanations={['맞습니다. 안전한 운영 기본 순서입니다.','로그는 원인 파악의 근거입니다.','재부팅만으로 원인을 알 수 없습니다.','변경 범위가 넓으면 원인 추적이 어려워집니다.']}
+  question="Red Hat 계열 리눅스 배포판이 아닌 것은?"
+  options={['CentOS', 'Rocky Linux', 'Ubuntu', 'Fedora']}
+  correctAnswer={3}
+  explanation="Ubuntu는 Debian 계열 배포판입니다. CentOS, Rocky Linux, Fedora는 모두 Red Hat 계열입니다."
+  optionExplanations={['CentOS는 RHEL의 무료 클론으로 Red Hat 계열입니다.', 'Rocky Linux는 CentOS 대체를 목적으로 만든 RHEL 클론입니다.', '맞습니다. Ubuntu는 Debian 기반의 배포판입니다.', 'Fedora는 Red Hat이 후원하는 실험적 배포판입니다.']}
 />
 
 <Quiz
   questionNumber={3}
-  question="01. 리눅스 구조와 배포판에서 피해야 할 실수는 무엇인가요?"
-  options={['결과를 다시 확인한다.', '대상과 경로를 확인한다.', '셸과 터미널을 같은 뜻으로 외우는 실수', '로그를 근거로 판단한다.']}
-  correctAnswer={3}
-  explanation="셸과 터미널을 같은 뜻으로 외우는 실수은 잘못된 변경이나 원인 오판으로 이어질 수 있습니다."
-  optionExplanations={['좋은 점검 방법입니다.','좋은 점검 방법입니다.','맞습니다. 이 문서의 주의점입니다.','좋은 점검 방법입니다.']}
+  question="현재 시스템의 커널 버전만 확인하는 명령어는?"
+  options={['uname -a', 'uname -r', 'cat /etc/os-release', 'cat /etc/redhat-release']}
+  correctAnswer={2}
+  explanation="uname -r은 커널 버전(릴리스)만 출력합니다. uname -a는 전체 시스템 정보를 출력합니다."
+  optionExplanations={['uname -a는 커널 버전 외에도 호스트명, 아키텍처 등 전체 정보를 출력합니다.', '맞습니다. uname -r은 커널 릴리스 버전만 출력합니다.', 'cat /etc/os-release는 배포판 이름과 버전을 확인하는 파일입니다.', 'cat /etc/redhat-release는 Red Hat 계열 배포판 전용 정보 파일입니다.']}
 />
 
 ## 참고 자료
 
 - [KAIT 리눅스마스터 안내](https://kait.or.kr/user/MainMenuList.do?cateSeq=5&menuSeq=119)
-- [GNU Bash Reference Manual](https://www.gnu.org/software/bash/manual/)
 - [Linux man-pages project](https://man7.org/linux/man-pages/)
+- [GNU Bash Reference Manual](https://www.gnu.org/software/bash/manual/)

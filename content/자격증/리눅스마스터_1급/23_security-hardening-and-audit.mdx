@@ -1,87 +1,320 @@
 ---
 title: '23. 보안 강화와 감사'
-description: '최소 권한·패치·로그·감사의 기본 원칙을 운영 절차로 연결합니다.'
+description: '계정 보안 정책, 파일 속성 보호, auditd 감사 설정, 로그 분석으로 시스템 보안을 강화하는 방법을 학습합니다.'
 ---
 
 <Callout type="info">
-  **이번 문서의 목표:** 보안 강화는 한 설정이 아니라 계정, 권한, 패치, 서비스, 로그를 함께 관리하는 과정입니다. 감사 로그는 나중에 원인을 추적할 근거가 됩니다.
+  **이번 문서의 목표:** 계정 잠금과 비밀번호 정책을 설정하고, chattr로 중요 파일을 보호하며, auditd로 보안 이벤트를 감사하고, 로그 분석으로 침해 징후를 탐지하는 방법을 익힙니다.
 </Callout>
 
-## 관리자 계정의 무단 접속 위험을 줄이는 상황
+## 계정 보안
 
-리눅스 문제는 명령 하나를 외우는 것보다 **대상, 현재 상태, 바꿀 결과**를 순서대로 보는 편이 안전합니다. 이 상황에서 먼저 확인할 것은 무엇이 문제인지, 어떤 권한과 서비스가 관여하는지입니다.
-
-| 확인 순서 | 질문 | 이 문서에서 보는 것 |
-| --- | --- | --- |
-| 1 | 대상은 무엇인가? | 파일, 계정, 서비스, 네트워크 중 대상을 고릅니다. |
-| 2 | 현재 상태는 어떤가? | 명령 결과와 로그를 먼저 확인합니다. |
-| 3 | 무엇을 바꿀까? | 필요한 설정만 최소 범위로 바꿉니다. |
-
-## 핵심 뜻
-
-보안 강화는 한 설정이 아니라 계정, 권한, 패치, 서비스, 로그를 함께 관리하는 과정입니다. 감사 로그는 나중에 원인을 추적할 근거가 됩니다.
-
-여기서 중요한 것은 **명령의 이름**보다 실행 뒤에 무엇이 바뀌는지입니다. 명령은 상태를 확인하는 명령과 실제로 변경하는 명령으로 나누어 기억하면 실수가 줄어듭니다.
-
-## 직접 확인해 봅니다
+### /etc/login.defs — 계정 기본 정책
 
 ```bash
-last
-lastlog
-sudo -l
-journalctl -p warning
+cat /etc/login.defs
+
+PASS_MAX_DAYS   90      # 비밀번호 최대 유효 기간 (일)
+PASS_MIN_DAYS   7       # 비밀번호 최소 사용 기간 (일, 이전 변경 후 최소 대기)
+PASS_MIN_LEN    8       # 비밀번호 최소 길이
+PASS_WARN_AGE   14      # 비밀번호 만료 경고 기간 (일)
+
+UID_MIN         1000    # 일반 사용자 UID 최솟값
+UID_MAX         60000   # 일반 사용자 UID 최댓값
+GID_MIN         1000    # 일반 그룹 GID 최솟값
+GID_MAX         60000   # 일반 그룹 GID 최댓값
+
+UMASK           077     # 기본 umask
+CREATE_HOME     yes     # 홈 디렉터리 자동 생성
 ```
 
-위 예시는 시험에서 자주 나오는 기본 흐름입니다. 실습 환경에서는 먼저 읽기 전용 확인 명령을 실행하고, 그 다음에 변경 명령을 실행하세요. 변경 전후 결과를 비교하면 옵션의 의미가 더 잘 남습니다.
+### PAM — 비밀번호 품질 정책 (pam_pwquality)
 
-<Callout type="warning">
-  **헷갈리기 쉬운 점:** 한 번 설정한 뒤 로그와 업데이트를 점검하지 않는 실수입니다. 운영 환경에서는 명령을 실행하기 전에 대상 경로·서비스 이름·권한 범위를 한 번 더 확인하세요.
-</Callout>
+```bash
+# /etc/security/pwquality.conf
+cat /etc/security/pwquality.conf
 
-## 시험에서는 이렇게 판단합니다
+minlen = 12        # 최소 길이
+minclass = 3       # 최소 문자 종류 수 (대/소/숫자/특수)
+maxrepeat = 3      # 같은 문자 최대 반복 횟수
+dcredit = -1       # 숫자 최소 1개 필요
+ucredit = -1       # 대문자 최소 1개 필요
+lcredit = -1       # 소문자 최소 1개 필요
+ocredit = -1       # 특수문자 최소 1개 필요
+dictcheck = 1      # 사전 단어 사용 금지
 
-- 보기에 나온 명령이 **조회**인지 **변경**인지 먼저 구분합니다.
-- 경로나 옵션이 하나라도 다르면 결과가 달라질 수 있으므로 끝까지 읽습니다.
-- 권한·보안 문제는 "무엇을 허용하고 무엇을 막는가"로 설명합니다.
-- 서술형은 명령만 적지 말고 실행 목적과 기대 결과를 한 문장으로 붙입니다.
+# PAM 설정에서 활성화 확인
+grep pam_pwquality /etc/pam.d/system-auth
+# password requisite pam_pwquality.so try_first_pass local_users_only retry=3
+```
+
+### 계정 잠금과 비밀번호 관리
+
+```bash
+# 계정 잠금
+usermod -L user1        # 계정 잠금 (비밀번호 앞에 ! 추가)
+passwd -l user1         # 계정 잠금 (동일 효과)
+
+# 계정 잠금 해제
+usermod -U user1        # 잠금 해제
+passwd -u user1         # 잠금 해제
+
+# 계정 만료 설정
+usermod -e 2025-12-31 user1    # 계정 만료일 설정
+chage -E 2025-12-31 user1      # 동일 효과
+
+# 비밀번호 정책 변경 (특정 사용자)
+chage -M 90 user1      # 최대 유효 기간 90일
+chage -m 7 user1       # 최소 사용 기간 7일
+chage -W 14 user1      # 경고 기간 14일
+chage -l user1         # 현재 비밀번호 정책 확인
+
+# 다음 로그인 시 비밀번호 강제 변경
+chage -d 0 user1
+```
+
+### sudo 설정
+
+```bash
+# sudo 설정 파일 편집 (visudo 사용 권장 — 문법 검사 포함)
+visudo                        # /etc/sudoers 편집
+
+# /etc/sudoers 주요 설정
+# user1 ALL=(ALL) ALL                 # user1이 모든 명령 sudo 실행
+# user1 ALL=(ALL) NOPASSWD: ALL       # 비밀번호 없이 sudo
+# %wheel ALL=(ALL) ALL                # wheel 그룹 전체 허용
+# user1 ALL=(ALL) /sbin/reboot        # 특정 명령만 허용
+
+# sudoers.d 디렉터리 활용
+echo "user1 ALL=(ALL) NOPASSWD: /usr/bin/systemctl" > /etc/sudoers.d/user1
+
+# sudo 로그 확인
+grep sudo /var/log/secure
+```
+
+## 파일 보안
+
+### chattr — 파일 속성 설정
+
+`chattr`은 파일에 특수 속성을 설정하여 root도 수정/삭제할 수 없도록 보호합니다.
+
+```bash
+# 불변 속성 설정 (+i: immutable)
+chattr +i /etc/passwd         # 불변 속성 추가 (삭제/수정/링크 불가)
+chattr +i /etc/shadow
+chattr +i /etc/hosts
+
+# 속성 제거 (-i)
+chattr -i /etc/passwd
+
+# 추가 전용 속성 (+a: append only)
+chattr +a /var/log/secure     # 로그 파일에 적합 (추가만 가능)
+
+# 속성 확인
+lsattr /etc/passwd
+# ----i--------e-- /etc/passwd  (i: immutable)
+lsattr -R /etc/              # 재귀적 속성 확인
+```
+
+### 위험 파일 탐색
+
+```bash
+# 월드 쓰기 권한 파일 탐색 (모든 사용자가 쓸 수 있는 파일)
+find / -perm -002 -type f 2>/dev/null
+find / -perm -o+w -type f 2>/dev/null
+
+# SUID 비트 파일 탐색 (소유자 권한으로 실행되는 파일)
+find / -perm -4000 -type f 2>/dev/null
+find / -perm /4000 -type f -ls 2>/dev/null
+
+# SGID 비트 파일 탐색 (그룹 권한으로 실행)
+find / -perm -2000 -type f 2>/dev/null
+
+# 소유자 없는 파일 탐색 (삭제된 사용자의 파일)
+find / -nouser -type f 2>/dev/null
+find / -nogroup -type f 2>/dev/null
+
+# 숨김 파일 탐색 (. 로 시작)
+find /home -name ".*" -type f 2>/dev/null
+```
+
+## auditd — 감사 시스템
+
+auditd는 커널 레벨에서 보안 이벤트를 기록하는 감사 데몬입니다.
+
+### auditd 서비스 관리
+
+```bash
+systemctl enable --now auditd
+systemctl status auditd
+
+# 설정 파일
+/etc/audit/auditd.conf      # 주 설정 (로그 파일 경로, 크기 등)
+/etc/audit/rules.d/         # 감사 규칙 파일
+/var/log/audit/audit.log    # 감사 로그
+```
+
+### /etc/audit/auditd.conf 주요 설정
+
+```bash
+log_file = /var/log/audit/audit.log   # 로그 파일 경로
+max_log_file = 50                     # 최대 로그 파일 크기 (MB)
+max_log_file_action = ROTATE          # 크기 초과 시 동작 (ROTATE/SYSLOG/SUSPEND)
+num_logs = 5                          # 보관할 로그 파일 수
+space_left = 100                      # 남은 공간 경고 임계값 (MB)
+space_left_action = SYSLOG            # 공간 부족 시 동작
+```
+
+### auditctl — 감사 규칙 설정
+
+```bash
+# 파일 감시 규칙
+auditctl -w /etc/passwd -p rwa -k passwd_change
+# -w: 감시할 경로
+# -p rwa: 읽기(r), 쓰기(w), 속성변경(a), 실행(x) 권한 감시
+# -k: 검색 키워드 (이벤트 식별용)
+
+auditctl -w /etc/sudoers -p rwa -k sudoers_change
+auditctl -w /var/log/auth.log -p wa -k auth_log
+auditctl -w /bin/ -p x -k binary_exec    # 바이너리 실행 감시
+
+# 시스템 콜 감시
+auditctl -a always,exit -F arch=b64 -S execve -k command_exec
+
+# 현재 규칙 목록
+auditctl -l
+
+# 규칙 삭제
+auditctl -D              # 모든 규칙 삭제
+auditctl -W /etc/passwd  # 특정 규칙 삭제
+
+# 영구 규칙 (재부팅 후에도 유지)
+cat /etc/audit/rules.d/audit.rules
+# -w /etc/passwd -p rwa -k passwd_change
+# -w /etc/sudoers -p rwa -k sudoers_change
+```
+
+### ausearch — 감사 로그 검색
+
+```bash
+ausearch -k passwd_change              # 키워드로 검색
+ausearch -k passwd_change -ts today   # 오늘 이벤트만
+ausearch -k passwd_change -ts recent  # 최근 10분
+ausearch -m AVC                       # SELinux 거부 이벤트
+ausearch -m USER_LOGIN                # 로그인 이벤트
+ausearch -ui 1000                     # UID 1000 사용자 이벤트
+ausearch -p 1234                      # 특정 PID 이벤트
+
+# 출력 형식 지정
+ausearch -k passwd_change --format text  # 사람이 읽기 쉬운 형식
+```
+
+### aureport — 감사 요약 보고서
+
+```bash
+aureport                      # 전체 요약 보고서
+aureport --login              # 로그인 이벤트 보고서
+aureport --auth               # 인증 이벤트 보고서
+aureport --failed             # 실패 이벤트 보고서
+aureport --file               # 파일 접근 보고서
+aureport --executable         # 실행 파일 보고서
+aureport -ts today            # 오늘 이벤트만
+```
+
+## 로그 분석과 침해 탐지
+
+### 주요 보안 로그 파일
+
+```bash
+/var/log/secure          # RHEL 계열: 인증/보안 로그
+/var/log/auth.log        # Debian 계열: 인증 로그
+/var/log/audit/audit.log # auditd 감사 로그
+/var/log/messages        # 시스템 전반 로그
+/var/log/syslog          # Debian 계열 시스템 로그
+```
+
+### 로그 분석 명령
+
+```bash
+# SSH 로그인 실패 탐지
+grep "Failed password" /var/log/secure
+grep "Failed password" /var/log/secure | awk '{print $11}' | sort | uniq -c | sort -rn
+
+# 성공한 로그인
+grep "Accepted password\|Accepted publickey" /var/log/secure
+
+# 무차별 대입 공격 IP 탐지 (10회 이상 실패)
+grep "Failed password" /var/log/secure | awk '{print $11}' | sort | uniq -c | sort -rn | awk '$1>10'
+
+# 로그인 기록 확인
+last                     # 최근 성공한 로그인 목록 (/var/log/wtmp)
+lastb                    # 실패한 로그인 목록 (/var/log/btmp)
+lastlog                  # 각 사용자의 마지막 로그인 시각
+who                      # 현재 로그인한 사용자
+w                        # 현재 로그인 사용자와 실행 중인 명령
+```
+
+### 불필요한 서비스 제거
+
+```bash
+# 현재 열린 포트 확인
+ss -tuln                 # TCP/UDP 리스닝 포트
+ss -tulnp                # 포트와 프로세스 정보 함께
+
+# 불필요한 서비스 비활성화
+systemctl disable --now telnet       # 텔넷 비활성화
+systemctl disable --now rsh          # rsh 비활성화
+systemctl disable --now vsftpd       # FTP 비활성화 (필요 없을 경우)
+
+# 서비스 목록 확인
+systemctl list-units --type=service --state=running  # 실행 중인 서비스
+systemctl list-unit-files --type=service             # 전체 서비스 파일 목록
+```
 
 ## 핵심 정리
 
-- 보안 강화는 한 설정이 아니라 계정, 권한, 패치, 서비스, 로그를 함께 관리하는 과정입니다. 감사 로그는 나중에 원인을 추적할 근거가 됩니다.
-- 상태 확인 후 필요한 변경만 적용합니다.
-- 한 번 설정한 뒤 로그와 업데이트를 점검하지 않는 실수을 피하고, 결과로 다시 검증합니다.
+- `/etc/login.defs`: 계정 기본 보안 정책 (PASS_MAX_DAYS, PASS_MIN_LEN 등)
+- `/etc/security/pwquality.conf`: 비밀번호 복잡도 정책 (pam_pwquality.so)
+- `usermod -L user1` / `passwd -l user1`: 계정 잠금
+- `chage -M 90 user1`: 비밀번호 최대 유효 기간, `chage -d 0`: 즉시 변경 강제
+- `visudo`: /etc/sudoers 안전 편집
+- `chattr +i 파일`: 불변 속성(root도 삭제/수정 불가), `lsattr`: 속성 확인
+- `find / -perm -4000 -type f`: SUID 파일 탐색, `find / -perm -002 -type f`: 월드 쓰기 가능 파일
+- `auditctl -w /etc/passwd -p rwa -k passwd_change`: 파일 감시 규칙 등록
+- `ausearch -k passwd_change`: 키로 감사 로그 검색, `aureport --login`: 로그인 보고서
+- `grep "Failed password" /var/log/secure`: SSH 실패 로그인 확인
+- `lastb`: 실패 로그인, `last`: 성공 로그인, `ss -tuln`: 열린 포트
 
 ## 마무리 복습
 
 <Quiz
   questionNumber={1}
-  question="23. 보안 강화와 감사에서 가장 먼저 확인할 태도는 무엇인가요?"
-  options={["보안 강화는 한 설정이 아니라 계정, 권한, 패치, 서비스, 로그를 함께 관리하는 과정입니다. 감사 로그는 나중에 원인을 추적할 근거가 됩니다.의 목적과 적용 조건을 확인한다.","명령 이름만 외우고 결과는 보지 않는다.","한 번 설정한 뒤 로그와 업데이트를 점검하지 않는 실수을 그대로 적용한다.","문제와 관계없는 설정부터 바꾼다."]}
-  correctAnswer={1}
-  explanation="리눅스 운영 문제는 개념의 목적과 적용 조건을 확인한 뒤 명령을 선택해야 합니다."
-  optionExplanations={['맞습니다. 목적과 조건을 먼저 확인합니다.','명령 이름만으로는 안전한 판단을 할 수 없습니다.','이 문서에서 짚은 흔한 실수입니다.','증거 없이 설정을 바꾸면 장애를 키울 수 있습니다.']}
+  question="파일에 chattr +i 속성을 적용하면 어떤 효과가 있는가?"
+  options={['파일을 숨김 처리하여 ls로 보이지 않게 한다', 'root를 포함한 모든 사용자가 파일을 삭제하거나 수정할 수 없게 된다', '파일에 추가(append)만 가능하고 기존 내용 수정은 불가능하다', '파일을 암호화하여 권한 있는 사용자만 읽을 수 있게 한다']}
+  correctAnswer={2}
+  explanation="+i(immutable) 속성은 파일을 불변 상태로 만들어 root도 내용 수정, 삭제, 이름 변경, 링크 생성이 불가능합니다. +a는 추가 전용(append-only), 파일 암호화는 chattr의 기능이 아닙니다."
+  optionExplanations={['chattr은 파일을 숨기는 기능이 없습니다.', '맞습니다. +i는 root도 포함한 모든 사용자가 수정/삭제할 수 없는 불변 속성입니다.', '추가 전용은 +a(append-only) 속성입니다.', 'chattr은 파일 암호화 기능을 제공하지 않습니다.']}
 />
 
 <Quiz
   questionNumber={2}
-  question="명령을 실행하기 전 가장 알맞은 순서는 무엇인가요?"
-  options={['현재 상태 확인 → 필요한 변경 → 결과 검증', '변경 → 로그 삭제 → 상태 확인', '재부팅 → 추측 → 변경', '모든 설정을 동시에 수정']}
-  correctAnswer={1}
-  explanation="현재 상태를 확인한 뒤 최소 범위로 바꾸고 결과를 검증해야 원인을 추적할 수 있습니다."
-  optionExplanations={['맞습니다. 안전한 운영 기본 순서입니다.','로그는 원인 파악의 근거입니다.','재부팅만으로 원인을 알 수 없습니다.','변경 범위가 넓으면 원인 추적이 어려워집니다.']}
+  question="시스템에서 SUID 비트가 설정된 파일을 모두 찾는 find 명령은?"
+  options={['find / -perm -002 -type f', 'find / -perm -4000 -type f', 'find / -perm -2000 -type f', 'find / -suid -type f']}
+  correctAnswer={2}
+  explanation="-perm -4000은 SUID 비트(특수 권한 4000)가 설정된 파일을 검색합니다. -perm -002는 월드 쓰기 가능 파일, -perm -2000은 SGID 파일 검색입니다. -suid 옵션은 존재하지 않습니다."
+  optionExplanations={['-perm -002는 other 쓰기 권한(월드 쓰기 가능) 파일을 찾습니다.', '맞습니다. -perm -4000으로 SUID 비트 설정 파일을 탐색합니다.', '-perm -2000은 SGID 비트 설정 파일을 찾습니다.', '-suid 옵션은 find에 없습니다.']}
 />
 
 <Quiz
   questionNumber={3}
-  question="23. 보안 강화와 감사에서 피해야 할 실수는 무엇인가요?"
-  options={['결과를 다시 확인한다.', '대상과 경로를 확인한다.', '한 번 설정한 뒤 로그와 업데이트를 점검하지 않는 실수', '로그를 근거로 판단한다.']}
-  correctAnswer={3}
-  explanation="한 번 설정한 뒤 로그와 업데이트를 점검하지 않는 실수은 잘못된 변경이나 원인 오판으로 이어질 수 있습니다."
-  optionExplanations={['좋은 점검 방법입니다.','좋은 점검 방법입니다.','맞습니다. 이 문서의 주의점입니다.','좋은 점검 방법입니다.']}
+  question="auditd에서 /etc/passwd 파일의 읽기, 쓰기, 속성 변경을 감시하고 'passwd_change' 키를 부여하는 명령은?"
+  options={['auditctl -w /etc/passwd -p rwa -k passwd_change', 'auditd --watch /etc/passwd --key passwd_change', 'ausearch -w /etc/passwd -k passwd_change', 'audit -f /etc/passwd -p rwa']}
+  correctAnswer={1}
+  explanation="auditctl -w 경로 -p 권한 -k 키 형식으로 파일 감시 규칙을 설정합니다. -p rwa는 읽기(r), 쓰기(w), 속성변경(a)을 감시하며, -k는 검색에 사용할 키워드를 지정합니다."
+  optionExplanations={['맞습니다. auditctl -w /etc/passwd -p rwa -k passwd_change가 올바른 명령입니다.', 'auditd는 데몬 이름으로 직접 실행하는 도구가 아니며 --watch 옵션도 없습니다.', 'ausearch는 로그 검색 명령이며 감시 규칙 등록에 사용하지 않습니다.', 'audit 단독 명령에 이런 옵션은 없습니다.']}
 />
 
 ## 참고 자료
 
 - [KAIT 리눅스마스터 안내](https://kait.or.kr/user/MainMenuList.do?cateSeq=5&menuSeq=119)
-- [GNU Bash Reference Manual](https://www.gnu.org/software/bash/manual/)
 - [Linux man-pages project](https://man7.org/linux/man-pages/)

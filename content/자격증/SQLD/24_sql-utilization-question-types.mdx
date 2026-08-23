@@ -1,61 +1,416 @@
 ---
-title: '24. SQL 활용 기출 유형'
-description: '조인·서브쿼리·트랜잭션·관리 구문의 기출 유형을 풉니다.'
+title: '24. SQL 활용·관리 구문 기출 유형'
+description: '서브쿼리·윈도우 함수·TCL·DDL·MERGE 등 활용 파트 핵심 유형을 예제로 정복합니다.'
 ---
 
 <Callout type="info">
-  **이번 문서의 목표:** LEFT JOIN은 왼쪽 행을 남기고 ROLLBACK은 변경을 되돌립니다.
+  **이번 문서의 목표:** SQL 활용·관리 파트에서 자주 출제되는 7가지 유형을 실제 쿼리와 예제로 익혀서 빠른 판단이 가능해집니다.
 </Callout>
 
-## 먼저 작은 상황을 봅니다
+## 유형 1. 서브쿼리 결과 — 단일행 vs 다중행
 
-**활용 문제는 어떤 구문이 행을 늘리거나 줄이는지 보는 것이 핵심입니다.**을(를) 다룰 때는 용어를 먼저 외우기보다, 무엇을 확인하고 어떤 결정을 내려야 하는지부터 잡는 편이 좋습니다.
+서브쿼리는 실행 결과에 따라 연산자를 구분합니다.
 
-| 확인할 항목 | 작은 사례 |
-| --- | --- |
-| 문제 상황 | 활용 문제는 어떤 구문이 행을 늘리거나 줄이는지 보는 것이 핵심입니다. |
-| 핵심 개념 | LEFT JOIN은 왼쪽 행을 남기고 ROLLBACK은 변경을 되돌립니다. |
-| 적용 예 | 핵심 개념을 문제의 조건과 결과에 연결해 판단합니다. |
+**핵심 구분**
 
-## 핵심 뜻
+| 서브쿼리 종류 | 반환 행 수 | 사용 가능 연산자 |
+|--------------|-----------|-----------------|
+| 단일행 서브쿼리 | 1행 | =, >, <, >=, <=, <> |
+| 다중행 서브쿼리 | N행 | IN, ANY, ALL, EXISTS |
+| 다중컬럼 서브쿼리 | N행, N컬럼 | IN과 함께 (컬럼, 컬럼) 형태 |
 
-LEFT JOIN은 왼쪽 행을 남기고 ROLLBACK은 변경을 되돌립니다.
+---
 
-처음에는 낯선 말처럼 보여도 핵심은 간단합니다. 문제의 대상, 조건, 결과를 나누어 읽고 서로 어떻게 연결되는지 확인하는 것입니다.
+**[예제 1-1]** 다음 쿼리의 실행 결과는?
 
-## 예시를 한 단계씩 읽어 봅니다
+```sql
+-- 직원 테이블
+-- 직원번호 | 부서코드 | 급여
+--   E001  |   D01   | 3000000
+--   E002  |   D01   | 4000000
+--   E003  |   D02   | 2500000
+--   E004  |   D02   | 3500000
 
-핵심 개념을 문제의 조건과 결과에 연결해 판단합니다.
+SELECT 직원번호, 급여
+FROM 직원
+WHERE 급여 > (SELECT AVG(급여) FROM 직원);
+```
 
-1. 먼저 어떤 값 또는 규칙이 기준인지 확인합니다.
-2. 그 기준이 결과를 어떻게 바꾸는지 봅니다.
-3. 결과를 실제 업무 상황이나 표의 행으로 다시 해석합니다.
+1. E001, E003
+2. E002, E004
+3. E002만
+4. E001, E002, E003, E004
 
-<Callout type="warning">
-  **헷갈리기 쉬운 점:** 비슷한 용어라도 역할이 다르면 같은 뜻으로 섞으면 안 됩니다. 문제의 대상과 조건을 먼저 표시하세요.
+<Callout type="success">
+  **정답: 2번 (E002, E004)**
+
+  서브쿼리 먼저 계산:
+  - AVG(급여) = (3000000 + 4000000 + 2500000 + 3500000) / 4 = 3250000
+
+  메인쿼리: 급여 > 3250000인 직원
+  - E001: 3000000 → 제외
+  - E002: 4000000 → 포함
+  - E003: 2500000 → 제외
+  - E004: 3500000 → 포함
+
+  결과: E002(4000000), E004(3500000)
 </Callout>
 
-## 시험에서 이렇게 확인합니다
+---
 
-- 정의 문제에서는 이 개념이 **무엇을 위한 것인지** 찾습니다.
-- 사례 문제에서는 필요한 조건이 실제로 충족되는지 확인합니다.
-- 선택지가 비슷하면 어떤 결과가 남거나 바뀌는지 끝까지 비교합니다.
+**[예제 1-2]** 다음 중 오류가 발생하는 쿼리는?
 
-## 핵심 정리
+```sql
+-- 상황: 부서별 최고 급여가 여러 값(다중행)을 반환
+-- SELECT MAX(급여) FROM 직원 GROUP BY 부서코드
+-- → 결과: 4000000, 3500000 (2행)
+```
 
-- LEFT JOIN은 왼쪽 행을 남기고 ROLLBACK은 변경을 되돌립니다.
-- 조건과 결과를 연결해 보면 같은 개념을 새 사례에도 적용할 수 있습니다.
-- 용어를 결과와 연결하면 처음 보는 사례에도 적용할 수 있습니다.
+1. `WHERE 급여 IN (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)`
+2. `WHERE 급여 = ANY (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)`
+3. `WHERE 급여 = (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)`
+4. `WHERE 급여 >= ALL (SELECT MAX(급여) FROM 직원 GROUP BY 부서코드)`
+
+<Callout type="success">
+  **정답: 3번**
+
+  서브쿼리가 다중행(4000000, 3500000)을 반환하는데 단일행 연산자(=)를 사용했습니다. 단일행 연산자(=, >, <, >=, <=, <>)는 서브쿼리가 정확히 1행을 반환할 때만 사용 가능합니다.
+
+  - ①: IN은 다중행 연산자 → 정상
+  - ②: ANY는 다중행 연산자 → 정상 (하나라도 만족하면 참)
+  - ③: = 단일행 연산자인데 다중행 반환 → **ORA-01427 오류**
+  - ④: ALL은 다중행 연산자 → 정상 (모두 만족해야 참)
+</Callout>
+
+---
+
+## 유형 2. UNION vs UNION ALL — 결과 행 수 차이
+
+**핵심 차이**
+
+| 구분 | 중복 제거 | 정렬 | 속도 |
+|------|----------|------|------|
+| UNION | O (제거) | 내부 정렬 발생 | 느림 |
+| UNION ALL | X (유지) | 정렬 없음 | 빠름 |
+| INTERSECT | 교집합 | - | - |
+| MINUS/EXCEPT | 차집합 | - | - |
+
+---
+
+**[예제 2-1]** 다음 쿼리의 결과 행 수는?
+
+```sql
+-- 2024년_수강 테이블: 학번 A001, A002, A003
+-- 2025년_수강 테이블: 학번 A002, A003, A004
+
+SELECT 학번 FROM 2024년_수강
+UNION ALL
+SELECT 학번 FROM 2025년_수강;
+
+-- 별도로:
+SELECT 학번 FROM 2024년_수강
+UNION
+SELECT 학번 FROM 2025년_수강;
+```
+
+1. UNION ALL: 6행, UNION: 6행
+2. UNION ALL: 6행, UNION: 4행
+3. UNION ALL: 4행, UNION: 4행
+4. UNION ALL: 6행, UNION: 3행
+
+<Callout type="success">
+  **정답: 2번 (UNION ALL: 6행, UNION: 4행)**
+
+  - **UNION ALL**: 두 결과를 단순 합치기 → 3 + 3 = **6행** (A001, A002, A003, A002, A003, A004)
+  - **UNION**: 중복 제거 → A001, A002, A003, A004 → **4행** (A002, A003 중복 제거)
+</Callout>
+
+---
+
+## 유형 3. 윈도우 함수 — RANK vs DENSE_RANK vs ROW_NUMBER
+
+**핵심 차이**
+
+| 함수 | 동점 처리 | 다음 순위 |
+|------|----------|----------|
+| RANK() | 동점에 같은 순위 | 건너뜀 (1,1,3) |
+| DENSE_RANK() | 동점에 같은 순위 | 건너뛰지 않음 (1,1,2) |
+| ROW_NUMBER() | 동점도 다른 번호 | 연속 (1,2,3) |
+
+---
+
+**[예제 3-1]** 다음 테이블에서 쿼리를 실행했을 때 RANK, DENSE_RANK, ROW_NUMBER 결과를 올바르게 설명한 것은?
+
+```sql
+-- 성적 테이블
+-- 학번 | 점수
+-- S001 | 95
+-- S002 | 88
+-- S003 | 95
+-- S004 | 80
+
+SELECT 학번, 점수,
+       RANK() OVER (ORDER BY 점수 DESC) AS R,
+       DENSE_RANK() OVER (ORDER BY 점수 DESC) AS DR,
+       ROW_NUMBER() OVER (ORDER BY 점수 DESC) AS RN
+FROM 성적;
+```
+
+S001(95점)의 R, DR, RN 값과 S002(88점)의 R, DR, RN 값을 고르세요.
+
+1. S001: R=1, DR=1, RN=1 / S002: R=3, DR=2, RN=3
+2. S001: R=1, DR=1, RN=1 / S002: R=2, DR=2, RN=3
+3. S001: R=1, DR=1, RN=2 / S002: R=3, DR=3, RN=3
+4. S001: R=2, DR=1, RN=1 / S002: R=3, DR=2, RN=3
+
+<Callout type="success">
+  **정답: 1번**
+
+  점수 내림차순: S001(95), S003(95), S002(88), S004(80)
+
+  **S001/S003 (공동 1위, 95점)**:
+  - RANK: **1** (1위)
+  - DENSE_RANK: **1** (1위)
+  - ROW_NUMBER: 1 또는 2 (행 처리 순서에 따라 다름)
+
+  **S002 (88점)**:
+  - RANK: **3** (1위가 2명이므로 2위 없이 3위로 건너뜀)
+  - DENSE_RANK: **2** (연속 순위, 건너뛰지 않음)
+  - ROW_NUMBER: **3** (S001, S003 다음 3번째 행)
+
+  따라서 S001: R=1, DR=1 / S002: R=3, DR=2, RN=3 → **1번 정답**
+</Callout>
+
+---
+
+**[예제 3-2]** 다음 중 윈도우 함수의 PARTITION BY에 대한 설명으로 올바른 것은?
+
+1. PARTITION BY는 GROUP BY와 동일하게 집계 행 수를 줄인다.
+2. PARTITION BY는 지정된 컬럼 기준으로 그룹을 나누되, 원래 행 수를 유지한다.
+3. PARTITION BY 없이 윈도우 함수를 사용하면 오류가 발생한다.
+4. PARTITION BY는 ORDER BY 절 없이 사용할 수 없다.
+
+<Callout type="success">
+  **정답: 2번**
+
+  윈도우 함수의 핵심 특성: **원본 행 수를 유지하면서** 그룹 내 순위/집계를 계산합니다.
+
+  - **GROUP BY**: 그룹별로 행을 축약 → 결과 행 수 감소
+  - **PARTITION BY (윈도우 함수)**: 그룹을 나누어 계산하되 각 원본 행에 결과를 부여 → 행 수 동일
+
+  PARTITION BY는 선택 사항입니다(생략 시 전체를 하나의 파티션으로 처리). ORDER BY도 생략 가능합니다(함수에 따라 다름).
+</Callout>
+
+---
+
+## 유형 4. ROLLUP/CUBE — 소계 행 수 계산
+
+**ROLLUP 소계 행 수**: n개 컬럼 → n+1 레벨의 소계 생성
+
+```sql
+GROUP BY ROLLUP(A, B)
+-- 생성: (A,B)별 합계 + A별 소계 + 전체 합계
+```
+
+**CUBE 소계 행 수**: 2^n 가지 조합
+
+```sql
+GROUP BY CUBE(A, B)
+-- 생성: (A,B), A, B, 전체 = 4가지
+```
+
+---
+
+**[예제 4-1]** 다음 쿼리에서 반환되는 총 행 수는?
+
+```sql
+-- 판매 테이블: 지역(서울, 부산), 분기(1분기, 2분기)
+-- 각 조합당 1행 → 기본 4행 존재
+
+SELECT 지역, 분기, SUM(매출)
+FROM 판매
+GROUP BY ROLLUP(지역, 분기);
+```
+
+1. 4행
+2. 6행
+3. 7행
+4. 8행
+
+<Callout type="success">
+  **정답: 3번 (7행)**
+
+  ROLLUP(지역, 분기) 생성 행:
+  - (서울, 1분기) → 1행
+  - (서울, 2분기) → 1행
+  - **(서울, NULL) → 서울 소계** → 1행
+  - (부산, 1분기) → 1행
+  - (부산, 2분기) → 1행
+  - **(부산, NULL) → 부산 소계** → 1행
+  - **(NULL, NULL) → 전체 합계** → 1행
+
+  총 **7행**
+
+  공식: ROLLUP(A, B)에서 A의 종류 × (B의 종류 + 1) + 1 = 2 × (2+1) + 1 = **7**
+</Callout>
+
+---
+
+## 유형 5. TCL — SAVEPOINT와 ROLLBACK TO
+
+**TCL(Transaction Control Language) 명령어**
+
+| 명령어 | 설명 |
+|--------|------|
+| COMMIT | 트랜잭션 확정, 영구 반영 |
+| ROLLBACK | 트랜잭션 취소, COMMIT 이전 상태로 복원 |
+| SAVEPOINT 이름 | 트랜잭션 내 중간 저장점 생성 |
+| ROLLBACK TO 이름 | 해당 저장점까지만 취소 |
+
+---
+
+**[예제 5-1]** 다음 트랜잭션 수행 후 최종 테이블 상태는?
+
+```sql
+-- 초기: 직원 테이블에 급여 3000000인 E001 존재
+
+UPDATE 직원 SET 급여 = 3500000 WHERE 직원번호 = 'E001';
+SAVEPOINT SP1;
+UPDATE 직원 SET 급여 = 4000000 WHERE 직원번호 = 'E001';
+SAVEPOINT SP2;
+UPDATE 직원 SET 급여 = 5000000 WHERE 직원번호 = 'E001';
+ROLLBACK TO SP1;
+COMMIT;
+```
+
+1. 급여 = 3000000 (초기 상태)
+2. 급여 = 3500000
+3. 급여 = 4000000
+4. 급여 = 5000000
+
+<Callout type="success">
+  **정답: 2번 (급여 = 3500000)**
+
+  단계별 추적:
+  1. UPDATE: 급여 → 3500000
+  2. SAVEPOINT SP1: 현재 상태(3500000)를 SP1에 저장
+  3. UPDATE: 급여 → 4000000
+  4. SAVEPOINT SP2: 현재 상태(4000000)를 SP2에 저장
+  5. UPDATE: 급여 → 5000000
+  6. **ROLLBACK TO SP1**: SP1 이후의 모든 변경 취소 → 급여가 **3500000**으로 복원 (SP1 이전 변경인 3000000→3500000은 유지)
+  7. COMMIT: 현재 상태(3500000)를 확정
+
+  최종: **3500000**
+</Callout>
+
+---
+
+## 유형 6. DDL 특성 — TRUNCATE vs DELETE와 자동 COMMIT
+
+**핵심 비교**
+
+| 구분 | DELETE | TRUNCATE | DROP |
+|------|--------|----------|------|
+| 분류 | DML | DDL | DDL |
+| 자동 COMMIT | X (명시적 COMMIT 필요) | O (자동 COMMIT) | O (자동 COMMIT) |
+| ROLLBACK | 가능 | 불가능 | 불가능 |
+| WHERE 조건 | 가능 | 불가능 (전체 삭제) | - |
+| 로그 기록 | 행별 로그 남김 | 최소 로그 | - |
+| 속도 | 느림 | 빠름 | - |
+
+---
+
+**[예제 6-1]** 다음 중 TRUNCATE와 DELETE의 차이점으로 올바르지 않은 것은?
+
+1. TRUNCATE는 DDL이므로 자동으로 COMMIT되어 ROLLBACK할 수 없다.
+2. DELETE는 WHERE 조건으로 특정 행만 삭제할 수 있다.
+3. TRUNCATE는 WHERE 조건 없이 테이블의 모든 데이터를 삭제한다.
+4. DELETE는 자동 COMMIT되므로 ROLLBACK이 불가능하다.
+
+<Callout type="success">
+  **정답: 4번 (틀린 설명)**
+
+  DELETE는 DML(Data Manipulation Language)이므로 트랜잭션 내에서 실행되고, 자동 COMMIT되지 않습니다. 따라서 `ROLLBACK`으로 취소할 수 있습니다.
+
+  반면 TRUNCATE는 DDL(Data Definition Language)이므로 실행 즉시 자동 COMMIT되어 ROLLBACK이 불가능합니다.
+</Callout>
+
+---
+
+## 유형 7. MERGE 문 — WHEN MATCHED / NOT MATCHED
+
+MERGE는 SOURCE 테이블의 데이터를 TARGET 테이블에 "있으면 UPDATE, 없으면 INSERT"하는 문법입니다.
+
+```sql
+MERGE INTO TARGET T
+USING SOURCE S ON (T.키 = S.키)
+WHEN MATCHED THEN
+    UPDATE SET T.컬럼 = S.컬럼
+WHEN NOT MATCHED THEN
+    INSERT (컬럼) VALUES (값);
+```
+
+---
+
+**[예제 7-1]** 다음 MERGE 문 실행 후 TARGET 테이블의 상태는?
+
+```sql
+-- TARGET (상품재고)     SOURCE (입고내역)
+-- 상품코드 | 재고수량   상품코드 | 입고수량
+--   P001  |   100      P001   |   50
+--   P002  |    30      P003   |   20
+
+MERGE INTO 상품재고 T
+USING 입고내역 S ON (T.상품코드 = S.상품코드)
+WHEN MATCHED THEN
+    UPDATE SET T.재고수량 = T.재고수량 + S.입고수량
+WHEN NOT MATCHED THEN
+    INSERT (상품코드, 재고수량) VALUES (S.상품코드, S.입고수량);
+```
+
+1. P001: 100, P002: 30 (변경 없음)
+2. P001: 150, P002: 30, P003: 20
+3. P001: 50, P002: 30, P003: 20
+4. P001: 150, P003: 20 (P002 삭제)
+
+<Callout type="success">
+  **정답: 2번**
+
+  MERGE 처리 과정:
+  - SOURCE의 P001 → TARGET에 P001 **존재** → MATCHED → `UPDATE: 재고수량 = 100 + 50 = 150`
+  - SOURCE의 P003 → TARGET에 P003 **없음** → NOT MATCHED → `INSERT: (P003, 20)`
+  - TARGET의 P002 → SOURCE에 없음 → MERGE 대상 아님 → **변경 없이 유지**
+
+  최종: P001(150), P002(30), P003(20)
+</Callout>
+
+---
+
+**[예제 7-2]** MERGE 문에 대한 설명으로 올바르지 않은 것은?
+
+1. WHEN MATCHED THEN 절에서 UPDATE와 DELETE를 모두 사용할 수 있다.
+2. WHEN NOT MATCHED THEN 절에서 INSERT를 수행할 수 있다.
+3. ON 조건에 일치하지 않는 TARGET 행은 자동으로 삭제된다.
+4. MERGE는 DML문으로 트랜잭션 내에서 ROLLBACK이 가능하다.
+
+<Callout type="success">
+  **정답: 3번 (올바르지 않은 설명)**
+
+  MERGE 문에서 ON 조건에 일치하지 않는 TARGET 행은 **그대로 유지**됩니다. 삭제되지 않습니다. 위 예제에서 P002가 그대로 유지된 것처럼, SOURCE에 없는 TARGET 행은 MERGE의 영향을 받지 않습니다.
+
+  WHEN MATCHED THEN DELETE를 명시적으로 작성해야만 삭제됩니다.
+</Callout>
+
+---
 
 ## 마무리 복습
 
-<Quiz questionNumber={1} question="24. SQL 활용 기출 유형에서 가장 먼저 확인할 것은 무엇인가요?" options={['LEFT JOIN은 왼쪽 행을 남기고 ROLLBACK은 변경을 되돌립니다.의 뜻과 역할', '글자 색상', '파일 이름만', '근거 없는 추측']} correctAnswer={1} explanation="LEFT JOIN은 왼쪽 행을 남기고 ROLLBACK은 변경을 되돌립니다.의 역할을 사례와 연결해야 다음 문제에도 적용할 수 있습니다." optionExplanations={['맞습니다. 핵심 개념의 역할을 확인합니다.','디자인 요소입니다.','이름만으로 판단할 수 없습니다.','조건과 근거가 필요합니다.']} />
+<Quiz questionNumber={1} question="다음 중 RANK()와 DENSE_RANK()의 차이를 올바르게 설명한 것은?" options={["RANK()는 동점자가 없고, DENSE_RANK()는 동점자를 허용한다.", "RANK()는 동점 시 순위를 건너뛰지만(1,1,3), DENSE_RANK()는 건너뛰지 않는다(1,1,2).", "RANK()는 PARTITION BY 없이 사용 불가하고, DENSE_RANK()는 가능하다.", "두 함수의 차이는 없고 동의어이다."]} correctAnswer={2} explanation="핵심 차이: 동점자가 있을 때 RANK()는 동점 인원만큼 다음 순위를 건너뜁니다(1위가 2명이면 다음은 3위). DENSE_RANK()는 동점이어도 다음 순위가 연속됩니다(1위가 2명이어도 다음은 2위). ROW_NUMBER()는 동점도 각기 다른 번호를 부여합니다." optionExplanations={["동점 허용 여부는 두 함수 모두 동일합니다. 차이는 다음 순위 처리 방식입니다.", "정답. RANK()는 건너뜀(1,1,3), DENSE_RANK()는 연속(1,1,2)입니다.", "두 함수 모두 PARTITION BY 없이 사용 가능합니다(전체를 하나의 파티션으로 처리).", "두 함수는 동점 처리에서 명확히 다릅니다."]} />
 
-<Quiz questionNumber={2} question="다음 사례를 가장 바르게 해석한 것은 무엇인가요? 문제의 조건과 결과를 함께 확인합니다." options={['조건과 결과를 함께 확인한다.', '모든 값을 같은 의미로 본다.', '검증 없이 결론을 확정한다.', '필요한 정보를 먼저 삭제한다.']} correctAnswer={1} explanation="사례의 조건을 읽고 LEFT JOIN은 왼쪽 행을 남기고 ROLLBACK은 변경을 되돌립니다.의 관점에서 결과를 판단해야 합니다." optionExplanations={['맞습니다. 조건과 결과의 연결을 확인합니다.','값의 의미를 잃게 됩니다.','검증이 필요합니다.','판단 기준을 없애면 안 됩니다.']} />
+<Quiz questionNumber={2} question="TRUNCATE TABLE 명령에 대한 설명으로 올바른 것은?" options={["TRUNCATE는 DML이므로 ROLLBACK으로 취소할 수 있다.", "TRUNCATE는 WHERE 조건을 사용하여 일부 행만 삭제할 수 있다.", "TRUNCATE는 DDL이며 자동 COMMIT되어 ROLLBACK이 불가능하다.", "TRUNCATE 후에도 테이블 구조(스키마)가 삭제된다."]} correctAnswer={3} explanation="TRUNCATE는 DDL(Data Definition Language)로 분류되며, 실행 즉시 자동 COMMIT됩니다. 따라서 ROLLBACK으로 취소할 수 없습니다. WHERE 조건을 사용할 수 없어 항상 테이블의 모든 데이터를 삭제하지만, 테이블 구조(스키마)는 유지됩니다. 구조까지 삭제하려면 DROP TABLE을 사용해야 합니다." optionExplanations={["TRUNCATE는 DML이 아니라 DDL입니다.", "TRUNCATE는 WHERE 조건 없이 테이블 전체를 삭제합니다. 조건부 삭제는 DELETE를 사용합니다.", "정답. TRUNCATE는 DDL로 자동 COMMIT되며 ROLLBACK이 불가합니다.", "TRUNCATE는 데이터만 삭제하고 테이블 구조(스키마)는 유지합니다. 구조 삭제는 DROP입니다."]} />
 
-<Quiz questionNumber={3} question="24. SQL 활용 기출 유형에서 피해야 할 실수는 무엇인가요?" options={['작은 예시로 확인한다.', '결과가 나온 이유를 설명한다.', '비슷한 개념을 구분하지 않고 섞는다.', '조건이 바뀌면 결과도 확인한다.']} correctAnswer={3} explanation="비슷한 개념도 역할과 적용 조건이 다르므로 구분해야 합니다." optionExplanations={['좋은 학습 방법입니다.','좋은 학습 방법입니다.','맞습니다. 시험에서 자주 묻는 함정입니다.','좋은 점검 방법입니다.']} />
+<Quiz questionNumber={3} question="다음 MERGE 문에서 'WHEN NOT MATCHED THEN' 절이 실행되는 조건은?" options={["TARGET 테이블에 SOURCE와 일치하는 키가 있을 때", "SOURCE 테이블에 TARGET과 일치하는 키가 없을 때", "TARGET과 SOURCE 모두에 해당 키가 없을 때", "ON 조건이 NULL일 때"]} correctAnswer={2} explanation="MERGE의 ON 절 조건 결과에 따라 실행 분기가 결정됩니다. WHEN MATCHED: ON 조건이 참(TARGET에 SOURCE와 일치하는 행이 있음) → UPDATE/DELETE 가능. WHEN NOT MATCHED: ON 조건이 거짓(SOURCE 행에 해당하는 TARGET 행이 없음) → INSERT 수행. 즉 SOURCE 기준으로 TARGET에 없는 데이터를 새로 삽입하는 것이 NOT MATCHED 절입니다." optionExplanations={["이 경우 WHEN MATCHED THEN 절이 실행됩니다.", "정답. SOURCE에는 있지만 TARGET에 일치하는 키가 없을 때 NOT MATCHED 절이 실행됩니다.", "SOURCE에 없는 행은 MERGE 처리 자체의 대상이 되지 않습니다.", "ON 조건이 NULL이면 UNKNOWN이 되어 NOT MATCHED처럼 처리되나, 이는 일반적인 동작이 아닙니다."]} />
 
 ## 참고 자료
 
 - [KDATA 데이터자격시험 - SQL 개발자](https://www.dataq.or.kr/www/sub/a_04.do)
-- [Oracle Database SQL Language Reference](https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/)

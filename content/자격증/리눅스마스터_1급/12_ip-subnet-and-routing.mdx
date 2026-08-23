@@ -1,0 +1,247 @@
+---
+title: '12. IP 주소, 서브넷과 라우팅'
+description: 'IPv4 주소 체계, 서브넷 마스크 계산, 리눅스 네트워크 설정과 라우팅을 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** CIDR 서브넷 계산을 손으로 할 수 있게 되고, ip 명령어와 네트워크 설정 파일로 리눅스 네트워크를 설정합니다.
+</Callout>
+
+## IPv4 주소 체계
+
+IPv4 주소는 **32비트** 정수이며, 8비트씩 4개의 옥텟(octet)으로 표현합니다.
+
+```
+192      .  168    .    1   .    100
+11000000    10101000  00000001  01100100
+(1옥텟)     (2옥텟)   (3옥텟)   (4옥텟)
+```
+
+### 클래스별 IP 주소 범위
+
+| 클래스 | 첫 번째 옥텟 | 기본 서브넷 마스크 | 용도 |
+|--------|------------|-----------------|------|
+| A | 1 ~ 126 | 255.0.0.0 (/8) | 대규모 네트워크 |
+| B | 128 ~ 191 | 255.255.0.0 (/16) | 중간 규모 |
+| C | 192 ~ 223 | 255.255.255.0 (/24) | 소규모 네트워크 |
+| D | 224 ~ 239 | - | 멀티캐스트 |
+| E | 240 ~ 255 | - | 예약됨 |
+
+<Callout type="info">
+  **특수 주소:** 127.0.0.1은 루프백(loopback) 주소입니다. 클래스 A처럼 보이지만 네트워크용이 아니므로 클래스 A 범위(1~126)에서 제외됩니다.
+</Callout>
+
+### 사설(Private) IP 주소
+
+인터넷에서 사용할 수 없는 내부 네트워크용 주소입니다.
+
+| 범위 | CIDR | 클래스 |
+|------|------|--------|
+| 10.0.0.0 ~ 10.255.255.255 | 10.0.0.0/8 | A |
+| 172.16.0.0 ~ 172.31.255.255 | 172.16.0.0/12 | B |
+| 192.168.0.0 ~ 192.168.255.255 | 192.168.0.0/16 | C |
+
+## CIDR 서브넷 계산
+
+**CIDR(Classless Inter-Domain Routing)** 은 /프리픽스 길이로 서브넷을 표기합니다.
+
+### 서브넷 마스크와 CIDR 대응
+
+| CIDR | 서브넷 마스크 | 호스트 수 | 사용 가능 호스트 |
+|------|-------------|---------|--------------|
+| /24 | 255.255.255.0 | 256 | 254 |
+| /25 | 255.255.255.128 | 128 | 126 |
+| /26 | 255.255.255.192 | 64 | 62 |
+| /27 | 255.255.255.224 | 32 | 30 |
+| /28 | 255.255.255.240 | 16 | 14 |
+| /16 | 255.255.0.0 | 65536 | 65534 |
+
+### 서브넷 계산 예시
+
+**예시: 192.168.1.0/24 네트워크**
+
+```
+네트워크 주소: 192.168.1.0   (호스트 부분이 모두 0)
+브로드캐스트:  192.168.1.255 (호스트 부분이 모두 1)
+사용 가능 호스트: 192.168.1.1 ~ 192.168.1.254 (총 254개)
+서브넷 마스크: 255.255.255.0
+```
+
+**예시: 192.168.1.0/26 서브넷 분할**
+
+```
+/26 = 255.255.255.192 → 서브넷당 64개 주소 (사용 가능 62개)
+
+1번 서브넷: 192.168.1.0   ~ 192.168.1.63   (브로드캐스트: .63)
+2번 서브넷: 192.168.1.64  ~ 192.168.1.127  (브로드캐스트: .127)
+3번 서브넷: 192.168.1.128 ~ 192.168.1.191  (브로드캐스트: .191)
+4번 서브넷: 192.168.1.192 ~ 192.168.1.255  (브로드캐스트: .255)
+```
+
+## 리눅스 네트워크 설정
+
+### ip 명령어 (iproute2)
+
+```bash
+# IP 주소 확인
+ip addr show
+# 단축형
+ip a
+
+# 출력 예시
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP
+    link/ether 00:11:22:33:44:55 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.100/24 brd 192.168.1.255 scope global eth0
+    inet6 fe80::211:22ff:fe33:4455/64 scope link
+
+# 임시 IP 주소 추가 (재부팅 시 사라짐)
+ip addr add 192.168.1.200/24 dev eth0
+
+# IP 주소 삭제
+ip addr del 192.168.1.200/24 dev eth0
+
+# 인터페이스 활성화/비활성화
+ip link set eth0 up
+ip link set eth0 down
+```
+
+### NetworkManager (nmcli)
+
+```bash
+# 네트워크 연결 목록
+nmcli con show
+
+# 출력 예시
+NAME    UUID                                  TYPE      DEVICE
+eth0    12345678-1234-1234-1234-123456789012  ethernet  eth0
+
+# 정적 IP 설정
+nmcli con mod eth0 ipv4.addresses 192.168.1.100/24
+nmcli con mod eth0 ipv4.gateway 192.168.1.1
+nmcli con mod eth0 ipv4.dns "8.8.8.8 8.8.4.4"
+nmcli con mod eth0 ipv4.method manual
+nmcli con up eth0
+```
+
+### 네트워크 설정 파일
+
+**RHEL/CentOS 계열:**
+
+```bash
+# /etc/sysconfig/network-scripts/ifcfg-eth0
+cat /etc/sysconfig/network-scripts/ifcfg-eth0
+
+TYPE=Ethernet
+BOOTPROTO=static
+IPADDR=192.168.1.100
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+DNS1=8.8.8.8
+DNS2=8.8.4.4
+ONBOOT=yes
+NAME=eth0
+DEVICE=eth0
+```
+
+**Debian/Ubuntu 계열:**
+
+```bash
+# /etc/network/interfaces
+cat /etc/network/interfaces
+
+auto eth0
+iface eth0 inet static
+    address 192.168.1.100
+    netmask 255.255.255.0
+    gateway 192.168.1.1
+    dns-nameservers 8.8.8.8 8.8.4.4
+```
+
+## 라우팅
+
+### 라우팅 테이블 확인 및 설정
+
+```bash
+# 현재 라우팅 테이블 확인
+ip route show
+
+# 출력 예시
+default via 192.168.1.1 dev eth0 proto static metric 100
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.100
+10.0.0.0/8 via 192.168.1.254 dev eth0
+
+# 기본 게이트웨이(default route) 추가
+ip route add default via 192.168.1.1
+
+# 특정 네트워크 경로 추가
+ip route add 10.0.0.0/8 via 192.168.1.254
+
+# 라우트 삭제
+ip route del 10.0.0.0/8
+```
+
+## 이름 해석 설정 파일
+
+```bash
+# 로컬 호스트명 매핑 (/etc/hosts)
+cat /etc/hosts
+
+127.0.0.1       localhost
+127.0.1.1       server.example.com server
+192.168.1.200   db.internal db
+
+# DNS 서버 설정 (/etc/resolv.conf)
+cat /etc/resolv.conf
+
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+search example.com
+
+# 이름 해석 순서 (/etc/nsswitch.conf)
+grep hosts /etc/nsswitch.conf
+# 출력: hosts: files dns   (먼저 /etc/hosts, 그 다음 DNS)
+```
+
+## 핵심 정리
+
+- IPv4는 32비트, 클래스 A(1-126), B(128-191), C(192-223)
+- CIDR /24 = 255.255.255.0 = 254개 사용 가능 호스트
+- 사용 가능 호스트 수 = 2^(32-프리픽스) - 2 (네트워크/브로드캐스트 제외)
+- ip addr add/del 로 임시 IP 설정, nmcli con mod 로 영구 설정
+- 라우팅: ip route show (확인), ip route add default via 게이트웨이 (기본 경로)
+- /etc/hosts (로컬 이름 매핑), /etc/resolv.conf (DNS 서버)
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="192.168.10.0/28 네트워크에서 사용 가능한 호스트 수는?"
+  options={['14개', '16개', '30개', '62개']}
+  correctAnswer={1}
+  explanation="/28은 서브넷 마스크 255.255.255.240으로, 총 주소 수가 2^(32-28)=16개입니다. 네트워크 주소와 브로드캐스트 주소를 제외하면 14개의 호스트를 사용할 수 있습니다."
+  optionExplanations={['맞습니다. 2^(32-28) - 2 = 16 - 2 = 14개의 호스트를 사용할 수 있습니다.', '16개는 /28의 전체 주소 수이며, 실제 사용 가능한 수는 네트워크/브로드캐스트 제외한 14개입니다.', '30개는 /27(255.255.255.224)의 사용 가능 호스트 수입니다.', '62개는 /26(255.255.255.192)의 사용 가능 호스트 수입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="리눅스에서 기본 게이트웨이를 192.168.1.1로 설정하는 ip 명령은?"
+  options={['ip gateway set 192.168.1.1', 'ip route add default via 192.168.1.1', 'ip addr add gateway 192.168.1.1', 'route add default gw 192.168.1.1 eth0']}
+  correctAnswer={2}
+  explanation="ip route add default via 게이트웨이IP 명령으로 기본 라우트(default route)를 설정합니다. 이것이 iproute2 패키지의 현대적 방식입니다."
+  optionExplanations={['ip gateway 서브커맨드는 존재하지 않습니다.', '맞습니다. ip route add default via 192.168.1.1 이 현대적인 기본 게이트웨이 설정 명령입니다.', 'ip addr는 IP 주소 설정 명령으로 게이트웨이 설정과 다릅니다.', 'route 명령은 구버전 net-tools의 명령이며, 현재는 ip route 사용을 권장합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="IP 주소 172.20.1.1은 어떤 클래스에 속하는가?"
+  options={['클래스 A', '클래스 B', '클래스 C', '사설 클래스 A']}
+  correctAnswer={2}
+  explanation="첫 번째 옥텟 172는 128~191 범위에 해당하므로 클래스 B입니다. 또한 172.16.0.0~172.31.255.255는 클래스 B의 사설 IP 범위이므로 사설 클래스 B 주소이기도 합니다."
+  optionExplanations={['클래스 A의 범위는 첫 번째 옥텟이 1~126입니다. 172는 이 범위를 벗어납니다.', '맞습니다. 첫 번째 옥텟 172는 128~191 범위로 클래스 B에 속합니다.', '클래스 C의 범위는 첫 번째 옥텟이 192~223입니다.', '사설 클래스 A의 범위는 10.0.0.0/8입니다. 172.x.x.x는 사설 클래스 B입니다.']}
+/>
+
+## 참고 자료
+
+- [KAIT 리눅스마스터 안내](https://kait.or.kr/user/MainMenuList.do?cateSeq=5&menuSeq=119)
+- [Linux man-pages project](https://man7.org/linux/man-pages/)
+- [GNU Bash Reference Manual](https://www.gnu.org/software/bash/manual/)

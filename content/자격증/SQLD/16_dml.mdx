@@ -1,59 +1,193 @@
 ---
-title: '16. DML 데이터 조작'
-description: 'INSERT·UPDATE·DELETE·MERGE가 데이터를 바꾸는 방식을 이해합니다.'
+title: '16. DML: 데이터 조작'
+description: 'INSERT, UPDATE, DELETE, MERGE로 테이블 데이터를 추가·수정·삭제·병합하는 방법을 익힙니다.'
 ---
 
 <Callout type="info">
-  **이번 문서의 목표:** UPDATE에는 변경할 행을 고르는 WHERE 조건이 중요합니다.
+  **이번 문서의 목표:** WHERE 조건을 빠뜨렸을 때의 위험성을 이해하고, MERGE로 조건에 따라 INSERT/UPDATE를 자동으로 선택하는 방법을 익힙니다.
 </Callout>
 
-## 먼저 작은 상황을 봅니다
+## DML이란?
 
-**DML은 테이블의 행 데이터를 추가·수정·삭제하는 명령입니다.**을(를) 다룰 때는 용어를 먼저 외우기보다, 무엇을 확인하고 어떤 결정을 내려야 하는지부터 잡는 편이 좋습니다.
+DML(Data Manipulation Language)은 테이블 안의 **행 데이터**를 다루는 SQL 명령입니다.
 
-| 확인할 항목 | 작은 사례 |
-| --- | --- |
-| 문제 상황 | DML은 테이블의 행 데이터를 추가·수정·삭제하는 명령입니다. |
-| 핵심 개념 | UPDATE에는 변경할 행을 고르는 WHERE 조건이 중요합니다. |
-| 적용 예 | 핵심 개념을 문제의 조건과 결과에 연결해 판단합니다. |
-
-## 핵심 뜻
-
-UPDATE에는 변경할 행을 고르는 WHERE 조건이 중요합니다.
-
-처음에는 낯선 말처럼 보여도 핵심은 간단합니다. 문제의 대상, 조건, 결과를 나누어 읽고 서로 어떻게 연결되는지 확인하는 것입니다.
-
-## 예시를 한 단계씩 읽어 봅니다
-
-핵심 개념을 문제의 조건과 결과에 연결해 판단합니다.
-
-1. 먼저 어떤 값 또는 규칙이 기준인지 확인합니다.
-2. 그 기준이 결과를 어떻게 바꾸는지 봅니다.
-3. 결과를 실제 업무 상황이나 표의 행으로 다시 해석합니다.
+| 명령    | 기능             |
+| ------- | ---------------- |
+| INSERT  | 새 행 추가       |
+| UPDATE  | 기존 행 수정     |
+| DELETE  | 기존 행 삭제     |
+| MERGE   | 조건에 따라 INSERT 또는 UPDATE |
 
 <Callout type="warning">
-  **헷갈리기 쉬운 점:** 비슷한 용어라도 역할이 다르면 같은 뜻으로 섞으면 안 됩니다. 문제의 대상과 조건을 먼저 표시하세요.
+  DML은 **자동 커밋(Auto Commit)이 되지 않습니다.** COMMIT을 실행해야 다른 세션에서 변경 내용을 볼 수 있습니다. ROLLBACK으로 취소도 가능합니다.
 </Callout>
 
-## 시험에서 이렇게 확인합니다
+## INSERT: 데이터 삽입
 
-- 정의 문제에서는 이 개념이 **무엇을 위한 것인지** 찾습니다.
-- 사례 문제에서는 필요한 조건이 실제로 충족되는지 확인합니다.
-- 선택지가 비슷하면 어떤 결과가 남거나 바뀌는지 끝까지 비교합니다.
+### 단일 행 INSERT
+
+```sql
+INSERT INTO EMP (사원번호, 이름, 부서번호, 직급, 급여)
+VALUES (1006, '한지수', 30, '사원', 2700000);
+```
+
+**실행 후 EMP 테이블**
+
+| 사원번호 | 이름   | 부서번호 | 직급 | 급여    |
+| -------- | ------ | -------- | ---- | ------- |
+| 1001     | 김민준 | 10       | 과장 | 4500000 |
+| 1002     | 이서연 | 20       | 대리 | 3200000 |
+| 1003     | 박지훈 | 10       | 부장 | 6000000 |
+| 1004     | 최수아 | 30       | 사원 | 2500000 |
+| 1005     | 정도윤 | 20       | 과장 | 4800000 |
+| **1006** | **한지수** | **30** | **사원** | **2700000** |
+
+컬럼 목록을 생략하면 테이블 정의 순서대로 값을 넣어야 합니다. NULL을 넣을 때는 명시적으로 `NULL`을 쓰거나, 컬럼 목록에서 해당 컬럼을 생략합니다.
+
+```sql
+-- 관리자번호를 NULL로 삽입 (두 가지 방법)
+INSERT INTO EMP (사원번호, 이름, 부서번호, 관리자번호)
+VALUES (1007, '오태양', 40, NULL);  -- 방법 1: 명시적 NULL
+
+INSERT INTO EMP (사원번호, 이름, 부서번호)
+VALUES (1008, '윤하늘', 40);  -- 방법 2: 컬럼 생략 (관리자번호 자동 NULL)
+```
+
+### 서브쿼리를 이용한 다중 행 INSERT
+
+다른 테이블의 데이터를 조회하여 한 번에 여러 행을 삽입합니다.
+
+```sql
+-- EMP_BACKUP 테이블에 급여 400만 이상 사원 복사
+INSERT INTO EMP_BACKUP (사원번호, 이름, 급여)
+SELECT 사원번호, 이름, 급여
+FROM   EMP
+WHERE  급여 >= 4000000;
+```
+
+이 방식에서는 `VALUES` 절 없이 `SELECT` 결과가 바로 삽입됩니다.
+
+## UPDATE: 데이터 수정
+
+```sql
+-- 1004번 최수아의 급여를 300만으로 올리고 직급을 대리로 변경
+UPDATE EMP
+SET    급여 = 3000000, 직급 = '대리'
+WHERE  사원번호 = 1004;
+```
+
+**실행 전 → 실행 후**
+
+| 사원번호 | 이름   | 직급 | 급여    |
+| -------- | ------ | ---- | ------- |
+| 1004     | 최수아 | 사원 → **대리** | 2500000 → **3000000** |
+
+<Callout type="warning">
+  **WHERE 없는 UPDATE는 전체 행을 수정합니다!**
+  ```sql
+  UPDATE EMP SET 급여 = 0;  -- 모든 사원 급여가 0이 됨!
+  ```
+  SQLD 시험에서 WHERE 없이 UPDATE/DELETE 했을 때 영향받는 행 수를 묻는 문제가 자주 출제됩니다.
+</Callout>
+
+서브쿼리를 SET 절에 사용할 수도 있습니다.
+
+```sql
+-- 개발팀(10) 사원 급여를 개발팀 평균으로 일괄 변경
+UPDATE EMP
+SET    급여 = (SELECT AVG(급여) FROM EMP WHERE 부서번호 = 10)
+WHERE  부서번호 = 10;
+```
+
+## DELETE: 데이터 삭제
+
+```sql
+-- 사원번호 1006인 행 삭제
+DELETE FROM EMP
+WHERE 사원번호 = 1006;
+```
+
+<Callout type="warning">
+  **WHERE 없는 DELETE는 전체 행을 삭제합니다!**
+  ```sql
+  DELETE FROM EMP;  -- EMP 테이블의 모든 행이 삭제됨!
+  ```
+  DELETE는 ROLLBACK이 가능합니다. TRUNCATE는 ROLLBACK이 불가능합니다.
+</Callout>
+
+### DELETE vs TRUNCATE 비교
+
+| 항목               | DELETE                     | TRUNCATE                  |
+| ------------------ | -------------------------- | ------------------------- |
+| 종류               | DML                        | DDL                       |
+| WHERE 조건         | 사용 가능                  | 사용 불가 (전체 삭제)     |
+| ROLLBACK           | 가능                       | 불가능 (자동 COMMIT)      |
+| 로그 기록          | 행 단위 기록               | 최소화 (빠름)             |
+| 처리 속도          | 느림                       | 빠름                      |
+
+## MERGE: 조건부 INSERT/UPDATE
+
+원본 테이블과 대상 테이블을 비교하여, 일치하는 행은 UPDATE, 없는 행은 INSERT합니다.
+
+```sql
+MERGE INTO EMP_BACKUP T           -- 대상 테이블
+USING EMP S                        -- 원본 테이블
+ON (T.사원번호 = S.사원번호)       -- 비교 조건
+WHEN MATCHED THEN                  -- 일치: UPDATE
+  UPDATE SET T.급여 = S.급여,
+             T.직급 = S.직급
+WHEN NOT MATCHED THEN              -- 불일치: INSERT
+  INSERT (사원번호, 이름, 급여)
+  VALUES (S.사원번호, S.이름, S.급여);
+```
+
+MERGE는 **UPSERT(Update + Insert)** 패턴을 구현할 때 사용합니다. ETL 작업이나 데이터 동기화에서 자주 씁니다.
+
+## SQLD 시험 자주 출제 포인트
+
+1. **NULL 삽입**: 컬럼 목록 생략 또는 명시적 `NULL` 사용
+2. **WHERE 없는 UPDATE/DELETE**: 영향받는 행 = 테이블 전체 행 수
+3. **DELETE vs TRUNCATE**: ROLLBACK 가능 여부, DDL vs DML 구분
+4. **COMMIT 전 가시성**: 변경한 세션 본인만 볼 수 있음, 다른 세션은 COMMIT 후
+5. **MERGE**: WHEN MATCHED(UPDATE), WHEN NOT MATCHED(INSERT) 구분
 
 ## 핵심 정리
 
-- UPDATE에는 변경할 행을 고르는 WHERE 조건이 중요합니다.
-- 조건과 결과를 연결해 보면 같은 개념을 새 사례에도 적용할 수 있습니다.
-- 용어를 결과와 연결하면 처음 보는 사례에도 적용할 수 있습니다.
+- **INSERT**: 단일 행 `VALUES`, 다중 행은 `SELECT` 서브쿼리 활용
+- **UPDATE**: `SET 컬럼=값`, WHERE 없으면 전체 행 수정
+- **DELETE**: WHERE 없으면 전체 행 삭제, ROLLBACK 가능
+- **TRUNCATE**: DDL, 전체 삭제만 가능, ROLLBACK 불가
+- **MERGE**: 대상 테이블과 원본 비교 → 일치 시 UPDATE, 불일치 시 INSERT
+- **DML 공통**: 자동 COMMIT 없음, COMMIT/ROLLBACK으로 트랜잭션 관리
 
 ## 마무리 복습
 
-<Quiz questionNumber={1} question="16. DML 데이터 조작에서 가장 먼저 확인할 것은 무엇인가요?" options={['UPDATE에는 변경할 행을 고르는 WHERE 조건이 중요합니다.의 뜻과 역할', '글자 색상', '파일 이름만', '근거 없는 추측']} correctAnswer={1} explanation="UPDATE에는 변경할 행을 고르는 WHERE 조건이 중요합니다.의 역할을 사례와 연결해야 다음 문제에도 적용할 수 있습니다." optionExplanations={['맞습니다. 핵심 개념의 역할을 확인합니다.','디자인 요소입니다.','이름만으로 판단할 수 없습니다.','조건과 근거가 필요합니다.']} />
+<Quiz
+  questionNumber={1}
+  question="WHERE 조건 없이 DELETE FROM EMP; 를 실행하면 어떻게 됩니까?"
+  options={['오류가 발생한다', 'EMP 테이블 구조만 삭제된다', 'EMP 테이블의 모든 행이 삭제된다', '첫 번째 행만 삭제된다']}
+  correctAnswer={3}
+  explanation="DELETE는 WHERE 조건이 없으면 테이블의 모든 행을 삭제합니다. ROLLBACK으로 취소할 수 있다는 점에서 TRUNCATE와 다릅니다."
+  optionExplanations={['DELETE 문 자체는 오류 없이 실행됩니다.', '테이블 구조(스키마)는 DROP TABLE로 삭제합니다.', '정답입니다. WHERE가 없으면 모든 행이 삭제됩니다.', '첫 번째 행만 삭제하려면 ROWNUM이나 서브쿼리를 활용해야 합니다.']}
+/>
 
-<Quiz questionNumber={2} question="다음 사례를 가장 바르게 해석한 것은 무엇인가요? 문제의 조건과 결과를 함께 확인합니다." options={['조건과 결과를 함께 확인한다.', '모든 값을 같은 의미로 본다.', '검증 없이 결론을 확정한다.', '필요한 정보를 먼저 삭제한다.']} correctAnswer={1} explanation="사례의 조건을 읽고 UPDATE에는 변경할 행을 고르는 WHERE 조건이 중요합니다.의 관점에서 결과를 판단해야 합니다." optionExplanations={['맞습니다. 조건과 결과의 연결을 확인합니다.','값의 의미를 잃게 됩니다.','검증이 필요합니다.','판단 기준을 없애면 안 됩니다.']} />
+<Quiz
+  questionNumber={2}
+  question="TRUNCATE와 DELETE의 차이점으로 올바른 것은?"
+  options={['TRUNCATE는 DML이고 DELETE는 DDL이다', 'TRUNCATE는 ROLLBACK이 가능하고 DELETE는 불가능하다', 'DELETE는 WHERE 조건을 사용할 수 있지만 TRUNCATE는 사용할 수 없다', 'TRUNCATE는 특정 행만 삭제할 수 있다']}
+  correctAnswer={3}
+  explanation="DELETE는 WHERE 조건으로 특정 행만 삭제할 수 있지만, TRUNCATE는 테이블 전체를 삭제하며 WHERE 조건을 사용할 수 없습니다."
+  optionExplanations={['반대입니다. TRUNCATE는 DDL이고 DELETE는 DML입니다.', '반대입니다. DELETE는 ROLLBACK 가능, TRUNCATE는 자동 COMMIT으로 ROLLBACK 불가합니다.', '정답입니다. DELETE는 WHERE 사용 가능, TRUNCATE는 전체 삭제만 가능합니다.', 'TRUNCATE는 특정 행 삭제가 불가능하고 항상 전체를 삭제합니다.']}
+/>
 
-<Quiz questionNumber={3} question="16. DML 데이터 조작에서 피해야 할 실수는 무엇인가요?" options={['작은 예시로 확인한다.', '결과가 나온 이유를 설명한다.', '비슷한 개념을 구분하지 않고 섞는다.', '조건이 바뀌면 결과도 확인한다.']} correctAnswer={3} explanation="비슷한 개념도 역할과 적용 조건이 다르므로 구분해야 합니다." optionExplanations={['좋은 학습 방법입니다.','좋은 학습 방법입니다.','맞습니다. 시험에서 자주 묻는 함정입니다.','좋은 점검 방법입니다.']} />
+<Quiz
+  questionNumber={3}
+  question="MERGE 문에서 원본 테이블의 행이 대상 테이블에 이미 존재하는 경우 실행되는 절은?"
+  options={['WHEN NOT MATCHED THEN INSERT', 'WHEN MATCHED THEN UPDATE', 'WHEN EXISTS THEN MODIFY', 'WHEN FOUND THEN REPLACE']}
+  correctAnswer={2}
+  explanation="MERGE에서 ON 조건에 맞는 행이 대상 테이블에 이미 있으면 WHEN MATCHED THEN 절의 UPDATE가 실행되고, 없으면 WHEN NOT MATCHED THEN 절의 INSERT가 실행됩니다."
+  optionExplanations={['WHEN NOT MATCHED THEN INSERT는 대상 테이블에 행이 없을 때 실행됩니다.', '정답입니다. 대상 테이블에 매칭되는 행이 있으면 UPDATE가 실행됩니다.', 'WHEN EXISTS THEN MODIFY는 존재하지 않는 문법입니다.', 'WHEN FOUND THEN REPLACE는 존재하지 않는 문법입니다.']}
+/>
 
 ## 참고 자료
 

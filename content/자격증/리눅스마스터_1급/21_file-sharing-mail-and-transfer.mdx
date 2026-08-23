@@ -1,0 +1,330 @@
+---
+title: '21. 파일 공유, 메일과 전송 서비스'
+description: 'NFS, Samba, FTP, Postfix를 이용한 파일 공유와 메일 서비스 설정 방법을 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** NFS로 리눅스 간 파일 공유, Samba로 윈도우-리눅스 파일 공유, vsftpd로 FTP 서버를, Postfix로 메일 서버를 구성하는 방법을 익힙니다.
+</Callout>
+
+## NFS — 리눅스 네트워크 파일 공유
+
+NFS(Network File System)는 리눅스/유닉스 시스템 간 파일 시스템을 네트워크로 공유하는 프로토콜입니다.
+
+### NFS 서버 설정
+
+```bash
+# 설치
+dnf install nfs-utils
+
+# 서비스 시작
+systemctl enable --now nfs-server
+systemctl enable --now rpcbind
+
+# 방화벽 설정
+firewall-cmd --permanent --add-service=nfs
+firewall-cmd --permanent --add-service=rpc-bind
+firewall-cmd --permanent --add-service=mountd
+firewall-cmd --reload
+```
+
+### /etc/exports 설정 파일
+
+```bash
+# 문법: 공유경로  클라이언트(옵션1,옵션2,...)
+
+/data       192.168.1.0/24(rw,sync,no_root_squash)
+/public     *(ro,sync)
+/home       192.168.1.100(rw,sync,root_squash)
+/backup     192.168.1.50(rw,sync,all_squash,anonuid=1000,anongid=1000)
+```
+
+주요 옵션 설명:
+
+| 옵션 | 설명 |
+|---|---|
+| `rw` | 읽기/쓰기 허용 |
+| `ro` | 읽기 전용 |
+| `sync` | 데이터를 즉시 디스크에 기록 (안전) |
+| `async` | 쓰기를 버퍼링 (빠르지만 위험) |
+| `no_root_squash` | 클라이언트 root를 서버 root로 허용 |
+| `root_squash` | 클라이언트 root를 anonymous로 매핑 (기본값) |
+| `all_squash` | 모든 사용자를 anonymous로 매핑 |
+| `anonuid/anongid` | anonymous 사용자의 UID/GID 지정 |
+
+### NFS 서버 명령
+
+```bash
+exportfs -a     # /etc/exports 재로드 및 모든 공유 적용
+exportfs -v     # 현재 공유 목록과 옵션 출력
+exportfs -r     # 모든 공유 갱신
+exportfs -u /data  # 특정 디렉터리 공유 해제
+
+# 서비스 재시작 없이 적용
+exportfs -ra
+```
+
+### NFS 클라이언트 설정
+
+```bash
+# 서버에서 공유 목록 확인
+showmount -e 192.168.1.1       # 서버의 공유 목록
+showmount -a 192.168.1.1       # 마운트된 클라이언트 목록
+
+# 수동 마운트
+mount -t nfs 192.168.1.1:/data /mnt/data
+mount -t nfs4 192.168.1.1:/data /mnt/data  # NFSv4 명시
+
+# 부팅 시 자동 마운트 (/etc/fstab)
+# 192.168.1.1:/data  /mnt/data  nfs  defaults,_netdev  0  0
+
+# 마운트 상태 확인
+df -h | grep nfs
+mount | grep nfs
+```
+
+## Samba — 윈도우-리눅스 파일 공유
+
+Samba는 SMB/CIFS 프로토콜로 윈도우와 리눅스 간 파일 공유를 구현합니다.
+
+### Samba 설치와 서비스
+
+```bash
+dnf install samba samba-client samba-common
+systemctl enable --now smb   # Samba 파일 서버
+systemctl enable --now nmb   # NetBIOS 이름 서버
+
+firewall-cmd --permanent --add-service=samba
+firewall-cmd --reload
+```
+
+### /etc/samba/smb.conf 설정
+
+```ini
+[global]
+    workgroup = WORKGROUP
+    server string = Samba Server %v
+    netbios name = LINUX-SERVER
+    security = user
+    map to guest = bad user
+    dns proxy = no
+
+# 공개 공유 (인증 불필요)
+[public]
+    comment = Public Share
+    path = /srv/samba/public
+    browsable = yes
+    writable = yes
+    guest ok = yes
+    read only = no
+
+# 인증 필요 공유
+[private]
+    comment = Private Share
+    path = /srv/samba/private
+    browsable = yes
+    writable = yes
+    valid users = user1 user2
+    read only = no
+    create mask = 0644
+    directory mask = 0755
+```
+
+### Samba 사용자 관리
+
+```bash
+# Samba 사용자 추가 (먼저 시스템 계정이 있어야 함)
+smbpasswd -a user1        # Samba 비밀번호 설정 (추가)
+smbpasswd -e user1        # 사용자 활성화
+smbpasswd -d user1        # 사용자 비활성화
+smbpasswd -x user1        # 사용자 삭제
+
+# 설정 검증
+testparm                  # smb.conf 문법 검사
+testparm -v               # 전체 파라미터 출력
+
+# 연결된 클라이언트 확인
+smbstatus
+```
+
+### Samba 클라이언트
+
+```bash
+# 공유 목록 확인
+smbclient -L 192.168.1.1 -U user1
+
+# 공유에 접속 (FTP와 유사한 인터페이스)
+smbclient //192.168.1.1/public -U user1
+
+# 마운트 (cifs)
+mount -t cifs //192.168.1.1/public /mnt/samba -o username=user1,password=pass
+```
+
+## FTP — vsftpd 파일 전송 서버
+
+### vsftpd 설치와 서비스
+
+```bash
+dnf install vsftpd
+systemctl enable --now vsftpd
+
+firewall-cmd --permanent --add-service=ftp
+firewall-cmd --reload
+```
+
+### /etc/vsftpd/vsftpd.conf 주요 설정
+
+```ini
+# 익명 FTP 허용 여부
+anonymous_enable=NO
+# anonymous_enable=YES     # 익명 허용 시
+
+# 로컬 사용자 허용
+local_enable=YES
+
+# 쓰기 허용
+write_enable=YES
+
+# 로컬 사용자의 umask
+local_umask=022
+
+# 업로드 파일 소유자 매핑
+chown_uploads=YES
+chown_username=ftp
+
+# 접속 메시지
+ftpd_banner=Welcome to FTP Server.
+
+# chroot 설정 (사용자를 홈 디렉터리에 가두기)
+chroot_local_user=YES
+chroot_list_enable=YES
+chroot_list_file=/etc/vsftpd/chroot_list
+
+# 패시브 모드 설정
+pasv_enable=YES
+pasv_min_port=30000
+pasv_max_port=31000
+
+# 로그 설정
+xferlog_enable=YES
+xferlog_file=/var/log/vsftpd.log
+```
+
+### 능동 모드 vs 수동(패시브) 모드
+
+| 구분 | 능동 모드(Active) | 수동 모드(Passive) |
+|---|---|---|
+| 데이터 연결 | 서버가 클라이언트에 연결 | 클라이언트가 서버에 연결 |
+| 서버 포트 | 20번 (데이터) | 협의된 임의 포트 |
+| 방화벽 | 클라이언트 방화벽 문제 발생 | 서버 방화벽만 열면 됨 |
+| 사용 환경 | 방화벽 없는 환경 | NAT/방화벽 환경 (일반적) |
+
+## Postfix — 메일 서버
+
+### 포트 번호 정리
+
+| 프로토콜 | 포트 | 설명 |
+|---|---|---|
+| SMTP | 25 | 서버 간 메일 전송 |
+| SMTPS | 465 | SSL/TLS 암호화 SMTP |
+| SUBMISSION | 587 | 클라이언트 메일 제출 (STARTTLS) |
+| IMAP | 143 | 메일 수신 (인터넷 메시지 접근) |
+| IMAPS | 993 | SSL 암호화 IMAP |
+| POP3 | 110 | 메일 수신 (다운로드 후 삭제) |
+| POP3S | 995 | SSL 암호화 POP3 |
+
+### Postfix 설치와 서비스
+
+```bash
+dnf install postfix
+systemctl enable --now postfix
+```
+
+### /etc/postfix/main.cf 주요 설정
+
+```ini
+# 서버 호스트명
+myhostname = mail.example.com
+
+# 도메인 이름
+mydomain = example.com
+
+# 메일 발신 주소 도메인
+myorigin = $mydomain
+
+# 수신 주소 바인딩
+inet_interfaces = all
+# inet_interfaces = localhost  (로컬만 수신)
+
+# 메일 수신 도메인 목록
+mydestination = $myhostname, localhost.$mydomain, $mydomain
+
+# 로컬 네트워크 릴레이 허용
+mynetworks = 127.0.0.0/8 192.168.1.0/24
+
+# 메일박스 위치
+home_mailbox = Maildir/
+
+# 최대 메시지 크기 (바이트, 10MB)
+message_size_limit = 10485760
+```
+
+### Postfix 관리 명령
+
+```bash
+postfix check          # 설정 검사
+postfix status         # 서비스 상태
+postconf -n            # 기본값과 다른 설정만 출력
+postconf myhostname    # 특정 파라미터 확인
+
+# 메일 큐 관리
+mailq                  # 큐에 대기 중인 메일 목록
+postqueue -p           # 큐 목록 (mailq와 동일)
+postqueue -f           # 큐에 있는 메일 즉시 전송 시도
+postsuper -d ALL       # 큐의 모든 메일 삭제
+```
+
+## 핵심 정리
+
+- NFS 서버: `/etc/exports` 설정, `exportfs -a`로 적용, `systemctl start nfs-server`
+- exports 옵션: `rw`/`ro`, `sync`, `no_root_squash`(root 허용), `root_squash`(기본, root 차단)
+- NFS 클라이언트: `showmount -e 서버IP`로 공유 목록 확인, `mount -t nfs 서버:/경로 /마운트포인트`
+- Samba 서비스: `smb`(파일), `nmb`(NetBIOS), 설정 검사: `testparm`, 사용자: `smbpasswd -a`
+- vsftpd 주요 옵션: `anonymous_enable`, `chroot_local_user`, `pasv_enable`
+- FTP 수동 모드가 NAT/방화벽 환경에서 권장됨
+- Postfix 설정: `/etc/postfix/main.cf`, `myhostname`, `mydestination`, `mynetworks`
+- 메일 포트: SMTP(25), SMTPS(465), SUBMISSION(587), IMAP(143), IMAPS(993), POP3(110), POP3S(995)
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="NFS 서버에서 /etc/exports 설정 변경 후 서비스 재시작 없이 적용하는 명령은?"
+  options={['nfsctl reload', 'exportfs -a', 'mount -a', 'nfs-server restart']}
+  correctAnswer={2}
+  explanation="exportfs -a 명령은 /etc/exports 파일을 다시 읽어 공유 설정을 적용합니다. exportfs -r은 모든 공유를 갱신하고, exportfs -v는 현재 공유 목록을 출력합니다."
+  optionExplanations={['nfsctl reload 명령은 존재하지 않습니다.', '맞습니다. exportfs -a로 /etc/exports 변경 내용을 적용합니다.', 'mount -a는 /etc/fstab에 따라 파일시스템을 마운트합니다.', 'nfs-server restart는 서비스 재시작이라 더 강한 방법입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="FTP 수동(Passive) 모드에서 데이터 연결을 맺는 방향은?"
+  options={['서버가 클라이언트의 20번 포트로 연결', '클라이언트가 서버의 20번 포트로 연결', '클라이언트가 서버가 알려준 임의 포트로 연결', '서버가 클라이언트의 임의 포트로 연결']}
+  correctAnswer={3}
+  explanation="수동(Passive) 모드에서는 클라이언트가 서버에 PASV 명령을 보내면, 서버는 데이터 포트(임의의 높은 번호)를 알려주고 클라이언트가 그 포트로 연결합니다. NAT나 방화벽 뒤의 클라이언트에서 유리합니다."
+  optionExplanations={['능동(Active) 모드에서는 서버가 클라이언트의 포트로 연결합니다.', '클라이언트가 20번이 아닌 협의된 임의 포트로 연결합니다.', '맞습니다. 수동 모드에서는 클라이언트가 서버의 임의 포트로 연결합니다.', '수동 모드에서 서버는 연결을 시작하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Postfix 메일 서버의 주 설정 파일에서 이 서버가 메일을 최종 수신할 도메인 목록을 지정하는 파라미터는?"
+  options={['myhostname', 'myorigin', 'mydestination', 'mynetworks']}
+  correctAnswer={3}
+  explanation="mydestination은 Postfix가 최종 목적지로 메일을 수신할 도메인 목록입니다. myhostname은 서버 호스트명, myorigin은 발신 도메인, mynetworks는 릴레이를 허용할 네트워크 대역을 지정합니다."
+  optionExplanations={['myhostname은 서버 자체의 호스트명 설정입니다.', 'myorigin은 발신 메일의 도메인을 지정합니다.', '맞습니다. mydestination이 이 서버가 수신할 도메인 목록입니다.', 'mynetworks는 릴레이를 허용할 IP 대역입니다.']}
+/>
+
+## 참고 자료
+
+- [KAIT 리눅스마스터 안내](https://kait.or.kr/user/MainMenuList.do?cateSeq=5&menuSeq=119)
+- [Linux man-pages project](https://man7.org/linux/man-pages/)
