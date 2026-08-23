@@ -1,0 +1,293 @@
+---
+title: '11. 쿼리 최적화'
+description: '실행 계획, 비용 기반 최적화, 조인 알고리즘(NL/Hash/Sort-Merge), 힌트를 이해한다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 데이터베이스 쿼리가 실행되는 방식과 성능을 향상시키는 쿼리 최적화 기법을 이해한다.
+</Callout>
+
+## 쿼리 처리 과정
+
+SQL 쿼리는 다음 단계를 거쳐 실행됩니다:
+
+```
+SQL 쿼리
+  ↓ 파싱(Parsing) — 문법 분석 및 AST 생성
+쿼리 트리
+  ↓ 의미 검사 — 테이블/열 존재 확인
+검증된 쿼리 트리
+  ↓ 쿼리 최적화(Query Optimization)
+실행 계획(Execution Plan)
+  ↓ 실행(Execution)
+결과
+```
+
+## 실행 계획 (Execution Plan)
+
+DBMS가 쿼리를 어떻게 실행할지 결정한 계획입니다.
+
+**확인 방법:**
+```sql
+EXPLAIN SELECT * FROM orders WHERE customer_id = 100;
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 100;
+```
+
+**실행 계획 주요 항목:**
+| 항목 | 설명 |
+|------|------|
+| 접근 방법 | Index Scan, Full Table Scan 등 |
+| 조인 순서 | 어느 테이블을 먼저 처리할지 |
+| 조인 방법 | Nested Loop, Hash, Sort-Merge |
+| 예상 비용 | I/O 비용 + CPU 비용 |
+| 예상 행 수 | 각 연산에서 반환될 행의 수 |
+
+## 최적화 방식
+
+### 규칙 기반 최적화 (RBO, Rule-Based Optimization)
+
+미리 정해진 규칙(우선순위)에 따라 실행 계획을 선택합니다.
+
+- 인덱스가 있으면 항상 사용
+- 데이터 통계에 무관하게 동일한 계획
+- 현재는 대부분의 DBMS에서 비용 기반으로 대체
+
+### 비용 기반 최적화 (CBO, Cost-Based Optimization)
+
+**통계 정보**를 바탕으로 여러 실행 계획의 비용을 추정하여 가장 낮은 비용의 계획을 선택합니다.
+
+$$\text{비용} = \text{I/O 비용} + \text{CPU 비용}$$
+
+**사용하는 통계 정보:**
+- 테이블의 행 수
+- 각 열의 카디널리티(고유 값 수)
+- 인덱스 깊이
+- 데이터 분포(히스토그램)
+
+**통계 수집:**
+```sql
+-- Oracle
+EXEC DBMS_STATS.GATHER_TABLE_STATS('SCHEMA', 'TABLE');
+
+-- PostgreSQL
+ANALYZE table_name;
+```
+
+## 조인 알고리즘
+
+### Nested Loop Join (중첩 루프 조인)
+
+외부 테이블의 각 행마다 내부 테이블 전체를 반복 탐색합니다.
+
+```
+FOR each row r in 외부 테이블 R:
+    FOR each row s in 내부 테이블 S:
+        IF r.join_key = s.join_key:
+            output (r, s)
+```
+
+**비용:** $O(|R| \times |S|)$
+
+**특징:**
+- 내부 테이블에 인덱스가 있으면 효율적 → Index NL Join
+- 소량의 데이터 또는 내부 테이블이 작을 때 적합
+- 인덱스 없으면 대량 데이터에 비효율적
+
+### Hash Join
+
+해시 함수를 사용하여 조인 조건 기반으로 버킷을 나눠 조인합니다.
+
+```
+-- Build Phase (빌드 단계)
+작은 테이블 S에 해시 테이블 생성:
+  h(s.join_key) → 버킷
+
+-- Probe Phase (프로브 단계)
+큰 테이블 R의 각 행에 대해:
+  해당 버킷에서 일치하는 행 탐색
+```
+
+**특징:**
+- 등치 조인(=)에서 대량 데이터 처리에 효율적
+- 정렬 불필요
+- 해시 테이블을 메모리에 올려야 하므로 메모리 의존
+- 범위 조인에는 사용 불가
+
+### Sort-Merge Join (정렬-병합 조인)
+
+두 테이블을 조인 키 기준으로 정렬 후 병합합니다.
+
+```
+1. R을 join_key로 정렬
+2. S를 join_key로 정렬
+3. 두 정렬된 테이블을 병합하여 일치하는 행 출력
+```
+
+**특징:**
+- 정렬 비용이 크지만 정렬 후 병합은 선형
+- 데이터가 이미 정렬되어 있으면 매우 효율적
+- 등치(=) 및 범위(BETWEEN, >, <) 조인 모두 가능
+- 대량 데이터에 적합
+
+### 조인 알고리즘 비교
+
+| 항목 | Nested Loop | Hash Join | Sort-Merge |
+|------|-------------|-----------|------------|
+| 적합한 크기 | 소량/인덱스 있을 때 | 중대량 | 중대량 |
+| 등치 조인 | 가능 | 가능 | 가능 |
+| 범위 조인 | 가능 | 불가 | 가능 |
+| 메모리 요구 | 적음 | 많음 | 중간 |
+| 인덱스 활용 | 높음 | 낮음 | 낮음 |
+
+## 쿼리 최적화 기법
+
+### 선택 조건 최대한 먼저 적용 (Selection Pushdown)
+
+조인 전에 WHERE 조건을 최대한 빨리 적용하여 처리할 행 수를 줄입니다.
+
+```sql
+-- 비효율
+SELECT * FROM orders o JOIN customers c ON o.cid = c.id
+WHERE c.city = '서울';
+
+-- 최적화: 필터 먼저 적용
+SELECT * FROM orders o
+JOIN (SELECT * FROM customers WHERE city = '서울') c ON o.cid = c.id;
+```
+
+### 적절한 인덱스 활용
+
+- 자주 검색하는 열에 인덱스 생성
+- 복합 인덱스 활용 시 선두 열 규칙 준수
+
+### EXPLAIN 분석 포인트
+
+| 나쁜 신호 | 의미 | 해결책 |
+|-----------|------|--------|
+| Full Table Scan | 인덱스 미사용 | 인덱스 생성 |
+| 높은 rows 추정 | 대량 처리 예상 | 필터 조건 추가 |
+| Nested Loop on large table | 비효율 조인 | Hash/Sort-Merge 검토 |
+
+## 힌트 (Query Hint)
+
+옵티마이저의 판단을 개발자가 직접 지정합니다.
+
+```sql
+-- MySQL 인덱스 힌트
+SELECT /*+ INDEX(orders idx_customer) */ *
+FROM orders USE INDEX (idx_customer)
+WHERE customer_id = 100;
+
+-- Oracle 힌트
+SELECT /*+ FULL(o) */ *
+FROM orders o
+WHERE amount > 1000;
+
+-- 조인 방법 힌트
+SELECT /*+ USE_HASH(a b) */ *
+FROM a JOIN b ON a.id = b.id;
+```
+
+**힌트 사용 주의사항:**
+- 통계가 오래됐거나 옵티마이저 판단이 틀릴 때 사용
+- 과도한 힌트는 유지보수를 어렵게 함
+- 통계를 최신으로 유지하는 것이 우선
+
+## 핵심 정리
+
+- 비용 기반 최적화(CBO): 통계 정보로 최저 비용 계획 선택
+- Nested Loop Join: 내부 테이블 인덱스 있을 때 효율적
+- Hash Join: 등치 조인, 대량 데이터, 메모리 필요
+- Sort-Merge Join: 정렬 후 병합, 범위 조인도 가능
+- 힌트: 옵티마이저 결정을 개발자가 직접 지정
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="비용 기반 최적화(CBO)에서 사용하는 통계 정보가 아닌 것은?"
+  options={['① 테이블의 행 수', '② 각 열의 카디널리티(고유 값 수)', '③ 쿼리 작성자의 ID', '④ 데이터 분포(히스토그램)']}
+  correctAnswer={3}
+  explanation="비용 기반 최적화는 테이블 행 수, 열의 카디널리티, 인덱스 깊이, 데이터 분포(히스토그램) 등의 통계 정보를 사용하여 실행 계획의 비용을 추정합니다. 쿼리 작성자 정보는 통계에 포함되지 않습니다."
+  optionExplanations={[
+    '테이블 행 수는 비용 추정의 핵심 통계입니다.',
+    '카디널리티는 선택도를 추정하는 데 사용됩니다.',
+    '맞습니다. 쿼리 작성자 ID는 최적화 통계 정보가 아닙니다.',
+    '히스토그램은 데이터 분포를 파악하여 행 수를 추정하는 데 사용됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="Nested Loop Join이 가장 효율적인 경우는?"
+  options={['① 두 테이블 모두 수백만 행인 경우', '② 내부 테이블에 인덱스가 있고 외부 테이블이 소량인 경우', '③ 범위 조인이 아닌 경우', '④ 메모리가 충분한 경우']}
+  correctAnswer={2}
+  explanation="Nested Loop Join은 외부 테이블의 각 행에 대해 내부 테이블을 탐색합니다. 내부 테이블에 조인 키에 대한 인덱스가 있으면 각 탐색이 O(log n)이 되고, 외부 테이블이 소량이면 전체 비용이 낮아집니다."
+  optionExplanations={[
+    '두 테이블 모두 대량이면 Nested Loop는 비효율적입니다.',
+    '맞습니다. 내부 테이블 인덱스 + 소량 외부 테이블이 Nested Loop의 최적 조건입니다.',
+    '범위 조인 여부보다 데이터 크기와 인덱스가 중요합니다.',
+    '메모리는 Hash Join에서 중요한 요소입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Hash Join이 지원하지 않는 조인 조건은?"
+  options={['① 등치 조인 (A.id = B.id)', '② 다중 등치 조인 (A.id = B.id AND A.type = B.type)', '③ 범위 조인 (A.date BETWEEN B.start AND B.end)', '④ Natural Join']}
+  correctAnswer={3}
+  explanation="Hash Join은 해시 함수를 이용한 등치(=) 조인에만 사용할 수 있습니다. 범위 조인은 해시 버킷 구조로 처리할 수 없으며, 이 경우 Sort-Merge Join이나 Nested Loop Join을 사용합니다."
+  optionExplanations={[
+    '등치 조인은 Hash Join의 기본 사용 케이스입니다.',
+    '다중 등치 조인도 Hash Join이 지원합니다.',
+    '맞습니다. 범위 조인은 Hash Join으로 처리할 수 없습니다.',
+    'Natural Join은 공통 열 이름으로 등치 조인을 수행하므로 Hash Join 적용 가능합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="Sort-Merge Join의 특징으로 옳지 않은 것은?"
+  options={['① 두 테이블을 조인 키로 정렬 후 병합한다', '② 데이터가 이미 정렬되어 있으면 정렬 비용이 없다', '③ 범위 조인에 사용할 수 없다', '④ 대량 데이터 처리에 적합하다']}
+  correctAnswer={3}
+  explanation="Sort-Merge Join은 두 테이블을 정렬 후 순차적으로 병합하므로 등치 조인뿐만 아니라 범위 조인에도 사용할 수 있습니다. 이 점이 Hash Join과 구별되는 특징입니다."
+  optionExplanations={[
+    '정렬 후 병합은 Sort-Merge Join의 핵심 방식입니다.',
+    '이미 정렬된 데이터(인덱스 기반 등)는 정렬 단계를 생략합니다.',
+    '맞습니다. Sort-Merge Join은 범위 조인에도 사용할 수 있습니다.',
+    'Sort-Merge Join은 대량 데이터 조인에 적합합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="쿼리 힌트(Query Hint)를 사용하는 적절한 상황은?"
+  options={['① 항상 기본값으로 사용해야 한다', '② 통계 정보가 오래되어 옵티마이저가 잘못된 실행 계획을 선택할 때', '③ 쿼리 작성 시 항상 힌트를 명시해야 한다', '④ 테이블에 데이터가 없을 때']}
+  correctAnswer={2}
+  explanation="쿼리 힌트는 옵티마이저의 판단이 잘못되었을 때(통계가 오래되거나 특수한 데이터 분포) 개발자가 직접 실행 계획을 지정하는 방법입니다. 일반적으로 통계를 최신으로 유지하는 것이 우선이며 힌트는 예외적 상황에 사용합니다."
+  optionExplanations={[
+    '힌트는 기본 수단이 아니라 예외적 수단입니다.',
+    '맞습니다. 옵티마이저 판단 오류 시 힌트로 직접 지정합니다.',
+    '불필요한 힌트는 유지보수를 어렵게 합니다.',
+    '데이터가 없을 때는 힌트가 의미 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="EXPLAIN 결과에서 Full Table Scan이 나타났을 때 일반적인 해결책은?"
+  options={['① 테이블을 삭제하고 다시 만든다', '② WHERE 절에서 사용하는 열에 인덱스를 생성한다', '③ 쿼리를 삭제한다', '④ 테이블을 두 개로 분리한다']}
+  correctAnswer={2}
+  explanation="Full Table Scan은 인덱스를 사용하지 않고 테이블 전체를 스캔하는 것입니다. 일반적으로 WHERE 절의 조건 열에 적절한 인덱스를 생성하면 Index Scan으로 전환되어 성능이 향상됩니다."
+  optionExplanations={[
+    '테이블 재생성은 Full Table Scan의 해결책이 아닙니다.',
+    '맞습니다. 조건 열에 인덱스를 생성하여 Index Scan으로 전환합니다.',
+    '쿼리 삭제는 해결책이 아닙니다.',
+    '테이블 분리는 근본적인 해결책이 아닐 수 있습니다.',
+  ]}
+/>
+
+## 참고 자료
+
+- [국가평생교육진흥원 독학학위제](https://bdes.nile.or.kr/nile/study/nStudy1_1.do)
+- Ramez Elmasri, "Fundamentals of Database Systems"
