@@ -480,39 +480,44 @@
 
 .gridJunction,
 .groupJoint {
+  --junction-x: -50%;
+  --junction-y: -50%;
   position: absolute;
-  z-index: 10;
-  width: 7px;
-  height: 7px;
+  z-index: 20;
+  width: 6px;
+  height: 6px;
   background: var(--junction);
-  box-shadow: 0 0 0 2px var(--page);
+  box-shadow: 0 0 0 1px var(--page);
   opacity: 0.96;
   pointer-events: none;
-  transform: rotate(45deg);
+  transform: translate(var(--junction-x), var(--junction-y)) rotate(45deg);
 }
 .gridJunctionLeft {
-  left: -3.5px;
+  left: 0;
 }
 
 .groupJointLeft {
-  left: calc(-1 * var(--catalog-gutter) - 3.5px);
+  left: calc(-1 * var(--catalog-gutter));
 }
 
 .gridJunctionRight {
-  right: -3.5px;
+  --junction-x: 50%;
+  right: 0;
 }
 
 .groupJointRight {
-  right: calc(-1 * var(--catalog-gutter) - 3.5px);
+  --junction-x: 50%;
+  right: calc(-1 * var(--catalog-gutter));
 }
 
 .gridJunctionTop,
 .groupJoint {
-  top: -3.5px;
+  top: 0;
 }
 
 .gridJunctionBottom {
-  bottom: -3.5px;
+  --junction-y: 50%;
+  bottom: 0;
 }
 
 .gridJunction[data-active='true'],
@@ -521,8 +526,8 @@
 }
 
 @keyframes junction-arrive {
-  from { transform: rotate(45deg); }
-  to { transform: rotate(405deg); }
+  from { transform: translate(var(--junction-x), var(--junction-y)) rotate(45deg); }
+  to { transform: translate(var(--junction-x), var(--junction-y)) rotate(405deg); }
 }
 .featureRail {
   position: relative;
@@ -1314,17 +1319,13 @@
     font-size: 31px;
   }
 
-  .groupJoint {
-    width: 5px;
-    height: 5px;
-  }
 
   .gridJunctionLeft {
-    left: 9px;
+    left: 12px;
   }
 
   .gridJunctionRight {
-    right: 9px;
+    right: 12px;
   }
 
   .groupJointLeft {

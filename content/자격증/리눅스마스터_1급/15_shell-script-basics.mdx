@@ -291,7 +291,7 @@ chmod +x log_check.sh
 ## 핵심 정리
 
 - 스크립트 첫 줄: #!/bin/bash (shebang), 실행: chmod +x 후 ./script.sh 또는 bash script.sh
-- 변수 선언: name="값" (공백 없음), 사용: $name 또는 ${name}
+- 변수 선언: name="값" (공백 없음), 사용: $name 또는 $&#123;name&#125;
 - 특수 변수: $0(스크립트명), $1~$9(인수), $#(인수수), $?(종료코드), $$(PID)
 - 조건: -f(파일), -d(디렉터리), -z(빈문자열), -eq/-ne/-lt/-gt(숫자 비교)
 - for 반복, while 반복, case 패턴 매칭, 함수 내 local 변수 사용
