@@ -1,0 +1,283 @@
+---
+title: '10. 유틸리티 타입'
+description: 'Partial, Required, Readonly, Pick, Omit, Record, ReturnType, Parameters를 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** TypeScript 내장 유틸리티 타입을 이해하고 실전 코드에 적용합니다.
+</Callout>
+
+## Partial - 모든 프로퍼티를 선택적으로
+
+```ts
+interface User {
+  id: number
+  name: string
+  email: string
+  age: number
+}
+
+type PartialUser = Partial<User>
+// { id?: number; name?: string; email?: string; age?: number }
+
+// 업데이트 함수에서 유용
+function updateUser(id: number, updates: Partial<User>) {
+  // 일부 필드만 업데이트 가능
+}
+
+updateUser(1, { name: 'Bob' })         // OK
+updateUser(1, { email: 'b@test.com' }) // OK
+```
+
+## Required - 모든 프로퍼티를 필수로
+
+```ts
+interface Config {
+  host?: string
+  port?: number
+  debug?: boolean
+}
+
+type RequiredConfig = Required<Config>
+// { host: string; port: number; debug: boolean }
+
+// Partial의 반대
+```
+
+## Readonly - 모든 프로퍼티를 읽기 전용으로
+
+```ts
+interface Config {
+  host: string
+  port: number
+}
+
+type ReadonlyConfig = Readonly<Config>
+
+const config: ReadonlyConfig = { host: 'localhost', port: 3000 }
+config.host = 'other'  // 오류: 읽기 전용
+```
+
+## Pick - 특정 프로퍼티만 선택
+
+```ts
+interface User {
+  id: number
+  name: string
+  email: string
+  password: string
+  createdAt: Date
+}
+
+// API 응답에서 민감 정보 제외
+type PublicUser = Pick<User, 'id' | 'name' | 'email'>
+// { id: number; name: string; email: string }
+
+function getPublicProfile(user: User): PublicUser {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  }
+}
+```
+
+## Omit - 특정 프로퍼티를 제외
+
+```ts
+// 생성 시 id와 createdAt은 서버에서 생성
+type CreateUserDto = Omit<User, 'id' | 'createdAt'>
+// { name: string; email: string; password: string }
+
+function createUser(dto: CreateUserDto): User {
+  return {
+    ...dto,
+    id: generateId(),
+    createdAt: new Date(),
+  }
+}
+```
+
+## Record - 키-값 쌍의 객체 타입
+
+```ts
+// Record<Keys, Values>
+type UserMap = Record<string, User>
+// { [key: string]: User }
+
+const users: UserMap = {
+  alice: { id: 1, name: 'Alice', email: 'a@test.com', password: 'pw', createdAt: new Date() },
+}
+
+// 유니온 키와 함께
+type Status = 'pending' | 'active' | 'closed'
+type StatusLabel = Record<Status, string>
+
+const labels: StatusLabel = {
+  pending: '대기 중',
+  active: '활성',
+  closed: '종료',
+}
+```
+
+## ReturnType - 함수 반환 타입 추출
+
+```ts
+function fetchUser(id: number) {
+  return { id, name: 'Alice', email: 'a@test.com' }
+}
+
+type FetchUserResult = ReturnType<typeof fetchUser>
+// { id: number; name: string; email: string }
+
+// async 함수는 Promise로 감싸짐
+async function fetchData() {
+  return { count: 10, items: [] }
+}
+
+type FetchDataResult = Awaited<ReturnType<typeof fetchData>>
+// { count: number; items: never[] }
+```
+
+## Parameters - 함수 매개변수 타입 추출
+
+```ts
+function createPost(title: string, content: string, authorId: number) {
+  return { title, content, authorId }
+}
+
+type CreatePostParams = Parameters<typeof createPost>
+// [string, string, number]
+
+// 특정 매개변수 타입 접근
+type FirstParam = Parameters<typeof createPost>[0]  // string
+
+// 사용 예시
+function logCall<T extends (...args: unknown[]) => unknown>(
+  fn: T,
+  ...args: Parameters<T>
+): ReturnType<T> {
+  console.log('호출:', fn.name, args)
+  return fn(...args) as ReturnType<T>
+}
+```
+
+## NonNullable - null/undefined 제거
+
+```ts
+type MaybeString = string | null | undefined
+type DefinitelyString = NonNullable<MaybeString>  // string
+
+// 배열에서 null 제거
+const items = ['a', null, 'b', undefined, 'c']
+const filtered = items.filter((x): x is NonNullable<typeof x> => x != null)
+// 타입: string[]
+```
+
+## 핵심 정리
+
+- `Partial<T>`: 모든 프로퍼티를 선택적으로
+- `Required<T>`: 모든 프로퍼티를 필수로
+- `Readonly<T>`: 모든 프로퍼티를 읽기 전용으로
+- `Pick<T, K>`: T에서 K 프로퍼티만 선택
+- `Omit<T, K>`: T에서 K 프로퍼티를 제외
+- `Record<K, V>`: 키-값 매핑 타입 생성
+- `ReturnType<F>`: 함수 반환 타입 추출
+- `Parameters<F>`: 함수 매개변수 타입 추출
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="업데이트 API에서 일부 필드만 변경할 때 적합한 유틸리티 타입은?"
+  options={[
+    'Required',
+    'Partial',
+    'Readonly',
+    'Record',
+  ]}
+  correctAnswer={2}
+  explanation="Partial은 모든 프로퍼티를 선택적으로 만듭니다. PATCH 요청처럼 일부 필드만 업데이트하는 경우 Partial을 활용하면 모든 필드를 제공하지 않아도 됩니다."
+  optionExplanations={[
+    'Required는 모든 프로퍼티를 필수로 만듭니다.',
+    '맞습니다. Partial로 선택적 업데이트를 구현합니다.',
+    'Readonly는 변경을 막습니다.',
+    'Record는 키-값 쌍 타입 생성에 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="Pick과 Omit의 차이는?"
+  options={[
+    '동일하다.',
+    'Pick은 선택할 프로퍼티를, Omit은 제외할 프로퍼티를 지정한다.',
+    'Pick은 타입에서, Omit은 값에서 프로퍼티를 선택한다.',
+    'Omit은 Partial과 동일하다.',
+  ]}
+  correctAnswer={2}
+  explanation="Pick은 포함할 프로퍼티 키를 지정합니다. Omit은 제외할 프로퍼티 키를 지정합니다. 제외 수가 선택 수보다 적다면 Omit이 편리합니다."
+  optionExplanations={[
+    '반대되는 유틸리티 타입입니다.',
+    '맞습니다. 선택과 제외의 차이입니다.',
+    '둘 다 타입 레벨 연산입니다.',
+    'Omit과 Partial은 다릅니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Record&lt;string, number&gt;와 동일한 인덱스 시그니처는?"
+  options={[
+    '{ string: number }',
+    '{ [key: string]: number }',
+    'Map&lt;string, number&gt;',
+    '{ [key: number]: string }',
+  ]}
+  correctAnswer={2}
+  explanation="Record&lt;string, number&gt;는 { [key: string]: number }와 동일합니다. 임의의 문자열 키에 number 값을 가지는 객체 타입입니다."
+  optionExplanations={[
+    '{ string: number }은 키 이름이 'string'인 객체입니다.',
+    '맞습니다. Record는 인덱스 시그니처의 타입 별칭입니다.',
+    'Map은 런타임 데이터 구조입니다.',
+    '키-값 타입이 반대입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="ReturnType을 사용하는 주요 이점은?"
+  options={[
+    '함수 실행 속도를 높인다.',
+    '함수 반환 타입을 수동으로 복사하지 않고 자동으로 추출해 동기화를 유지한다.',
+    '함수를 더 안전하게 만든다.',
+    'null 반환을 방지한다.',
+  ]}
+  correctAnswer={2}
+  explanation="ReturnType을 사용하면 함수의 반환 타입이 바뀌어도 추출된 타입이 자동으로 업데이트됩니다. 타입을 중복 정의하지 않아 유지보수성이 향상됩니다."
+  optionExplanations={[
+    '실행 속도와 관련 없습니다.',
+    '맞습니다. 타입 자동 추출로 중복과 불일치를 방지합니다.',
+    '직접적인 안전성 향상은 아닙니다.',
+    'null 방지와는 관련 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="NonNullable 유틸리티 타입이 제거하는 타입은?"
+  options={[
+    'undefined만',
+    'null만',
+    'null과 undefined 모두',
+    'any와 unknown',
+  ]}
+  correctAnswer={3}
+  explanation="NonNullable은 타입에서 null과 undefined를 모두 제거합니다. string | null | undefined에 적용하면 string이 됩니다."
+  optionExplanations={[
+    'undefined만 제거하는 것은 아닙니다.',
+    'null만 제거하는 것은 아닙니다.',
+    '맞습니다. null과 undefined 모두 제거합니다.',
+    'any와 unknown은 NonNullable의 대상이 아닙니다.',
+  ]}
+/>

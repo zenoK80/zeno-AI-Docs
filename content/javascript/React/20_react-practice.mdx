@@ -1,0 +1,428 @@
+---
+title: '20. React 예상기출문제'
+description: 'React 핵심 개념 20문제 이상으로 실력을 점검합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** React의 핵심 개념 전반을 아우르는 기출 예상 문제로 최종 실력을 점검합니다.
+</Callout>
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="React에서 Virtual DOM을 사용하는 이유는?"
+  options={[
+    '실제 DOM보다 항상 빠르기 때문에',
+    'DOM 조작 비용을 줄이기 위해 변경된 부분만 실제 DOM에 반영하기 위해',
+    'JavaScript 없이 렌더링하기 위해',
+    'SEO를 향상시키기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="Virtual DOM은 실제 DOM의 가벼운 복사본입니다. 상태 변경 시 새 Virtual DOM과 이전 Virtual DOM을 비교(diffing)해 변경된 부분만 실제 DOM에 반영(reconciliation)해 불필요한 DOM 조작을 줄입니다."
+  optionExplanations={[
+    'Virtual DOM이 항상 더 빠른 것은 아닙니다.',
+    '맞습니다. 변경 최소화를 위해 Virtual DOM을 사용합니다.',
+    'JavaScript 기반 기술입니다.',
+    'SSR이 SEO에 도움을 주며 Virtual DOM 자체가 SEO를 개선하지는 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="React 컴포넌트에서 key prop이 필요한 이유는?"
+  options={[
+    '스타일을 적용하기 위해',
+    'React가 리스트를 렌더링할 때 각 항목을 고유하게 식별해 효율적으로 업데이트하기 위해',
+    '컴포넌트 이름을 지정하기 위해',
+    'ref를 참조하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="key는 React가 어떤 항목이 추가·삭제·변경되었는지 식별하는 데 사용합니다. 인덱스 대신 데이터의 고유 ID를 key로 사용하는 것이 권장됩니다."
+  optionExplanations={[
+    'key는 스타일과 관련 없습니다.',
+    '맞습니다. 리스트 항목의 고유 식별자입니다.',
+    '컴포넌트 이름은 함수/클래스 이름으로 지정합니다.',
+    'ref는 별도의 prop입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="useState의 상태 업데이트 함수에 값 대신 함수를 전달하는 이유는?"
+  options={[
+    '성능을 높이기 위해',
+    '이전 상태를 기반으로 안전하게 업데이트하기 위해',
+    '비동기 처리를 위해',
+    '타입 안전성을 위해',
+  ]}
+  correctAnswer={2}
+  explanation="React의 상태 업데이트는 배치 처리될 수 있어 setCount(count + 1)을 여러 번 호출해도 한 번만 증가할 수 있습니다. setCount(c => c + 1)처럼 함수를 전달하면 항상 최신 상태를 기반으로 업데이트됩니다."
+  optionExplanations={[
+    '성능이 주된 이유는 아닙니다.',
+    '맞습니다. 최신 상태를 기반으로 안전한 업데이트를 보장합니다.',
+    '비동기 처리와 직접 관련은 없습니다.',
+    'TypeScript와 무관합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="useEffect의 의존성 배열이 빈 배열([])일 때의 동작은?"
+  options={[
+    '매 렌더링마다 실행된다.',
+    '컴포넌트 마운트 시 한 번만 실행된다.',
+    '의존성 배열 없이 쓴 것과 동일하다.',
+    '실행되지 않는다.',
+  ]}
+  correctAnswer={2}
+  explanation="의존성 배열이 빈 배열([])이면 의존하는 값이 없으므로 컴포넌트가 처음 마운트될 때 한 번만 실행됩니다. componentDidMount와 유사합니다."
+  optionExplanations={[
+    '매 렌더링 실행은 의존성 배열 자체를 생략했을 때입니다.',
+    '맞습니다. 마운트 시 한 번 실행됩니다.',
+    '의존성 배열 없이 쓰면 매 렌더링마다 실행됩니다.',
+    '실행되지 않는 것이 아니라 마운트 시 한 번 실행됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="제어 컴포넌트(Controlled Component)와 비제어 컴포넌트(Uncontrolled Component)의 차이는?"
+  options={[
+    '제어 컴포넌트는 클래스 컴포넌트, 비제어는 함수 컴포넌트다.',
+    '제어 컴포넌트는 React 상태로 폼 값을 관리하고, 비제어는 DOM이 직접 관리한다.',
+    '제어 컴포넌트는 ref를 사용하고, 비제어는 state를 사용한다.',
+    '차이가 없다.',
+  ]}
+  correctAnswer={2}
+  explanation="제어 컴포넌트는 input의 value를 React 상태(state)로 관리하고 onChange로 상태를 업데이트합니다. 비제어 컴포넌트는 ref를 통해 DOM에서 직접 값을 읽습니다."
+  optionExplanations={[
+    '클래스/함수 컴포넌트와는 무관합니다.',
+    '맞습니다. 폼 값의 관리 주체가 다릅니다.',
+    '역할이 바뀌었습니다.',
+    '분명한 차이가 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="React에서 상태(state)를 직접 변경(mutation)하면 안 되는 이유는?"
+  options={[
+    'JavaScript 문법 오류가 발생하기 때문에',
+    'React가 변경을 감지하지 못해 리렌더링이 일어나지 않기 때문에',
+    '성능이 느려지기 때문에',
+    'TypeScript 오류가 발생하기 때문에',
+  ]}
+  correctAnswer={2}
+  explanation="React는 참조 비교로 상태 변경을 감지합니다. 객체를 직접 변경(mutation)하면 참조가 같아 React가 변경을 인식하지 못하고 리렌더링하지 않습니다. 항상 새 객체/배열을 반환해야 합니다."
+  optionExplanations={[
+    '문법 오류는 발생하지 않습니다.',
+    '맞습니다. 참조 비교로 감지하므로 직접 변경은 인식되지 않습니다.',
+    '성능 문제보다 동작 문제가 더 심각합니다.',
+    'TypeScript 오류와는 별개입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="useRef가 반환하는 객체의 특징은?"
+  options={[
+    '변경 시 리렌더링을 트리거한다.',
+    '.current 프로퍼티에 값을 저장하며 변경해도 리렌더링이 일어나지 않는다.',
+    '읽기 전용 값을 저장한다.',
+    '비동기 값을 저장한다.',
+  ]}
+  correctAnswer={2}
+  explanation="useRef는 { current: value } 형태의 변경 가능한 ref 객체를 반환합니다. .current를 변경해도 리렌더링이 발생하지 않아 DOM 참조나 렌더링과 무관한 값 저장에 유용합니다."
+  optionExplanations={[
+    '리렌더링을 트리거하는 것은 useState입니다.',
+    '맞습니다. .current 변경은 리렌더링을 유발하지 않습니다.',
+    'ref의 .current는 변경 가능합니다.',
+    '비동기와는 관련 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="props.children은 무엇인가요?"
+  options={[
+    '컴포넌트의 상태값',
+    '컴포넌트 태그 사이에 전달된 자식 요소들',
+    '부모 컴포넌트의 참조',
+    'DOM 노드 목록',
+  ]}
+  correctAnswer={2}
+  explanation="props.children은 컴포넌트 여는 태그와 닫는 태그 사이에 전달된 내용입니다. 텍스트, JSX 요소, 배열, 함수 등 어떤 값도 될 수 있습니다."
+  optionExplanations={[
+    'children은 상태가 아닌 props입니다.',
+    '맞습니다. 태그 사이의 자식 요소입니다.',
+    '부모 참조는 다른 방법으로 전달합니다.',
+    'DOM 노드는 ref로 참조합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="React.StrictMode의 역할은?"
+  options={[
+    '프로덕션 빌드에서 성능을 최적화한다.',
+    '개발 모드에서 잠재적 문제를 감지하기 위해 일부 함수를 두 번 호출한다.',
+    '에러를 자동으로 수정한다.',
+    'TypeScript 타입 검사를 수행한다.',
+  ]}
+  correctAnswer={2}
+  explanation="StrictMode는 개발 환경에서만 동작합니다. 컴포넌트를 두 번 렌더링하고 useEffect를 두 번 실행해 사이드이펙트, 오래된 API 사용, 순수하지 않은 렌더링 등을 감지합니다."
+  optionExplanations={[
+    'StrictMode는 개발 모드 전용이며 프로덕션에서는 동작하지 않습니다.',
+    '맞습니다. 개발 중 잠재적 문제를 조기에 발견하게 돕습니다.',
+    '에러를 자동 수정하지는 않습니다.',
+    'TypeScript 검사와는 무관합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="Context의 value가 변경될 때 어떤 컴포넌트가 리렌더링되나요?"
+  options={[
+    '전체 앱이 리렌더링된다.',
+    '해당 Context를 useContext로 구독하는 모든 컴포넌트가 리렌더링된다.',
+    'Context Provider 컴포넌트만 리렌더링된다.',
+    '아무것도 리렌더링되지 않는다.',
+  ]}
+  correctAnswer={2}
+  explanation="Context value가 변경되면 해당 Context를 useContext로 구독 중인 모든 컴포넌트가 리렌더링됩니다. 이것이 Context API의 성능 한계이며, 전역 상태 관리 라이브러리가 필요한 이유 중 하나입니다."
+  optionExplanations={[
+    '전체 앱이 아닌 구독 중인 컴포넌트만 리렌더링됩니다.',
+    '맞습니다. useContext로 구독하는 컴포넌트 전체가 리렌더링됩니다.',
+    'Provider 자체만 리렌더링되지는 않습니다.',
+    '구독 중인 컴포넌트가 리렌더링됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="JSX에서 조건부 렌더링에 &&를 사용할 때 주의할 점은?"
+  options={[
+    '&&는 JSX에서 사용할 수 없다.',
+    '왼쪽 값이 0이면 0이 화면에 렌더링된다.',
+    '&&는 항상 true를 반환한다.',
+    '조건이 false이면 에러가 발생한다.',
+  ]}
+  correctAnswer={2}
+  explanation="0 && <Component />에서 0은 falsy지만 React가 숫자 0을 텍스트로 렌더링합니다. items.length && 같은 패턴이 위험한 이유입니다. items.length > 0 &&처럼 boolean으로 명시하거나 삼항 연산자를 사용합니다."
+  optionExplanations={[
+    '&&는 JSX에서 자주 쓰이는 조건부 렌더링 패턴입니다.',
+    '맞습니다. 왼쪽이 0이면 0이 그대로 렌더링됩니다.',
+    '&&의 반환값은 두 피연산자 중 하나입니다.',
+    'false는 렌더링되지 않아 에러가 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="React에서 이벤트 핸들러 이름 컨벤션은?"
+  options={[
+    'onclick, onchange처럼 소문자로 작성한다.',
+    'onClick, onChange처럼 camelCase로 작성한다.',
+    'on-click, on-change처럼 케밥케이스로 작성한다.',
+    'handleClick, handleChange처럼 handle 접두사를 사용한다.',
+  ]}
+  correctAnswer={2}
+  explanation="React JSX에서 이벤트 핸들러는 HTML과 달리 camelCase로 작성합니다. onclick은 HTML 속성이고, React에서는 onClick이 올바른 형태입니다."
+  optionExplanations={[
+    'HTML 속성 방식이며 React에서는 camelCase를 사용합니다.',
+    '맞습니다. React 이벤트는 camelCase입니다.',
+    '케밥케이스는 React 이벤트에서 사용하지 않습니다.',
+    'handle 접두사는 핸들러 함수 이름 컨벤션이지 prop 이름이 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="React Router v6에서 index route의 역할은?"
+  options={[
+    '404 페이지를 처리한다.',
+    '부모 경로로 접근했을 때 렌더링되는 기본 자식 라우트다.',
+    '가장 우선순위가 높은 라우트다.',
+    '이름 없는 라우트를 의미한다.',
+  ]}
+  correctAnswer={2}
+  explanation="index prop이 있는 Route는 부모 경로 자체(/dashboard)에 접근했을 때 Outlet 위치에 렌더링되는 기본 자식 라우트입니다. path를 지정하지 않아도 부모 경로와 일치합니다."
+  optionExplanations={[
+    '404는 path=&quot;*&quot;가 처리합니다.',
+    '맞습니다. 부모 경로의 기본 자식 라우트입니다.',
+    '우선순위와는 다른 개념입니다.',
+    '이름이 아닌 경로와 관련된 개념입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="Zustand에서 set 함수의 역할은?"
+  options={[
+    'DOM을 업데이트한다.',
+    '스토어의 상태를 업데이트한다.',
+    '컴포넌트를 강제로 리렌더링한다.',
+    'Context를 업데이트한다.',
+  ]}
+  correctAnswer={2}
+  explanation="Zustand의 create 콜백에서 받는 set 함수는 스토어 상태를 업데이트합니다. set(newState) 또는 set(state => newState) 형태로 호출합니다."
+  optionExplanations={[
+    'DOM 업데이트는 React가 자동으로 처리합니다.',
+    '맞습니다. set은 Zustand 스토어 상태를 업데이트합니다.',
+    '리렌더링은 상태 변경의 결과로 자동 발생합니다.',
+    'Context 업데이트와는 다른 개념입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="React.lazy()의 반환값은?"
+  options={[
+    '컴포넌트 함수',
+    '동적으로 로드될 컴포넌트를 나타내는 lazy 컴포넌트',
+    'Promise',
+    '모듈 객체',
+  ]}
+  correctAnswer={2}
+  explanation="React.lazy()는 동적 import()를 감싸 Suspense와 함께 사용할 수 있는 lazy 컴포넌트를 반환합니다. 실제 컴포넌트는 처음 렌더링될 때 로드됩니다."
+  optionExplanations={[
+    '일반 컴포넌트 함수가 아닙니다.',
+    '맞습니다. Suspense에서 사용할 수 있는 lazy 컴포넌트입니다.',
+    'Promise를 직접 반환하지 않습니다.',
+    '모듈 객체가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={16}
+  question="커스텀 훅에서 반환값의 형태로 가장 일반적인 것은?"
+  options={[
+    '항상 배열을 반환해야 한다.',
+    '항상 객체를 반환해야 한다.',
+    '값, 배열, 객체 등 자유롭게 설계할 수 있다.',
+    '항상 단일 값을 반환해야 한다.',
+  ]}
+  correctAnswer={3}
+  explanation="커스텀 훅의 반환값 형태에는 제한이 없습니다. useState처럼 [value, setter] 배열, 여러 값을 묶은 객체, 단일 값, 또는 아무것도 반환하지 않아도 됩니다."
+  optionExplanations={[
+    '배열만 반환하는 규칙은 없습니다.',
+    '객체만 반환하는 규칙은 없습니다.',
+    '맞습니다. 반환값 형태는 자유롭게 설계합니다.',
+    '단일 값만 반환하는 규칙은 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={17}
+  question="Next.js에서 'use client'를 선언하지 않은 컴포넌트의 기본 동작은?"
+  options={[
+    '클라이언트에서만 렌더링된다.',
+    '서버에서 렌더링되는 Server Component다.',
+    '정적 HTML로 빌드된다.',
+    '렌더링되지 않는다.',
+  ]}
+  correctAnswer={2}
+  explanation="Next.js App Router에서 모든 컴포넌트는 기본적으로 Server Component입니다. 서버에서 렌더링되어 HTML을 생성하며 클라이언트 번들에 포함되지 않습니다."
+  optionExplanations={[
+    "'use client' 없이는 클라이언트 전용이 아닙니다.",
+    '맞습니다. App Router의 기본값은 Server Component입니다.',
+    'Server Component가 맞지만 항상 정적 HTML만은 아닙니다.',
+    '렌더링됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={18}
+  question="React에서 폼 제출 시 기본 동작을 막는 방법은?"
+  options={[
+    'return false를 반환한다.',
+    'e.preventDefault()를 호출한다.',
+    'e.stopPropagation()을 호출한다.',
+    'type=&quot;button&quot;을 사용한다.',
+  ]}
+  correctAnswer={2}
+  explanation="e.preventDefault()는 브라우저의 기본 동작(폼 제출 시 페이지 이동)을 막습니다. e.stopPropagation()은 이벤트 버블링을 막는 별개의 메서드입니다."
+  optionExplanations={[
+    'React 이벤트 핸들러에서 return false는 기본 동작을 막지 않습니다.',
+    '맞습니다. e.preventDefault()로 기본 동작을 막습니다.',
+    'stopPropagation은 이벤트 전파를 막는 메서드입니다.',
+    'type=&quot;button&quot;은 submit 동작을 하지 않지만 다른 목적의 해결책입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={19}
+  question="React에서 배열 상태에 항목을 추가하는 올바른 방법은?"
+  options={[
+    'state.push(newItem)으로 직접 추가한다.',
+    '[...state, newItem]처럼 새 배열을 만들어 setState를 호출한다.',
+    'state.concat은 사용할 수 없다.',
+    'setState(state)로 같은 배열을 다시 설정한다.',
+  ]}
+  correctAnswer={2}
+  explanation="React 상태 배열을 직접 변경(push, splice 등)하면 참조가 같아 리렌더링이 일어나지 않습니다. 스프레드 문법이나 concat으로 새 배열을 만들어 setState에 전달해야 합니다."
+  optionExplanations={[
+    'push는 상태를 직접 변경해 리렌더링이 발생하지 않습니다.',
+    '맞습니다. 새 배열을 만들어 setState에 전달합니다.',
+    'state.concat(newItem)도 새 배열을 반환하므로 사용 가능합니다.',
+    '같은 참조를 설정하면 리렌더링이 발생하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={20}
+  question="useEffect의 클린업 함수가 실행되는 시점은?"
+  options={[
+    '컴포넌트가 마운트될 때',
+    '컴포넌트가 언마운트되거나 의존성이 변경되기 직전에',
+    '상태가 변경될 때마다',
+    '앱이 종료될 때',
+  ]}
+  correctAnswer={2}
+  explanation="클린업 함수는 두 시점에 실행됩니다. 첫째, 컴포넌트가 언마운트될 때. 둘째, 의존성이 변경되어 Effect가 재실행되기 직전에 이전 Effect의 클린업이 먼저 실행됩니다."
+  optionExplanations={[
+    '마운트 시에는 클린업이 아닌 Effect 본문이 실행됩니다.',
+    '맞습니다. 언마운트 시 또는 의존성 변경 직전에 실행됩니다.',
+    '상태 변경 자체가 아닌 의존성이 바뀔 때 실행됩니다.',
+    '앱 종료를 React가 감지하지는 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={21}
+  question="React.memo는 props를 어떤 방식으로 비교하나요?"
+  options={[
+    '깊은 비교(deep comparison)',
+    '얕은 비교(shallow comparison)',
+    '문자열로 변환 후 비교',
+    'JSON.stringify로 비교',
+  ]}
+  correctAnswer={2}
+  explanation="React.memo는 기본적으로 얕은 비교를 합니다. 원시값은 값을 비교하고 객체/배열/함수는 참조를 비교합니다. 커스텀 비교 함수를 두 번째 인수로 전달해 동작을 바꿀 수 있습니다."
+  optionExplanations={[
+    '깊은 비교는 비용이 크므로 기본값이 아닙니다.',
+    '맞습니다. 기본은 얕은 비교이며 커스텀 비교 함수를 줄 수 있습니다.',
+    '문자열 변환으로 비교하지 않습니다.',
+    'JSON.stringify 비교는 별도 구현이 필요합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={22}
+  question="Suspense의 fallback prop은 언제 렌더링되나요?"
+  options={[
+    '항상 렌더링된다.',
+    '자식 컴포넌트가 로딩 중(Promise가 pending 상태)일 때',
+    '에러가 발생했을 때',
+    '서버 렌더링 중일 때',
+  ]}
+  correctAnswer={2}
+  explanation="Suspense는 자식 컴포넌트 트리에서 데이터 로딩 등으로 Promise가 throw될 때(pending 상태) fallback을 표시합니다. lazy()나 use() 등과 함께 사용합니다."
+  optionExplanations={[
+    '항상 렌더링되지는 않습니다.',
+    '맞습니다. 자식이 suspended 상태일 때 fallback을 보여줍니다.',
+    '에러 처리는 ErrorBoundary가 담당합니다.',
+    '서버 렌더링과는 직접 관련 없습니다.',
+  ]}
+/>

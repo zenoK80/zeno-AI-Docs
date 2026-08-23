@@ -1,0 +1,281 @@
+---
+title: '14. 전역 상태 관리'
+description: 'Context API의 한계를 이해하고 Zustand와 Redux Toolkit으로 전역 상태를 관리합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** Context API의 한계를 파악하고 Zustand 기본 사용법, Redux Toolkit의 핵심 개념을 익힙니다.
+</Callout>
+
+## Context API의 한계
+
+Context API는 간단한 전역 상태에는 좋지만 다음 한계가 있습니다.
+
+```
+1. 성능: Context 값이 바뀌면 해당 Context를 구독하는 모든 컴포넌트가 리렌더링됩니다.
+2. 분리 어려움: 여러 상태를 하나의 Context에 넣으면 관련 없는 컴포넌트도 리렌더링됩니다.
+3. 미들웨어 없음: 비동기 처리, 로깅, 사이드이펙트 관리에 추가 작업이 필요합니다.
+4. 개발 도구 없음: Redux DevTools 같은 전용 디버깅 도구가 없습니다.
+```
+
+## Zustand — 경량 상태 관리
+
+```bash
+npm install zustand
+```
+
+```js
+import { create } from 'zustand'
+
+// 스토어 생성
+const useCounterStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 })),
+  reset: () => set({ count: 0 }),
+}))
+
+// 컴포넌트에서 사용
+function Counter() {
+  const { count, increment, decrement } = useCounterStore()
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+    </div>
+  )
+}
+```
+
+## Zustand — 비동기 액션
+
+```js
+const useUserStore = create((set) => ({
+  user: null,
+  loading: false,
+  error: null,
+
+  fetchUser: async (id) => {
+    set({ loading: true, error: null })
+    try {
+      const res = await fetch(`/api/users/${id}`)
+      const user = await res.json()
+      set({ user, loading: false })
+    } catch (err) {
+      set({ error: err.message, loading: false })
+    }
+  },
+
+  logout: () => set({ user: null }),
+}))
+
+function Profile() {
+  const { user, loading, fetchUser } = useUserStore()
+
+  useEffect(() => {
+    fetchUser(1)
+  }, [fetchUser])
+
+  if (loading) return <p>로딩...</p>
+  return <p>{user?.name}</p>
+}
+```
+
+## Zustand — 선택적 구독 (리렌더링 최적화)
+
+```js
+// count만 구독 — 다른 상태가 바뀌어도 리렌더링 안 됨
+function CountDisplay() {
+  const count = useCounterStore((state) => state.count)
+  return <p>{count}</p>
+}
+
+// 액션만 구독 — 상태가 바뀌어도 리렌더링 안 됨
+function CountButtons() {
+  const { increment, decrement } = useCounterStore(
+    (state) => ({ increment: state.increment, decrement: state.decrement })
+  )
+  return (
+    <div>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+    </div>
+  )
+}
+```
+
+## Redux Toolkit 개념
+
+Redux Toolkit(RTK)은 Redux의 공식 권장 방식으로 보일러플레이트를 크게 줄였습니다.
+
+```bash
+npm install @reduxjs/toolkit react-redux
+```
+
+```js
+import { createSlice, configureStore } from '@reduxjs/toolkit'
+
+// Slice — 상태 + 리듀서 + 액션을 한 곳에서 정의
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { value: 0 },
+  reducers: {
+    increment: (state) => { state.value += 1 },    // Immer 덕분에 직접 수정 가능
+    decrement: (state) => { state.value -= 1 },
+    incrementByAmount: (state, action) => {
+      state.value += action.payload
+    },
+  },
+})
+
+export const { increment, decrement, incrementByAmount } = counterSlice.actions
+
+// Store 생성
+const store = configureStore({
+  reducer: { counter: counterSlice.reducer },
+})
+
+// React와 연결
+import { Provider, useSelector, useDispatch } from 'react-redux'
+
+function App() {
+  return (
+    <Provider store={store}>
+      <Counter />
+    </Provider>
+  )
+}
+
+function Counter() {
+  const count = useSelector((state) => state.counter.value)
+  const dispatch = useDispatch()
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={() => dispatch(increment())}>+</button>
+      <button onClick={() => dispatch(decrement())}>-</button>
+    </div>
+  )
+}
+```
+
+## 라이브러리 선택 기준
+
+```
+Zustand
+- 적은 보일러플레이트
+- 작은~중간 규모 프로젝트
+- Context API보다 성능 좋음
+- 러닝커브 낮음
+
+Redux Toolkit
+- 대규모 팀/프로젝트
+- 강력한 DevTools 필요
+- 예측 가능한 상태 흐름 중요
+- 비동기 처리(RTK Query) 통합 필요
+```
+
+## 핵심 정리
+
+- Context API는 값 변경 시 모든 구독 컴포넌트를 리렌더링해 성능 문제가 생깁니다.
+- Zustand는 선택적 구독으로 리렌더링을 최소화하고 코드가 간결합니다.
+- Redux Toolkit은 `createSlice`와 `configureStore`로 보일러플레이트를 줄인 공식 Redux 방식입니다.
+- 프로젝트 규모와 팀 상황에 맞게 라이브러리를 선택합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Context API의 가장 큰 성능 문제는?"
+  options={[
+    'Context 크기에 제한이 있다.',
+    'Context 값이 변경되면 해당 Context를 구독하는 모든 컴포넌트가 리렌더링된다.',
+    'Context는 비동기 처리를 지원하지 않는다.',
+    'Context는 중첩할 수 없다.',
+  ]}
+  correctAnswer={2}
+  explanation="Context 값이 변경되면 useContext로 해당 Context를 구독하는 모든 컴포넌트가 리렌더링됩니다. 관련 없는 상태 변경에도 리렌더링이 발생할 수 있습니다."
+  optionExplanations={[
+    'Context에 크기 제한은 없습니다.',
+    '맞습니다. 구독 중인 모든 컴포넌트가 리렌더링되는 것이 핵심 문제입니다.',
+    '비동기 처리는 Context 외부에서 처리하면 됩니다.',
+    'Context는 중첩 가능합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="Zustand에서 특정 상태만 선택적으로 구독하는 방법은?"
+  options={[
+    'useStore.select()를 사용한다.',
+    'useStore에 셀렉터 함수를 전달한다.',
+    '별도의 subscribe 메서드를 사용한다.',
+    'Zustand는 선택적 구독을 지원하지 않는다.',
+  ]}
+  correctAnswer={2}
+  explanation="useStore((state) =&gt; state.count)처럼 셀렉터 함수를 전달하면 해당 값이 변경될 때만 컴포넌트가 리렌더링됩니다."
+  optionExplanations={[
+    'useStore.select()는 존재하지 않습니다.',
+    '맞습니다. 셀렉터 함수로 필요한 상태만 구독합니다.',
+    'subscribe는 React 외부에서 사용하는 메서드입니다.',
+    'Zustand는 셀렉터로 선택적 구독을 지원합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Redux Toolkit의 createSlice가 생성하는 것은?"
+  options={[
+    '스토어만 생성한다.',
+    '상태, 리듀서, 액션 생성자를 한 번에 생성한다.',
+    '미들웨어를 설정한다.',
+    '비동기 액션을 자동으로 처리한다.',
+  ]}
+  correctAnswer={2}
+  explanation="createSlice는 name, initialState, reducers를 받아 리듀서와 액션 생성자를 자동으로 생성합니다. actions 객체에서 액션 생성자를 꺼내 사용합니다."
+  optionExplanations={[
+    '스토어는 configureStore가 생성합니다.',
+    '맞습니다. createSlice는 상태, 리듀서, 액션을 모두 생성합니다.',
+    '미들웨어 설정은 configureStore의 middleware 옵션입니다.',
+    '비동기 처리는 createAsyncThunk를 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="Redux Toolkit에서 reducer 내부에서 state를 직접 수정할 수 있는 이유는?"
+  options={[
+    'Redux가 업데이트되었기 때문에',
+    'Immer 라이브러리가 내부적으로 불변성을 유지해주기 때문에',
+    '리듀서에서는 직접 수정이 원래 가능하다.',
+    'configureStore 옵션 때문에',
+  ]}
+  correctAnswer={2}
+  explanation="Redux Toolkit은 Immer를 내장합니다. Immer는 draft 객체에 대한 직접 변경을 감지해 새로운 불변 상태를 생성합니다."
+  optionExplanations={[
+    'Redux 자체의 변경이 아닌 Immer 덕분입니다.',
+    '맞습니다. Immer가 불변성을 내부적으로 처리합니다.',
+    '순수 Redux에서는 직접 수정이 금지됩니다.',
+    'configureStore 옵션과 무관합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="소규모 프로젝트에 Zustand를 선택하는 이유로 가장 적합한 것은?"
+  options={[
+    '더 많은 기능을 제공하기 때문에',
+    '보일러플레이트가 적고 러닝커브가 낮기 때문에',
+    'Redux보다 성능이 항상 더 좋기 때문에',
+    '공식 React 라이브러리이기 때문에',
+  ]}
+  correctAnswer={2}
+  explanation="Zustand는 create 함수 하나로 스토어를 만들 수 있어 보일러플레이트가 매우 적습니다. 간단한 API 덕분에 빠르게 배우고 적용할 수 있습니다."
+  optionExplanations={[
+    'Redux Toolkit이 더 많은 기능을 제공합니다.',
+    '맞습니다. 간결함과 낮은 러닝커브가 Zustand의 장점입니다.',
+    '성능은 사용 방식에 따라 다릅니다.',
+    'Zustand는 서드파티 라이브러리입니다.',
+  ]}
+/>

@@ -1,0 +1,269 @@
+---
+title: '18. 스타일링'
+description: 'CSS Modules, Tailwind CSS, styled-components의 특징과 사용법을 비교합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** React 프로젝트에서 사용하는 주요 스타일링 방법의 특징을 이해하고 상황에 맞는 도구를 선택합니다.
+</Callout>
+
+## 인라인 스타일
+
+```jsx
+function Box() {
+  return (
+    <div
+      style={{
+        backgroundColor: 'blue',
+        padding: '16px',
+        borderRadius: '8px',
+        color: 'white',
+      }}
+    >
+      인라인 스타일
+    </div>
+  )
+}
+```
+
+장점: 동적 값 적용 쉬움 / 단점: CSS 기능 제한, 클래스 재사용 불가, 성능 불리
+
+## CSS Modules
+
+파일 이름을 `.module.css`로 지정하면 클래스 이름이 자동으로 고유하게 변환됩니다.
+
+```css
+/* Button.module.css */
+.button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #2563eb;
+}
+
+.large {
+  padding: 12px 24px;
+  font-size: 1.125rem;
+}
+```
+
+```jsx
+import styles from './Button.module.css'
+
+function Button({ size = 'normal', children }) {
+  const className = size === 'large'
+    ? `${styles.button} ${styles.large}`
+    : styles.button
+
+  return <button className={className}>{children}</button>
+}
+```
+
+장점: 클래스 이름 충돌 없음, 기존 CSS 문법 그대로 사용  
+단점: 동적 스타일이 복잡해질 수 있음
+
+## Tailwind CSS
+
+유틸리티 퍼스트 CSS 프레임워크입니다. 클래스를 조합해 스타일을 적용합니다.
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+```jsx
+function Card({ title, description, featured }) {
+  return (
+    <div className={`
+      rounded-xl shadow-md p-6
+      ${featured ? 'bg-blue-600 text-white' : 'bg-white text-gray-800'}
+    `}>
+      <h2 className="text-xl font-bold mb-2">{title}</h2>
+      <p className="text-sm opacity-80">{description}</p>
+    </div>
+  )
+}
+
+function Button({ variant = 'primary', children }) {
+  const base = 'px-4 py-2 rounded font-medium transition-colors'
+  const variants = {
+    primary: 'bg-blue-600 text-white hover:bg-blue-700',
+    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
+  }
+  return (
+    <button className={`${base} ${variants[variant]}`}>
+      {children}
+    </button>
+  )
+}
+```
+
+장점: 빠른 개발, 일관된 디자인, 번들 크기 최적화  
+단점: 클래스 문자열이 길어짐, 초기 학습 필요
+
+## styled-components
+
+CSS를 JavaScript 안에 작성하는 CSS-in-JS 방식입니다.
+
+```bash
+npm install styled-components
+```
+
+```jsx
+import styled from 'styled-components'
+
+const Button = styled.button`
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: ${props => props.variant === 'primary' ? '#3b82f6' : '#e5e7eb'};
+  color: ${props => props.variant === 'primary' ? 'white' : '#374151'};
+
+  &:hover {
+    opacity: 0.9;
+  }
+`
+
+const Card = styled.div`
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+`
+
+function App() {
+  return (
+    <Card>
+      <Button variant="primary">확인</Button>
+      <Button>취소</Button>
+    </Card>
+  )
+}
+```
+
+장점: props 기반 동적 스타일, 컴포넌트와 스타일 응집도 높음  
+단점: 런타임 성능 비용, 번들 크기 증가
+
+## 세 가지 방식 비교
+
+```
+                  CSS Modules   Tailwind CSS   styled-components
+클래스 충돌 없음      O              O                O
+동적 스타일          보통           쉬움             쉬움
+기존 CSS 문법        O              X                O (template)
+런타임 비용          없음           없음             있음
+SSR 지원            쉬움           쉬움             설정 필요
+팀 적합성        전통 CSS 선호  유틸리티 선호   JS 통합 선호
+```
+
+## 핵심 정리
+
+- CSS Modules는 기존 CSS 문법을 유지하면서 클래스 이름 충돌을 방지합니다.
+- Tailwind CSS는 유틸리티 클래스를 조합해 빠르게 UI를 구축합니다.
+- styled-components는 props 기반 동적 스타일이 강점인 CSS-in-JS 방식입니다.
+- 프로젝트 규모, 팀 성향, 성능 요구사항에 따라 방식을 선택합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="CSS Modules에서 파일 이름의 형식은?"
+  options={[
+    '.css',
+    '.module.css',
+    '.styled.css',
+    '.scoped.css',
+  ]}
+  correctAnswer={2}
+  explanation="CSS Modules는 .module.css 확장자를 사용합니다. 빌드 도구가 이를 감지해 클래스 이름을 고유한 해시값으로 변환합니다."
+  optionExplanations={[
+    '.css는 일반 CSS 파일로 전역 스타일이 됩니다.',
+    '맞습니다. .module.css가 CSS Modules의 형식입니다.',
+    '.styled.css는 존재하지 않습니다.',
+    '.scoped.css는 Vue.js의 개념입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="Tailwind CSS의 특징으로 올바르지 않은 것은?"
+  options={[
+    '유틸리티 퍼스트 CSS 프레임워크다.',
+    '사용하지 않는 CSS 클래스는 빌드 시 자동으로 제거된다.',
+    '런타임에 스타일을 생성한다.',
+    'JIT(Just-In-Time) 컴파일을 사용한다.',
+  ]}
+  correctAnswer={3}
+  explanation="Tailwind CSS는 빌드 타임에 필요한 유틸리티 클래스만 생성합니다. 런타임 스타일 생성은 styled-components 같은 CSS-in-JS 방식의 특징입니다."
+  optionExplanations={[
+    'Tailwind는 유틸리티 퍼스트 방식이 맞습니다.',
+    'PurgeCSS/JIT로 미사용 클래스를 제거합니다.',
+    '맞습니다. Tailwind는 빌드 타임에 처리되며 런타임 비용이 없습니다.',
+    'JIT 컴파일로 필요한 클래스만 생성합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="styled-components의 주요 단점은?"
+  options={[
+    '동적 스타일을 지원하지 않는다.',
+    '런타임에 스타일을 삽입해 성능 비용이 발생할 수 있다.',
+    'TypeScript와 호환되지 않는다.',
+    'React에서만 사용 가능하다.',
+  ]}
+  correctAnswer={2}
+  explanation="styled-components는 런타임에 CSS를 생성하고 style 태그에 삽입합니다. 컴포넌트가 많거나 SSR 환경에서 설정이 복잡해지고 초기 렌더링 성능에 영향을 줄 수 있습니다."
+  optionExplanations={[
+    '동적 스타일은 styled-components의 강점입니다.',
+    '맞습니다. 런타임 CSS 생성이 주요 단점입니다.',
+    'TypeScript 타입 지원이 있습니다.',
+    'React 외에도 사용할 수 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="CSS Modules를 사용하면 클래스 이름 충돌이 방지되는 이유는?"
+  options={[
+    'CSS를 사용하지 않기 때문에',
+    '빌드 시 클래스 이름이 고유한 해시값을 포함한 이름으로 변환되기 때문에',
+    '클래스 이름을 자동으로 삭제하기 때문에',
+    'Shadow DOM을 사용하기 때문에',
+  ]}
+  correctAnswer={2}
+  explanation="CSS Modules는 빌드 과정에서 .button과 같은 클래스 이름을 Button_button__3a8Kv 같은 고유한 이름으로 변환합니다. 따라서 다른 파일의 동일한 클래스 이름과 충돌하지 않습니다."
+  optionExplanations={[
+    'CSS Modules는 CSS를 사용합니다.',
+    '맞습니다. 고유 해시를 포함한 클래스 이름으로 변환합니다.',
+    '클래스 이름을 삭제하지 않습니다.',
+    'Shadow DOM은 Web Components의 기술입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="props 기반으로 동적 스타일을 가장 자연스럽게 적용할 수 있는 방법은?"
+  options={[
+    'CSS Modules',
+    'Tailwind CSS',
+    'styled-components',
+    '인라인 스타일',
+  ]}
+  correctAnswer={3}
+  explanation="styled-components는 tagged template literal 안에서 props를 참조해 동적 CSS를 작성할 수 있습니다. 컴포넌트 API와 스타일이 자연스럽게 통합됩니다."
+  optionExplanations={[
+    'CSS Modules는 동적 클래스 조합이 불편합니다.',
+    'Tailwind는 조건부 클래스 문자열 조합으로 동적 스타일을 적용합니다.',
+    '맞습니다. styled-components는 props 기반 동적 스타일이 가장 자연스럽습니다.',
+    '인라인 스타일은 모든 CSS 기능을 지원하지 않습니다.',
+  ]}
+/>

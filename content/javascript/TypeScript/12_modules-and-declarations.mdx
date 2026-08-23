@@ -1,0 +1,271 @@
+---
+title: '12. 모듈과 선언 파일'
+description: 'ESM import/export, .d.ts 선언 파일, @types 패키지, declare 키워드를 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** TypeScript 모듈 시스템과 타입 선언 파일의 역할을 이해합니다.
+</Callout>
+
+## ESM import/export
+
+```ts
+// math.ts — 명명된 내보내기
+export function add(a: number, b: number): number {
+  return a + b
+}
+
+export function subtract(a: number, b: number): number {
+  return a - b
+}
+
+export const PI = 3.14159
+
+// 기본 내보내기
+export default function multiply(a: number, b: number): number {
+  return a * b
+}
+```
+
+```ts
+// main.ts — 가져오기
+import multiply, { add, subtract, PI } from './math'
+import type { SomeType } from './types'  // 타입만 가져오기
+
+// 네임스페이스 가져오기
+import * as MathUtils from './math'
+MathUtils.add(1, 2)
+```
+
+## 타입 전용 import/export
+
+```ts
+// 타입만 내보내기
+export type { User, Product }
+export interface Config { ... }
+
+// 타입만 가져오기 — 런타임에 제거됨
+import type { User } from './types'
+import { type User, createUser } from './users'
+```
+
+## .d.ts 선언 파일
+
+타입 정보만 담은 파일로 런타임 코드는 없습니다.
+
+```ts
+// utils.d.ts — JavaScript 라이브러리의 타입 선언
+export function formatDate(date: Date, format: string): string
+export function parseDate(str: string): Date
+
+export interface FormatOptions {
+  locale?: string
+  timezone?: string
+}
+```
+
+```ts
+// 사용
+import { formatDate } from './utils'
+// utils.js가 실행되고 타입은 utils.d.ts에서 가져옴
+```
+
+## @types 패키지
+
+JavaScript 라이브러리의 타입 선언을 별도 패키지로 제공합니다.
+
+```bash
+# JavaScript 라이브러리 설치
+npm install lodash
+
+# 타입 선언 설치
+npm install -D @types/lodash
+
+# 이미 타입이 포함된 경우 @types 불필요
+npm install axios  # 내장 타입 포함
+```
+
+```ts
+// @types/lodash가 있으면 타입 지원됨
+import _ from 'lodash'
+const result = _.chunk([1, 2, 3, 4], 2)  // 타입: number[][]
+```
+
+## declare 키워드
+
+타입 정보를 선언하며 실제 구현은 제공하지 않습니다.
+
+```ts
+// 전역 변수 선언
+declare const __DEV__: boolean
+declare const VERSION: string
+
+// 전역 함수 선언
+declare function require(module: string): unknown
+
+// 모듈 선언 — 타입이 없는 패키지 보완
+declare module 'some-untyped-lib' {
+  export function doSomething(value: string): void
+  export const VERSION: string
+}
+
+// CSS/SVG 파일 등 비JS 파일 가져오기
+declare module '*.svg' {
+  const content: string
+  export default content
+}
+
+declare module '*.css' {
+  const styles: Record<string, string>
+  export default styles
+}
+```
+
+## global 확장
+
+```ts
+// global.d.ts
+declare global {
+  interface Window {
+    analytics: {
+      track(event: string, data?: object): void
+    }
+  }
+
+  namespace NodeJS {
+    interface ProcessEnv {
+      NODE_ENV: 'development' | 'production' | 'test'
+      DATABASE_URL: string
+      API_KEY: string
+    }
+  }
+}
+
+export {}  // 모듈로 만들어야 global 확장이 동작함
+
+// 사용
+window.analytics.track('page_view')
+process.env.DATABASE_URL  // 타입: string
+```
+
+## 모듈 증강 (Module Augmentation)
+
+```ts
+// express 타입 확장
+import 'express'
+
+declare module 'express' {
+  interface Request {
+    user?: {
+      id: number
+      email: string
+    }
+  }
+}
+
+// 이후 req.user를 타입 안전하게 사용 가능
+```
+
+## 핵심 정리
+
+- `import type`으로 타입만 가져오면 런타임 번들에 포함되지 않습니다.
+- `.d.ts` 파일은 타입 선언만 포함하며 JavaScript 라이브러리에 타입을 추가합니다.
+- `@types/*` 패키지는 커뮤니티가 유지하는 타입 선언 모음입니다.
+- `declare`는 구현 없이 타입 정보를 선언합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question=".d.ts 파일의 역할은?"
+  options={[
+    '런타임 코드를 포함한다.',
+    '타입 정보만 선언하며 컴파일 후 제거된다.',
+    'CSS 스타일을 정의한다.',
+    '테스트 코드를 포함한다.',
+  ]}
+  correctAnswer={2}
+  explanation=".d.ts는 선언 파일로 타입 정보만 담습니다. 런타임에는 존재하지 않으며 TypeScript 컴파일러가 타입 검사에만 사용합니다. JavaScript 라이브러리에 타입을 추가할 때 활용합니다."
+  optionExplanations={[
+    '런타임 코드는 없습니다.',
+    '맞습니다. 타입 선언만 있고 런타임에는 없습니다.',
+    'CSS와는 관련 없습니다.',
+    '테스트 코드와는 관련 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="@types/lodash를 설치해야 하는 이유는?"
+  options={[
+    'lodash가 TypeScript로 작성되어 있기 때문에',
+    'lodash 자체에 타입 선언이 포함되지 않아 별도 타입 패키지가 필요하기 때문에',
+    'lodash를 더 빠르게 만들기 위해',
+    'TypeScript 요구사항이기 때문에',
+  ]}
+  correctAnswer={2}
+  explanation="lodash는 JavaScript로 작성된 라이브러리입니다. TypeScript 타입 정보가 없어 @types/lodash라는 별도 패키지(DefinitelyTyped)에서 타입 선언을 제공합니다."
+  optionExplanations={[
+    'lodash는 JavaScript로 작성되었습니다.',
+    '맞습니다. 타입 정보가 없는 JS 라이브러리에 @types가 필요합니다.',
+    '성능과 관련 없습니다.',
+    '모든 라이브러리에 @types가 필요한 것은 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="import type의 이점은?"
+  options={[
+    '더 빠른 타입 검사',
+    '런타임 번들에 포함되지 않아 번들 크기를 줄인다.',
+    'any 타입을 자동으로 추론한다.',
+    '순환 참조를 방지한다.',
+  ]}
+  correctAnswer={2}
+  explanation="import type은 타입만 가져오며 컴파일 시 제거됩니다. 값(함수, 클래스 등)이 아닌 타입만 필요한 경우 import type을 사용하면 런타임 번들 크기를 줄일 수 있습니다."
+  optionExplanations={[
+    '타입 검사 속도와는 직접 관련 없습니다.',
+    '맞습니다. 런타임 코드 없이 타입만 가져옵니다.',
+    'any 추론과는 관련 없습니다.',
+    '순환 참조 방지는 별도 설계가 필요합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="declare module '*.svg'를 선언하는 이유는?"
+  options={[
+    'SVG를 편집하기 위해',
+    'SVG 파일을 import할 때 TypeScript가 타입을 인식하게 하기 위해',
+    'SVG를 CSS로 변환하기 위해',
+    'SVG 최적화를 위해',
+  ]}
+  correctAnswer={2}
+  explanation="TypeScript는 .js/.ts 외 파일을 이해하지 못합니다. declare module '*.svg'처럼 와일드카드 모듈 선언으로 SVG 파일의 import 타입을 정의하면 TypeScript가 오류 없이 인식합니다."
+  optionExplanations={[
+    'SVG 편집과는 관련 없습니다.',
+    '맞습니다. 비JS 파일 import의 타입을 정의합니다.',
+    'CSS 변환과는 관련 없습니다.',
+    '최적화와는 관련 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="global.d.ts에서 Window 인터페이스를 확장하는 이유는?"
+  options={[
+    '새 브라우저 API를 추가하기 위해',
+    '라이브러리나 스크립트가 window에 추가한 프로퍼티에 TypeScript 타입을 제공하기 위해',
+    '성능을 향상시키기 위해',
+    'SSR을 지원하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="타사 스크립트나 초기화 코드가 window 객체에 analytics 같은 프로퍼티를 추가할 때 TypeScript는 이를 알 수 없습니다. declare global로 Window 인터페이스를 확장해 타입 안전하게 접근합니다."
+  optionExplanations={[
+    '브라우저 API 추가가 아닌 타입 정보 제공입니다.',
+    '맞습니다. 런타임에 추가된 프로퍼티에 타입을 제공합니다.',
+    '성능과는 관련 없습니다.',
+    'SSR 지원과는 직접 관련 없습니다.',
+  ]}
+/>

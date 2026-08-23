@@ -1,0 +1,267 @@
+---
+title: '13. React Router v6'
+description: 'React Router v6로 SPA 라우팅을 구현합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** BrowserRouter, Routes, Route, Link, useNavigate, useParams를 이해하고 중첩 라우팅까지 구현합니다.
+</Callout>
+
+## React Router v6 기본 설정
+
+```bash
+npm install react-router-dom
+```
+
+```jsx
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <nav>
+        <Link to="/">홈</Link>
+        <Link to="/about">소개</Link>
+        <Link to="/users">사용자</Link>
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+```
+
+## useNavigate — 프로그래밍 방식 이동
+
+```jsx
+import { useNavigate } from 'react-router-dom'
+
+function LoginForm() {
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    await login()
+    navigate('/dashboard')          // 이동
+    // navigate(-1)                 // 뒤로 가기
+    // navigate('/home', { replace: true })  // 히스토리 교체
+  }
+
+  return <form onSubmit={handleSubmit}>...</form>
+}
+```
+
+## useParams — URL 파라미터 읽기
+
+```jsx
+import { useParams } from 'react-router-dom'
+
+// Route: <Route path="/users/:id" element={<UserDetail />} />
+function UserDetail() {
+  const { id } = useParams()
+
+  return <p>사용자 ID: {id}</p>
+}
+```
+
+## useSearchParams — 쿼리 문자열
+
+```jsx
+import { useSearchParams } from 'react-router-dom'
+
+// URL: /search?q=react&page=1
+function SearchPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const query = searchParams.get('q') || ''
+  const page = Number(searchParams.get('page')) || 1
+
+  return (
+    <div>
+      <p>검색어: {query}</p>
+      <button onClick={() => setSearchParams({ q: query, page: page + 1 })}>
+        다음 페이지
+      </button>
+    </div>
+  )
+}
+```
+
+## 중첩 라우팅 (Nested Routes)
+
+```jsx
+import { Outlet } from 'react-router-dom'
+
+// Layout 컴포넌트 — Outlet이 자식 라우트를 렌더링
+function DashboardLayout() {
+  return (
+    <div>
+      <nav>
+        <Link to="profile">프로필</Link>
+        <Link to="settings">설정</Link>
+      </nav>
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  )
+}
+
+// 라우트 정의
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<DashboardHome />} />      {/* /dashboard */}
+          <Route path="profile" element={<Profile />} />  {/* /dashboard/profile */}
+          <Route path="settings" element={<Settings />} />{/* /dashboard/settings */}
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
+}
+```
+
+## NavLink — 활성 링크 스타일
+
+```jsx
+import { NavLink } from 'react-router-dom'
+
+function Nav() {
+  return (
+    <nav>
+      <NavLink
+        to="/home"
+        style={({ isActive }) => ({ color: isActive ? 'red' : 'black' })}
+      >
+        홈
+      </NavLink>
+      <NavLink
+        to="/about"
+        className={({ isActive }) => isActive ? 'active-link' : ''}
+      >
+        소개
+      </NavLink>
+    </nav>
+  )
+}
+```
+
+## v5 vs v6 주요 변경점
+
+```
+v5                              v6
+Switch                       →  Routes
+exact prop 필요              →  기본이 exact 매칭
+component={Comp}             →  element={<Comp />}
+useHistory()                 →  useNavigate()
+중첩 라우트 별도 설정        →  <Outlet />으로 간단하게
+```
+
+## 핵심 정리
+
+- `BrowserRouter`로 앱을 감싸고 `Routes`/`Route`로 경로를 정의합니다.
+- `Link`와 `NavLink`는 페이지 새로고침 없이 이동합니다.
+- `useNavigate()`로 코드에서 이동하고, `useParams()`로 URL 파라미터를 읽습니다.
+- 중첩 라우팅은 `Outlet`을 통해 부모 레이아웃 안에 자식 라우트를 렌더링합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="React Router v6에서 URL 파라미터를 읽는 훅은?"
+  options={[
+    'useHistory',
+    'useLocation',
+    'useParams',
+    'useRoute',
+  ]}
+  correctAnswer={3}
+  explanation="useParams()는 현재 URL에서 동적 세그먼트(`:id` 등)의 값을 객체로 반환합니다."
+  optionExplanations={[
+    'useHistory는 v5의 API입니다. v6에서는 useNavigate를 사용합니다.',
+    'useLocation은 현재 URL 정보(pathname, search 등)를 반환합니다.',
+    '맞습니다. useParams()로 URL 파라미터를 읽습니다.',
+    'useRoute는 존재하지 않는 훅입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="중첩 라우팅에서 자식 라우트가 렌더링될 위치를 지정하는 컴포넌트는?"
+  options={[
+    'Children',
+    'Outlet',
+    'Portal',
+    'Slot',
+  ]}
+  correctAnswer={2}
+  explanation="Outlet은 부모 라우트 컴포넌트 안에서 자식 라우트 컴포넌트가 렌더링될 위치를 지정합니다."
+  optionExplanations={[
+    'Children은 React Router 개념이 아닙니다.',
+    '맞습니다. Outlet이 자식 라우트 렌더링 위치입니다.',
+    'Portal은 DOM 노드를 다른 곳에 렌더링하는 React API입니다.',
+    'Slot은 Vue.js의 개념입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="v6에서 useHistory를 대체하는 훅은?"
+  options={[
+    'useRouter',
+    'useHistory',
+    'useNavigate',
+    'useRedirect',
+  ]}
+  correctAnswer={3}
+  explanation="React Router v6에서는 useHistory가 useNavigate로 교체되었습니다. navigate('/path')로 이동하고 navigate(-1)로 뒤로 가기를 구현합니다."
+  optionExplanations={[
+    'useRouter는 Next.js의 훅입니다.',
+    'useHistory는 v5 API이며 v6에서 제거되었습니다.',
+    '맞습니다. useNavigate가 v6의 프로그래밍 방식 이동 훅입니다.',
+    'useRedirect는 존재하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="NavLink와 Link의 차이점은?"
+  options={[
+    'NavLink는 외부 링크에 사용한다.',
+    'NavLink는 현재 경로와 일치할 때 활성 상태를 알 수 있다.',
+    'Link는 더 이상 사용하지 않는다.',
+    'NavLink는 새 탭에서 열린다.',
+  ]}
+  correctAnswer={2}
+  explanation="NavLink는 isActive 속성을 통해 현재 경로와 일치하는지 알 수 있어 네비게이션 메뉴의 활성 스타일 적용에 유용합니다."
+  optionExplanations={[
+    'NavLink는 내부 링크에 사용합니다.',
+    '맞습니다. NavLink는 isActive 상태를 제공합니다.',
+    'Link는 여전히 일반 링크로 사용됩니다.',
+    '새 탭 열기는 target 속성으로 제어합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="Route path=&quot;*&quot;는 무엇을 의미하나요?"
+  options={[
+    '모든 경로에서 항상 렌더링된다.',
+    '정의된 어떤 경로와도 일치하지 않을 때 렌더링된다.',
+    '동적 파라미터를 의미한다.',
+    '중첩 라우트에서만 사용한다.',
+  ]}
+  correctAnswer={2}
+  explanation="path=&quot;*&quot;는 와일드카드 패턴으로, 앞서 정의된 어떤 Route와도 매칭되지 않았을 때 선택됩니다. 404 페이지 구현에 사용합니다."
+  optionExplanations={[
+    '모든 경로에서 항상 렌더링되지는 않습니다.',
+    '맞습니다. 매칭되는 경로가 없을 때 사용하는 와일드카드입니다.',
+    '동적 파라미터는 :paramName 형식입니다.',
+    '와일드카드는 최상위 Routes에서도 사용합니다.',
+  ]}
+/>

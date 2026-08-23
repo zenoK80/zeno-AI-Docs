@@ -1,0 +1,326 @@
+---
+title: '17. Node.js + TypeScript'
+description: 'Express 타입, 환경 변수 타이핑, path alias 설정을 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** Node.js 백엔드 환경에서 TypeScript를 활용하는 실전 패턴을 익힙니다.
+</Callout>
+
+## 프로젝트 설정
+
+```bash
+npm init -y
+npm install express
+npm install -D typescript @types/node @types/express ts-node nodemon
+
+npx tsc --init
+```
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## Express 타입 활용
+
+```ts
+import express, { Request, Response, NextFunction } from 'express'
+
+const app = express()
+app.use(express.json())
+
+// 기본 라우트
+app.get('/health', (req: Request, res: Response) => {
+  res.json({ status: 'ok' })
+})
+
+// 경로 매개변수 타입
+app.get('/users/:id', (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params
+  res.json({ userId: id })
+})
+
+// 쿼리 파라미터 타입
+interface UserQuery {
+  page?: string
+  limit?: string
+  search?: string
+}
+
+app.get('/users', (req: Request<{}, {}, {}, UserQuery>, res: Response) => {
+  const { page = '1', limit = '10', search } = req.query
+  res.json({ page: Number(page), limit: Number(limit), search })
+})
+
+// 요청 본문 타입
+interface CreateUserBody {
+  name: string
+  email: string
+  role?: 'admin' | 'user'
+}
+
+app.post('/users', (req: Request<{}, {}, CreateUserBody>, res: Response) => {
+  const { name, email, role = 'user' } = req.body
+  res.status(201).json({ id: Date.now(), name, email, role })
+})
+```
+
+## Request 타입 확장
+
+```ts
+// types/express.d.ts
+import { User } from '../models/User'
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User
+      requestId?: string
+    }
+  }
+}
+
+// 미들웨어에서 사용
+function authMiddleware(req: Request, res: Response, next: NextFunction) {
+  const token = req.headers.authorization?.split(' ')[1]
+  if (!token) {
+    return res.status(401).json({ error: '인증이 필요합니다.' })
+  }
+  // 토큰 검증 후
+  req.user = verifyToken(token) as User  // 타입 안전하게 설정
+  next()
+}
+
+function verifyToken(token: string): unknown {
+  // JWT 검증 로직
+  return {}
+}
+```
+
+## 환경 변수 타이핑
+
+```ts
+// types/env.d.ts
+declare namespace NodeJS {
+  interface ProcessEnv {
+    NODE_ENV: 'development' | 'production' | 'test'
+    PORT: string
+    DATABASE_URL: string
+    JWT_SECRET: string
+    REDIS_URL?: string
+  }
+}
+
+// env.ts — 환경 변수 검증 및 타입 변환
+interface AppConfig {
+  port: number
+  databaseUrl: string
+  jwtSecret: string
+  isProduction: boolean
+}
+
+function loadConfig(): AppConfig {
+  const { PORT, DATABASE_URL, JWT_SECRET, NODE_ENV } = process.env
+
+  if (!DATABASE_URL) throw new Error('DATABASE_URL 환경 변수가 필요합니다.')
+  if (!JWT_SECRET) throw new Error('JWT_SECRET 환경 변수가 필요합니다.')
+
+  return {
+    port: Number(PORT) || 3000,
+    databaseUrl: DATABASE_URL,
+    jwtSecret: JWT_SECRET,
+    isProduction: NODE_ENV === 'production',
+  }
+}
+
+export const config = loadConfig()
+```
+
+## 에러 핸들링 미들웨어
+
+```ts
+interface ApiError {
+  status: number
+  message: string
+  errors?: Record<string, string>
+}
+
+function errorHandler(
+  error: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  console.error(error.stack)
+
+  if (error instanceof ValidationError) {
+    res.status(400).json({
+      status: 400,
+      message: error.message,
+      errors: error.fields,
+    } satisfies ApiError)
+    return
+  }
+
+  res.status(500).json({
+    status: 500,
+    message: '서버 내부 오류가 발생했습니다.',
+  } satisfies ApiError)
+}
+
+class ValidationError extends Error {
+  constructor(message: string, public fields: Record<string, string>) {
+    super(message)
+    this.name = 'ValidationError'
+  }
+}
+```
+
+## path alias 설정 (tsconfig-paths)
+
+```bash
+npm install -D tsconfig-paths
+```
+
+```json
+// package.json
+{
+  "scripts": {
+    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "build": "tsc",
+    "start": "node -r ./dist/register.js dist/index.js"
+  }
+}
+```
+
+```ts
+// src/register.ts — 프로덕션에서 경로 별칭 처리
+import { register } from 'tsconfig-paths'
+import { compilerOptions } from '../tsconfig.json'
+
+register({
+  baseUrl: compilerOptions.baseUrl || '.',
+  paths: compilerOptions.paths || {},
+})
+```
+
+## 핵심 정리
+
+- `@types/node`와 `@types/express`로 Node.js와 Express 타입 지원을 추가합니다.
+- `Request<Params, ResBody, ReqBody, Query>`로 Express 요청의 각 부분 타입을 지정합니다.
+- `declare namespace NodeJS` 확장으로 process.env에 타입을 제공합니다.
+- 경로 별칭은 tsconfig.json의 paths와 tsconfig-paths로 런타임에서도 동작하게 합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Express에서 req.params 타입을 지정하는 방법은?"
+  options={[
+    'params 미들웨어를 사용한다.',
+    'Request&lt;{ id: string }&gt;처럼 첫 번째 제네릭 인수로 지정한다.',
+    '별도 타입 캐스팅이 필요하다.',
+    'req.params는 항상 any다.',
+  ]}
+  correctAnswer={2}
+  explanation="Express의 Request는 제네릭 타입으로 Request&lt;Params, ResBody, ReqBody, Query&gt; 형태입니다. 첫 번째 인수로 params 타입을 지정하면 req.params가 타입 안전해집니다."
+  optionExplanations={[
+    'params 미들웨어는 별도 개념입니다.',
+    '맞습니다. Request의 첫 번째 제네릭으로 params 타입을 지정합니다.',
+    '타입 캐스팅 없이 제네릭으로 처리합니다.',
+    '기본 타입이 any지만 제네릭으로 타입을 지정할 수 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="process.env에 TypeScript 타입을 제공하는 방법은?"
+  options={[
+    'process.env를 any로 캐스팅한다.',
+    'declare namespace NodeJS로 ProcessEnv 인터페이스를 확장한다.',
+    'process.env를 별도 변수에 저장한다.',
+    '.env 파일을 TypeScript로 작성한다.',
+  ]}
+  correctAnswer={2}
+  explanation="declare namespace NodeJS { interface ProcessEnv { ... } }로 ProcessEnv를 확장하면 process.env.DATABASE_URL 같은 접근이 타입 안전해집니다."
+  optionExplanations={[
+    'any 캐스팅은 타입 안전성을 포기합니다.',
+    '맞습니다. NodeJS 네임스페이스 확장으로 타입을 제공합니다.',
+    '별도 변수에 저장해도 타입은 그대로입니다.',
+    '.env 파일은 TypeScript가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Express Request에 user 같은 커스텀 프로퍼티를 추가하려면?"
+  options={[
+    'Request 클래스를 직접 수정한다.',
+    'declare global로 Express.Request 인터페이스를 확장한다.',
+    'req.user = value를 직접 할당한다.',
+    '새 Request 클래스를 만든다.',
+  ]}
+  correctAnswer={2}
+  explanation="모듈 확장(module augmentation)을 통해 declare global { namespace Express { interface Request { user?: User } } }로 Request에 커스텀 프로퍼티를 추가합니다."
+  optionExplanations={[
+    'Express 소스코드를 직접 수정하면 안 됩니다.',
+    '맞습니다. 모듈 확장으로 Request 타입을 확장합니다.',
+    '직접 할당은 TypeScript 오류를 발생시킵니다.',
+    '새 클래스 생성이 아닌 타입 확장을 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="ts-node를 사용하는 이유는?"
+  options={[
+    'TypeScript를 빠르게 컴파일하기 위해',
+    '별도 컴파일 단계 없이 TypeScript 파일을 Node.js에서 직접 실행하기 위해',
+    '프로덕션 환경에서 사용하기 위해',
+    '타입 검사를 건너뛰기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="ts-node는 TypeScript를 즉석으로 컴파일해 Node.js에서 실행합니다. tsc로 .js 파일을 생성하지 않아도 되어 개발 중 편리합니다. 프로덕션에서는 tsc로 컴파일 후 node로 실행합니다."
+  optionExplanations={[
+    '빠른 컴파일보다는 즉시 실행이 목적입니다.',
+    '맞습니다. 컴파일 단계 없이 직접 실행합니다.',
+    '프로덕션에는 tsc + node를 사용합니다.',
+    '타입 검사를 건너뛰지는 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="tsconfig-paths가 필요한 이유는?"
+  options={[
+    'TypeScript 컴파일을 빠르게 하기 위해',
+    'tsconfig.json의 paths 별칭을 런타임(Node.js)에서도 해석하기 위해',
+    'path 모듈을 교체하기 위해',
+    '빌드 출력 경로를 설정하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="tsconfig.json의 paths는 TypeScript 컴파일러에만 알려줍니다. 컴파일된 JavaScript를 Node.js가 실행할 때는 경로 별칭을 모릅니다. tsconfig-paths는 런타임에 경로 별칭을 해석합니다."
+  optionExplanations={[
+    '컴파일 속도와는 관련 없습니다.',
+    '맞습니다. 런타임 경로 별칭 해석이 목적입니다.',
+    'Node.js path 모듈 교체가 아닙니다.',
+    '빌드 경로는 tsconfig.json outDir로 설정합니다.',
+  ]}
+/>

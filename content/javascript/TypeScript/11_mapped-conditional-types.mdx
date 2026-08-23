@@ -1,0 +1,263 @@
+---
+title: '11. 매핑·조건부 타입'
+description: 'Mapped Types, 조건부 타입, infer, Template Literal Types를 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** TypeScript 고급 타입 기능인 매핑 타입, 조건부 타입, infer를 이해하고 활용합니다.
+</Callout>
+
+## 매핑 타입 (Mapped Types)
+
+기존 타입의 프로퍼티를 순회해 새 타입을 만듭니다.
+
+```ts
+// Partial 구현 원리
+type MyPartial<T> = {
+  [K in keyof T]?: T[K]
+}
+
+// Readonly 구현 원리
+type MyReadonly<T> = {
+  readonly [K in keyof T]: T[K]
+}
+
+// 모든 값을 string으로
+type Stringify<T> = {
+  [K in keyof T]: string
+}
+
+interface User {
+  id: number
+  name: string
+  active: boolean
+}
+
+type StringifiedUser = Stringify<User>
+// { id: string; name: string; active: string }
+```
+
+## 매핑 타입 — 키 재매핑
+
+```ts
+// as로 키 이름 변환
+type Getters<T> = {
+  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K]
+}
+
+interface User {
+  id: number
+  name: string
+}
+
+type UserGetters = Getters<User>
+// { getId: () => number; getName: () => string }
+```
+
+## 조건부 타입 (Conditional Types)
+
+```ts
+// T extends U ? TrueType : FalseType
+type IsString<T> = T extends string ? true : false
+
+type A = IsString<string>  // true
+type B = IsString<number>  // false
+
+// 배열 타입에서 요소 타입 추출
+type Flatten<T> = T extends Array<infer Item> ? Item : T
+
+type Str = Flatten<string[]>   // string
+type Num = Flatten<number[]>   // number
+type Same = Flatten<string>    // string (배열이 아님)
+```
+
+## infer 키워드
+
+조건부 타입에서 타입을 캡처합니다.
+
+```ts
+// Promise의 내부 타입 추출
+type Awaited<T> = T extends Promise<infer Value> ? Value : T
+
+type Result = Awaited<Promise<string>>  // string
+type Same = Awaited<number>            // number (Promise 아님)
+
+// 함수 반환 타입 구현
+type MyReturnType<T extends (...args: unknown[]) => unknown> =
+  T extends (...args: unknown[]) => infer R ? R : never
+
+function getUser() {
+  return { id: 1, name: 'Alice' }
+}
+
+type UserType = MyReturnType<typeof getUser>  // { id: number; name: string }
+```
+
+## 분산 조건부 타입
+
+유니온 타입에 조건부 타입을 적용하면 각 멤버에 분산됩니다.
+
+```ts
+type ToArray<T> = T extends unknown ? T[] : never
+
+type Result = ToArray<string | number>
+// string[] | number[]  (분산 적용)
+
+// 분산을 막으려면 대괄호로 감쌈
+type NoDistribute<T> = [T] extends [unknown] ? T[] : never
+
+type Result2 = NoDistribute<string | number>
+// (string | number)[]
+```
+
+## Template Literal Types
+
+```ts
+// 문자열 타입을 조합
+type Greeting = `Hello, ${string}`
+
+type Direction = 'left' | 'right' | 'up' | 'down'
+type EventName = `on${Capitalize<Direction>}`
+// 'onLeft' | 'onRight' | 'onUp' | 'onDown'
+
+// REST API 타입 생성
+type HttpMethod = 'get' | 'post' | 'put' | 'delete'
+type Endpoint = '/users' | '/posts' | '/comments'
+type ApiRoute = `${Uppercase<HttpMethod>} ${Endpoint}`
+// 'GET /users' | 'GET /posts' | ... (12가지 조합)
+
+// 객체 이벤트 이름 생성
+type EventMap<T extends object> = {
+  [K in keyof T as `on${Capitalize<string & K>}Change`]: (value: T[K]) => void
+}
+
+interface FormValues {
+  name: string
+  email: string
+  age: number
+}
+
+type FormEvents = EventMap<FormValues>
+// { onNameChange: (value: string) => void; onEmailChange: ...; onAgeChange: ... }
+```
+
+## 실전 활용 예시
+
+```ts
+// 깊은 Partial (재귀 매핑 타입)
+type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K]
+}
+
+interface Config {
+  db: { host: string; port: number }
+  cache: { ttl: number }
+}
+
+type PartialConfig = DeepPartial<Config>
+// { db?: { host?: string; port?: number }; cache?: { ttl?: number } }
+```
+
+## 핵심 정리
+
+- 매핑 타입 `[K in keyof T]`로 기존 타입의 프로퍼티를 변환합니다.
+- 조건부 타입 `T extends U ? A : B`로 타입을 조건에 따라 결정합니다.
+- `infer`로 조건부 타입 내에서 타입을 추출합니다.
+- Template Literal Types로 문자열 타입을 조합합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="[K in keyof T] 문법의 의미는?"
+  options={[
+    'T의 값을 순회한다.',
+    'T의 모든 키를 순회한다.',
+    'T의 인덱스를 순회한다.',
+    'T의 메서드를 순회한다.',
+  ]}
+  correctAnswer={2}
+  explanation="[K in keyof T]는 타입 T의 모든 키를 순회하는 매핑 타입 문법입니다. keyof T로 키 목록을 얻고 in으로 각 키를 K에 바인딩합니다."
+  optionExplanations={[
+    '값이 아닌 키를 순회합니다.',
+    '맞습니다. T의 모든 키를 순회합니다.',
+    '인덱스가 아닌 키를 순회합니다.',
+    '메서드만이 아닌 모든 키를 순회합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="infer 키워드는 어디서 사용할 수 있나요?"
+  options={[
+    '매핑 타입에서',
+    '조건부 타입의 extends 절에서',
+    '제네릭 제약에서',
+    '인터페이스 정의에서',
+  ]}
+  correctAnswer={2}
+  explanation="infer는 조건부 타입 T extends ... infer R ...에서 타입을 캡처할 때 사용합니다. Promise의 내부 타입이나 함수 반환 타입 같은 중첩된 타입을 추출할 때 유용합니다."
+  optionExplanations={[
+    '매핑 타입에서는 사용하지 않습니다.',
+    '맞습니다. 조건부 타입의 extends 절에서만 사용합니다.',
+    '제네릭 제약에서는 extends를 사용합니다.',
+    '인터페이스에서는 사용하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Template Literal Types의 활용 예시로 올바른 것은?"
+  options={[
+    "런타임 문자열 처리",
+    "타입 수준에서 문자열 조합으로 새 타입을 생성",
+    "정규표현식과 연동",
+    "JSON 파싱",
+  ]}
+  correctAnswer={2}
+  explanation="Template Literal Types는 타입 수준에서 문자열을 조합합니다. `on${Capitalize<K>}`처럼 기존 타입의 키를 변환해 이벤트 이름이나 API 경로 같은 새 타입을 생성하는 데 사용합니다."
+  optionExplanations={[
+    '런타임이 아닌 타입 시스템에서 동작합니다.',
+    '맞습니다. 타입 수준의 문자열 조합 기능입니다.',
+    '정규표현식과 직접 연동하지 않습니다.',
+    'JSON 파싱과는 무관합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="조건부 타입이 유니온 타입에 적용될 때의 동작은?"
+  options={[
+    '유니온 전체에 한 번만 적용된다.',
+    '유니온의 각 멤버에 개별적으로 분산 적용된다.',
+    '오류가 발생한다.',
+    '첫 번째 멤버에만 적용된다.',
+  ]}
+  correctAnswer={2}
+  explanation="분산 조건부 타입(Distributive Conditional Types)으로, T extends U ? A : B에서 T가 유니온이면 각 멤버에 개별 적용됩니다. string | number에 적용하면 (string extends U ? A : B) | (number extends U ? A : B)가 됩니다."
+  optionExplanations={[
+    '전체에 한 번이 아닌 각 멤버에 분산 적용됩니다.',
+    '맞습니다. 유니온 각 멤버에 분산 적용됩니다.',
+    '오류 없이 분산 적용됩니다.',
+    '모든 멤버에 적용됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="Capitalize 유틸리티가 Template Literal Types에서 하는 역할은?"
+  options={[
+    '문자열을 대문자로 변환한다.',
+    '첫 글자만 대문자로 변환한다.',
+    '소문자로 변환한다.',
+    '공백을 제거한다.',
+  ]}
+  correctAnswer={2}
+  explanation="Capitalize는 문자열의 첫 글자를 대문자로 변환합니다. Capitalize&lt;'name'&gt;은 'Name'이 됩니다. 관련 유틸리티로 Uncapitalize, Uppercase, Lowercase가 있습니다."
+  optionExplanations={[
+    '모든 글자가 아닌 첫 글자만 대문자입니다.',
+    '맞습니다. Capitalize는 첫 글자를 대문자로 바꿉니다.',
+    '소문자는 Lowercase 유틸리티입니다.',
+    '공백 제거 기능은 없습니다.',
+  ]}
+/>

@@ -1,0 +1,257 @@
+---
+title: '16. 성능 최적화'
+description: 'React.memo, useMemo, useCallback, 코드 분할로 렌더링 성능을 최적화합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 불필요한 리렌더링을 방지하는 React.memo, useMemo, useCallback을 이해하고 코드 분할로 초기 로딩을 개선합니다.
+</Callout>
+
+## 리렌더링이 발생하는 경우
+
+```
+1. state가 변경될 때
+2. props가 변경될 때
+3. 부모 컴포넌트가 리렌더링될 때
+4. context 값이 변경될 때
+```
+
+## React.memo — 컴포넌트 메모이제이션
+
+부모가 리렌더링되어도 props가 바뀌지 않으면 자식을 리렌더링하지 않습니다.
+
+```jsx
+// memo 없이 — 부모 리렌더링 시 항상 리렌더링됨
+function ExpensiveChild({ name }) {
+  console.log('렌더링')
+  return <p>{name}</p>
+}
+
+// memo 적용 — props가 바뀔 때만 리렌더링
+const ExpensiveChild = React.memo(function ExpensiveChild({ name }) {
+  console.log('렌더링')
+  return <p>{name}</p>
+})
+
+function Parent() {
+  const [count, setCount] = useState(0)
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>카운트: {count}</button>
+      <ExpensiveChild name="고정값" /> {/* count 변경 시 리렌더링 안 됨 */}
+    </div>
+  )
+}
+```
+
+## useMemo — 계산 결과 메모이제이션
+
+의존성이 바뀔 때만 무거운 계산을 재실행합니다.
+
+```jsx
+function ProductList({ products, filter }) {
+  // filter가 바뀔 때만 재계산
+  const filteredProducts = useMemo(
+    () => products.filter(p => p.category === filter),
+    [products, filter]
+  )
+
+  return (
+    <ul>
+      {filteredProducts.map(p => <li key={p.id}>{p.name}</li>)}
+    </ul>
+  )
+}
+```
+
+## useCallback — 함수 메모이제이션
+
+의존성이 바뀔 때만 새 함수를 생성합니다. React.memo와 함께 쓸 때 효과적입니다.
+
+```jsx
+function Parent() {
+  const [count, setCount] = useState(0)
+
+  // count가 바뀌어도 handleClick은 동일한 참조 유지
+  const handleClick = useCallback(() => {
+    console.log('클릭')
+  }, []) // 의존성 없음 → 항상 같은 함수
+
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>{count}</button>
+      <MemoizedButton onClick={handleClick} />
+    </div>
+  )
+}
+
+const MemoizedButton = React.memo(function MemoizedButton({ onClick }) {
+  console.log('버튼 렌더링')
+  return <button onClick={onClick}>클릭</button>
+})
+```
+
+## 코드 분할 (Code Splitting)
+
+초기 번들 크기를 줄여 첫 로딩 속도를 개선합니다.
+
+```jsx
+import { lazy, Suspense } from 'react'
+
+// 컴포넌트를 동적으로 임포트
+const HeavyChart = lazy(() => import('./HeavyChart'))
+const AdminPanel = lazy(() => import('./AdminPanel'))
+
+function App() {
+  return (
+    <Suspense fallback={<div>로딩 중...</div>}>
+      <HeavyChart />
+    </Suspense>
+  )
+}
+
+// React Router와 함께 라우트별 코드 분할
+const Home = lazy(() => import('./pages/Home'))
+const About = lazy(() => import('./pages/About'))
+
+function Router() {
+  return (
+    <Suspense fallback={<Spinner />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </Suspense>
+  )
+}
+```
+
+## 최적화 적용 기준
+
+```
+언제 최적화해야 하나?
+
+React.memo: 자식 컴포넌트가 무겁고 props가 자주 바뀌지 않을 때
+useMemo: 계산 비용이 크고 의존성이 자주 바뀌지 않을 때
+useCallback: React.memo 적용 컴포넌트에 핸들러를 전달할 때
+
+경고:
+- 모든 컴포넌트에 React.memo를 쓰면 메모이제이션 비교 비용이 더 클 수 있음
+- useMemo/useCallback의 과도한 사용은 코드 복잡도만 높임
+- 먼저 프로파일러로 병목을 찾은 후 최적화 적용
+```
+
+## React DevTools Profiler
+
+```
+1. React DevTools 설치
+2. Profiler 탭 클릭 → 녹화 시작
+3. 인터랙션 수행
+4. 녹화 중지 → 리렌더링 이유와 시간 확인
+5. 문제가 있는 컴포넌트에만 최적화 적용
+```
+
+## 핵심 정리
+
+- `React.memo`는 props가 바뀌지 않으면 컴포넌트 리렌더링을 건너뜁니다.
+- `useMemo`는 의존성이 바뀔 때만 무거운 계산을 재실행합니다.
+- `useCallback`은 의존성이 바뀔 때만 새 함수 참조를 생성합니다.
+- `lazy + Suspense`로 코드를 분할해 초기 로딩 속도를 개선합니다.
+- 최적화는 Profiler로 병목을 먼저 확인한 후 적용합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="React.memo의 역할은?"
+  options={[
+    '컴포넌트의 상태를 저장한다.',
+    'props가 변경되지 않으면 컴포넌트 리렌더링을 건너뛴다.',
+    '비동기 컴포넌트 로딩을 지원한다.',
+    'Context 구독을 최적화한다.',
+  ]}
+  correctAnswer={2}
+  explanation="React.memo로 감싼 컴포넌트는 이전 props와 새 props를 얕은 비교합니다. 동일하면 리렌더링을 건너뛰고 이전 결과를 재사용합니다."
+  optionExplanations={[
+    'React.memo는 상태 저장과 관련 없습니다.',
+    '맞습니다. props가 같으면 리렌더링을 방지합니다.',
+    '비동기 로딩은 lazy가 담당합니다.',
+    'Context 최적화는 별도 처리가 필요합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="useMemo와 useCallback의 차이는?"
+  options={[
+    '둘 다 완전히 동일하다.',
+    'useMemo는 계산된 값을, useCallback은 함수를 메모이제이션한다.',
+    'useCallback은 값을, useMemo는 함수를 메모이제이션한다.',
+    'useMemo는 훅이고 useCallback은 HOC다.',
+  ]}
+  correctAnswer={2}
+  explanation="useMemo는 함수 실행 결과(값)를 메모이제이션하고, useCallback은 함수 자체를 메모이제이션합니다. useCallback(fn, deps)는 useMemo(() => fn, deps)와 동일합니다."
+  optionExplanations={[
+    '목적이 다릅니다.',
+    '맞습니다. useMemo는 값, useCallback은 함수를 캐시합니다.',
+    '역할이 바뀌었습니다.',
+    '둘 다 훅입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="lazy()와 함께 반드시 사용해야 하는 컴포넌트는?"
+  options={[
+    'ErrorBoundary',
+    'Suspense',
+    'Provider',
+    'Fragment',
+  ]}
+  correctAnswer={2}
+  explanation="lazy로 동적으로 임포트한 컴포넌트는 로딩 중일 때 fallback을 보여줄 Suspense로 감싸야 합니다. Suspense 없이 사용하면 오류가 발생합니다."
+  optionExplanations={[
+    'ErrorBoundary는 오류 처리에 사용하며 lazy와 함께 권장하지만 필수는 아닙니다.',
+    '맞습니다. Suspense의 fallback이 로딩 UI를 보여줍니다.',
+    'Provider는 Context 관련 컴포넌트입니다.',
+    'Fragment는 DOM 노드 없이 자식을 묶는 컴포넌트입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="useCallback을 사용해야 하는 대표적인 상황은?"
+  options={[
+    '항상 사용해야 한다.',
+    'React.memo로 최적화된 컴포넌트에 콜백 함수를 props로 전달할 때',
+    '상태 초기화 시에만 사용한다.',
+    'useEffect의 의존성 배열에 함수가 있을 때',
+  ]}
+  correctAnswer={2}
+  explanation="React.memo 컴포넌트에 함수를 전달하면 부모가 리렌더링될 때마다 새 함수가 생성되어 memo가 무효화됩니다. useCallback으로 함수 참조를 안정적으로 유지해야 합니다."
+  optionExplanations={[
+    '항상 사용하면 불필요한 비교 비용이 생깁니다.',
+    '맞습니다. memo 컴포넌트에 핸들러를 전달할 때 효과적입니다.',
+    '상태 초기화와는 관련 없습니다.',
+    'useEffect 의존성도 해당하지만 핵심 사용 사례는 memo와의 조합입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="성능 최적화의 올바른 접근 순서는?"
+  options={[
+    '모든 컴포넌트에 React.memo를 먼저 적용한다.',
+    '코드 작성 전에 useMemo/useCallback을 모두 추가한다.',
+    'Profiler로 실제 병목을 찾은 후 해당 부분만 최적화한다.',
+    'useState를 useReducer로 먼저 교체한다.',
+  ]}
+  correctAnswer={3}
+  explanation="조기 최적화는 코드를 복잡하게 만들고 실제 성능 향상이 미미할 수 있습니다. React DevTools Profiler로 실제 병목 컴포넌트를 찾은 후 해당 부분에만 최적화를 적용하는 것이 올바른 순서입니다."
+  optionExplanations={[
+    '모든 컴포넌트에 memo를 적용하면 비교 비용이 더 클 수 있습니다.',
+    '사전 최적화는 불필요한 복잡성을 만듭니다.',
+    '맞습니다. 측정 후 최적화가 올바른 접근입니다.',
+    'useReducer로의 교체는 성능 최적화가 아닙니다.',
+  ]}
+/>

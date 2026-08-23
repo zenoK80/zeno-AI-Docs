@@ -1,0 +1,267 @@
+---
+title: '03. 객체 타입'
+description: 'interface와 type alias로 객체 타입을 정의하고 선택적·readonly 프로퍼티를 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** interface와 type alias의 차이를 이해하고 선택적 프로퍼티, readonly, 인덱스 시그니처를 활용합니다.
+</Callout>
+
+## interface
+
+```ts
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+const user: User = {
+  id: 1,
+  name: 'Alice',
+  email: 'alice@example.com',
+}
+
+// 선택적 프로퍼티 ?
+interface Product {
+  id: number
+  name: string
+  description?: string   // 있어도 되고 없어도 됨
+  price: number
+}
+
+const item: Product = {
+  id: 1,
+  name: '상품명',
+  price: 9900,
+  // description 생략 가능
+}
+```
+
+## readonly 프로퍼티
+
+```ts
+interface Config {
+  readonly apiUrl: string
+  readonly maxRetries: number
+  timeout: number
+}
+
+const config: Config = {
+  apiUrl: 'https://api.example.com',
+  maxRetries: 3,
+  timeout: 5000,
+}
+
+config.timeout = 3000       // OK
+config.apiUrl = 'other'     // 오류: readonly 프로퍼티는 변경 불가
+```
+
+## type alias
+
+```ts
+type Point = {
+  x: number
+  y: number
+}
+
+// 원시 타입, 유니온, 교차 타입에도 사용 가능
+type ID = string | number
+type Status = 'active' | 'inactive' | 'pending'
+
+const point: Point = { x: 10, y: 20 }
+```
+
+## interface vs type alias
+
+```ts
+// interface — 확장(extends) 가능
+interface Animal {
+  name: string
+}
+
+interface Dog extends Animal {
+  breed: string
+}
+
+// 선언 병합 — 같은 이름의 interface를 여러 번 선언하면 병합됨
+interface Window {
+  myCustomProp: string
+}
+// 기존 Window 타입에 myCustomProp가 추가됨
+
+// type alias — 확장은 교차 타입(&)으로
+type Animal2 = {
+  name: string
+}
+
+type Dog2 = Animal2 & {
+  breed: string
+}
+
+// type은 선언 병합 불가
+```
+
+## 주요 차이점
+
+```
+                    interface         type alias
+객체 타입 정의         O                 O
+원시 타입 별칭         X                 O
+유니온 타입            X                 O
+교차 타입              X (extends)       O (&)
+선언 병합              O                 X
+extends/implements    O                 제한적
+```
+
+## 인덱스 시그니처
+
+```ts
+// 동적 키를 가진 객체 타입
+interface StringMap {
+  [key: string]: string
+}
+
+const headers: StringMap = {
+  'Content-Type': 'application/json',
+  Authorization: 'Bearer token',
+}
+
+// 인덱스 시그니처 + 특정 프로퍼티
+interface NumberMap {
+  [key: string]: number
+  count: number    // 반드시 value 타입(number)과 호환되어야 함
+}
+```
+
+## 중첩 객체 타입
+
+```ts
+interface Address {
+  street: string
+  city: string
+  country: string
+}
+
+interface Person {
+  name: string
+  age: number
+  address: Address        // 중첩 객체
+  hobbies: string[]       // 배열
+}
+
+const person: Person = {
+  name: 'Bob',
+  age: 30,
+  address: {
+    street: '123 Main St',
+    city: '서울',
+    country: 'Korea',
+  },
+  hobbies: ['reading', 'coding'],
+}
+```
+
+## 핵심 정리
+
+- `interface`는 객체 타입 정의에 최적화되어 있고 선언 병합과 extends를 지원합니다.
+- `type alias`는 더 유연해 유니온, 교차, 원시 타입 별칭 등에 모두 사용됩니다.
+- `?`로 선택적 프로퍼티를, `readonly`로 변경 불가 프로퍼티를 선언합니다.
+- 객체 타입에서는 일반적으로 `interface`를 선호하고, 유니온/교차 등은 `type`을 사용합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="interface와 type alias의 가장 큰 차이는?"
+  options={[
+    'interface는 함수 타입을 정의할 수 없다.',
+    'interface는 선언 병합을 지원하고 type alias는 지원하지 않는다.',
+    'type alias는 객체 타입을 정의할 수 없다.',
+    '둘은 완전히 동일하다.',
+  ]}
+  correctAnswer={2}
+  explanation="interface는 같은 이름으로 여러 번 선언하면 자동으로 병합됩니다. 이 선언 병합은 라이브러리 타입 확장에 유용합니다. type alias는 선언 병합이 불가능합니다."
+  optionExplanations={[
+    'interface도 함수 타입을 정의할 수 있습니다.',
+    '맞습니다. 선언 병합 여부가 핵심 차이입니다.',
+    'type alias도 객체 타입을 정의할 수 있습니다.',
+    '선언 병합, 유니온 타입 지원 등 차이가 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="interface에서 ? 기호의 의미는?"
+  options={[
+    '타입이 불확실하다.',
+    '해당 프로퍼티는 선택적이어서 있어도 되고 없어도 된다.',
+    'null 가능 타입을 나타낸다.',
+    '읽기 전용 프로퍼티다.',
+  ]}
+  correctAnswer={2}
+  explanation="프로퍼티 이름 뒤에 ?를 붙이면 선택적 프로퍼티가 됩니다. 해당 프로퍼티는 객체를 생성할 때 포함하지 않아도 타입 오류가 발생하지 않습니다."
+  optionExplanations={[
+    '타입 불확실성을 나타내지 않습니다.',
+    '맞습니다. ?는 선택적 프로퍼티를 의미합니다.',
+    'null 가능은 | null로 표현합니다.',
+    '읽기 전용은 readonly 키워드를 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="readonly 프로퍼티에 대한 설명으로 올바른 것은?"
+  options={[
+    '런타임에도 변경이 불가능하다.',
+    '컴파일 타임에만 변경을 막으며 런타임에는 일반 프로퍼티와 동일하다.',
+    '초기화도 불가능하다.',
+    'private와 동일한 의미다.',
+  ]}
+  correctAnswer={2}
+  explanation="readonly는 TypeScript 컴파일러가 컴파일 타임에 재할당을 막습니다. 컴파일된 JavaScript에는 readonly가 없으므로 런타임에는 일반 프로퍼티와 동일합니다."
+  optionExplanations={[
+    '런타임에는 제약이 없습니다.',
+    '맞습니다. 컴파일 타임 검사만 합니다.',
+    '초기화는 가능합니다.',
+    'private는 접근 제어이고 readonly는 변경 불가입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="인덱스 시그니처 [key: string]: string은 무엇을 의미하나요?"
+  options={[
+    '한 개의 string 키만 허용한다.',
+    '문자열 키로 접근했을 때 string 값을 반환하는 객체 타입이다.',
+    '배열 타입을 정의한다.',
+    '제네릭 타입을 정의한다.',
+  ]}
+  correctAnswer={2}
+  explanation="인덱스 시그니처는 객체의 동적 키에 대한 타입을 정의합니다. [key: string]: string은 임의의 문자열 키로 접근 시 항상 string 값을 반환함을 의미합니다."
+  optionExplanations={[
+    '임의의 문자열 키 모두를 허용합니다.',
+    '맞습니다. 동적 키와 값의 타입을 정의합니다.',
+    '배열 타입은 Type[]로 정의합니다.',
+    '제네릭과는 다른 개념입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="유니온 타입(|)을 정의할 때 interface와 type 중 어떤 것을 써야 하나요?"
+  options={[
+    'interface',
+    'type',
+    '둘 다 가능하다.',
+    '유니온 타입은 TypeScript에서 지원하지 않는다.',
+  ]}
+  correctAnswer={2}
+  explanation="유니온 타입은 type alias로만 정의할 수 있습니다. type Status = 'active' | 'inactive'처럼 사용합니다. interface는 유니온 타입 정의를 지원하지 않습니다."
+  optionExplanations={[
+    'interface는 유니온 타입을 직접 정의하지 못합니다.',
+    '맞습니다. 유니온 타입은 type alias로 정의합니다.',
+    'interface로는 유니온 타입을 정의할 수 없습니다.',
+    'TypeScript는 유니온 타입을 완전히 지원합니다.',
+  ]}
+/>

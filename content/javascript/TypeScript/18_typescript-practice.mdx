@@ -1,0 +1,428 @@
+---
+title: '18. TypeScript 예상기출문제'
+description: 'TypeScript 핵심 개념 20문제 이상으로 최종 실력을 점검합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** TypeScript 기초부터 고급 개념까지 아우르는 기출 예상 문제로 최종 실력을 점검합니다.
+</Callout>
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="TypeScript가 JavaScript의 '상위 집합(superset)'이라는 의미는?"
+  options={[
+    'TypeScript는 JavaScript보다 빠르다.',
+    '모든 JavaScript 코드는 유효한 TypeScript 코드다.',
+    'TypeScript는 JavaScript를 포함하지 않는다.',
+    'TypeScript는 Python을 기반으로 한다.',
+  ]}
+  correctAnswer={2}
+  explanation="상위 집합이란 TypeScript가 JavaScript의 모든 기능을 포함하며 추가 기능(타입 시스템 등)을 제공한다는 의미입니다. .js 파일을 .ts로 바꿔도 기본적으로 동작합니다."
+  optionExplanations={[
+    '실행 속도와는 관련 없습니다.',
+    '맞습니다. 모든 JS 코드는 유효한 TS 코드입니다.',
+    'JavaScript를 완전히 포함합니다.',
+    'JavaScript 기반입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="any와 unknown의 가장 중요한 차이점은?"
+  options={[
+    '성능 차이가 있다.',
+    'any는 타입 검사를 건너뛰고, unknown은 사용 전 타입을 좁혀야 한다.',
+    'unknown이 any보다 더 많은 값을 허용한다.',
+    '차이가 없다.',
+  ]}
+  correctAnswer={2}
+  explanation="any는 타입 검사를 완전히 비활성화합니다. unknown은 모든 값을 받지만 사용 전 typeof/instanceof 등으로 타입을 좁혀야 합니다. unknown이 더 안전합니다."
+  optionExplanations={[
+    '타입 시스템 기능으로 성능 차이는 없습니다.',
+    '맞습니다. 타입 검사 여부가 핵심 차이입니다.',
+    '허용 값은 같지만 사용 방식이 다릅니다.',
+    '분명한 차이가 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="interface와 type alias를 구분하는 핵심 차이는?"
+  options={[
+    'type alias는 객체 타입을 정의할 수 없다.',
+    'interface는 선언 병합을 지원하고 type은 유니온/원시 타입 별칭을 지원한다.',
+    'interface가 항상 더 빠르다.',
+    '차이가 없다.',
+  ]}
+  correctAnswer={2}
+  explanation="interface는 선언 병합이 가능해 같은 이름을 여러 번 선언해 확장할 수 있습니다. type alias는 유니온(|), 원시 타입 별칭, 교차(&) 등 더 유연한 표현이 가능합니다."
+  optionExplanations={[
+    'type alias도 객체 타입을 정의합니다.',
+    '맞습니다. 선언 병합과 유연성이 핵심 차이입니다.',
+    '런타임이 없으므로 성능 차이가 없습니다.',
+    '차이가 있습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="제네릭 함수 function identity&lt;T&gt;(arg: T): T에서 T의 역할은?"
+  options={[
+    '항상 string 타입을 나타낸다.',
+    '입력 타입을 캡처해 반환 타입과 동일하게 유지하는 타입 변수다.',
+    '타입 검사를 건너뛰기 위한 것이다.',
+    'any와 동일하다.',
+  ]}
+  correctAnswer={2}
+  explanation="T는 타입 변수로, 함수를 호출할 때 결정됩니다. identity('hello')를 호출하면 T는 string이 되고 반환 타입도 string입니다. any와 달리 타입 정보를 유지합니다."
+  optionExplanations={[
+    'T는 호출 시 결정되는 타입 변수입니다.',
+    '맞습니다. 입력과 출력 타입을 연결하는 타입 변수입니다.',
+    '타입 검사를 유지하면서 다형성을 지원합니다.',
+    'any와 달리 타입 정보를 유지합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="Partial&lt;T&gt;는 어떻게 구현되나요?"
+  options={[
+    '{ [K in T]: T[K] }',
+    '{ [K in keyof T]?: T[K] }',
+    '{ [K in T]?: K }',
+    'Partial은 내장 함수다.',
+  ]}
+  correctAnswer={2}
+  explanation="Partial은 매핑 타입으로 구현됩니다. [K in keyof T]로 모든 키를 순회하고 ?로 선택적으로 만들며 T[K]로 원래 값 타입을 유지합니다."
+  optionExplanations={[
+    'keyof가 빠져 있고 ?가 없어 잘못된 구현입니다.',
+    '맞습니다. Partial의 내부 구현입니다.',
+    'T[K]가 아닌 K가 값 타입이 되어 잘못되었습니다.',
+    'Partial은 내장 유틸리티 타입이지만 내장 함수가 아닌 타입 레벨 구현입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="TypeScript strict 모드의 useUnknownInCatchVariables가 하는 일은?"
+  options={[
+    'catch 변수를 never로 만든다.',
+    'catch 변수의 타입을 any에서 unknown으로 변경한다.',
+    'catch 블록을 비활성화한다.',
+    '에러를 자동으로 처리한다.',
+  ]}
+  correctAnswer={2}
+  explanation="useUnknownInCatchVariables가 활성화되면 catch(error) 블록의 error 타입이 any 대신 unknown이 됩니다. error를 사용하기 전에 instanceof Error 등으로 타입을 좁혀야 합니다."
+  optionExplanations={[
+    'never가 아닌 unknown이 됩니다.',
+    '맞습니다. catch 변수 타입이 any에서 unknown으로 바뀝니다.',
+    'catch 블록은 그대로 동작합니다.',
+    '에러 자동 처리와는 무관합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="keyof typeof obj의 결과는?"
+  options={[
+    'obj의 값 타입들의 유니온',
+    'obj의 키 타입들의 유니온 (리터럴 타입)',
+    'string 타입',
+    'number 타입',
+  ]}
+  correctAnswer={2}
+  explanation="typeof obj는 obj의 TypeScript 타입을 추출하고, keyof는 그 타입의 키들의 유니온을 반환합니다. const obj = { a: 1, b: 2 }면 keyof typeof obj는 'a' | 'b'가 됩니다."
+  optionExplanations={[
+    '값 타입은 typeof obj[keyof typeof obj]로 얻습니다.',
+    '맞습니다. 객체의 키 이름의 리터럴 유니온입니다.',
+    'string이 아닌 구체적인 리터럴 유니온입니다.',
+    'number가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="infer 키워드는 어디서 사용하나요?"
+  options={[
+    '제네릭 제약에서',
+    '조건부 타입의 extends 절에서 타입을 캡처할 때',
+    '인터페이스 정의에서',
+    '매핑 타입에서',
+  ]}
+  correctAnswer={2}
+  explanation="infer는 조건부 타입 T extends Promise&lt;infer V&gt; ? V : T처럼 extends 절에서만 사용합니다. Promise나 함수의 내부 타입처럼 중첩된 타입을 캡처할 때 유용합니다."
+  optionExplanations={[
+    '제네릭 제약은 T extends Type 형태입니다.',
+    '맞습니다. 조건부 타입의 extends 절에서 사용합니다.',
+    '인터페이스에서는 사용하지 않습니다.',
+    '매핑 타입에서는 사용하지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="const enum과 일반 enum의 차이점은?"
+  options={[
+    '동일하다.',
+    'const enum은 컴파일 시 인라인 치환되어 런타임 객체를 생성하지 않는다.',
+    'const enum은 문자열만 지원한다.',
+    'const enum이 더 느리다.',
+  ]}
+  correctAnswer={2}
+  explanation="const enum은 컴파일 시 사용 위치에 실제 값이 삽입되어 런타임에 enum 객체가 없습니다. 번들 크기가 줄지만 역방향 매핑이 불가능합니다."
+  optionExplanations={[
+    '런타임 객체 생성 여부가 다릅니다.',
+    '맞습니다. 인라인 치환으로 런타임 객체가 없습니다.',
+    '숫자도 지원합니다.',
+    '컴파일 후 더 작고 빠릅니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="satisfies 연산자의 역할은?"
+  options={[
+    'any 타입을 제거한다.',
+    '값이 타입을 만족하는지 확인하면서 더 구체적인 타입 추론을 유지한다.',
+    'as와 동일하다.',
+    '런타임 타입 검사를 수행한다.',
+  ]}
+  correctAnswer={2}
+  explanation="satisfies는 값이 타입 조건을 만족하는지 확인하지만 타입을 해당 타입으로 단언하지 않습니다. 리터럴 타입 추론을 유지하면서 타입 검사를 할 수 있습니다."
+  optionExplanations={[
+    'any 제거와는 관련 없습니다.',
+    '맞습니다. 타입 검사와 구체적 추론을 동시에 합니다.',
+    'as는 타입 단언이고 satisfies는 타입 검사입니다.',
+    '런타임이 아닌 컴파일 타임 검사입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="ReturnType&lt;typeof fn&gt;에서 Awaited가 필요한 경우는?"
+  options={[
+    '항상 필요하다.',
+    'fn이 async 함수여서 Promise를 반환할 때',
+    'fn에 제네릭이 있을 때',
+    'fn이 void를 반환할 때',
+  ]}
+  correctAnswer={2}
+  explanation="async 함수는 항상 Promise를 반환합니다. ReturnType만 사용하면 Promise&lt;T&gt;가 됩니다. Awaited를 추가해야 Promise가 벗겨진 실제 타입 T를 얻습니다."
+  optionExplanations={[
+    '동기 함수에서는 필요하지 않습니다.',
+    '맞습니다. async 함수의 반환 타입에서 Promise를 제거합니다.',
+    '제네릭 여부와는 관련 없습니다.',
+    'void 반환 시에도 ReturnType은 void가 됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="TypeScript에서 추상 클래스(abstract class)를 인스턴스화하면?"
+  options={[
+    '추상 메서드 없이 빈 인스턴스가 생성된다.',
+    '컴파일 오류가 발생한다.',
+    '런타임 오류가 발생한다.',
+    '정상적으로 동작한다.',
+  ]}
+  correctAnswer={2}
+  explanation="추상 클래스는 직접 인스턴스화할 수 없습니다. new AbstractClass()를 시도하면 컴파일 타임에 오류가 발생합니다. 반드시 서브클래스를 통해 인스턴스화해야 합니다."
+  optionExplanations={[
+    '빈 인스턴스가 생성되지 않습니다.',
+    '맞습니다. 컴파일 오류가 발생합니다.',
+    '런타임까지 가지 않고 컴파일 시 오류가 납니다.',
+    '인스턴스화가 불가능합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="Pick&lt;User, 'id' | 'name'&gt;의 결과는?"
+  options={[
+    'User에서 id와 name을 제외한 타입',
+    'User에서 id와 name만 포함한 타입',
+    'User에 id와 name을 추가한 타입',
+    'User와 동일한 타입',
+  ]}
+  correctAnswer={2}
+  explanation="Pick은 지정한 키만 선택해 새 타입을 만듭니다. Pick&lt;User, 'id' | 'name'&gt;은 User에서 id와 name 프로퍼티만 가지는 타입입니다."
+  optionExplanations={[
+    '제외는 Omit의 동작입니다.',
+    '맞습니다. id와 name만 선택합니다.',
+    '추가가 아닌 선택입니다.',
+    '원본 타입의 서브셋입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="타입 서술어(type predicate) value is string이 있는 함수가 true를 반환하면?"
+  options={[
+    'TypeScript가 해당 스코프에서 value를 string으로 인식한다.',
+    '런타임에 타입이 변환된다.',
+    'value가 string으로 캐스팅된다.',
+    '컴파일 오류가 발생한다.',
+  ]}
+  correctAnswer={1}
+  explanation="타입 서술어 함수가 true를 반환하면 TypeScript는 해당 변수를 지정한 타입으로 인식합니다. 런타임에는 아무것도 변경되지 않으며 타입 정보만 좁혀집니다."
+  optionExplanations={[
+    '맞습니다. TypeScript가 타입을 string으로 좁힙니다.',
+    '런타임 변환은 일어나지 않습니다.',
+    '캐스팅이 아닌 타입 좁히기입니다.',
+    '컴파일 오류가 아닌 타입 좁히기입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="TypeScript에서 private 필드가 JavaScript로 컴파일 후 어떻게 되나요?"
+  options={[
+    '완전히 사라진다.',
+    '일반 JavaScript 프로퍼티가 되어 런타임에 접근 가능하다.',
+    '런타임에도 접근 불가하다.',
+    'get/set accessor로 변환된다.',
+  ]}
+  correctAnswer={2}
+  explanation="TypeScript의 private는 컴파일 타임만의 제약입니다. 컴파일된 JavaScript에서는 일반 프로퍼티가 되어 런타임에 접근할 수 있습니다. 진짜 런타임 프라이버시는 # 접두사(JavaScript private fields)를 사용해야 합니다."
+  optionExplanations={[
+    '사라지지 않고 일반 프로퍼티가 됩니다.',
+    '맞습니다. 컴파일 타임만의 제약이며 런타임에는 일반 프로퍼티입니다.',
+    '런타임에는 접근 가능합니다.',
+    'get/set으로 변환되지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={16}
+  question="NonNullable&lt;string | null | undefined&gt;의 결과는?"
+  options={[
+    'string | null',
+    'string | undefined',
+    'string',
+    'never',
+  ]}
+  correctAnswer={3}
+  explanation="NonNullable은 타입에서 null과 undefined를 모두 제거합니다. string | null | undefined에서 null과 undefined를 제거하면 string이 남습니다."
+  optionExplanations={[
+    'null도 제거됩니다.',
+    'undefined도 제거됩니다.',
+    '맞습니다. null과 undefined가 모두 제거됩니다.',
+    '남은 타입이 있으므로 never가 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={17}
+  question="declare global { interface Window { ... } }를 사용하는 이유는?"
+  options={[
+    '새 브라우저 API를 구현하기 위해',
+    '런타임에 window 객체를 수정하기 위해',
+    'Window 타입에 커스텀 프로퍼티를 추가해 타입 안전하게 접근하기 위해',
+    'TypeScript가 Window를 인식하게 하기 위해',
+  ]}
+  correctAnswer={3}
+  explanation="외부 스크립트가 window.analytics처럼 window에 프로퍼티를 추가할 때 TypeScript는 이를 알지 못합니다. declare global로 Window 인터페이스를 확장해야 타입 오류 없이 접근할 수 있습니다."
+  optionExplanations={[
+    '런타임 구현이 아닌 타입 선언입니다.',
+    '런타임 수정이 아닌 컴파일 타임 타입 정보 제공입니다.',
+    '맞습니다. 커스텀 프로퍼티에 타입 안전성을 제공합니다.',
+    'TypeScript는 이미 Window를 인식합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={18}
+  question="분산 조건부 타입(Distributive Conditional Types)이 적용되는 조건은?"
+  options={[
+    '조건부 타입에 유니온이 포함될 때',
+    '타입 변수 T가 직접 extends 왼쪽에 올 때 (대괄호 없이)',
+    '제네릭을 사용할 때',
+    '항상 분산 적용된다.',
+  ]}
+  correctAnswer={2}
+  explanation="분산은 T extends U ? A : B에서 T가 naked 타입 변수(대괄호 없이 직접 사용)이고 유니온일 때 발생합니다. [T] extends [U]처럼 대괄호로 감싸면 분산을 방지합니다."
+  optionExplanations={[
+    '유니온 포함만으로는 부족합니다.',
+    '맞습니다. T가 대괄호 없이 직접 사용될 때 분산됩니다.',
+    '제네릭 사용만으로는 분산이 보장되지 않습니다.',
+    '조건이 맞을 때만 분산됩니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={19}
+  question="Branded Type type UserId = Brand&lt;number, 'UserId'&gt;의 목적은?"
+  options={[
+    'UserId가 문자열이 되게 한다.',
+    '같은 number 기반이지만 UserId와 ProductId를 타입 수준에서 구별한다.',
+    '런타임에 타입을 검사한다.',
+    'null 안전성을 제공한다.',
+  ]}
+  correctAnswer={2}
+  explanation="UserId와 ProductId가 모두 number라면 실수로 혼용해도 TypeScript가 잡지 못합니다. 브랜드 타입으로 __brand 가상 프로퍼티를 추가하면 두 타입이 구별됩니다."
+  optionExplanations={[
+    'UserId는 여전히 number입니다.',
+    '맞습니다. 같은 기본 타입의 의미적 구별이 목적입니다.',
+    '런타임 검사가 아닌 컴파일 타임 검사입니다.',
+    'null 안전성과는 다른 목적입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={20}
+  question="tsconfig.json에서 paths를 설정할 때 반드시 함께 지정해야 하는 옵션은?"
+  options={[
+    'rootDir',
+    'outDir',
+    'baseUrl',
+    'module',
+  ]}
+  correctAnswer={3}
+  explanation="paths 옵션의 경로 패턴은 baseUrl을 기준으로 해석됩니다. baseUrl 없이 paths를 설정하면 TypeScript가 경고를 발생시킵니다."
+  optionExplanations={[
+    'rootDir는 소스 루트 디렉터리입니다.',
+    'outDir는 출력 디렉터리입니다.',
+    '맞습니다. paths는 반드시 baseUrl과 함께 사용해야 합니다.',
+    'module은 모듈 시스템 설정입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={21}
+  question="TypeScript에서 never 타입이 유니온에 포함되면 어떻게 되나요?"
+  options={[
+    '전체 타입이 never가 된다.',
+    'never는 유니온에서 제거된다.',
+    '컴파일 오류가 발생한다.',
+    'any가 된다.',
+  ]}
+  correctAnswer={2}
+  explanation="never는 유니온의 항등원입니다. string | never = string처럼 유니온에서 never는 제거됩니다. 이 성질이 조건부 타입에서 특정 타입을 필터링하는 데 활용됩니다."
+  optionExplanations={[
+    '전체가 never가 되지 않습니다.',
+    '맞습니다. never는 유니온에서 자동으로 제거됩니다.',
+    '컴파일 오류 없이 동작합니다.',
+    'any가 되지 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={22}
+  question="import type을 사용하는 주된 이유는?"
+  options={[
+    '더 빠른 타입 검사를 위해',
+    '런타임 번들에 포함되지 않는 타입만 가져와 번들 크기를 줄이기 위해',
+    '순환 참조를 방지하기 위해',
+    'any 타입을 방지하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="import type은 타입 정보만 가져오며 컴파일 시 완전히 제거됩니다. 값(함수, 클래스, 변수)이 아닌 타입만 필요할 때 사용하면 번들 크기를 줄일 수 있습니다."
+  optionExplanations={[
+    '타입 검사 속도 향상이 주목적이 아닙니다.',
+    '맞습니다. 런타임에서 제거되어 번들 크기를 줄입니다.',
+    '순환 참조 방지가 주목적이 아닙니다.',
+    'any 방지와는 관련 없습니다.',
+  ]}
+/>

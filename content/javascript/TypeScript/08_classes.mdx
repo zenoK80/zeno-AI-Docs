@@ -1,0 +1,317 @@
+---
+title: '08. 클래스'
+description: '접근 제어자 public/private/protected, 추상 클래스, implements를 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** TypeScript 클래스의 접근 제어자와 추상 클래스, 인터페이스 구현을 이해합니다.
+</Callout>
+
+## 클래스 기본
+
+```ts
+class Animal {
+  name: string
+  age: number
+
+  constructor(name: string, age: number) {
+    this.name = name
+    this.age = age
+  }
+
+  speak(): string {
+    return `${this.name}이(가) 말합니다.`
+  }
+}
+
+const dog = new Animal('멍멍이', 3)
+console.log(dog.speak())
+```
+
+## 접근 제어자
+
+```ts
+class BankAccount {
+  public owner: string       // 어디서나 접근 가능 (기본값)
+  private balance: number    // 클래스 내부에서만 접근 가능
+  protected id: string       // 클래스와 서브클래스에서 접근 가능
+
+  constructor(owner: string, initialBalance: number) {
+    this.owner = owner
+    this.balance = initialBalance
+    this.id = Math.random().toString(36)
+  }
+
+  deposit(amount: number): void {
+    if (amount > 0) {
+      this.balance += amount
+    }
+  }
+
+  withdraw(amount: number): boolean {
+    if (amount > 0 && this.balance >= amount) {
+      this.balance -= amount
+      return true
+    }
+    return false
+  }
+
+  getBalance(): number {
+    return this.balance
+  }
+}
+
+const account = new BankAccount('Alice', 1000)
+account.owner        // OK
+account.balance      // 오류: private
+account.getBalance() // OK — 메서드로 접근
+```
+
+## 생성자 매개변수 단축
+
+```ts
+// 장황한 방식
+class Point {
+  public x: number
+  public y: number
+
+  constructor(x: number, y: number) {
+    this.x = x
+    this.y = y
+  }
+}
+
+// 단축 방식 — 생성자 매개변수에 접근 제어자 추가
+class Point {
+  constructor(
+    public x: number,
+    public y: number,
+    private label: string = 'point'
+  ) {}
+
+  toString() {
+    return `${this.label}(${this.x}, ${this.y})`
+  }
+}
+```
+
+## readonly와 static
+
+```ts
+class Config {
+  readonly apiUrl: string         // 한 번 설정 후 변경 불가
+  static instanceCount = 0        // 클래스 레벨 프로퍼티
+
+  constructor(apiUrl: string) {
+    this.apiUrl = apiUrl
+    Config.instanceCount++
+  }
+
+  static create(apiUrl: string): Config {
+    return new Config(apiUrl)
+  }
+}
+
+const config = Config.create('https://api.example.com')
+Config.instanceCount  // 1
+config.apiUrl = 'other'  // 오류: readonly
+```
+
+## 상속과 protected
+
+```ts
+class Vehicle {
+  constructor(
+    protected make: string,
+    protected model: string,
+    private year: number
+  ) {}
+
+  getInfo(): string {
+    return `${this.year} ${this.make} ${this.model}`
+  }
+}
+
+class Car extends Vehicle {
+  constructor(
+    make: string,
+    model: string,
+    year: number,
+    private doors: number
+  ) {
+    super(make, model, year)  // 부모 생성자 호출
+  }
+
+  describe(): string {
+    // protected 접근 가능, private 접근 불가
+    return `${this.make} ${this.model} - ${this.doors}도어`
+  }
+}
+```
+
+## 추상 클래스
+
+```ts
+abstract class Shape {
+  abstract getArea(): number      // 서브클래스에서 반드시 구현
+  abstract getPerimeter(): number
+
+  // 공통 구현 제공 가능
+  describe(): string {
+    return `넓이: ${this.getArea()}, 둘레: ${this.getPerimeter()}`
+  }
+}
+
+class Circle extends Shape {
+  constructor(private radius: number) {
+    super()
+  }
+
+  getArea(): number {
+    return Math.PI * this.radius ** 2
+  }
+
+  getPerimeter(): number {
+    return 2 * Math.PI * this.radius
+  }
+}
+
+// const shape = new Shape()  // 오류: 추상 클래스는 직접 인스턴스화 불가
+const circle = new Circle(5)
+console.log(circle.describe())
+```
+
+## implements — 인터페이스 구현
+
+```ts
+interface Printable {
+  print(): void
+}
+
+interface Serializable {
+  serialize(): string
+  deserialize(data: string): void
+}
+
+class Document implements Printable, Serializable {
+  private content: string = ''
+
+  print(): void {
+    console.log(this.content)
+  }
+
+  serialize(): string {
+    return JSON.stringify({ content: this.content })
+  }
+
+  deserialize(data: string): void {
+    const parsed = JSON.parse(data)
+    this.content = parsed.content
+  }
+}
+```
+
+## 핵심 정리
+
+- `public`: 어디서나 접근 가능 (기본값)
+- `private`: 클래스 내부에서만 접근 가능
+- `protected`: 클래스와 서브클래스에서 접근 가능
+- `abstract class`: 직접 인스턴스화 불가, 서브클래스에서 추상 메서드를 구현해야 합니다.
+- `implements`로 인터페이스를 구현하면 해당 타입 계약을 지킵니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="private와 protected의 차이는?"
+  options={[
+    'private가 더 넓은 범위에서 접근 가능하다.',
+    'private는 클래스 내부에서만, protected는 서브클래스에서도 접근 가능하다.',
+    '둘 다 동일하다.',
+    'protected는 JavaScript에서 지원하지 않는다.',
+  ]}
+  correctAnswer={2}
+  explanation="private는 해당 클래스 내부에서만 접근할 수 있습니다. protected는 클래스 내부와 해당 클래스를 상속받은 서브클래스에서도 접근할 수 있습니다."
+  optionExplanations={[
+    'private가 더 제한적입니다.',
+    '맞습니다. 서브클래스 접근 가능 여부가 차이입니다.',
+    '범위가 다릅니다.',
+    'protected는 TypeScript 타입 시스템에서 지원합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="추상 클래스(abstract class)를 사용하는 이유는?"
+  options={[
+    '인스턴스를 더 빠르게 생성하기 위해',
+    '공통 구현을 제공하면서 서브클래스가 특정 메서드를 반드시 구현하도록 강제하기 위해',
+    '인터페이스와 동일한 목적으로',
+    '메모리를 절약하기 위해',
+  ]}
+  correctAnswer={2}
+  explanation="추상 클래스는 공통 기능을 구현하면서 추상 메서드로 서브클래스의 구현을 강제합니다. 인터페이스와 달리 구현 코드를 포함할 수 있습니다."
+  optionExplanations={[
+    '인스턴스 생성 속도와 무관합니다.',
+    '맞습니다. 공통 구현과 구현 강제가 목적입니다.',
+    '인터페이스는 구현 코드를 포함할 수 없습니다.',
+    '메모리와 관련 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="생성자 매개변수에 접근 제어자를 붙이면 어떻게 되나요?"
+  options={[
+    '매개변수를 readonly로 만든다.',
+    '자동으로 프로퍼티를 선언하고 할당한다.',
+    '생성자 호출을 막는다.',
+    '기본값이 설정된다.',
+  ]}
+  correctAnswer={2}
+  explanation="constructor(public x: number)처럼 접근 제어자를 붙이면 this.x = x를 별도로 작성하지 않아도 됩니다. 클래스 프로퍼티 선언과 할당이 자동으로 이루어집니다."
+  optionExplanations={[
+    'readonly가 아닌 프로퍼티 선언과 할당이 일어납니다.',
+    '맞습니다. 프로퍼티 선언과 할당을 자동화합니다.',
+    '생성자 호출을 막지 않습니다.',
+    '기본값은 별도로 지정해야 합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="implements와 extends의 차이는?"
+  options={[
+    'implements는 클래스에서 클래스를 구현하고, extends는 인터페이스를 상속한다.',
+    'implements는 인터페이스를 구현하고, extends는 클래스를 상속한다.',
+    '둘 다 동일하다.',
+    'extends는 추상 클래스에서만 사용한다.',
+  ]}
+  correctAnswer={2}
+  explanation="extends는 클래스 상속(또는 인터페이스가 다른 인터페이스를 확장)에 사용합니다. implements는 클래스가 인터페이스의 계약을 따른다고 선언할 때 사용합니다."
+  optionExplanations={[
+    '역할이 바뀌었습니다.',
+    '맞습니다. implements는 인터페이스, extends는 클래스/인터페이스 상속입니다.',
+    '다릅니다.',
+    'extends는 추상 클래스뿐 아니라 일반 클래스 상속에도 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="abstract 메서드에 대한 설명으로 올바른 것은?"
+  options={[
+    '추상 클래스에서 구현을 제공한다.',
+    '서브클래스에서 반드시 구현해야 하며 추상 클래스에서는 선언만 한다.',
+    '일반 클래스에서도 선언할 수 있다.',
+    'private로만 선언할 수 있다.',
+  ]}
+  correctAnswer={2}
+  explanation="abstract 메서드는 추상 클래스에서 선언만 하고 구현은 서브클래스에서 반드시 해야 합니다. 구현하지 않으면 컴파일 오류가 발생합니다."
+  optionExplanations={[
+    '추상 메서드는 구현 없이 선언만 합니다.',
+    '맞습니다. 선언만 있고 서브클래스에서 구현을 강제합니다.',
+    'abstract 메서드는 추상 클래스에서만 선언 가능합니다.',
+    'private abstract는 사용할 수 없습니다.',
+  ]}
+/>

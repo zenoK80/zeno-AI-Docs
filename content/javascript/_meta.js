@@ -7,6 +7,14 @@ const meta = {
     title: 'ECMAScript',
     type: 'page',
   },
+  React: {
+    title: 'React',
+    type: 'page',
+  },
+  TypeScript: {
+    title: 'TypeScript',
+    type: 'page',
+  },
 }
 
 export default meta

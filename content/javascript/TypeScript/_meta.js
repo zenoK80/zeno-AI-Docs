@@ -1,0 +1,21 @@
+const meta = {
+  '01_typescript-overview': '01. TypeScript 개요',
+  '02_basic-types': '02. 기본 타입',
+  '03_object-types': '03. 객체 타입',
+  '04_union-intersection': '04. 유니온과 교차',
+  '05_functions': '05. 함수 타입',
+  '06_generics': '06. 제네릭',
+  '07_enums': '07. 열거형',
+  '08_classes': '08. 클래스',
+  '09_type-narrowing': '09. 타입 좁히기',
+  '10_utility-types': '10. 유틸리티 타입',
+  '11_mapped-conditional-types': '11. 매핑·조건부 타입',
+  '12_modules-and-declarations': '12. 모듈과 선언 파일',
+  '13_tsconfig': '13. tsconfig.json',
+  '14_typescript-with-react': '14. React + TypeScript',
+  '15_advanced-patterns': '15. 고급 패턴',
+  '16_error-handling': '16. 에러 처리',
+  '17_typescript-node': '17. Node.js + TypeScript',
+  '18_typescript-practice': '18. TypeScript 예상기출문제',
+}
+export default meta

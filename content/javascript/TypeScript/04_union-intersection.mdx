@@ -1,0 +1,262 @@
+---
+title: '04. 유니온과 교차'
+description: '유니온(|), 교차(&), 리터럴 타입, 판별 유니온 패턴을 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 유니온과 교차 타입의 의미를 이해하고 판별 유니온 패턴을 실전에 적용합니다.
+</Callout>
+
+## 유니온 타입 (|)
+
+여러 타입 중 하나가 될 수 있음을 나타냅니다.
+
+```ts
+type StringOrNumber = string | number
+
+let value: StringOrNumber = 'hello'
+value = 42   // OK
+
+// 함수 매개변수
+function printId(id: string | number) {
+  if (typeof id === 'string') {
+    console.log(id.toUpperCase())  // string 메서드 사용 가능
+  } else {
+    console.log(id.toFixed(2))     // number 메서드 사용 가능
+  }
+}
+
+// 공통 메서드는 타입 좁히기 없이도 사용 가능
+function getLength(value: string | string[]) {
+  return value.length  // string과 string[] 모두 length 있음
+}
+```
+
+## 교차 타입 (&)
+
+여러 타입을 모두 만족해야 함을 나타냅니다. 합집합(union)이 아닌 교집합(intersection)입니다.
+
+```ts
+type HasName = { name: string }
+type HasAge = { age: number }
+
+type Person = HasName & HasAge
+// Person은 name과 age 모두 필요
+
+const person: Person = {
+  name: 'Alice',
+  age: 25,
+}
+
+// 인터페이스 확장과 유사
+interface A { a: string }
+interface B { b: number }
+type AB = A & B  // { a: string; b: number }
+```
+
+## 리터럴 타입
+
+구체적인 값 자체를 타입으로 사용합니다.
+
+```ts
+// 문자열 리터럴
+type Direction = 'north' | 'south' | 'east' | 'west'
+type Status = 'pending' | 'active' | 'closed'
+
+// 숫자 리터럴
+type DiceRoll = 1 | 2 | 3 | 4 | 5 | 6
+type HttpSuccess = 200 | 201 | 204
+
+// boolean 리터럴 (거의 true | false와 같음)
+type AlwaysTrue = true
+
+// as const — 객체의 모든 프로퍼티를 리터럴 타입으로
+const config = {
+  host: 'localhost',
+  port: 3000,
+} as const
+// config.host: 'localhost' (string이 아닌 리터럴)
+// config.port: 3000 (number가 아닌 리터럴)
+```
+
+## 판별 유니온 (Discriminated Union)
+
+공통 리터럴 프로퍼티로 유니온 타입을 구별하는 패턴입니다.
+
+```ts
+type Circle = {
+  kind: 'circle'    // 판별자 (discriminant)
+  radius: number
+}
+
+type Rectangle = {
+  kind: 'rectangle'  // 판별자
+  width: number
+  height: number
+}
+
+type Triangle = {
+  kind: 'triangle'
+  base: number
+  height: number
+}
+
+type Shape = Circle | Rectangle | Triangle
+
+function getArea(shape: Shape): number {
+  switch (shape.kind) {
+    case 'circle':
+      return Math.PI * shape.radius ** 2
+    case 'rectangle':
+      return shape.width * shape.height
+    case 'triangle':
+      return (shape.base * shape.height) / 2
+    default:
+      const _exhaustive: never = shape  // 누락 감지
+      return _exhaustive
+  }
+}
+```
+
+## 유니온 타입의 함정
+
+```ts
+// 유니온 타입에서는 공통 프로퍼티만 접근 가능
+type Cat = { name: string; meow(): void }
+type Dog = { name: string; bark(): void }
+type Pet = Cat | Dog
+
+function greetPet(pet: Pet) {
+  console.log(pet.name)  // OK — 공통 프로퍼티
+  pet.meow()             // 오류 — Dog에 meow 없음
+  pet.bark()             // 오류 — Cat에 bark 없음
+}
+
+// 타입 가드로 해결
+function greetPetSafe(pet: Pet) {
+  if ('meow' in pet) {
+    pet.meow()  // Cat
+  } else {
+    pet.bark()  // Dog
+  }
+}
+```
+
+## 선택적 체이닝과 유니온
+
+```ts
+type User = {
+  id: number
+  profile?: {
+    avatar?: string
+  }
+}
+
+function getAvatar(user: User): string | undefined {
+  return user.profile?.avatar  // undefined 안전하게 접근
+}
+```
+
+## 핵심 정리
+
+- 유니온(`|`)은 여러 타입 중 하나, 교차(`&`)는 여러 타입을 모두 만족해야 합니다.
+- 리터럴 타입으로 허용값을 구체적으로 제한합니다.
+- 판별 유니온은 공통 리터럴 프로퍼티(`kind` 등)로 유니온 멤버를 구별합니다.
+- 유니온 타입에서는 공통 프로퍼티만 직접 접근 가능하며, 개별 타입 접근 시 타입 가드가 필요합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="유니온 타입(|)과 교차 타입(&)의 차이는?"
+  options={[
+    '유니온은 AND, 교차는 OR 조건이다.',
+    '유니온은 타입 중 하나, 교차는 타입 모두를 만족해야 한다.',
+    '교차 타입은 배열에만 사용한다.',
+    '유니온 타입은 함수에서만 사용한다.',
+  ]}
+  correctAnswer={2}
+  explanation="유니온(|)은 나열된 타입 중 하나면 충족됩니다. 교차(&)는 모든 타입의 조건을 동시에 만족해야 합니다. 교차는 여러 인터페이스를 합치는 데 자주 사용됩니다."
+  optionExplanations={[
+    '유니온이 OR, 교차가 AND에 해당합니다.',
+    '맞습니다. 유니온은 OR, 교차는 AND 조건입니다.',
+    '교차 타입은 객체 타입 합성에 주로 사용합니다.',
+    '유니온 타입은 변수, 매개변수, 반환 타입 등 어디서나 사용합니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="판별 유니온(Discriminated Union)에서 판별자(discriminant)란?"
+  options={[
+    '함수 이름',
+    '모든 유니온 멤버가 공통으로 가지는 리터럴 타입의 프로퍼티',
+    '타입 단언',
+    '인덱스 시그니처',
+  ]}
+  correctAnswer={2}
+  explanation="판별자는 유니온의 각 멤버가 공통으로 가지는 리터럴 타입 프로퍼티입니다. kind: 'circle', kind: 'rectangle'처럼 구체적인 리터럴 값으로 타입을 구별합니다."
+  optionExplanations={[
+    '함수 이름과 무관합니다.',
+    '맞습니다. 공통 리터럴 프로퍼티로 타입을 구별합니다.',
+    '타입 단언과 다릅니다.',
+    '인덱스 시그니처와 다릅니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="as const를 객체에 사용하면 어떻게 되나요?"
+  options={[
+    '객체가 동결(freeze)된다.',
+    '모든 프로퍼티가 리터럴 타입으로 추론되고 readonly가 된다.',
+    '제네릭 타입이 된다.',
+    '컴파일 오류가 발생한다.',
+  ]}
+  correctAnswer={2}
+  explanation="as const를 사용하면 객체의 모든 프로퍼티가 리터럴 타입으로 추론됩니다. port: 3000이 number가 아닌 3000 리터럴 타입이 됩니다. 또한 모든 프로퍼티가 readonly가 됩니다."
+  optionExplanations={[
+    'Object.freeze는 런타임 동결이고 as const는 타입 레벨 처리입니다.',
+    '맞습니다. 리터럴 타입 추론 + readonly가 됩니다.',
+    '제네릭과는 관련 없습니다.',
+    '올바른 사용이며 컴파일 오류가 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="string | number 유니온 타입에서 toUpperCase()를 안전하게 호출하려면?"
+  options={[
+    '직접 호출한다.',
+    'typeof 체크로 string임을 확인한 후 호출한다.',
+    'any로 단언 후 호출한다.',
+    'toString()을 먼저 호출한다.',
+  ]}
+  correctAnswer={2}
+  explanation="유니온 타입에서는 모든 타입에 공통으로 존재하는 메서드만 타입 좁히기 없이 사용 가능합니다. string 전용 메서드인 toUpperCase를 사용하려면 typeof 체크로 string임을 확인해야 합니다."
+  optionExplanations={[
+    'number에는 toUpperCase가 없어 타입 오류가 발생합니다.',
+    '맞습니다. typeof로 타입을 좁혀 string임을 확인합니다.',
+    'any 단언은 타입 안전성을 포기합니다.',
+    'toString()은 string을 반환하지만 의미가 다릅니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="교차 타입 A & B에서 A = { x: string }이고 B = { x: number }일 때 x의 타입은?"
+  options={[
+    'string | number',
+    'string',
+    'never',
+    '컴파일 오류',
+  ]}
+  correctAnswer={3}
+  explanation="string과 number를 동시에 만족하는 타입은 존재하지 않으므로 never가 됩니다. 교차 타입에서 같은 프로퍼티의 타입이 충돌하면 never로 귀결됩니다."
+  optionExplanations={[
+    '유니온이 아닌 교차의 경우 string이면서 number인 값은 없습니다.',
+    'string만 되는 것은 아닙니다.',
+    '맞습니다. 교차 불가능한 타입 충돌은 never가 됩니다.',
+    '컴파일 오류가 아닌 never 타입이 됩니다.',
+  ]}
+/>

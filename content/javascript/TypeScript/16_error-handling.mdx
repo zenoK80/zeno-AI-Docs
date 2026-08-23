@@ -1,0 +1,318 @@
+---
+title: '16. 에러 처리'
+description: 'try/catch 타입, Result 패턴, unknown vs any in catch를 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** TypeScript에서 타입 안전한 에러 처리 패턴을 이해하고 적용합니다.
+</Callout>
+
+## catch 절의 타입 — unknown vs any
+
+```ts
+// TypeScript 4.0 이전 — catch 변수가 any
+try {
+  riskyOperation()
+} catch (error) {
+  console.log(error.message)  // any라서 타입 오류 없음 (위험)
+}
+
+// TypeScript 4.0+ 기본값 — catch 변수가 unknown
+// tsconfig.json useUnknownInCatchVariables: true (strict에 포함)
+try {
+  riskyOperation()
+} catch (error) {
+  // error는 unknown
+  console.log(error.message)  // 오류: unknown에는 접근 불가
+
+  // 타입 좁히기 필요
+  if (error instanceof Error) {
+    console.log(error.message)  // OK
+    console.log(error.stack)    // OK
+  } else {
+    console.log(String(error))
+  }
+}
+```
+
+## 에러 처리 유틸리티
+
+```ts
+// 에러 메시지를 안전하게 추출
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'string') return error
+  return '알 수 없는 오류가 발생했습니다.'
+}
+
+// 에러인지 확인
+function isError(error: unknown): error is Error {
+  return error instanceof Error
+}
+
+// 사용
+try {
+  await fetchData()
+} catch (error) {
+  console.error(getErrorMessage(error))
+}
+```
+
+## Result 패턴
+
+예외 대신 반환값으로 에러를 전달합니다.
+
+```ts
+type Ok<T> = { ok: true; value: T }
+type Err<E> = { ok: false; error: E }
+type Result<T, E = Error> = Ok<T> | Err<E>
+
+function ok<T>(value: T): Ok<T> {
+  return { ok: true, value }
+}
+
+function err<E>(error: E): Err<E> {
+  return { ok: false, error }
+}
+
+// 사용
+async function parseJson(text: string): Promise<Result<unknown, SyntaxError>> {
+  try {
+    return ok(JSON.parse(text))
+  } catch (e) {
+    return err(e as SyntaxError)
+  }
+}
+
+async function main() {
+  const result = await parseJson('{"name": "Alice"}')
+  if (result.ok) {
+    console.log(result.value)
+  } else {
+    console.error('파싱 실패:', result.error.message)
+  }
+}
+```
+
+## 커스텀 에러 클래스
+
+```ts
+class HttpError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+    public readonly data?: unknown
+  ) {
+    super(message)
+    this.name = 'HttpError'
+    // ES5 호환성을 위해 필요
+    Object.setPrototypeOf(this, HttpError.prototype)
+  }
+}
+
+class NetworkError extends Error {
+  constructor(message: string, public readonly cause?: Error) {
+    super(message)
+    this.name = 'NetworkError'
+    Object.setPrototypeOf(this, NetworkError.prototype)
+  }
+}
+
+// 에러 처리
+async function fetchUser(id: number) {
+  try {
+    const res = await fetch(`/api/users/${id}`)
+    if (!res.ok) {
+      throw new HttpError(res.status, `사용자 조회 실패`)
+    }
+    return res.json()
+  } catch (error) {
+    if (error instanceof HttpError) {
+      if (error.status === 404) {
+        console.log('사용자를 찾을 수 없습니다.')
+      } else {
+        throw error
+      }
+    }
+    throw new NetworkError('네트워크 오류', isError(error) ? error : undefined)
+  }
+}
+
+function isError(value: unknown): value is Error {
+  return value instanceof Error
+}
+```
+
+## 비동기 에러 처리 패턴
+
+```ts
+// Promise를 Result로 변환하는 유틸리티
+async function tryCatch<T>(promise: Promise<T>): Promise<Result<T>> {
+  try {
+    const value = await promise
+    return { ok: true, value }
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error : new Error(String(error)),
+    }
+  }
+}
+
+// 사용
+const result = await tryCatch(fetch('/api/users'))
+if (result.ok) {
+  const users = await result.value.json()
+} else {
+  console.error(result.error.message)
+}
+
+// 여러 비동기 작업 병렬 처리
+const [usersResult, postsResult] = await Promise.all([
+  tryCatch(fetchUsers()),
+  tryCatch(fetchPosts()),
+])
+
+if (usersResult.ok && postsResult.ok) {
+  // 두 작업 모두 성공
+}
+```
+
+## 에러 경계 (React)
+
+```tsx
+import { Component, ErrorInfo } from 'react'
+
+interface Props {
+  children: React.ReactNode
+  fallback: React.ReactNode
+}
+
+interface State {
+  hasError: boolean
+  error: Error | null
+}
+
+class ErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false, error: null }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo): void {
+    console.error('에러 경계 포착:', error, info.componentStack)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback
+    }
+    return this.props.children
+  }
+}
+```
+
+## 핵심 정리
+
+- catch 절의 error 변수는 TypeScript 4.0+에서 기본적으로 unknown입니다.
+- `instanceof Error` 체크 후 에러 프로퍼티에 접근해야 합니다.
+- Result 패턴으로 에러를 타입으로 표현하면 처리를 강제할 수 있습니다.
+- 커스텀 에러 클래스는 `Object.setPrototypeOf`로 instanceof 체크를 보장합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="TypeScript 4.0+ strict 모드에서 catch 절 error 변수의 타입은?"
+  options={[
+    'any',
+    'unknown',
+    'Error',
+    'never',
+  ]}
+  correctAnswer={2}
+  explanation="TypeScript 4.0에서 useUnknownInCatchVariables 옵션이 추가되었고 strict에 포함됩니다. catch 변수는 unknown이 되어 사용 전 타입 좁히기가 필요합니다."
+  optionExplanations={[
+    '이전 버전에서는 any였지만 4.0+에서는 unknown입니다.',
+    '맞습니다. strict 모드에서는 unknown입니다.',
+    '항상 Error는 아닙니다. 문자열, 숫자 등 무엇이든 throw될 수 있습니다.',
+    'catch 변수가 never가 되지는 않습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="catch (error) 블록에서 error.message에 안전하게 접근하려면?"
+  options={[
+    '(error as Error).message로 단언한다.',
+    'error instanceof Error 체크 후 접근한다.',
+    'error?.message로 옵셔널 체이닝한다.',
+    '직접 접근해도 안전하다.',
+  ]}
+  correctAnswer={2}
+  explanation="unknown 타입에서는 어떤 프로퍼티도 직접 접근할 수 없습니다. instanceof Error로 타입을 좁힌 후 .message에 접근하는 것이 안전합니다. as Error 단언은 가능하지만 잘못된 단언은 런타임 오류를 일으킵니다."
+  optionExplanations={[
+    '타입 단언은 런타임 오류 가능성이 있습니다.',
+    '맞습니다. instanceof 체크가 가장 안전합니다.',
+    'unknown에는 옵셔널 체이닝도 적용 불가합니다.',
+    'unknown에서 직접 접근은 컴파일 오류입니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Result 패턴이 try/catch 방식보다 유리한 점은?"
+  options={[
+    '성능이 더 좋다.',
+    '에러를 타입으로 표현해 호출 측에서 반드시 처리하도록 강제한다.',
+    '코드가 짧아진다.',
+    '비동기를 동기로 변환한다.',
+  ]}
+  correctAnswer={2}
+  explanation="try/catch는 에러 처리를 잊어도 컴파일 오류가 없습니다. Result 패턴은 ok 여부를 확인하지 않으면 data에 접근할 수 없어 에러 처리를 강제합니다."
+  optionExplanations={[
+    '성능은 오히려 비슷하거나 낮을 수 있습니다.',
+    '맞습니다. 타입으로 에러 처리를 강제합니다.',
+    '코드가 길어질 수 있습니다.',
+    '비동기 동기 변환과는 관련 없습니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="커스텀 에러 클래스에서 Object.setPrototypeOf(this, CustomError.prototype)이 필요한 이유는?"
+  options={[
+    '이름을 설정하기 위해',
+    'ES5 환경에서 instanceof가 올바르게 동작하게 하기 위해',
+    '스택 트레이스를 위해',
+    'TypeScript 컴파일 요구사항이기 때문에',
+  ]}
+  correctAnswer={2}
+  explanation="TypeScript를 ES5로 컴파일하면 클래스 상속이 완벽하지 않습니다. Object.setPrototypeOf를 constructor에서 호출해야 instanceof Error가 올바르게 동작합니다."
+  optionExplanations={[
+    '이름은 this.name으로 설정합니다.',
+    '맞습니다. ES5 컴파일 시 instanceof 동작을 보장합니다.',
+    '스택 트레이스는 super()로 가져옵니다.',
+    'TypeScript 필수 요구사항은 아닙니다.',
+  ]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="Promise.all 중 하나가 실패하면 어떻게 되나요?"
+  options={[
+    '다른 Promise는 계속 진행하고 실패한 것만 무시된다.',
+    '모든 Promise가 거부되고 첫 번째 에러를 throw한다.',
+    'undefined를 반환한다.',
+    '자동으로 재시도한다.',
+  ]}
+  correctAnswer={2}
+  explanation="Promise.all은 하나라도 reject되면 전체가 reject됩니다. 부분 성공/실패를 처리하려면 Promise.allSettled를 사용합니다."
+  optionExplanations={[
+    '다른 Promise를 무시하지 않습니다. 전체가 reject됩니다.',
+    '맞습니다. 하나 실패 시 전체 Promise.all이 reject됩니다.',
+    'undefined를 반환하지 않습니다.',
+    '자동 재시도 기능은 없습니다.',
+  ]}
+/>
