@@ -54,11 +54,11 @@ description: 'B+ Tree 구조, Hash 인덱스, 클러스터/비클러스터, 밀�
 
 해시 함수를 사용하여 키를 버킷에 매핑합니다.
 
-$$\text{버킷 주소} = h(\text{검색 키})$$
+**버킷 주소 = h(검색 키)**
 
 **특징:**
 - 등치 검색(=) 시 O(1)의 매우 빠른 성능
-- 범위 검색(BETWEEN, >, <)에는 사용 불가
+- 범위 검색(BETWEEN, >, &lt;)에는 사용 불가
 - 정렬 순서 유지 안 함
 - 해시 충돌(Collision) 처리 필요
 
@@ -180,7 +180,7 @@ CREATE INDEX idx_name_dept ON employees (last_name, department);
 <Quiz
   questionNumber={2}
   question="Hash 인덱스가 B+ Tree 인덱스보다 불리한 상황은?"
-  options={['① 등치 검색(=)을 수행할 때', '② 범위 검색(BETWEEN, >, <)을 수행할 때', '③ 메모리 내 검색을 수행할 때', '④ 해시 충돌이 없는 경우']}
+  options={['① 등치 검색(=)을 수행할 때', "② 범위 검색(BETWEEN, >, \\u003C)을 수행할 때", '③ 메모리 내 검색을 수행할 때', '④ 해시 충돌이 없는 경우']}
   correctAnswer={2}
   explanation="Hash 인덱스는 해시 함수로 특정 버킷에 직접 접근하므로 등치 검색에 O(1)로 빠릅니다. 하지만 범위 검색을 수행하려면 전체 해시 테이블을 탐색해야 하므로 B+ Tree보다 불리합니다."
   optionExplanations={[

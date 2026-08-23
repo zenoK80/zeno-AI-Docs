@@ -237,7 +237,7 @@ const filtered = items.filter((x): x is NonNullable<typeof x> => x != null)
   correctAnswer={2}
   explanation="Record&lt;string, number&gt;는 { [key: string]: number }와 동일합니다. 임의의 문자열 키에 number 값을 가지는 객체 타입입니다."
   optionExplanations={[
-    '{ string: number }은 키 이름이 'string'인 객체입니다.',
+    '{ string: number }은 키 이름이 string인 객체입니다.',
     '맞습니다. Record는 인덱스 시그니처의 타입 별칭입니다.',
     'Map은 런타임 데이터 구조입니다.',
     '키-값 타입이 반대입니다.',

@@ -30,7 +30,7 @@ description: '리눅스마스터 1급 2차 실기 모의고사 1회 (단답·서
   question="find 명령어로 현재 디렉터리에서 확장자가 .log인 파일을 찾아 삭제하는 명령으로 알맞은 것은?"
   options={['① find . -name *.log -delete', '② find . -name "*.log" -exec rm {} \\;', '③ ls *.log | rm', '④ grep -r .log . | xargs rm']}
   correctAnswer={2}
-  explanation="find . -name \"*.log\" -exec rm {} \\; 명령은 현재 디렉터리에서 .log 파일을 찾아 rm으로 삭제합니다. -delete 옵션도 사용 가능하지만 안전을 위해 -exec rm {} \\; 방식이 더 일반적입니다."
+  explanation="find . -name '*.log' -exec rm {} \; 명령은 현재 디렉터리에서 .log 파일을 찾아 rm으로 삭제합니다. -delete 옵션도 사용 가능하지만 안전을 위해 -exec rm {} \; 방식이 더 일반적입니다."
   optionExplanations={['*.log는 따옴표 없이 쉘 글로브로 해석될 수 있습니다.', '정답입니다. find와 -exec rm으로 파일을 찾아 삭제합니다.', 'ls 출력을 rm에 파이프로 넘기는 것은 동작하지 않습니다.', 'grep은 파일 내용 검색용입니다.']}
 />
 
