@@ -11,6 +11,11 @@ const meta = {
   '10_probability-basics': '10. 표본공간, 사건, 확률 법칙',
   '11_conditional-probability': '11. 조건부확률과 독립',
   '12_bayes-theorem': '12. 베이즈 정리와 전확률 공식',
+  '13_random-variables': '13. 확률변수, 기댓값, 분산',
+  '14_discrete-distributions-binomial': '14. 이항분포',
+  '15_discrete-distributions-poisson': '15. 포아송분포와 초기하분포',
+  '16_normal-distribution': '16. 정규분포와 표준정규분포',
+  '17_other-distributions': '17. t분포, F분포, 카이제곱분포',
 }
 
 export default meta
