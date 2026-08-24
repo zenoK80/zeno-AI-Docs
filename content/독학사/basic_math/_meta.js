@@ -22,6 +22,9 @@ const meta = {
   '21_indefinite-integrals': '21. 부정적분 — 역도함수, 기본 공식',
   '22_definite-integrals': '22. 정적분과 미적분학의 기본정리',
   '23_area-and-volume': '23. 정적분의 응용 — 면적과 부피',
+  '24_substitution-integration': '24. 치환적분',
+  '25_integration-by-parts': '25. 부분적분',
+  '26_improper-integrals': '26. 이상적분 — 무한구간, 불연속점',
 }
 
 export default meta
