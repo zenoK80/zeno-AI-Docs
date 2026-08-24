@@ -16,6 +16,9 @@ const meta = {
   '15_limits': '15. 함수의 극한 — 수렴·발산, 극한 법칙',
   '16_continuity': '16. 연속의 정의와 불연속점 판별',
   '17_derivatives': '17. 미분계수와 기본 미분법',
+  '18_differentiation-rules': '18. 합성함수 미분, 지수·로그·삼각 미분',
+  '19_derivative-applications': '19. 증가·감소·오목볼록·극값 찾기',
+  '20_optimization': '20. 최적화 문제와 선형근사',
 }
 
 export default meta
