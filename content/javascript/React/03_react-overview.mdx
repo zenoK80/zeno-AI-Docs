@@ -286,8 +286,8 @@ createRoot(document.getElementById('root')).render(
 
 <Quiz
   questionNumber={7}
-  question="JSX `<Button label=\"확인\" />`가 실제로 변환되는 형태는?"
-  options={['①<Button label=\"확인\" /> (변환되지 않음)', '②HTML 문자열', '③React.createElement(Button, { label: \'확인\' })', '④CSS 클래스']}
+  question="JSX로 작성한 버튼 컴포넌트 태그가 실제로 변환되는 형태는?"
+  options={['①변환되지 않고 그대로 유지된다', '②HTML 문자열', '③React.createElement(Button, { label: 확인 })', '④CSS 클래스']}
   correctAnswer={3}
   explanation="JSX는 빌드 도구에 의해 React.createElement 함수 호출로 변환됩니다. 이 함수는 컴포넌트, props 등의 정보를 담은 순수 JavaScript 객체를 반환합니다."
   optionExplanations={['JSX는 브라우저가 이해할 수 없어 반드시 변환되어야 합니다.', 'HTML 문자열이 아닌 JS 객체로 변환됩니다.', '맞습니다. createElement 함수 호출로 변환됩니다.', 'CSS와는 무관합니다.']}
