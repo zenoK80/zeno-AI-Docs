@@ -25,6 +25,8 @@ const meta = {
   '24_substitution-integration': '24. 치환적분',
   '25_integration-by-parts': '25. 부분적분',
   '26_improper-integrals': '26. 이상적분 — 무한구간, 불연속점',
+  '27_first-order-ode': '27. 일계 미분방정식 — 변수분리, 선형',
+  '28_second-order-ode': '28. 이계 미분방정식 기초 — 상수계수 제차·비제차',
 }
 
 export default meta
