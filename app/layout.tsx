@@ -8,6 +8,7 @@ import { AiStudyAssistant } from './components/ai-study-assistant'
 import { CopyAttribution } from './components/copy-attribution'
 import { DocsNavbar } from './components/docs-navbar'
 import 'nextra-theme-docs/style.css'
+import 'katex/dist/katex.min.css'
 import './globals.css'
 
 export const metadata: Metadata = {
