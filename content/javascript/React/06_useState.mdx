@@ -35,10 +35,17 @@ React가 화면을 다시 그리려면 두 가지가 필요합니다.
 
 ## useState 기본 사용법
 
-```jsx
-import { useState } from 'react'
+아래 코드는 직접 실행하고 버튼을 눌러볼 수 있습니다. 코드를 고쳐서 바로 결과를 확인해 보세요.
 
-function Counter() {
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  showConsole
+  label="useState 카운터 실습"
+  files={{
+    '/App.js': `import { useState } from 'react'
+
+export default function Counter() {
   const [count, setCount] = useState(0)
   //    [현재값, 변경함수]  초기값
 
@@ -50,8 +57,9 @@ function Counter() {
       <button onClick={() => setCount(0)}>초기화</button>
     </div>
   )
-}
-```
+}`,
+  }}
+/>
 
 `useState(0)` 이 반환하는 배열을 구조 분해 해서 `[count, setCount]` 로 받습니다.
 - `count`: 현재 상태 값 (초기에는 0)
