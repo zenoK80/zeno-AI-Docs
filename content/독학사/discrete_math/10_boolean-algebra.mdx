@@ -1,75 +1,107 @@
 ---
 title: '10. 부울 대수'
-description: '부울 함수, 정규형(DNF/CNF), 카르노 맵을 이용한 논리 회로 간소화를 이해합니다.'
+description: '부울 함수, 정규형(DNF/CNF), 카르노 맵을 이용한 논리 회로 간소화를 완전 초보자도 이해할 수 있게 설명합니다.'
 ---
 
 <Callout type="info">
   **이번 문서의 목표:** 부울 함수를 정규형으로 표현하고, 카르노 맵으로 최소화합니다.
 </Callout>
 
+## 왜 부울 대수가 필요한가?
+
+컴퓨터의 CPU는 수억 개의 논리 게이트(logic gate)로 구성됩니다. AND 게이트, OR 게이트, NOT 게이트를 조합하여 덧셈, 곱셈, 비교 등 모든 연산을 수행합니다. 부울 대수(Boolean algebra)는 이 논리 회로를 설계하고 최소화하는 수학입니다.
+
+<Callout type="info">
+  **비유:** 직렬 연결된 스위치는 AND 게이트입니다. 두 스위치가 모두 ON이어야 전류가 흐릅니다. 병렬 연결된 스위치는 OR 게이트입니다. 하나만 ON이어도 전류가 흐릅니다.
+</Callout>
+
 ## 부울 대수 (Boolean Algebra)
+
+**쉽게 말하면:** 부울 대수(Boolean algebra)는 0과 1 두 값만 다루는 대수 체계입니다. 1700년대 수학자 조지 부울(George Boole)이 개발했으며, 컴퓨터 과학의 근간입니다.
 
 부울 대수는 0과 1 두 값만 다루는 대수 체계입니다.
 
 **기본 연산:**
 
-| 연산 | 기호 | 설명 |
-| --- | --- | --- |
-| AND | $\cdot$ 또는 $\land$ | 두 입력이 모두 1일 때 1 |
-| OR | $+$ 또는 $\lor$ | 하나 이상이 1일 때 1 |
-| NOT | $\bar{x}$ 또는 $\lnot$ | 값을 반전 |
+| 연산 | 기호 | 진리표 | 설명 |
+| --- | --- | --- | --- |
+| AND | $\cdot$ 또는 $\land$ | 1·1=1, 나머지=0 | 두 입력이 모두 1일 때 1 |
+| OR | $+$ 또는 $\lor$ | 0+0=0, 나머지=1 | 하나 이상이 1일 때 1 |
+| NOT | $\bar{x}$ 또는 $\lnot$ | $\bar{0}=1, \bar{1}=0$ | 값을 반전 |
+
+**부울 표기와 논리 표기 대응:**
+- 부울 대수: $x \cdot y$, $x + y$, $\bar{x}$
+- 논리학: $x \land y$, $x \lor y$, $\lnot x$
 
 ## 부울 대수의 기본 법칙
 
-| 법칙 | AND 형태 | OR 형태 |
+부울 대수에서 성립하는 법칙들입니다. 일반 수학과 유사하지만 다른 점도 있습니다.
+
+| 법칙 이름 | AND 형태 | OR 형태 |
 | --- | --- | --- |
-| 항등 법칙 | $x \cdot 1 = x$ | $x + 0 = x$ |
-| 영 법칙 | $x \cdot 0 = 0$ | $x + 1 = 1$ |
-| 멱등 법칙 | $x \cdot x = x$ | $x + x = x$ |
-| 보원 법칙 | $x \cdot \bar{x} = 0$ | $x + \bar{x} = 1$ |
-| 이중 부정 | $\bar{\bar{x}} = x$ | |
-| 교환 법칙 | $x \cdot y = y \cdot x$ | $x + y = y + x$ |
-| 결합 법칙 | $(x \cdot y) \cdot z = x \cdot (y \cdot z)$ | $(x + y) + z = x + (y + z)$ |
-| 분배 법칙 | $x \cdot (y + z) = xy + xz$ | $x + yz = (x+y)(x+z)$ |
-| 드모르간 | $\overline{x \cdot y} = \bar{x} + \bar{y}$ | $\overline{x + y} = \bar{x} \cdot \bar{y}$ |
+| 항등 법칙 (Identity) | $x \cdot 1 = x$ | $x + 0 = x$ |
+| 영 법칙 (Null) | $x \cdot 0 = 0$ | $x + 1 = 1$ |
+| 멱등 법칙 (Idempotent) | $x \cdot x = x$ | $x + x = x$ |
+| 보원 법칙 (Complement) | $x \cdot \bar{x} = 0$ | $x + \bar{x} = 1$ |
+| 이중 부정 (Double Negation) | $\bar{\bar{x}} = x$ | |
+| 교환 법칙 (Commutative) | $x \cdot y = y \cdot x$ | $x + y = y + x$ |
+| 결합 법칙 (Associative) | $(x \cdot y) \cdot z = x \cdot (y \cdot z)$ | $(x + y) + z = x + (y + z)$ |
+| 분배 법칙 (Distributive) | $x \cdot (y + z) = xy + xz$ | $x + yz = (x+y)(x+z)$ |
+| 흡수 법칙 (Absorption) | $x \cdot (x + y) = x$ | $x + x \cdot y = x$ |
+| 드모르간 (De Morgan) | $\overline{x \cdot y} = \bar{x} + \bar{y}$ | $\overline{x + y} = \bar{x} \cdot \bar{y}$ |
+
+**일반 수학과 다른 점:**
+- $x + x = x$ (일반 수학에서는 2x)
+- $x + 1 = 1$ (일반 수학에서는 x+1)
+- $x \cdot x = x$ (일반 수학에서는 x²)
+- 분배 법칙이 OR에도 성립: $x + yz = (x+y)(x+z)$
 
 ## 정규형 (Normal Form)
 
 ### 최소항(Minterm)과 최대항(Maxterm)
 
 $n$개의 변수에 대해:
-- **최소항(Minterm) $m_i$:** 모든 변수를 포함한 AND 항 (각 변수는 원형 또는 보수)
-- **최대항(Maxterm) $M_i$:** 모든 변수를 포함한 OR 항
+
+**최소항(Minterm) $m_i$:** 모든 변수가 AND로 연결된 항. 각 변수는 원형 또는 보수로 나타냄.
+- 변수 A, B에서: $m_0 = \bar{A}\bar{B}$, $m_1 = \bar{A}B$, $m_2 = A\bar{B}$, $m_3 = AB$
+
+**최대항(Maxterm) $M_i$:** 모든 변수가 OR로 연결된 항.
+- $M_0 = A+B$, $M_1 = A+\bar{B}$, $M_2 = \bar{A}+B$, $M_3 = \bar{A}+\bar{B}$
+
+**관계:** $m_i$와 $M_i$는 보수 관계 ($m_i = \overline{M_i}$)
+
+**$n$변수의 최소항/최대항 수:** $2^n$ (2변수→4개, 3변수→8개, 4변수→16개)
 
 ### 적화 정규형 (DNF, Disjunctive Normal Form)
 
-최소항들의 OR로 표현: 진리표에서 출력이 1인 행들의 최소항 합
+**쉽게 말하면:** DNF(적화 정규형, 합의 곱의 합 형태)는 최소항들의 OR로 표현합니다. 진리표에서 **출력이 1인 행들의 최소항을 OR로 연결**합니다.
 
-$$F = \sum m(...)$$
+$$F = \sum m(...) = m_{i_1} + m_{i_2} + ...$$
+
+**예:** 진리표에서 A=0,B=1일 때와 A=1,B=0일 때 출력이 1이면:
+
+$$F = \bar{A}B + A\bar{B} = m_1 + m_2$$
 
 ### 곱화 정규형 (CNF, Conjunctive Normal Form)
 
-최대항들의 AND로 표현: 진리표에서 출력이 0인 행들의 최대항 곱
+**쉽게 말하면:** CNF(곱화 정규형)는 최대항들의 AND로 표현합니다. 진리표에서 **출력이 0인 행들의 최대항을 AND로 연결**합니다.
 
-$$F = \prod M(...)$$
+$$F = \prod M(...) = M_{j_1} \cdot M_{j_2} \cdot ...$$
 
 ## 카르노 맵 (Karnaugh Map)
 
-진리표를 격자 형태로 배치하여 논리식을 최소화하는 방법입니다.
+**쉽게 말하면:** 카르노 맵(Karnaugh map, K-map)은 진리표를 격자(grid) 형태로 재배열하여 논리식을 시각적으로 최소화하는 방법입니다. "1들을 묶어서 간소화한다"고 생각하면 됩니다.
+
+**핵심 아이디어:** 인접한 1들을 묶으면 공통 변수만 남고 나머지는 소거됩니다.
 
 **2변수 카르노 맵:**
 
 |  | $\bar{B}$ | $B$ |
 | --- | --- | --- |
-| $\bar{A}$ | $m_0$ | $m_1$ |
-| $A$ | $m_2$ | $m_3$ |
+| $\bar{A}$ | $m_0$ (AB=00) | $m_1$ (AB=01) |
+| $A$ | $m_2$ (AB=10) | $m_3$ (AB=11) |
 
-**그루핑 규칙:**
-- 인접한 1들을 $2^k$개 ($k=0,1,2,...$) 그룹으로 묶음
-- 그룹이 클수록 간소화 효과 큼
-- 가장자리는 반대편과 인접
-
-**3변수 카르노 맵 (2×4):**
+**3변수 카르노 맵 (2행 4열):**
 
 |  | $\bar{B}\bar{C}$ | $\bar{B}C$ | $BC$ | $B\bar{C}$ |
 | --- | --- | --- | --- | --- |
@@ -77,25 +109,37 @@ $$F = \prod M(...)$$
 | $A$ | $m_4$ | $m_5$ | $m_7$ | $m_6$ |
 
 <Callout type="warning">
-  카르노 맵에서 그레이 코드(Gray Code) 순서로 배열해야 합니다. 인접 셀 간 변수가 한 개만 달라야 묶을 수 있습니다.
+  **중요:** 카르노 맵에서 열 순서는 그레이 코드(Gray Code) 순서입니다(00, 01, 11, 10). 인접한 셀 간 변수가 **딱 하나만** 달라야 합니다. 이 순서를 어기면 인접 관계가 성립하지 않습니다.
 </Callout>
 
-## 논리 게이트
+**그루핑 규칙:**
+- 인접한 1들을 $2^k$개 ($k=0,1,2,...$, 즉 1, 2, 4, 8개)씩 묶음
+- 그룹이 클수록 간소화 효과 큼 (변수 소거가 많음)
+- 가장자리는 반대편과 인접 (원통/도넛 모양처럼)
+- 겹쳐서 묶어도 됨 (더 크게 묶을 수 있으면 크게 묶음)
+- 0은 묶지 않음
 
-| 게이트 | 기호 | 표현 |
-| --- | --- | --- |
-| AND | AND | $F = A \cdot B$ |
-| OR | OR | $F = A + B$ |
-| NOT | NOT | $F = \bar{A}$ |
-| NAND | NAND | $F = \overline{A \cdot B}$ |
-| NOR | NOR | $F = \overline{A + B}$ |
-| XOR | XOR | $F = A \oplus B = A\bar{B} + \bar{A}B$ |
+**예:** 3변수에서 $m_0, m_1, m_4, m_5$가 1이면 A와 무관하게 $\bar{B}\bar{C}$ 또는 $\bar{B}C$이므로 → $\bar{B}$로 간소화
+
+## 논리 게이트 (Logic Gates)
+
+| 게이트 | 기호 | 표현 | 설명 |
+| --- | --- | --- | --- |
+| AND | AND gate | $F = A \cdot B$ | 둘 다 1이면 1 |
+| OR | OR gate | $F = A + B$ | 하나라도 1이면 1 |
+| NOT | NOT gate | $F = \bar{A}$ | 반전 |
+| NAND | NAND gate | $F = \overline{A \cdot B}$ | AND의 반전, NOT+AND |
+| NOR | NOR gate | $F = \overline{A + B}$ | OR의 반전, NOT+OR |
+| XOR | XOR gate | $F = A \oplus B = A\bar{B} + \bar{A}B$ | 입력이 다를 때 1 |
+
+**NAND와 NOR의 중요성:** NAND 게이트만으로 OR, AND, NOT 모든 연산 구현 가능 — 이를 "범용 게이트(Universal Gate)"라 합니다.
 
 ## 핵심 정리
 
-- 드모르간: $\overline{AB} = \bar{A} + \bar{B}$, $\overline{A+B} = \bar{A}\cdot\bar{B}$
-- DNF: 1인 최소항들의 합
-- CNF: 0인 최대항들의 곱
+- 드모르간: $\overline{AB} = \bar{A} + \bar{B}$ / $\overline{A+B} = \bar{A} \cdot \bar{B}$
+- DNF: **1인 최소항들의 합** (OR로 연결)
+- CNF: **0인 최대항들의 곱** (AND로 연결)
+- n변수 최소항 수: $2^n$
 - 카르노 맵: 인접 1들을 $2^k$ 그룹으로 묶어 최소화
 
 ## 마무리 복습
@@ -105,9 +149,9 @@ $$F = \prod M(...)$$
   question="드모르간 법칙에 따라 NOT(A AND B)와 동치인 식은?"
   options={['① NOT A AND NOT B', '② NOT A OR NOT B', '③ A OR B', '④ NOT(A OR B)']}
   correctAnswer={2}
-  explanation="드모르간 법칙: NOT(A AND B) = NOT A OR NOT B. 즉 $\\overline{A \\cdot B} = \\bar{A} + \\bar{B}$입니다."
+  explanation="드모르간 법칙: NOT(A AND B) = NOT A OR NOT B. 즉 A·B의 보수 = Ā + B̄입니다. AND 안의 NOT이 나오면 AND가 OR로 바뀝니다."
   optionExplanations={[
-    'NOT A AND NOT B는 NOT(A OR B)와 같습니다.',
+    'NOT A AND NOT B는 NOT(A OR B)와 같습니다(다른 드모르간 법칙).',
     '맞습니다. 드모르간 법칙: NOT(A·B) = NOT A + NOT B입니다.',
     'A OR B는 NOT(A AND B)와 다릅니다.',
     'NOT(A OR B) = NOT A AND NOT B입니다.',
@@ -119,7 +163,7 @@ $$F = \prod M(...)$$
   question="부울 식 x · (x + y)를 간소화하면?"
   options={['① x + y', '② x', '③ y', '④ 1']}
   correctAnswer={2}
-  explanation="흡수 법칙: x · (x + y) = x. 분배하면 x·x + x·y = x + x·y = x(1+y) = x·1 = x입니다."
+  explanation="흡수 법칙: x · (x + y) = x. 분배하면 x·x + x·y = x + x·y = x(1+y) = x·1 = x입니다. 흡수 법칙에 의해 바로 x가 됩니다."
   optionExplanations={[
     'x + y는 흡수 법칙 적용 후 결과가 아닙니다.',
     '맞습니다. 흡수 법칙에 의해 x·(x+y) = x입니다.',
@@ -133,12 +177,12 @@ $$F = \prod M(...)$$
   question="3변수 함수의 최소항은 총 몇 개인가?"
   options={['① 4개', '② 6개', '③ 8개', '④ 16개']}
   correctAnswer={3}
-  explanation="n변수 함수의 최소항 수는 2^n입니다. 3변수이면 2^3 = 8개입니다."
+  explanation="n변수 함수의 최소항 수는 2의 n승입니다. 3변수이면 2의 3승 = 8개입니다. 000~111까지 8가지 조합이 있습니다."
   optionExplanations={[
-    '4개는 2변수의 최소항 수입니다.',
+    '4개는 2변수(2의 2승)의 최소항 수입니다.',
     '6개는 아닙니다.',
-    '맞습니다. 3변수 = 2^3 = 8개의 최소항이 있습니다.',
-    '16개는 4변수의 최소항 수입니다.',
+    '맞습니다. 3변수 = 2의 3승 = 8개의 최소항이 있습니다.',
+    '16개는 4변수(2의 4승)의 최소항 수입니다.',
   ]}
 />
 
@@ -147,11 +191,11 @@ $$F = \prod M(...)$$
   question="DNF(Disjunctive Normal Form)를 올바르게 설명한 것은?"
   options={['① 최대항들의 AND', '② 최소항들의 OR', '③ 최소항들의 AND', '④ 최대항들의 OR']}
   correctAnswer={2}
-  explanation="DNF(적화 정규형)는 최소항(Minterm)들의 OR(합)로 표현됩니다. 진리표에서 출력이 1인 행들의 최소항을 OR로 연결합니다."
+  explanation="DNF(적화 정규형, 논리합 정규형)는 최소항(Minterm)들의 OR(합)로 표현됩니다. 진리표에서 출력이 1인 행들의 최소항을 OR로 연결합니다."
   optionExplanations={[
     '최대항들의 AND는 CNF(곱화 정규형)입니다.',
-    '맞습니다. DNF는 최소항들의 OR입니다.',
-    '최소항들의 AND는 정규형이 아닙니다.',
+    '맞습니다. DNF는 최소항들의 OR(합)입니다.',
+    '최소항들의 AND는 일반적인 정규형이 아닙니다.',
     '최대항들의 OR도 정규형이 아닙니다.',
   ]}
 />
@@ -159,13 +203,13 @@ $$F = \prod M(...)$$
 <Quiz
   questionNumber={5}
   question="카르노 맵에서 그루핑 시 묶을 수 있는 셀의 수는?"
-  options={['① 임의의 개수', '② 2의 거듭제곱(1, 2, 4, 8, ...)', '③ 짝수만', '④ 홀수만']}
+  options={['① 임의의 개수', '② 2의 거듭제곱(1, 2, 4, 8, ...)', '③ 짝수면 모두 가능', '④ 홀수만']}
   correctAnswer={2}
-  explanation="카르노 맵에서 그루핑은 1, 2, 4, 8, 16... 즉 2의 거듭제곱 개수의 인접한 1들을 묶어야 합니다."
+  explanation="카르노 맵에서 그루핑은 1, 2, 4, 8, 16... 즉 2의 거듭제곱 개수의 인접한 1들을 묶어야 합니다. 이 규칙을 지켜야 변수 소거가 가능합니다."
   optionExplanations={[
     '임의의 개수로 묶을 수 없습니다.',
     '맞습니다. 2의 거듭제곱(1, 2, 4, 8)개만 묶을 수 있습니다.',
-    '짝수이지만 모든 짝수가 가능한 것은 아닙니다.',
+    '6, 10 같은 짝수는 불가합니다.',
     '홀수로는 묶을 수 없습니다.',
   ]}
 />
@@ -175,11 +219,11 @@ $$F = \prod M(...)$$
   question="부울 식 x + x·y를 간소화하면?"
   options={['① x·y', '② x + y', '③ x', '④ y']}
   correctAnswer={3}
-  explanation="흡수 법칙: x + x·y = x(1 + y) = x·1 = x입니다."
+  explanation="흡수 법칙: x + x·y = x(1 + y) = x·1 = x입니다. 1+y = 1(영 법칙의 OR 형태)이기 때문입니다."
   optionExplanations={[
     'x·y는 간소화된 결과가 아닙니다.',
     'x + y는 아닙니다.',
-    '맞습니다. x + x·y = x입니다.',
+    '맞습니다. x + x·y = x입니다(흡수 법칙).',
     'y는 아닙니다.',
   ]}
 />
@@ -189,10 +233,10 @@ $$F = \prod M(...)$$
   question="XOR 연산(A ⊕ B)이 1이 되는 경우는?"
   options={['① A=1, B=1', '② A=0, B=0', '③ A와 B의 값이 다를 때', '④ A와 B의 값이 같을 때']}
   correctAnswer={3}
-  explanation="XOR(배타적 OR)는 두 입력이 서로 다를 때만 1이 됩니다. A=1,B=0 또는 A=0,B=1일 때 1입니다."
+  explanation="XOR(배타적 OR, Exclusive OR)는 두 입력이 서로 다를 때만 1이 됩니다. A=1,B=0이거나 A=0,B=1일 때 1입니다. 같으면 0입니다."
   optionExplanations={[
-    'A=1, B=1이면 XOR = 0입니다.',
-    'A=0, B=0이면 XOR = 0입니다.',
+    'A=1, B=1이면 XOR = 0입니다(같으므로).',
+    'A=0, B=0이면 XOR = 0입니다(같으므로).',
     '맞습니다. XOR은 입력이 다를 때 1입니다.',
     '입력이 같을 때 XOR = 0입니다.',
   ]}
