@@ -107,6 +107,27 @@ function Button({ label = '버튼', color = 'blue', onClick }) {
 // → label: '버튼', color: 'blue' 적용
 ```
 
+### props 객체 통째로 펼치기(spread)
+
+전달받은 props 중 일부만 쓰고, 나머지는 그대로 밑으로 흘려보내고 싶을 때 스프레드 문법을 씁니다.
+
+```jsx
+function CustomInput({ label, ...rest }) {
+  return (
+    <label>
+      {label}
+      {/* type, placeholder, value, onChange 등 나머지 props를 그대로 input에 전달 */}
+      <input {...rest} />
+    </label>
+  )
+}
+
+// 사용
+<CustomInput label="이메일" type="email" placeholder="이메일 입력" value={email} onChange={handleChange} />
+```
+
+`{ label, ...rest }`로 `label`만 따로 꺼내고, 나머지 모든 props(`type`, `placeholder`, `value`, `onChange`)는 `rest` 객체에 자동으로 모입니다. `<input {...rest} />`는 그 객체의 모든 키-값을 다시 개별 props로 풀어서 전달합니다. 재사용 가능한 UI 라이브러리 컴포넌트를 만들 때 매우 자주 쓰는 패턴입니다.
+
 ---
 
 ## Props는 읽기 전용
@@ -130,6 +151,32 @@ function GoodComponent({ name, onChangeName }) {
   )
 }
 ```
+
+**왜 React가 이렇게 강제할까?** props가 자유롭게 수정 가능하다면, 같은 데이터를 참조하는 다른 형제 컴포넌트가 "누가 언제 이 값을 바꿨는지" 추적할 수 없게 됩니다. 데이터가 오직 부모 → 자식으로만 흐르고, 변경은 항상 데이터의 "주인"(원래 상태를 가진 컴포넌트)에서만 일어나야 흐름을 예측할 수 있습니다.
+
+> **비유:** props는 계약서 사본과 같습니다. 사본을 받은 사람이 마음대로 내용을 고쳐 쓰면 원본과 달라져 혼란이 생깁니다. 내용을 바꾸고 싶으면 원본을 가진 사람(부모)에게 "이렇게 바꿔주세요"(콜백 함수 호출)라고 요청해야 합니다.
+
+### Prop Drilling — props 전달의 한계
+
+컴포넌트 트리가 깊어지면, 최상위에서 최하위까지 props를 계속 한 단계씩 전달해야 하는 문제가 생깁니다. 이를 **Prop Drilling(props 구멍 뚫기)**이라고 부릅니다.
+
+```jsx
+function App() {
+  const user = { name: '김철수' }
+  return <Layout user={user} />
+}
+function Layout({ user }) {
+  return <Sidebar user={user} />   // Layout은 user를 쓰지도 않는데 그냥 전달만 함
+}
+function Sidebar({ user }) {
+  return <UserBadge user={user} /> // Sidebar도 마찬가지
+}
+function UserBadge({ user }) {
+  return <p>{user.name}</p>        // 실제로 user를 쓰는 곳은 여기뿐
+}
+```
+
+`Layout`과 `Sidebar`는 `user`를 실제로 쓰지 않는데도 중간 전달자 역할만 합니다. 이 문제는 12번 문서에서 배울 **Context API**로 해결합니다.
 
 ---
 
@@ -163,6 +210,39 @@ function App() {
 ```
 
 `Card` 컴포넌트는 내부 내용이 무엇인지 몰라도 됩니다. 어떤 JSX든 `children`으로 받아서 렌더링합니다.
+
+### children은 사실 그냥 하나의 prop이다
+
+`children`은 마법이 아니라, JSX가 태그 사이의 내용을 자동으로 `children`이라는 이름의 prop으로 채워주는 것뿐입니다. 아래 두 코드는 완전히 동일합니다.
+
+```jsx
+// 일반적으로 쓰는 방식
+<Card title="정보">
+  <p>내용</p>
+</Card>
+
+// 완전히 같은 의미 — children을 직접 prop으로 전달
+<Card title="정보" children={<p>내용</p>} />
+```
+
+여러 개의 "구멍(슬롯)"이 필요하면, `children` 대신 일반 props로 JSX를 여러 개 전달할 수도 있습니다.
+
+```jsx
+function SplitLayout({ left, right }) {
+  return (
+    <div style={{ display: 'flex' }}>
+      <div className="left">{left}</div>
+      <div className="right">{right}</div>
+    </div>
+  )
+}
+
+// 사용 — JSX를 prop 값으로 그대로 전달
+<SplitLayout
+  left={<Sidebar />}
+  right={<MainContent />}
+/>
+```
 
 ---
 
@@ -202,7 +282,9 @@ function Example({
 - **Props**: 부모 → 자식으로 데이터를 전달하는 방법. HTML 속성처럼 작성.
 - Props는 구조 분해로 받고, 기본값을 설정할 수 있다.
 - **Props는 읽기 전용** — 자식에서 props를 직접 변경할 수 없다.
-- **children**: 컴포넌트 태그 사이의 내용. 레이아웃 컴포넌트에 유용.
+- **children**: 컴포넌트 태그 사이의 내용이 자동으로 전달되는 특별한 prop. 여러 슬롯이 필요하면 일반 props로 JSX를 전달.
+- **스프레드(`{...rest}`)**: 일부 props만 꺼내 쓰고 나머지는 자식 요소로 그대로 흘려보낼 때 사용.
+- **Prop Drilling**: 중간 컴포넌트가 쓰지도 않는 props를 계속 전달만 하는 문제. 깊어지면 Context로 해결.
 
 ---
 
@@ -251,4 +333,22 @@ function Example({
   correctAnswer={2}
   explanation="children은 컴포넌트 여는 태그와 닫는 태그 사이의 내용입니다. title은 명시적으로 전달된 prop이고, <p>내용</p>이 children입니다."
   optionExplanations={['title은 명시적 prop입니다. children이 아닙니다.', '맞습니다. 태그 사이의 <p>내용</p>이 children입니다.', 'Card 컴포넌트 자체는 children이 아닙니다.', 'title은 children이 아닌 명시적 prop입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="function Input({ label, ...rest }) 에서 ...rest가 의미하는 것은?"
+  options={['①label을 제외한 나머지 모든 props를 하나의 객체로 모은다', '②label의 기본값을 지정한다', '③컴포넌트를 반복 렌더링한다', '④props를 모두 삭제한다']}
+  correctAnswer={1}
+  explanation="구조 분해에서 ...rest(나머지 구조 분해)는 명시적으로 꺼낸 속성(label)을 제외한 나머지 모든 속성을 rest라는 객체 하나로 모읍니다."
+  optionExplanations={['맞습니다. label을 제외한 나머지 props가 rest 객체에 모입니다.', '기본값 지정은 = 기본값 형태로 합니다.', '반복 렌더링과는 무관합니다.', 'props를 삭제하지 않고 모으는 것입니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="컴포넌트 트리가 깊어질 때, 중간 컴포넌트들이 사용하지도 않는 props를 계속 전달만 해야 하는 문제를 가리키는 용어는?"
+  options={['①Prop Drilling', '②Reconciliation', '③Hoisting', '④Memoization']}
+  correctAnswer={1}
+  explanation="Prop Drilling(props 구멍 뚫기)은 최상위 컴포넌트의 데이터를 여러 단계 아래 컴포넌트까지 전달하기 위해, 중간의 모든 컴포넌트가 필요하지도 않은 props를 계속 전달해야 하는 문제입니다."
+  optionExplanations={['맞습니다. Prop Drilling이 정확한 용어입니다.', 'Reconciliation은 가상 DOM 비교·반영 과정입니다.', 'Hoisting은 변수·함수 선언이 끌어올려지는 JS 동작입니다.', 'Memoization은 계산 결과를 캐싱하는 최적화 기법입니다.']}
 />
