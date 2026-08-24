@@ -1,17 +1,17 @@
 # Zeno AI Docs
 
-GPT와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는 개인 학습 문서입니다.
+Claude Code와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는 개인 학습 문서입니다.
 
 ---
 
 ## How It Works
 
-- **GPT 단일 작업 흐름**: 하나의 GPT가 학습 과목과 웹 기술 문서를 일관된 기준으로 작성하고 검토합니다.
+- **Claude Code 단일 작업 흐름**: Claude Code가 학습 과목과 웹 기술 문서를 일관된 기준으로 작성하고 검토합니다.
 - **분야별 작업 규칙**: `study.md`와 `skill.md`에 문서 형식, 폴더 구조, 시각화와 실습 규칙을 기록합니다. (Instruction-Driven Development)
 - **과목별 계획 기반 작성**: `plan-study/`와 `plan-skill/`의 범위와 목차를 먼저 읽고 MDX 문서를 만듭니다. (Plan-Driven Content)
 - **문서도 코드처럼 관리**: 문서, 메뉴 설정, 작업 규칙을 Git으로 함께 기록하고 변경 이력을 남깁니다. (Docs as Code)
 - **자동 빌드와 배포**: GitHub에 푸시하면 GitHub Actions가 사이트를 빌드하고 GitHub Pages에 배포합니다. (CI/CD)
-- **짧은 학습 흐름**: MDX 문서에 핵심 개념, 시각 자료, 영상, 퀴즈·실습을 함께 구성해 읽고 바로 확인할 수 있게 합니다.
+- **충분한 학습 흐름**: MDX 문서에 핵심 개념, 시각 자료, 영상, 퀴즈·실습을 함께 구성해 읽고 바로 확인할 수 있게 합니다. (본문 10~15분 분량)
 
 ---
 
@@ -38,7 +38,8 @@ GPT와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는
 - `skill.md`: JavaScript·React 등 웹 기술 문서 지침
 - `plan-study/`: 학습 과목별 범위와 목차
 - `plan-skill/`: 웹 기술별 범위와 목차
-- `AGENTS.md`: 요청한 과목에 맞는 지침을 GPT가 자동으로 찾게 하는 안내 파일
+- `CLAUDE.md`: MDX 작성 규칙, 목차 설계 원칙, 컴포넌트 사용법 등 Claude Code 작업 지침
+- `AGENTS.md`: 요청한 과목에 맞는 지침을 AI가 자동으로 찾게 하는 안내 파일
 
 ---
 
