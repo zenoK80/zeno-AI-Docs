@@ -50,6 +50,46 @@ const [count, setCount] = useState(0)
 // count = 0, setCount = 변경 함수
 ```
 
+**객체 구조 분해는 "속성 이름"으로 꺼내고, 배열 구조 분해는 "순서"로 꺼냅니다.** 이 차이 때문에 문법이 다릅니다.
+
+```js
+const user = { name: '김철수', age: 25 }
+const { name } = user   // {} — 속성 이름 name과 일치해야 함
+
+const arr = ['김철수', 25]
+const [name2] = arr     // [] — 첫 번째 순서의 값을 가져옴 (이름 무관)
+```
+
+### 구조 분해의 응용 — 기본값, 이름 바꾸기, 중첩
+
+```js
+// 기본값: 속성이 없으면 기본값 사용
+const { name, role = '일반회원' } = { name: '김철수' }
+console.log(role) // '일반회원'
+
+// 이름 바꾸기: 속성명이 마음에 안 들거나 겹칠 때
+const { name: userName } = user
+console.log(userName) // '김철수' (name이 아닌 userName으로 사용)
+
+// 중첩 구조 분해: 객체 안의 객체에서 바로 꺼내기
+const response = { data: { id: 1, profile: { city: '서울' } } }
+const { data: { profile: { city } } } = response
+console.log(city) // '서울'
+
+// 나머지(rest) 구조 분해: 일부만 꺼내고 나머지는 객체로 묶기
+const { name: n, ...rest } = { name: '김철수', age: 25, city: '서울' }
+console.log(rest) // { age: 25, city: '서울' }
+```
+
+React에서 props 기본값을 줄 때 실무에서 정말 자주 씁니다.
+
+```jsx
+function Button({ label, variant = 'primary', onClick }) {
+  // variant를 지정하지 않고 <Button label="확인" />처럼 써도 'primary'가 기본값
+  return <button className={variant} onClick={onClick}>{label}</button>
+}
+```
+
 ---
 
 ## 화살표 함수 (Arrow Function)
@@ -79,6 +119,26 @@ const double = n => n * 2
 <button onClick={() => setCount(count + 1)}>+1</button>
 ```
 
+### 화살표 함수와 일반 함수의 진짜 차이 — this
+
+화살표 함수는 단순히 "짧은 문법"이 아닙니다. 결정적인 차이는 **`this`(자기 자신을 가리키는 키워드)를 자신만의 것으로 갖지 않고, 바깥 스코프의 `this`를 그대로 물려받는다**는 점입니다.
+
+```js
+const obj = {
+  name: '김철수',
+  // 일반 함수: this가 obj를 가리킴
+  greetNormal: function () {
+    console.log(this.name) // '김철수'
+  },
+  // 화살표 함수: this가 obj가 아닌 바깥(모듈 최상위)을 가리킴
+  greetArrow: () => {
+    console.log(this.name) // undefined
+  },
+}
+```
+
+React 클래스 컴포넌트(구식 문법)에서 이벤트 핸들러를 화살표 함수로 만드는 이유가 바로 이것입니다. 함수형 컴포넌트+훅을 쓰는 요즘은 이 문제를 거의 만나지 않지만, 오래된 코드나 면접에서 "왜 화살표 함수를 쓰나요?"의 답으로 자주 나옵니다.
+
 ---
 
 ## 배열 메서드 — map, filter, find
@@ -105,6 +165,35 @@ const users = [
 const user = users.find(u => u.id === 2)
 // { id: 2, name: '이영희' }
 ```
+
+### reduce — 배열을 하나의 값으로 압축
+
+`reduce`는 배열의 모든 항목을 순회하며 **누적값(accumulator)**을 계속 갱신해 최종적으로 값 하나를 만듭니다. 장바구니 합계 계산에 자주 쓰입니다.
+
+```js
+const cart = [
+  { name: '사과', price: 1000, qty: 3 },
+  { name: '바나나', price: 500, qty: 5 },
+]
+
+// reduce(누적함수, 초기값)
+const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0)
+// acc: 지금까지 누적된 값, item: 현재 항목
+// 1단계: acc=0 + 1000*3 = 3000
+// 2단계: acc=3000 + 500*5 = 5500
+console.log(total) // 5500
+```
+
+> **쉽게 말하면:** `reduce`는 "장바구니 영수증을 한 줄씩 읽으면서 누적 합계를 계속 더해가는 계산기"입니다.
+
+### 배열 메서드 선택 기준
+
+| 하고 싶은 일 | 메서드 |
+|---|---|
+| 각 항목을 다른 형태로 바꾼 새 배열이 필요 | `map` |
+| 조건에 맞는 항목들만 걸러낸 새 배열이 필요 | `filter` |
+| 조건에 맞는 항목 딱 하나만 필요 | `find` |
+| 배열 전체를 하나의 값(합계, 객체 등)으로 압축 | `reduce` |
 
 React에서 리스트를 렌더링할 때:
 
@@ -228,14 +317,79 @@ async function fetchUser(id) {
 
 ---
 
+## 템플릿 리터럴, 옵셔널 체이닝, null 병합 연산자
+
+### 템플릿 리터럴 — 문자열에 변수 끼워 넣기
+
+백틱(`` ` ``)으로 문자열을 감싸면 `${}` 안에 변수나 표현식을 바로 넣을 수 있습니다.
+
+```js
+const name = '김철수'
+const age = 25
+
+// 기존 방식 — 문자열을 + 로 이어 붙임
+const message1 = name + '님은 ' + age + '세입니다.'
+
+// 템플릿 리터럴
+const message2 = `${name}님은 ${age}세입니다.`
+```
+
+JSX 안에서 className을 동적으로 조합할 때 자주 씁니다.
+
+```jsx
+<div className={`card ${isActive ? 'active' : ''}`}>...</div>
+```
+
+### 옵셔널 체이닝(Optional Chaining) `?.`
+
+객체 속성에 접근할 때, 중간 단계가 `null`이나 `undefined`일 수 있으면 에러가 납니다. `?.`을 쓰면 중간이 비어 있어도 에러 대신 `undefined`를 반환합니다.
+
+```js
+const user = { profile: null }
+
+// ❌ 에러 발생 — profile이 null인데 city에 접근 시도
+console.log(user.profile.city)
+// TypeError: Cannot read properties of null
+
+// ✅ 옵셔널 체이닝 — profile이 없으면 undefined 반환, 에러 없음
+console.log(user.profile?.city) // undefined
+```
+
+API 응답처럼 데이터가 있을지 없을지 확신할 수 없을 때 필수입니다.
+
+```jsx
+function Profile({ user }) {
+  // user가 아직 로드되지 않아 null일 수 있는 상황을 안전하게 처리
+  return <p>{user?.name ?? '로딩 중...'}</p>
+}
+```
+
+### null 병합 연산자(Nullish Coalescing) `??`
+
+왼쪽 값이 `null` 또는 `undefined`일 때만 오른쪽 값을 대신 사용합니다.
+
+```js
+const count = 0
+console.log(count || 10) // 10 — || 는 0도 "거짓"으로 취급해버림 (의도치 않은 결과!)
+console.log(count ?? 10) // 0  — ??는 null/undefined만 검사하므로 0을 그대로 유지
+```
+
+<Callout type="warning">
+  **`||`와 `??`를 혼동하면 버그가 생깁니다.** `||`는 `0`, `''`(빈 문자열), `false`도 모두 "값이 없다"고 취급해 오른쪽 값으로 바꿔버립니다. 재고 수량이 0인데 `stock || '품절 아님'` 같은 코드를 쓰면 0을 "값 없음"으로 착각해 잘못된 결과가 나옵니다. 진짜 없음(null/undefined)만 검사하고 싶다면 반드시 `??`를 씁니다.
+</Callout>
+
+---
+
 ## 핵심 정리
 
-- **구조 분해** `const { a } = obj` — 객체/배열에서 값을 꺼낸다. `useState`의 `[state, setState]`가 이것.
-- **화살표 함수** `() => {}` — 이벤트 핸들러, 콜백에 항상 등장.
-- **map / filter / find** — 리스트 렌더링과 데이터 필터링에 필수.
+- **구조 분해** `const { a } = obj` — 객체는 이름으로, 배열은 순서로 꺼낸다. 기본값·이름 바꾸기·중첩도 가능.
+- **화살표 함수** `() => {}` — 짧은 문법일 뿐 아니라 `this`를 바깥 스코프에서 물려받는다.
+- **map / filter / find / reduce** — 각각 변환, 필터링, 단건 검색, 값 하나로 압축.
 - **스프레드** `...` — 배열·객체를 복사하거나 합칠 때. 상태 불변성에 핵심.
 - **import / export** — 컴포넌트를 파일로 분리하고 가져오는 문법.
-- **삼항·단축 평가** — JSX 안에서 조건부 렌더링에 사용.
+- **템플릿 리터럴** `` `${a}` `` — 문자열에 변수를 끼워 넣는 문법.
+- **옵셔널 체이닝** `?.` — 중간 값이 없어도 에러 없이 undefined 반환.
+- **null 병합** `??` — null/undefined일 때만 대체값 사용(`||`와 달리 0, ''은 유지).
 - **async/await** — 서버 데이터를 기다리는 비동기 처리.
 
 ---
@@ -294,4 +448,22 @@ async function fetchUser(id) {
   correctAnswer={2}
   explanation="await 키워드는 async로 선언된 함수 안에서만 사용할 수 있습니다."
   optionExplanations={['async 함수 밖에서는 await를 쓸 수 없습니다.', '맞습니다. await는 async 함수 안에서만 사용합니다.', 'Promise 체인 외부의 async 함수에서도 사용 가능합니다.', 'try 블록 여부는 관계 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="cart.reduce((acc, item) => acc + item.price, 0)에서 두 번째 인자 0의 역할은?"
+  options={['①배열의 첫 항목을 건너뛴다', '②누적값(acc)의 초기값을 지정한다', '③반복 횟수를 제한한다', '④아무 역할도 없다']}
+  correctAnswer={2}
+  explanation="reduce의 두 번째 인자는 누적값(accumulator)의 초기값입니다. 생략하면 배열의 첫 번째 항목이 초기값으로 쓰이는데, 합계 계산처럼 숫자를 누적할 때는 명시적으로 0을 주는 것이 안전합니다."
+  optionExplanations={['첫 항목을 건너뛰지 않습니다. acc의 시작값입니다.', '맞습니다. acc가 0부터 시작해 각 항목의 price를 더해갑니다.', '반복 횟수는 배열 길이만큼 고정입니다.', '초기값을 지정하는 중요한 역할을 합니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="const stock = 0; console.log(stock ?? '품절'); 의 출력 결과는?"
+  options={['①품절', '②0', '③undefined', '④에러 발생']}
+  correctAnswer={2}
+  explanation="??는 왼쪽 값이 null 또는 undefined일 때만 오른쪽 값을 사용합니다. 0은 null/undefined가 아니므로 그대로 0이 출력됩니다. ||를 썼다면 0도 거짓으로 취급되어 '품절'이 출력되었을 것입니다."
+  optionExplanations={['??는 0을 유효한 값으로 취급하므로 대체되지 않습니다.', '맞습니다. 0은 null/undefined가 아니므로 그대로 유지됩니다.', 'undefined가 아닌 0이 출력됩니다.', '정상적으로 실행되는 코드입니다.']}
 />
