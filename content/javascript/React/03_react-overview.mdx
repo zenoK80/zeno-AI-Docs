@@ -27,11 +27,26 @@ btn.addEventListener('click', () => {
 
 > **쉽게 말하면:** Vanilla JS는 "1번 서랍을 열어, 종이를 꺼내, 지우개로 지워, 새로 써, 다시 넣어"처럼 단계를 일일이 지시해야 합니다. React는 "이 서랍엔 항상 이 종이가 있어야 해"라고 결과만 선언하면 됩니다.
 
+### 명령형(Imperative) vs 선언형(Declarative)
+
+이 차이는 React를 이해하는 가장 중요한 관점입니다.
+
+| 구분 | 방식 | 비유 |
+|------|------|------|
+| **명령형** | "어떻게(How)" 할지 단계를 하나하나 지시 | 내비게이션 없이 "왼쪽 골목으로 들어가서, 두 번째 신호등에서 우회전..."처럼 길을 직접 안내 |
+| **선언형** | "무엇을(What)" 원하는지 결과만 선언 | 내비게이션에 "목적지"만 입력하면 나머지는 알아서 처리 |
+
+Vanilla JS 코드는 `getElementById`, `textContent =` 처럼 "DOM을 어떻게 바꿀지" 명령형으로 적었습니다. React 코드는 `count`라는 상태와 그 상태를 화면에 어떻게 보여줄지(`{count}`)만 선언하면, "상태가 바뀌었을 때 실제로 DOM을 어떻게 바꿀지"는 React가 알아서 계산합니다.
+
 ---
 
 ## React란?
 
-**React**는 Meta(구 Facebook)가 2013년에 오픈소스로 공개한 **JavaScript UI 라이브러리**입니다. UI를 **컴포넌트(component)** 단위로 쪼개고, 데이터(상태)가 바뀌면 화면을 자동으로 갱신합니다.
+**React**는 Meta(구 Facebook)가 2013년에 오픈소스로 공개한 **JavaScript UI 라이브러리**입니다. 원래 Facebook 뉴스피드처럼 실시간으로 계속 갱신되는 복잡한 화면을 유지보수하기 어려워지자, 이를 해결하기 위해 사내에서 개발되었습니다.
+
+> **라이브러리(Library) vs 프레임워크(Framework):** React는 스스로를 "라이브러리"라고 부릅니다. 프레임워크(Angular 등)는 라우팅, 상태 관리, HTTP 통신까지 모든 것을 포함한 "완제품"에 가깝고, 라이브러리인 React는 오직 "화면을 그리는 것(View)"만 담당합니다. 라우팅(React Router), 상태 관리(Zustand), 데이터 요청(TanStack Query)은 필요에 따라 별도로 골라서 조합해야 합니다. 이 때문에 React는 자유도가 높은 대신, 어떤 도구를 조합할지 스스로 결정해야 합니다.
+
+UI를 **컴포넌트(component)** 단위로 쪼개고, 데이터(상태)가 바뀌면 화면을 자동으로 갱신합니다.
 
 핵심 특징 세 가지:
 
@@ -75,6 +90,24 @@ function Counter() {
   가상 DOM이 항상 빠른 건 아닙니다. 단순한 앱은 오히려 순수 JS가 빠를 수 있습니다. React의 진짜 이점은 **복잡한 상태 관리를 쉽게 해주는 개발자 경험**입니다.
 </Callout>
 
+### 왜 "실제 DOM 직접 조작"이 느린가?
+
+브라우저의 실제 DOM 요소 하나를 바꾸면, 브라우저는 그 여파로 **레이아웃 재계산(reflow)**과 **다시 그리기(repaint)**를 수행할 수 있습니다. 이 과정은 CPU 연산 비용이 큽니다. 요소 100개를 하나씩 100번 바꾸면 이 과정이 100번 반복될 수 있습니다.
+
+React는 상태가 여러 번 바뀌어도 **한 번에 모아서(batch)** 계산한 뒤, 최종적으로 달라진 부분만 딱 한 번 실제 DOM에 반영합니다. 이렇게 "비교 후 최소한만 반영"하는 과정을 **재조정(Reconciliation, 리컨실리에이션)**이라고 부릅니다.
+
+### key — Diffing이 리스트를 구별하는 방법
+
+리스트를 렌더링할 때 각 항목에 `key`를 주는 이유가 바로 이 Diffing과 관련 있습니다. React는 이전 가상 DOM과 새 가상 DOM을 비교할 때, `key`를 보고 "이게 그 항목이 맞는지"를 판단합니다.
+
+```jsx
+{todos.map(todo => (
+  <li key={todo.id}>{todo.text}</li>  // ✅ 고유하고 안정적인 id 사용
+))}
+```
+
+`key`가 없거나 배열 인덱스를 쓰면, 리스트 중간에 항목이 추가·삭제될 때 React가 "어떤 항목이 진짜로 바뀐 것인지" 잘못 판단해 엉뚱한 항목이 리렌더링되거나 상태가 꼬일 수 있습니다. (자세한 내용은 9번 문서에서 다룹니다.)
+
 ---
 
 ## 컴포넌트란?
@@ -101,11 +134,50 @@ function UserCard({ name, email }) {
 
 컴포넌트를 조합해서 UI를 만드는 방식은 레고 블록과 같습니다. 작은 블록(Button)을 조합해 큰 구조물(UserCard)을 만들고, 여러 UserCard를 조합해 UserList를 만드는 방식입니다.
 
+### JSX의 실체 — React.createElement
+
+`<Button label="확인" />`처럼 생긴 JSX는 사실 HTML이 아니라 **JavaScript 함수 호출을 짧게 쓴 문법**입니다. 빌드 도구(Vite, Babel)가 JSX를 아래처럼 실제 JavaScript로 변환합니다.
+
+```jsx
+// 우리가 쓰는 JSX
+const element = <Button label="확인" onClick={handleClick} />
+
+// 실제로 변환되는 코드
+const element = React.createElement(Button, { label: '확인', onClick: handleClick })
+```
+
+`React.createElement(컴포넌트, props객체, 자식들)`은 "이런 컴포넌트를, 이런 props로 그려줘"라는 정보를 담은 **평범한 JavaScript 객체**를 반환합니다. 이 객체들이 모여 가상 DOM 트리를 이룹니다.
+
+> **쉽게 말하면:** JSX는 `React.createElement(...)`를 손으로 매번 치기 번거로우니 HTML처럼 편하게 쓸 수 있게 만든 "문법 설탕(Syntactic Sugar)"입니다. 겉모습만 HTML이고, 실제로는 100% JavaScript입니다.
+
+### 컴포넌트 트리 — 부모, 자식, 형제
+
+컴포넌트를 조합하면 아래처럼 트리(나무) 구조가 만들어집니다.
+
+```
+App
+├── Header
+├── Main
+│   ├── UserCard (부모: Main, 자식: Button)
+│   │   └── Button
+│   └── UserCard
+│       └── Button
+└── Footer
+```
+
+- **부모(Parent)**: 다른 컴포넌트를 감싸거나 렌더링하는 컴포넌트 (위에서 `Main`은 `UserCard`의 부모)
+- **자식(Child)**: 부모 안에서 렌더링되는 컴포넌트
+- **형제(Sibling)**: 같은 부모를 공유하는 컴포넌트들 (두 `UserCard`는 서로 형제)
+
+이 트리 구조와 "데이터는 부모 → 자식으로만 흐른다"는 단방향 원칙이 합쳐져, 데이터가 어디서 와서 어디로 가는지 추적하기 쉬워집니다.
+
 ---
 
 ## React 프로젝트 시작
 
-**Vite** 사용을 권장합니다. Create React App보다 훨씬 빠릅니다.
+**Vite**(비트) 사용을 권장합니다. 예전에 표준이었던 Create React App(CRA)보다 훨씬 빠르며, 현재 CRA는 공식적으로 유지보수가 중단되었습니다.
+
+**왜 Vite가 빠른가?** CRA는 개발 서버를 켤 때 프로젝트의 모든 파일을 한 번에 번들링(묶기)한 후 제공합니다. 파일이 많아질수록 시작 시간이 길어집니다. Vite는 브라우저가 최신 JS의 `import` 문법(ES Modules)을 직접 이해할 수 있다는 점을 활용해, **요청받은 파일만 그때그때 변환**해서 제공합니다. 그래서 프로젝트 규모가 커져도 개발 서버 시작 속도가 거의 일정합니다.
 
 ```bash
 npm create vite@latest my-app -- --template react
@@ -140,15 +212,19 @@ createRoot(document.getElementById('root')).render(
 )
 ```
 
+`createRoot(DOM요소).render(컴포넌트)`는 "이 실제 DOM 요소 안에 이 React 컴포넌트 트리를 그려라"는 명령입니다. `<StrictMode>`는 실제 화면에는 아무 영향이 없지만, 개발 중에만 컴포넌트를 일부러 두 번 렌더링해서 **부작용(side effect)이 있는 잘못된 코드를 미리 찾아주는** 개발자 도우미입니다. 배포 빌드에서는 자동으로 비활성화됩니다.
+
 ---
 
 ## 핵심 정리
 
-- React는 UI 라이브러리로, 상태가 바뀌면 화면을 자동으로 갱신해 준다.
-- **선언형**: "이런 화면이어야 해"라고 결과를 선언하면 React가 DOM 조작을 처리한다.
-- **가상 DOM**: 변경된 부분만 실제 DOM에 반영해 불필요한 조작을 줄인다.
-- **컴포넌트**: UI를 독립 조각으로 분리해 재사용하는 기본 단위.
-- `npm create vite@latest`로 빠르게 프로젝트를 시작한다.
+- React는 UI 라이브러리로, 상태가 바뀌면 화면을 자동으로 갱신해 준다. 프레임워크와 달리 View만 담당하며 나머지는 조합해서 쓴다.
+- **선언형 vs 명령형**: "무엇을" 원하는지 선언하면 React가 "어떻게" 바꿀지 알아서 계산한다.
+- **가상 DOM·재조정(Reconciliation)**: 여러 변경을 모아 비교한 뒤, 달라진 부분만 실제 DOM에 한 번에 반영한다.
+- **key**: 리스트 diffing 시 항목을 구별하는 기준. 인덱스 대신 고유 id를 쓴다.
+- **JSX**: `React.createElement(...)` 호출을 편하게 쓴 문법 설탕. 실체는 순수 JS 객체.
+- **컴포넌트 트리**: 부모→자식 방향으로 데이터가 흐르는 나무 구조.
+- `npm create vite@latest`로 빠르게 프로젝트를 시작한다. `StrictMode`는 개발 중 잠재적 버그를 미리 잡아준다.
 
 ---
 
@@ -197,4 +273,22 @@ createRoot(document.getElementById('root')).render(
   correctAnswer={2}
   explanation="React 18부터 createRoot(요소).render(컴포넌트)를 사용합니다. 기존 ReactDOM.render()는 React 18에서 deprecated되었습니다."
   optionExplanations={['ReactDOM.render()는 React 17 이하의 구형 API입니다.', '맞습니다. React 18의 현재 표준 방식입니다.', 'React.create()는 존재하지 않습니다.', 'ReactDOM.mount()는 존재하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="리스트를 렌더링할 때 각 항목에 고유한 key를 지정해야 하는 주된 이유는?"
+  options={['①코드를 더 짧게 쓰기 위해', '②React가 Diffing 시 어떤 항목이 추가·삭제·변경되었는지 정확히 구별하기 위해', '③CSS 스타일을 적용하기 위해', '④서버에 데이터를 전송하기 위해']}
+  correctAnswer={2}
+  explanation="key는 React가 이전 가상 DOM과 새 가상 DOM을 비교할 때 각 리스트 항목을 식별하는 기준입니다. key가 없거나 배열 인덱스를 쓰면 리스트 변경 시 잘못된 항목이 갱신될 수 있습니다."
+  optionExplanations={['코드 길이와는 무관합니다.', '맞습니다. Diffing 시 항목을 정확히 구별하기 위함입니다.', 'CSS와는 관련이 없습니다.', '서버 전송과는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="JSX `<Button label=\"확인\" />`가 실제로 변환되는 형태는?"
+  options={['①<Button label=\"확인\" /> (변환되지 않음)', '②HTML 문자열', '③React.createElement(Button, { label: \'확인\' })', '④CSS 클래스']}
+  correctAnswer={3}
+  explanation="JSX는 빌드 도구에 의해 React.createElement 함수 호출로 변환됩니다. 이 함수는 컴포넌트, props 등의 정보를 담은 순수 JavaScript 객체를 반환합니다."
+  optionExplanations={['JSX는 브라우저가 이해할 수 없어 반드시 변환되어야 합니다.', 'HTML 문자열이 아닌 JS 객체로 변환됩니다.', '맞습니다. createElement 함수 호출로 변환됩니다.', 'CSS와는 무관합니다.']}
 />
