@@ -8,6 +8,9 @@ const meta = {
   '07_measures-of-center': '07. 평균, 중앙값, 최빈값',
   '08_spread-and-variability': '08. 범위, 분산, 표준편차',
   '09_relative-position': '09. 백분위수, Z점수, 사분위수',
+  '10_probability-basics': '10. 표본공간, 사건, 확률 법칙',
+  '11_conditional-probability': '11. 조건부확률과 독립',
+  '12_bayes-theorem': '12. 베이즈 정리와 전확률 공식',
 }
 
 export default meta
