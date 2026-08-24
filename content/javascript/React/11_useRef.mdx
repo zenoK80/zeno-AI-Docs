@@ -18,6 +18,10 @@ description: 'useRef로 DOM 요소에 직접 접근하고, 렌더링 없이 값�
 
 > **쉽게 말하면:** `useRef`는 컴포넌트 함수 밖에 있는 "메모장"입니다. 적어도 화면이 바뀌지 않고, 함수가 재실행돼도 값이 유지됩니다.
 
+<Callout type="warning">
+  **렌더링 도중에는 ref를 읽거나 쓰지 않습니다.** `useState`의 state는 "이번 렌더링에서의 스냅샷"이라 렌더링 중에 읽어도 안전하지만, `ref.current`는 렌더링 중간에도 바뀔 수 있는 값이라 예측 불가능한 결과를 만들 수 있습니다. `ref.current`는 이벤트 핸들러나 `useEffect` 안에서만 읽고 쓰는 것이 원칙입니다.
+</Callout>
+
 ---
 
 ## DOM 접근 — input 포커스
