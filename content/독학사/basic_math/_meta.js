@@ -9,6 +9,10 @@ const meta = {
   '08_matrix-multiplication': '08. 행렬 곱셈과 전치행렬',
   '09_inverse-matrix': '09. 역행렬과 연립방정식 풀이',
   '10_determinants': '10. 행렬식 — 2×2, 3×3, 역행렬 존재 조건',
+  '11_vectors-and-operations': '11. 벡터, 크기, 덧셈·뺄셈·스칼라배',
+  '12_dot-product': '12. 내적과 응용 — 각도, 직교',
+  '13_lines-and-planes': '13. 직선과 평면의 방정식',
+  '14_linear-programming': '14. 부등식과 선형계획 — 실수 범위 최적화',
 }
 
 export default meta
