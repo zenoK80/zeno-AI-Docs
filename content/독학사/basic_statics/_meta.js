@@ -27,6 +27,9 @@ const meta = {
   '26_chi-square-test': '26. 카이제곱 검정 (독립성·적합도)',
   '27_correlation': '27. 상관관계와 상관계수',
   '28_simple-regression': '28. 단순회귀분석',
+  '29_statistics-question-types-1': '29. 예상기출문제 1 — 기술통계·확률',
+  '30_statistics-question-types-2': '30. 예상기출문제 2 — 분포·추정·검정',
+  '31_mock-exam': '31. 실전 모의고사',
 }
 
 export default meta
