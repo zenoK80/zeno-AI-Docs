@@ -20,6 +20,19 @@ React 컴포넌트는 기본적으로 "상태를 받아서 화면을 그리는" 
 
 > **쉽게 말하면:** `useEffect`는 "화면이 그려진 뒤에 이 코드를 실행해줘"라고 React에게 예약하는 훅입니다.
 
+### useEffect는 "언제" 실행되는가?
+
+`useEffect`의 콜백은 컴포넌트 함수가 실행되어 반환값(JSX)이 나온 **직후가 아니라, 브라우저가 실제 화면에 그림을 그린 뒤(paint 이후)** 비동기적으로 실행됩니다.
+
+```
+1. 컴포넌트 함수 실행 → JSX 반환
+2. React가 실제 DOM에 반영
+3. 브라우저가 화면에 그림을 그림 (paint)
+4. useEffect 콜백 실행    ← 여기!
+```
+
+이 때문에 `useEffect` 안에서 `document.title`을 바꾸거나 `fetch`를 호출해도 사용자가 화면을 보는 데 지장이 없습니다. (반대로, 화면이 그려지기 *전에* 동기적으로 처리해야 하는 드문 경우에는 `useLayoutEffect`를 씁니다. 15번 문서 이후에서 다시 다룹니다.)
+
 ---
 
 ## useEffect 기본 사용법
@@ -79,6 +92,31 @@ useEffect(() => {
   window.addEventListener('resize', handleResize)
 }, [])  // 빈 배열
 ```
+
+### 클로저(Closure)와 오래된 값(Stale State) 문제
+
+`useEffect` 안에서 참조하는 state·props는 **그 이펙트가 등록될 당시의 값에 고정**됩니다. 의존성 배열에 넣지 않으면 값이 바뀌어도 이펙트 안에서는 옛날 값을 계속 참조하는 버그가 생깁니다.
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      console.log(count) // ❌ 항상 0만 출력됨 (등록 당시의 count가 "갇혀버림")
+    }, 1000)
+    return () => clearInterval(id)
+  }, []) // count가 의존성에 없음 — 첫 렌더링의 count=0을 계속 참조
+
+  return <button onClick={() => setCount(c => c + 1)}>{count}</button>
+}
+```
+
+`count`를 화면에서 계속 증가시켜도, `setInterval` 콜백은 이펙트가 처음 등록될 때의 `count`(0)를 계속 참조합니다. 이를 **오래된 클로저(Stale Closure)**라고 부릅니다. 해결하려면 `count`를 의존성 배열에 추가하거나(그러면 count가 바뀔 때마다 이전 타이머를 정리하고 새로 등록), 함수형 업데이트(`setCount(c => c + 1)`)처럼 이전 값에 의존하지 않는 형태로 작성합니다.
+
+<Callout type="warning">
+  **자주 틀리는 점:** "이펙트 안에서 쓰는 state나 props는 전부 의존성 배열에 넣어야 한다"가 원칙입니다. React의 ESLint 플러그인(`eslint-plugin-react-hooks`)이 누락된 의존성을 자동으로 경고해 줍니다. 경고를 임의로 무시하면 이런 stale closure 버그가 생기기 쉽습니다.
+</Callout>
 
 ---
 
@@ -168,6 +206,8 @@ function PostList() {
 - 의존성 배열 없음 → 매 렌더링, `[]` → 마운트 시 1회, `[a]` → a 변경 시마다.
 - **클린업**: 이펙트가 등록한 타이머·리스너를 `return () => {정리코드}`로 정리한다.
 - 데이터 패칭은 내부 async 함수를 선언해서 호출하는 패턴을 사용한다.
+- useEffect 콜백은 화면에 paint가 끝난 뒤 비동기로 실행된다(즉시 동기 실행이 필요하면 useLayoutEffect).
+- 이펙트 안의 state·props는 등록 시점 값에 고정된다(클로저). 쓰는 값은 반드시 의존성 배열에 넣는다.
 
 ---
 
@@ -216,4 +256,22 @@ function PostList() {
   correctAnswer={2}
   explanation="컴포넌트가 언마운트되거나 재렌더링되어도 클린업 없이는 이전에 등록한 interval이 계속 실행됩니다. 컴포넌트가 반복적으로 마운트·언마운트되면 interval이 쌓여 메모리 누수가 생깁니다."
   optionExplanations={['렌더링 자체에는 문제가 없습니다.', '맞습니다. 클린업 없으면 중복 등록과 메모리 누수가 발생합니다.', 'setInterval은 자동으로 정리되지 않습니다.', '빌드 오류가 아닌 런타임 문제입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="의존성 배열을 []로 두고 useEffect 안에서 setInterval 콜백에 state 값을 참조하면 어떤 문제가 발생하는가?"
+  options={['①매번 최신 값이 정상적으로 출력된다', '②이펙트가 등록될 당시의 오래된 값에 고정되어 출력된다(stale closure)', '③interval이 즉시 멈춘다', '④컴포넌트가 무한 리렌더링된다']}
+  correctAnswer={2}
+  explanation="의존성 배열이 []이면 이펙트는 마운트 시 한 번만 등록되고, 그 안의 콜백은 등록 당시의 state 값을 클로저로 계속 참조합니다. state가 이후에 바뀌어도 콜백 안에서는 옛날 값 그대로입니다."
+  optionExplanations={['의존성이 없으면 최신 값을 반영하지 못합니다.', '맞습니다. 이것이 stale closure 문제입니다.', 'interval은 클린업 함수가 실행되기 전까지 계속 동작합니다.', '무한 리렌더링과는 다른 문제입니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="useEffect 콜백이 실제로 실행되는 시점은?"
+  options={['①컴포넌트 함수가 호출되기 직전', '②브라우저가 화면에 그림을 그린(paint) 이후', '③JSX가 반환되기 직전', '④이벤트 핸들러가 호출될 때']}
+  correctAnswer={2}
+  explanation="useEffect의 콜백은 컴포넌트가 렌더링되어 실제 DOM에 반영되고, 브라우저가 화면을 그린 뒤에 비동기적으로 실행됩니다. 화면이 그려지기 전에 동기적으로 실행해야 한다면 useLayoutEffect를 사용합니다."
+  optionExplanations={['컴포넌트 함수 호출 이전이 아닌 이후입니다.', '맞습니다. paint 이후 비동기로 실행됩니다.', 'JSX 반환은 렌더링 단계이며 이펙트는 그 이후입니다.', '이벤트 핸들러는 사용자 상호작용 시 실행되며 별개입니다.']}
 />
