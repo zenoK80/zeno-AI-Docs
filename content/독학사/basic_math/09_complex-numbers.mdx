@@ -1,0 +1,145 @@
+---
+title: '09. 복소수'
+description: '복소수의 사칙연산, 극형식 표현, 드무아브르 정리와 복소수의 거듭제곱을 학습합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 복소수 연산을 수행하고 극형식으로 변환하여 드무아브르 정리를 적용합니다.
+</Callout>
+
+## 복소수의 정의
+
+$i^2 = -1$을 만족하는 허수단위 $i$를 도입하면, $a + bi$ ($a, b \in \mathbb{R}$) 형태의 수를 **복소수**라 합니다.
+
+- $a$를 **실수부**, $b$를 **허수부**라 합니다.
+- $b = 0$이면 실수, $b \neq 0$이면 허수입니다.
+- $a = 0$이고 $b \neq 0$이면 **순허수**라 합니다.
+
+두 복소수 $a + bi = c + di$이면 $a = c$이고 $b = d$입니다.
+
+**켤레복소수:** $z = a + bi$의 켤레복소수는 $\bar{z} = a - bi$입니다.
+
+$$z\bar{z} = (a+bi)(a-bi) = a^2 + b^2$$
+
+## 복소수의 사칙연산
+
+$$\text{덧셈: } (a+bi)+(c+di) = (a+c)+(b+d)i$$
+
+$$\text{뺄셈: } (a+bi)-(c+di) = (a-c)+(b-d)i$$
+
+$$\text{곱셈: } (a+bi)(c+di) = (ac-bd)+(ad+bc)i$$
+
+$$\text{나눗셈: } \frac{a+bi}{c+di} = \frac{(a+bi)(c-di)}{c^2+d^2}$$
+
+나눗셈은 분모의 켤레복소수를 분자·분모에 곱해 분모를 실수로 만듭니다.
+
+**예제:** $\dfrac{1+2i}{3-i}$를 계산하시오.
+
+$$\frac{(1+2i)(3+i)}{(3-i)(3+i)} = \frac{3+i+6i+2i^2}{9+1} = \frac{3+7i-2}{10} = \frac{1+7i}{10} = \frac{1}{10} + \frac{7}{10}i$$
+
+## 복소수의 극형식
+
+복소수 $z = a + bi$를 좌표 평면(**복소평면**)의 점 $(a, b)$로 나타낼 수 있습니다.
+
+복소수의 **절댓값(모듈러스):** $|z| = r = \sqrt{a^2+b^2}$
+
+**편각:** $\theta = \arg(z)$, $\tan\theta = b/a$
+
+**극형식:**
+
+$$z = r(\cos\theta + i\sin\theta) = re^{i\theta}$$
+
+**예제:** $z = 1 + i$를 극형식으로 나타내시오.
+
+$$r = \sqrt{1^2+1^2} = \sqrt{2}, \quad \theta = \frac{\pi}{4}$$
+
+$$z = \sqrt{2}\left(\cos\frac{\pi}{4} + i\sin\frac{\pi}{4}\right)$$
+
+<Callout type="warning">
+  편각 $\theta$는 복소평면에서 양의 실수축으로부터 반시계 방향으로 잰 각도입니다. 제3·4사분면에서는 각도에 주의해야 합니다.
+</Callout>
+
+## 드무아브르 정리
+
+극형식 $z = r(\cos\theta + i\sin\theta)$에 대해 다음이 성립합니다.
+
+$$z^n = r^n(\cos n\theta + i\sin n\theta)$$
+
+이를 **드무아브르(de Moivre) 정리**라 합니다.
+
+**예제:** $(1+i)^8$을 계산하시오.
+
+$z = 1+i = \sqrt{2}\left(\cos\dfrac{\pi}{4} + i\sin\dfrac{\pi}{4}\right)$이므로
+
+$$z^8 = (\sqrt{2})^8\left(\cos\frac{8\pi}{4} + i\sin\frac{8\pi}{4}\right) = 16(\cos 2\pi + i\sin 2\pi) = 16$$
+
+## $n$제곱근
+
+방정식 $w^n = z$의 해를 $z$의 $n$제곱근이라 합니다. $z = re^{i\theta}$이면 $n$제곱근은 다음과 같습니다.
+
+$$w_k = r^{1/n}\left(\cos\frac{\theta + 2k\pi}{n} + i\sin\frac{\theta + 2k\pi}{n}\right), \quad k = 0, 1, \ldots, n-1$$
+
+**예제:** 1의 세제곱근 `{1, ω, ω²}`에서 $\omega = \cos\dfrac{2\pi}{3} + i\sin\dfrac{2\pi}{3} = -\dfrac{1}{2} + \dfrac{\sqrt{3}}{2}i$입니다.
+
+## 핵심 정리
+
+- 허수단위: $i^2 = -1$
+- 켤레복소수: $z\bar{z} = a^2+b^2$ (항상 실수)
+- 극형식: $z = r(\cos\theta + i\sin\theta)$, $r = |z|$
+- 드무아브르 정리: $z^n = r^n(\cos n\theta + i\sin n\theta)$
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="복소수 (2+3i)+(1-i)의 실수부와 허수부는?"
+  options={['실수부=3, 허수부=4', '실수부=3, 허수부=2', '실수부=2, 허수부=3', '실수부=1, 허수부=-1']}
+  correctAnswer={2}
+  explanation="실수부: 2+1=3, 허수부: 3+(-1)=2이므로 3+2i입니다."
+  optionExplanations={['허수부 계산이 틀렸습니다.', '맞습니다. (2+1)+(3-1)i = 3+2i입니다.', '원래 첫 번째 복소수의 성분입니다.', '두 번째 복소수만 쓴 오류입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="i의 거듭제곱 i⁴의 값은?"
+  options={['-1', 'i', '-i', '1']}
+  correctAnswer={4}
+  explanation="i¹=i, i²=-1, i³=-i, i⁴=1로 4주기 반복이므로 i⁴=1입니다."
+  optionExplanations={['i²=-1입니다.', 'i¹=i입니다.', 'i³=-i입니다.', '맞습니다. i⁴=(i²)²=(-1)²=1입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="복소수 z=3+4i의 절댓값 |z|는?"
+  options={['3', '4', '5', '7']}
+  correctAnswer={3}
+  explanation="|z| = √(3²+4²) = √(9+16) = √25 = 5입니다."
+  optionExplanations={['실수부만 취한 값입니다.', '허수부만 취한 값입니다.', '맞습니다. 피타고라스 정리를 이용합니다.', '성분의 합입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="분수 1/(2+i)를 표준형으로 나타내면?"
+  options={['2-i', '(2-i)/5', '(2+i)/5', '1/(2-i)']}
+  correctAnswer={2}
+  explanation="분자·분모에 켤레 (2-i)를 곱하면 (2-i)/((2+i)(2-i)) = (2-i)/(4+1) = (2-i)/5입니다."
+  optionExplanations={['분모의 절댓값 제곱으로 나누지 않은 오류입니다.', '맞습니다. 켤레를 곱해 분모를 실수화합니다.', '켤레 대신 원래 값을 분자에 둔 오류입니다.', '역수 형태로 켤레를 잘못 적었습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="드무아브르 정리로 (cosθ+i·sinθ)³을 나타내면?"
+  options={['cos3θ+i·sin3θ', 'cos(θ³)+i·sin(θ³)', '3cosθ+3i·sinθ', 'cos(θ/3)+i·sin(θ/3)']}
+  correctAnswer={1}
+  explanation="드무아브르 정리: (cosθ+i·sinθ)^n = cos(nθ)+i·sin(nθ)이므로 n=3이면 cos3θ+i·sin3θ입니다."
+  optionExplanations={['맞습니다. 지수 n을 각도에 곱합니다.', '각도를 세제곱으로 혼동한 오류입니다.', '지수 3을 삼각함수 계수로 잘못 적용했습니다.', '지수와 각도의 관계가 역수로 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="z=1+√3·i를 극형식 r(cosθ+i·sinθ)로 나타낼 때 r과 θ는?"
+  options={['r=1, θ=π/3', 'r=2, θ=π/3', 'r=2, θ=π/6', 'r=√3, θ=π/3']}
+  correctAnswer={2}
+  explanation="|z|=√(1+3)=2이고 tan θ=√3/1이므로 θ=π/3입니다. 따라서 r=2, θ=π/3입니다."
+  optionExplanations={['절댓값을 1로 잘못 계산했습니다.', '맞습니다. r=2, θ=π/3(60도)입니다.', '편각을 π/6으로 잘못 계산했습니다.', '절댓값을 허수부로 잘못 계산했습니다.']}
+/>

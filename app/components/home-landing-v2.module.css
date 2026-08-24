@@ -484,11 +484,11 @@
   --junction-y: -50%;
   position: absolute;
   z-index: 30;
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   background: var(--junction);
-  box-shadow: 0 0 0 1px var(--page);
-  opacity: 0.96;
+  box-shadow: 0 0 0 2px var(--surface);
+  opacity: 1;
   pointer-events: none;
   transform: translate(var(--junction-x), var(--junction-y)) rotate(45deg);
 }
