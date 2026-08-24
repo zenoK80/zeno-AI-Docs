@@ -7,13 +7,29 @@ description: '행렬의 기본 연산, 역행렬, 행렬을 이용한 연립방�
   **이번 문서의 목표:** 행렬의 덧셈·곱셈을 수행하고 역행렬과 행렬식을 이용하여 연립방정식을 풀 수 있습니다.
 </Callout>
 
+## 왜 행렬을 배우나요?
+
+여러 개의 방정식을 동시에 푸는 "연립방정식" 문제는 생활 곳곳에 있습니다. 예를 들어 "사과 2개와 배 3개의 가격이 7000원, 사과 1개와 배 2개의 가격이 4000원"이라는 정보에서 각각의 가격을 찾는 것이 연립방정식입니다. **행렬 `matrix`(행렬)**은 이러한 연립방정식을 간결하게 표현하고 체계적으로 푸는 강력한 도구입니다. 컴퓨터 그래픽, 머신러닝, 경제 모델, 물리 시뮬레이션 등 현대 과학기술 전반에서 핵심 도구로 쓰입니다.
+
 ## 행렬의 기본 개념
 
-**행렬**은 수를 직사각형 형태로 배열한 것입니다. $m$행 $n$열의 행렬을 $m \times n$ 행렬이라 합니다.
+**행렬** `matrix`(행렬)은 수를 직사각형 형태로 배열한 것입니다. $m$행 $n$열의 행렬을 $m \times n$ 행렬이라 합니다.
 
-$$A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{pmatrix} \quad (2 \times 3 \text{ 행렬})$$
+- **행 `row`**: 가로 줄 (수평 방향)
+- **열 `column`**: 세로 줄 (수직 방향)
 
-행렬의 각 수를 **성분**이라 하고, $i$행 $j$열 성분을 $a_{ij}$로 표기합니다.
+$$A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{pmatrix} \quad (2 \times 3 \text{ 행렬: 2행 3열})$$
+
+행렬의 각 수를 **성분 `element`(성분)**이라 하고, $i$행 $j$열 성분을 $a_{ij}$로 표기합니다.
+
+예를 들어 위의 행렬 A에서 $a_{12} = 2$ (1행 2열 성분), $a_{23} = 6$ (2행 3열 성분)입니다.
+
+**행렬의 종류:**
+- **정사각행렬 `square matrix`**: 행과 열의 수가 같은 행렬 (예: $2\times2$, $3\times3$)
+- **단위행렬 `identity matrix` $I$**: 대각선이 1이고 나머지는 0인 정사각행렬. 곱셈에서 1의 역할을 합니다.
+- **영행렬 `zero matrix`**: 모든 성분이 0인 행렬
+
+$$I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} \quad (2\times2 \text{ 단위행렬})$$
 
 ## 행렬의 덧셈·뺄셈과 스칼라 곱
 
@@ -21,41 +37,57 @@ $$A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{pmatrix} \quad (2 \times 3 \te
 
 $$\begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} + \begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix} = \begin{pmatrix} 6 & 8 \\ 10 & 12 \end{pmatrix}$$
 
-스칼라 $k$를 곱할 때는 모든 성분에 $k$를 곱합니다.
+스칼라 `scalar`(스칼라: 방향 없이 크기만 있는 수) $k$를 곱할 때는 모든 성분에 $k$를 곱합니다.
 
 $$3\begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} = \begin{pmatrix} 3 & 6 \\ 9 & 12 \end{pmatrix}$$
 
 ## 행렬의 곱셈
 
-$A$가 $m \times n$, $B$가 $n \times p$ 행렬일 때 $AB$는 $m \times p$ 행렬입니다. 앞 행렬의 열 수와 뒷 행렬의 행 수가 같아야 곱셈이 가능합니다.
+$A$가 $m \times n$, $B$가 $n \times p$ 행렬일 때 $AB$는 $m \times p$ 행렬입니다. **앞 행렬의 열 수와 뒷 행렬의 행 수가 같아야** 곱셈이 가능합니다.
 
-$(AB)_{ij} = \sum_{k=1}^{n} a_{ik} b_{kj}$
+$(AB)_{ij}$ = A의 $i$번째 행과 B의 $j$번째 열을 성분별로 곱하여 더한 값
+
+쉽게 말하면: "앞 행렬의 행"과 "뒷 행렬의 열"을 짝지어 계산합니다.
 
 **예제:**
 
 $$\begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} \begin{pmatrix} 2 & 0 \\ 1 & 3 \end{pmatrix} = \begin{pmatrix} 1\cdot2+2\cdot1 & 1\cdot0+2\cdot3 \\ 3\cdot2+4\cdot1 & 3\cdot0+4\cdot3 \end{pmatrix} = \begin{pmatrix} 4 & 6 \\ 10 & 12 \end{pmatrix}$$
 
+계산 순서: 결과의 (1,1) 위치 = A의 1행 × B의 1열 = $1\times2 + 2\times1 = 4$
+
 <Callout type="warning">
-  행렬 곱셈은 교환 법칙이 성립하지 않습니다. 일반적으로 $AB \neq BA$입니다.
+  행렬 곱셈은 교환 법칙이 성립하지 않습니다. 일반적으로 $AB \neq BA$입니다. 숫자 곱셈 $2\times3 = 3\times2$와 다르니 순서를 반드시 지켜야 합니다.
 </Callout>
 
 ## 행렬식 (determinant)
+
+**행렬식 `determinant`(행렬식, 판별식)**은 정사각행렬에서 계산하는 하나의 숫자입니다. 역행렬이 존재하는지 판단하는 데 쓰입니다.
 
 $2 \times 2$ 행렬의 행렬식은 다음과 같습니다.
 
 $$\det(A) = |A| = \begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad - bc$$
 
-$3 \times 3$ 행렬의 행렬식은 여인수 전개를 사용합니다.
+외우는 법: "주대각선 곱에서 부대각선 곱을 뺀다" (왼쪽 위×오른쪽 아래 - 오른쪽 위×왼쪽 아래)
+
+$3 \times 3$ 행렬의 행렬식은 여인수 전개 `cofactor expansion`를 사용합니다.
 
 $$\begin{vmatrix} a & b & c \\ d & e & f \\ g & h & i \end{vmatrix} = a(ei-fh) - b(di-fg) + c(dh-eg)$$
 
+첫 행을 기준으로 각 성분에 해당 2×2 소행렬식을 곱하고, 부호 $+, -, +$를 번갈아 붙입니다.
+
 ## 역행렬
 
-$AB = BA = I$ (단위행렬)인 행렬 $B$를 $A$의 **역행렬** $A^{-1}$이라 합니다. 역행렬은 $\det(A) \neq 0$일 때만 존재합니다.
+$AB = BA = I$ (단위행렬)인 행렬 $B$를 $A$의 **역행렬 `inverse matrix`** $A^{-1}$이라 합니다.
+
+쉽게 말하면: 숫자에서 $3$의 역수가 $\dfrac{1}{3}$이고 $3 \times \dfrac{1}{3} = 1$이듯, 행렬 $A$의 역행렬 $A^{-1}$은 $A \cdot A^{-1} = I$를 만족합니다.
+
+역행렬은 $\det(A) \neq 0$일 때만 존재합니다.
 
 $2 \times 2$ 행렬의 역행렬 공식은 다음과 같습니다.
 
 $$A = \begin{pmatrix} a & b \\ c & d \end{pmatrix}, \quad A^{-1} = \frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}$$
+
+외우는 법: 대각 성분 $a$와 $d$를 바꾸고, 비대각 성분 $b$와 $c$의 부호를 반전시킨 후, $\det(A) = ad-bc$로 나눕니다.
 
 **예제:** $A = \begin{pmatrix} 3 & 1 \\ 2 & 1 \end{pmatrix}$의 역행렬을 구하시오.
 
@@ -67,16 +99,24 @@ $$A^{-1} = \frac{1}{1}\begin{pmatrix} 1 & -1 \\ -2 & 3 \end{pmatrix} = \begin{pm
 
 연립방정식 $\begin{cases} ax + by = e \\ cx + dy = f \end{cases}$를 행렬식으로 나타내면 $AX = B$이고, $X = A^{-1}B$로 풉니다.
 
+여기서:
+- $A$: 계수행렬 (x, y 앞의 숫자들로 구성)
+- $X = \begin{pmatrix} x \\ y \end{pmatrix}$: 미지수 벡터
+- $B = \begin{pmatrix} e \\ f \end{pmatrix}$: 우변 상수 벡터
+
 **예제:** $\begin{cases} 3x + y = 5 \\ 2x + y = 3 \end{cases}$를 푸시오.
 
 위에서 구한 역행렬을 이용하면 다음과 같습니다.
 
-$$\begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} 1 & -1 \\ -2 & 3 \end{pmatrix}\begin{pmatrix} 5 \\ 3 \end{pmatrix} = \begin{pmatrix} 2 \\ -1 \end{pmatrix}$$
+$$\begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} 1 & -1 \\ -2 & 3 \end{pmatrix}\begin{pmatrix} 5 \\ 3 \end{pmatrix} = \begin{pmatrix} 5-3 \\ -10+9 \end{pmatrix} = \begin{pmatrix} 2 \\ -1 \end{pmatrix}$$
 
 따라서 $x = 2$, $y = -1$입니다.
 
+확인: $3(2)+(-1)=5$ ✓, $2(2)+(-1)=3$ ✓
+
 ## 핵심 정리
 
+- 행렬 덧셈: 같은 크기끼리, 같은 위치 성분끼리 계산
 - 행렬 곱셈: 앞 열 수 = 뒷 행 수인 경우에만 가능하며, 교환 법칙 불성립
 - $2 \times 2$ 행렬식: $ad - bc$
 - 역행렬 존재 조건: $\det(A) \neq 0$
