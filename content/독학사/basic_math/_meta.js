@@ -30,6 +30,8 @@ const meta = {
   '29_coordinate-systems': '29. 좌표계 — 직교, 극, 구면 좌표 변환',
   '30_partial-derivatives': '30. 편도함수와 전미분',
   '31_gradient-and-extrema': '31. 기울기 벡터, 극값 판별법',
+  '32_multiple-integrals': '32. 이중·삼중적분',
+  '33_multivariable-applications': '33. 다변수 함수 응용 — 경제·물리 모델',
 }
 
 export default meta
