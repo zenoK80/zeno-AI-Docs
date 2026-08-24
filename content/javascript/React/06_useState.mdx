@@ -59,6 +59,25 @@ function Counter() {
 
 > **쉽게 말하면:** `useState`는 React가 관리하는 "기억 공간"입니다. 값을 바꾸면 React가 자동으로 화면을 다시 그려줍니다.
 
+### 상태는 컴포넌트 인스턴스마다 독립적이다
+
+같은 컴포넌트를 여러 번 사용해도, 각각의 상태는 완전히 분리되어 서로 영향을 주지 않습니다.
+
+```jsx
+function App() {
+  return (
+    <div>
+      <Counter />  {/* 이 Counter의 count */}
+      <Counter />  {/* 이 Counter의 count — 완전히 별개 */}
+    </div>
+  )
+}
+```
+
+한쪽 `Counter`의 `+1` 버튼을 눌러도 다른 쪽 `Counter`의 숫자는 그대로입니다. React는 각 컴포넌트가 화면의 어느 위치에 렌더링되었는지에 따라 상태를 각각 따로 저장합니다.
+
+> **비유:** 같은 설계도(컴포넌트)로 지은 두 채의 집(인스턴스)이라도, 각 집의 냉장고(state) 안에 든 내용물은 서로 다릅니다.
+
 ---
 
 ## 다양한 타입의 상태
@@ -141,6 +160,34 @@ setCount(prev => prev + 1)
 
 버튼을 여러 번 빠르게 클릭하거나 `setCount`를 연달아 호출할 때는 함수형 업데이트가 더 안전합니다.
 
+### 배칭(Batching) — 왜 일반 업데이트는 위험한가?
+
+React는 한 이벤트 핸들러 안에서 발생한 여러 `setState` 호출을 **모아서(batch) 한 번만 리렌더링**합니다. 성능을 위한 최적화지만, 이 때문에 `count` 값을 여러 번 연속으로 증가시키려 하면 예상과 다르게 동작합니다.
+
+```jsx
+function handleTripleClick() {
+  setCount(count + 1)  // count가 0이라면 → 1로 설정 예약
+  setCount(count + 1)  // count는 여전히 0(클로저에 갇힌 값) → 1로 설정 예약
+  setCount(count + 1)  // 역시 0 → 1로 설정 예약
+}
+// 결과: count는 3이 아니라 1이 됩니다!
+```
+
+세 호출 모두 같은 렌더링에서 캡처된 `count`(예: 0)를 참조하기 때문에, "0+1"을 세 번 예약할 뿐입니다. 함수형 업데이트를 쓰면 각 호출이 **직전 예약된 최신 값**을 받아 정확히 누적됩니다.
+
+```jsx
+function handleTripleClick() {
+  setCount(prev => prev + 1)  // 0 → 1
+  setCount(prev => prev + 1)  // 1 → 2
+  setCount(prev => prev + 1)  // 2 → 3
+}
+// 결과: count는 정확히 3이 됩니다.
+```
+
+<Callout type="warning">
+  **자주 틀리는 점:** "여러 번 클릭해서 값을 여러 단계 바꿔야 하는 로직"에서는 반드시 함수형 업데이트(`prev => ...`)를 써야 합니다. 단순히 한 번만 바꾸는 경우라면 `setCount(count + 1)`도 문제없습니다.
+</Callout>
+
 ---
 
 ## 상태 초기값 지연 초기화
@@ -164,6 +211,8 @@ const [data, setData] = useState(() => heavyCalculation())
 - 변경 함수를 호출하면 React가 리렌더링을 트리거한다.
 - **불변성**: 배열·객체는 직접 수정하지 않고 스프레드 `...`나 `filter`, `map`으로 새 값을 만든다.
 - 이전 값 기반 업데이트에는 `setState(prev => prev + 1)` 형태가 안전하다.
+- 같은 컴포넌트를 여러 번 써도 각 인스턴스의 상태는 서로 독립적이다.
+- React는 한 이벤트 핸들러 안의 여러 setState를 **배칭(batching)**해 한 번만 리렌더링한다. 값을 여러 단계 바꾸려면 함수형 업데이트가 필수다.
 
 ---
 
@@ -221,4 +270,22 @@ const [data, setData] = useState(() => heavyCalculation())
   correctAnswer={3}
   explanation="상태를 직접 변경(예: count = 1)해도 React는 리렌더링하지 않습니다. 반드시 setCount처럼 변경 함수를 호출해야 합니다."
   optionExplanations={['훅 규칙: 최상위에서만 호출해야 합니다.', '한 컴포넌트에 여러 useState를 쓸 수 있습니다.', '틀렸습니다. 변경 함수를 통해야만 리렌더링이 발생합니다.', '초기값은 처음 마운트 시에만 사용됩니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="count가 0일 때, 아래 코드를 한 번 실행한 후 count의 최종 값은? setCount(count+1); setCount(count+1); setCount(count+1);"
+  options={['①0', '②1', '③2', '④3']}
+  correctAnswer={2}
+  explanation="세 호출 모두 같은 렌더링에서 캡처된 count(0)를 참조하므로 '0+1'을 세 번 예약할 뿐입니다. 배칭으로 인해 최종적으로 count는 1이 됩니다. 3을 만들려면 함수형 업데이트(prev => prev+1)를 써야 합니다."
+  optionExplanations={['setCount가 호출되었으므로 변경은 일어납니다.', '맞습니다. 세 호출 모두 같은 count(0)를 참조해 결과는 1입니다.', '2가 되려면 함수형 업데이트가 필요합니다.', '3이 되려면 함수형 업데이트가 필요합니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="같은 Counter 컴포넌트를 화면에 두 번 렌더링했을 때, 한쪽의 +1 버튼을 누르면 다른 쪽 숫자는?"
+  options={['①함께 증가한다', '②변하지 않는다', '③초기화된다', '④에러가 발생한다']}
+  correctAnswer={2}
+  explanation="같은 컴포넌트를 여러 번 사용해도 각 인스턴스의 상태는 서로 독립적으로 관리됩니다. 한쪽의 상태 변경이 다른 인스턴스에 영향을 주지 않습니다."
+  optionExplanations={['상태는 인스턴스별로 독립적이라 함께 증가하지 않습니다.', '맞습니다. 각 인스턴스의 상태는 독립적입니다.', '초기화되지 않고 각자의 값을 유지합니다.', '정상적으로 동작하며 에러가 발생하지 않습니다.']}
 />
