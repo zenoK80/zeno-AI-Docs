@@ -13,6 +13,9 @@ const meta = {
   '12_dot-product': '12. 내적과 응용 — 각도, 직교',
   '13_lines-and-planes': '13. 직선과 평면의 방정식',
   '14_linear-programming': '14. 부등식과 선형계획 — 실수 범위 최적화',
+  '15_limits': '15. 함수의 극한 — 수렴·발산, 극한 법칙',
+  '16_continuity': '16. 연속의 정의와 불연속점 판별',
+  '17_derivatives': '17. 미분계수와 기본 미분법',
 }
 
 export default meta
