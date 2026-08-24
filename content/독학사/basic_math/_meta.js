@@ -27,6 +27,9 @@ const meta = {
   '26_improper-integrals': '26. 이상적분 — 무한구간, 불연속점',
   '27_first-order-ode': '27. 일계 미분방정식 — 변수분리, 선형',
   '28_second-order-ode': '28. 이계 미분방정식 기초 — 상수계수 제차·비제차',
+  '29_coordinate-systems': '29. 좌표계 — 직교, 극, 구면 좌표 변환',
+  '30_partial-derivatives': '30. 편도함수와 전미분',
+  '31_gradient-and-extrema': '31. 기울기 벡터, 극값 판별법',
 }
 
 export default meta
