@@ -1,0 +1,188 @@
+---
+title: '36. 일반수학 실전 모의고사 1회'
+description: '집합, 함수, 행렬, 벡터, 미분법 범위를 아우르는 실전 모의고사 20문항입니다.'
+---
+
+<Callout type="warning">
+  실제 기출 문제를 그대로 복제하지 않습니다. 공식 출제 범위를 바탕으로 재구성한 문제입니다. 시간을 재고 풀어본 뒤 채점하는 것을 권장합니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="다음 중 무리수는?"
+  options={['①0.25', '②√5', '③2/3', '④-7']}
+  correctAnswer={2}
+  explanation="√5는 순환하지 않는 무한소수로 무리수입니다. 나머지는 모두 분수로 표현 가능한 유리수입니다."
+  optionExplanations={['유한소수로 유리수입니다.', '맞습니다. √5는 무리수입니다.', '분수 형태이므로 유리수입니다.', '정수이므로 유리수입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="(x-5)²을 올바르게 전개하면?"
+  options={['①x²-25', '②x²-10x+25', '③x²+25', '④x²-5x+25']}
+  correctAnswer={2}
+  explanation="(x-5)² = x²-2(5)x+5² = x²-10x+25입니다."
+  optionExplanations={['가운데 항이 빠졌습니다(합차공식과 혼동).', '맞습니다. x²-10x+25입니다.', '가운데 항이 빠지고 부호도 잘못되었습니다.', '가운데 항 계수가 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="직선 y=-2x+7의 기울기와 y절편은?"
+  options={['①기울기 2, y절편 7', '②기울기 -2, y절편 7', '③기울기 7, y절편 -2', '④기울기 -2, y절편 -7']}
+  correctAnswer={2}
+  explanation="y=mx+b 형태에서 m=-2, b=7이므로 기울기는 -2, y절편은 7입니다."
+  optionExplanations={['부호가 잘못되었습니다.', '맞습니다. 기울기 -2, y절편 7입니다.', '기울기와 y절편이 뒤바뀌었습니다.', 'y절편의 부호가 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="이차방정식 x²+3x-10=0의 해는?"
+  options={['①x=2, -5', '②x=-2, 5', '③x=5, 10', '④x=-2, -5']}
+  correctAnswer={1}
+  explanation="곱해서 -10, 더해서 3이 되는 두 수는 5와 -2이므로 (x-2)(x+5)=0, x=2 또는 -5입니다."
+  optionExplanations={['맞습니다. 2와 -5를 곱하면 -10, 더하면 3입니다.', '부호가 반대로 되어 있습니다.', '10을 그대로 사용한 잘못된 값입니다.', '부호가 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="A={2,4,6,8}, B={4,8,12}일 때 A∩B는?"
+  options={['①{2,4,6,8,12}', '②{4,8}', '③{2,6}', '④{}']}
+  correctAnswer={2}
+  explanation="두 집합에 공통으로 속하는 원소는 4와 8이므로 A∩B={4,8}입니다."
+  optionExplanations={['이는 A∪B(합집합)입니다.', '맞습니다. 공통 원소는 4, 8입니다.', '이는 A-B(차집합)입니다.', '교집합이 존재하므로 공집합이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="f(x)=3x-2, g(x)=x+1일 때 (f∘g)(3)의 값은?"
+  options={['①7', '②10', '③9', '④13']}
+  correctAnswer={2}
+  explanation="g(3)=3+1=4를 먼저 계산하고, f(4)=3(4)-2=10입니다."
+  optionExplanations={['계산이 잘못되었습니다.', '맞습니다. g(3)=4, f(4)=10입니다.', '계산이 잘못되었습니다.', '계산이 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="행렬 [[3,1],[2,4]]와 [[1,5],[0,2]]의 곱(왼쪽×오른쪽)에서 (1,1) 원소는?"
+  options={['①3', '②8', '③15', '④5']}
+  correctAnswer={1}
+  explanation="c11 = (1행)·(1열) = 3×1 + 1×0 = 3+0 = 3입니다."
+  optionExplanations={['맞습니다. 3×1+1×0=3입니다.', '(1,2) 원소(3×5+1×2=17)와도 다른 값입니다.', '다른 위치의 계산과 혼동한 값입니다.', '다른 위치의 계산과 혼동한 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="행렬 A=[[2,6],[1,3]]의 행렬식은?"
+  options={['①0', '②6', '③12', '④8']}
+  correctAnswer={1}
+  explanation="det = 2×3 - 6×1 = 6-6 = 0입니다. 행렬식이 0이므로 이 행렬은 역행렬이 존재하지 않는 특이행렬입니다."
+  optionExplanations={['맞습니다. 6-6=0입니다.', 'ad만 계산한 값입니다.', 'bc만 계산한 값입니다.', 'ad+bc로 잘못 계산한 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="벡터 a=(1,2), b=(3,4)일 때 a+b는?"
+  options={['①(4,6)', '②(2,2)', '③(3,8)', '④(-2,-2)']}
+  correctAnswer={1}
+  explanation="성분별로 더하면 (1+3, 2+4) = (4,6)입니다."
+  optionExplanations={['맞습니다. (4,6)입니다.', '뺄셈으로 계산한 값입니다(b-a).', '곱셈으로 계산한 값입니다.', '반대로 뺀 값(a-b)입니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="a=(3,0), b=(0,5)의 내적과 두 벡터의 관계는?"
+  options={['①내적=15, 예각', '②내적=0, 직교', '③내적=8, 둔각', '④내적=15, 직교']}
+  correctAnswer={2}
+  explanation="a·b = 3(0)+0(5) = 0이므로 두 벡터는 직교합니다."
+  optionExplanations={['내적 계산이 잘못되었습니다.', '맞습니다. 내적이 0이므로 직교입니다.', '내적 계산이 잘못되었습니다.', '내적 값이 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="lim(x→2) (x²-4)/(x-2)의 값은?"
+  options={['①0', '②2', '③4', '④정의되지 않음']}
+  correctAnswer={3}
+  explanation="(x²-4)/(x-2) = (x-2)(x+2)/(x-2) = x+2이므로, x→2일 때 극한값은 4입니다."
+  optionExplanations={['약분 후 값을 대입해야 합니다.', 'x값 자체입니다.', '맞습니다. 2+2=4입니다.', '약분을 통해 극한값을 구할 수 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="f(x)=2x³-6x+1의 도함수는?"
+  options={['①6x²-6', '②2x²-6', '③6x²-6x', '④6x-6']}
+  correctAnswer={1}
+  explanation="(2x³)'=6x², (-6x)'=-6, 1'=0을 더하면 6x²-6입니다."
+  optionExplanations={['맞습니다. 6x²-6입니다.', '거듭제곱 미분이 잘못 적용되었습니다.', 'x가 남아있으면 안 됩니다.', '첫 항이 잘못 미분되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="y=(2x+3)⁴의 도함수는?"
+  options={['①4(2x+3)³', '②8(2x+3)³', '③2(2x+3)³', '④4(2x+3)³×3']}
+  correctAnswer={2}
+  explanation="겉미분 4(2x+3)³에 속미분(2x+3)'=2를 곱하면 8(2x+3)³입니다."
+  optionExplanations={['속미분(×2)이 빠졌습니다.', '맞습니다. 4×2=8입니다.', '겉미분의 계수(4)가 반영되지 않았습니다.', '속미분 계산이 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="f(x)=x³-3x²+2의 극값 후보 x값(f'(x)=0의 해)은?"
+  options={['①x=0, 2', '②x=0, -2', '③x=1, 3', '④x=1, -1']}
+  correctAnswer={1}
+  explanation="f'(x)=3x²-6x=3x(x-2)=0이므로 x=0 또는 x=2입니다."
+  optionExplanations={['맞습니다. x=0, x=2입니다.', '부호가 잘못되었습니다.', '값이 잘못되었습니다.', '값이 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="함수가 x=a에서 연속이기 위한 조건에 포함되지 않는 것은?"
+  options={['①f(a)가 존재해야 한다', '②극한값이 존재해야 한다', '③극한값과 함숫값이 일치해야 한다', '④f(x)가 항상 증가해야 한다']}
+  correctAnswer={4}
+  explanation="연속의 조건은 함숫값 존재, 극한값 존재, 둘의 일치이며, 증가·감소 여부와는 무관합니다."
+  optionExplanations={['연속의 필요 조건입니다.', '연속의 필요 조건입니다.', '연속의 필요 조건입니다.', '맞습니다. 증가 여부는 연속의 조건이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={16}
+  question="∫(4x³-6x²+2)dx의 결과는?"
+  options={['①x⁴-2x³+2x+C', '②4x⁴-6x³+2x+C', '③x⁴-2x³+C', '④12x²-12x+C']}
+  correctAnswer={1}
+  explanation="각 항을 적분: 4x³/4=x⁴, -6x²의 적분은 -2x³, 2의 적분은 2x. 합치면 x⁴-2x³+2x+C입니다."
+  optionExplanations={['맞습니다. x⁴-2x³+2x+C입니다.', '계수가 약분되지 않은 값입니다.', '마지막 항(2x)이 빠졌습니다.', '이는 미분한 결과입니다.']}
+/>
+
+<Quiz
+  questionNumber={17}
+  question="∫₀³ 2x dx의 값은?"
+  options={['①6', '②9', '③12', '④3']}
+  correctAnswer={2}
+  explanation="F(x)=x², [x²]₀³ = 9-0 = 9입니다."
+  optionExplanations={['이는 피적분함수에 3을 대입한 값입니다.', '맞습니다. 3²=9입니다.', '4배로 잘못 계산한 값입니다.', '상한값 그대로입니다.']}
+/>
+
+<Quiz
+  questionNumber={18}
+  question="변수분리법이 적용 가능한 미분방정식의 형태는?"
+  options={['①dy/dx=x+y', '②dy/dx=g(x)h(y) (x함수와 y함수의 곱)', '③y\'\'+2y\'+y=0', '④모든 미분방정식']}
+  correctAnswer={2}
+  explanation="변수분리법은 도함수가 x만의 함수와 y만의 함수의 곱으로 표현될 때만 적용됩니다."
+  optionExplanations={['덧셈 형태는 변수분리가 되지 않습니다.', '맞습니다. 곱 형태여야 분리가 가능합니다.', '이는 2계 미분방정식이며 다른 방법이 필요합니다.', '모든 형태에 적용되는 것은 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={19}
+  question="f(x,y)=x²y+3y²에서 x에 대한 편도함수 fx는?"
+  options={['①2xy', '②x²+6y', '③2xy+6y', '④x²']}
+  correctAnswer={1}
+  explanation="y를 상수로 고정하고 x로 미분: (x²y)'=2xy, (3y²)'=0(x 없음). 합치면 2xy입니다."
+  optionExplanations={['맞습니다. 2xy입니다.', '이는 fy(y에 대한 편도함수)입니다.', '3y²항은 x가 없어 미분값이 0이어야 합니다.', '계수(y)가 빠졌습니다.']}
+/>
+
+<Quiz
+  questionNumber={20}
+  question="기울기 벡터가 머신러닝 경사하강법에서 사용되는 방식은?"
+  options={['①손실을 늘리는 방향으로 이동', '②손실이 가장 가파르게 증가하는 방향의 반대로 이동해 손실을 줄임', '③기울기와 무관하게 무작위로 이동', '④항상 원점으로 이동']}
+  correctAnswer={2}
+  explanation="경사하강법은 θ_new=θ_old-α∇J(θ)로, 기울기(증가 방향)의 반대로 이동해 손실을 최소화합니다."
+  optionExplanations={['손실을 줄이는 것이 목표이므로 반대입니다.', '맞습니다. 기울기의 반대 방향으로 이동합니다.', '기울기를 명확히 활용하는 방법입니다.', '원점이 아닌 손실 최소 지점으로 이동합니다.']}
+/>

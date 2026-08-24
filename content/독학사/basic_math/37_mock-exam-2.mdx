@@ -1,0 +1,188 @@
+---
+title: '37. 일반수학 실전 모의고사 2회'
+description: '적분법과 편미분법을 중심으로 전체 범위를 아우르는 실전 모의고사 20문항입니다.'
+---
+
+<Callout type="warning">
+  실제 기출 문제를 그대로 복제하지 않습니다. 공식 출제 범위를 바탕으로 재구성한 문제입니다. 시간을 재고 풀어본 뒤 채점하는 것을 권장합니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="부등식 -4x+3>15를 풀면?"
+  options={['①x>-3', '②x<-3', '③x>3', '④x<3']}
+  correctAnswer={2}
+  explanation="-4x>12, 양변을 -4로 나누면서 부호가 바뀌어 x<-3입니다."
+  optionExplanations={['부호가 바뀌지 않은 채로 계산했습니다.', '맞습니다. 음수로 나눠 부등호가 뒤집혔습니다.', '부호가 반대로 계산되었습니다.', '음수로 나눌 때 방향이 바뀌는 것을 놓쳤습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="함수 f(x)=√(x-3)의 정의역은?"
+  options={['①모든 실수', '②x≥3', '③x>3', '④x≤3']}
+  correctAnswer={2}
+  explanation="제곱근 안은 0 이상이어야 하므로 x-3≥0, 즉 x≥3입니다."
+  optionExplanations={['근호 안의 조건이 있어 제한이 필요합니다.', '맞습니다. x≥3입니다.', 'x=3도 포함되어야 합니다(그때 함숫값은 0).', '부등호 방향이 반대입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="함수 f(x)=2x-5의 역함수 f⁻¹(x)는?"
+  options={['①(x+5)/2', '②2x+5', '③(x-5)/2', '④1/(2x-5)']}
+  correctAnswer={1}
+  explanation="y=2x-5에서 x,y를 바꾸면 x=2y-5, 정리하면 y=(x+5)/2입니다."
+  optionExplanations={['맞습니다. (x+5)/2입니다.', '역함수 절차를 거치지 않았습니다.', '부호가 잘못되었습니다.', '역함수는 1/f(x)가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="3×3 행렬 A의 행렬식이 0일 때, A에 대한 설명으로 옳은 것은?"
+  options={['①A는 단위행렬이다', '②A는 역행렬이 존재하지 않는 특이행렬이다', '③A의 모든 원소가 0이다', '④A는 대칭행렬이다']}
+  correctAnswer={2}
+  explanation="행렬식이 0이면 역행렬 공식의 분모가 0이 되어 역행렬이 존재하지 않는 특이행렬입니다."
+  optionExplanations={['단위행렬의 행렬식은 1입니다.', '맞습니다. 행렬식이 0이면 특이행렬입니다.', '원소가 0이 아니어도 행렬식이 0일 수 있습니다.', '대칭행렬 여부와 행렬식 값은 별개입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="가우스-조던 소거법으로 역행렬을 구하는 절차의 핵심 아이디어는?"
+  options={['①A만 계산한다', '②[A|I]에서 행 연산으로 A를 I로 만들면 오른쪽이 A⁻¹이 된다', '③행렬식만 계산하면 끝난다', '④열을 삭제한다']}
+  correctAnswer={2}
+  explanation="증강행렬 [A|I]에 행 연산을 적용해 왼쪽을 단위행렬로 만들면, 그 과정이 누적된 오른쪽이 역행렬이 됩니다."
+  optionExplanations={['A만으로는 역행렬을 구할 수 없습니다.', '맞습니다. 가우스-조던 소거법의 핵심 원리입니다.', '행렬식은 역행렬 존재 여부만 알려줍니다.', '열 삭제는 허용된 연산이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="점 (1,1)을 지나고 방향벡터가 (2,3)인 직선 위의 t=2일 때 점은?"
+  options={['①(3,4)', '②(5,7)', '③(2,3)', '④(4,6)']}
+  correctAnswer={2}
+  explanation="x=1+2(2)=5, y=1+2(3)=7이므로 점은 (5,7)입니다."
+  optionExplanations={['t=1일 때의 계산과 혼동됩니다.', '맞습니다. (5,7)입니다.', '방향벡터 자체입니다.', '시작점을 반영하지 않은 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="선형계획법에서 목적함수 z=3x+5y를 꼭짓점 (0,0), (4,0), (2,3)에서 계산했을 때 최댓값은?"
+  options={['①0', '②12', '③21', '④15']}
+  correctAnswer={3}
+  explanation="(0,0)→0, (4,0)→12, (2,3)→3(2)+5(3)=6+15=21이므로 최댓값은 21입니다."
+  optionExplanations={['(0,0)에서의 값입니다.', '(4,0)에서의 값입니다.', '맞습니다. (2,3)에서 21로 최댓값입니다.', '어느 꼭짓점에서도 나오지 않는 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="lim(x→∞) (5x²+1)/(x²+3x)의 값은?"
+  options={['①1', '②5', '③3', '④무한대']}
+  correctAnswer={2}
+  explanation="최고차항 x²로 나누면 (5+1/x²)/(1+3/x) → (5+0)/(1+0) = 5입니다."
+  optionExplanations={['상수항이 아닌 최고차항 계수 비율이 극한값입니다.', '맞습니다. 최고차항 계수 비율(5/1=5)입니다.', '분모의 계수(3)와 혼동한 값입니다.', '분자·분모 차수가 같으면 유한값에 수렴합니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="y=e^(2x)의 도함수는?"
+  options={['①e^(2x)', '②2e^(2x)', '③2xe^(2x)', '④e^2']}
+  correctAnswer={2}
+  explanation="연쇄법칙: e^(2x)의 미분은 e^(2x) 그대로에 속함수 2x의 미분(2)을 곱한 2e^(2x)입니다."
+  optionExplanations={['속미분(×2)이 빠졌습니다.', '맞습니다. 2e^(2x)입니다.', '2x를 그대로 곱한 잘못된 형태입니다.', '변수 x가 사라진 잘못된 계산입니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="울타리 둘레가 60m인 직사각형에서 넓이가 최대가 되는 가로·세로 길이는?"
+  options={['①가로 10, 세로 20', '②가로 15, 세로 15(정사각형)', '③가로 30, 세로 0', '④가로 20, 세로 10']}
+  correctAnswer={2}
+  explanation="둘레가 고정된 직사각형은 정사각형일 때 넓이가 최대가 되므로, 가로=세로=15m입니다."
+  optionExplanations={['정사각형이 아닌 형태입니다.', '맞습니다. 정사각형일 때 최대 넓이입니다.', '세로가 0이면 넓이도 0이 됩니다.', '정사각형이 아닌 형태입니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="선형근사 f(x)≈f(a)+f'(a)(x-a)를 이용해 √9.2를 근사하면? (f(9)=3, f'(9)=1/6)"
+  options={['①3', '②3.033', '③3.1', '④3.2']}
+  correctAnswer={2}
+  explanation="f(9.2)≈3+(1/6)(0.2)=3+0.0333...≈3.033입니다."
+  optionExplanations={['변화량을 반영하지 않은 값입니다.', '맞습니다. 3+0.033=3.033입니다.', '변화량이 과대 반영된 값입니다.', '변화량이 과대 반영된 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="∫(1/x)dx의 결과는?"
+  options={['①x²/2+C', '②ln|x|+C', '③1/x²+C', '④x+C']}
+  correctAnswer={2}
+  explanation="1/x=x⁻¹은 거듭제곱 적분법의 예외(n=-1)이며, 결과는 ln|x|+C입니다."
+  optionExplanations={['거듭제곱 적분법이 적용되지 않는 예외 케이스입니다.', '맞습니다. n=-1일 때의 특별한 공식입니다.', '적분 결과가 아닙니다.', '적분 결과가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="곡선 y=x²와 y=4로 둘러싸인 영역의 넓이를 구하는 정적분 식(위: y=4, 아래: y=x²)은? (교점: x=-2, 2)"
+  options={['①∫₋₂² (x²-4)dx', '②∫₋₂² (4-x²)dx', '③∫₀² (4-x²)dx', '④∫₋₂² 4 dx']}
+  correctAnswer={2}
+  explanation="위 곡선(y=4)에서 아래 곡선(y=x²)을 빼고, 교점 -2부터 2까지 적분합니다."
+  optionExplanations={['위아래가 반대로 되어 있습니다(음수가 나옴).', '맞습니다. (4-x²)를 -2부터 2까지 적분합니다.', '적분 구간이 절반만 반영되었습니다.', 'x² 부분이 빠졌습니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="회전체의 부피 공식 V=π∫[f(x)]²dx에서 제곱을 하는 근거는?"
+  options={['①계산 편의', '②반지름이 f(x)인 원의 넓이가 πr²이기 때문', '③단위 통일', '④습관적 표기']}
+  correctAnswer={2}
+  explanation="각 단면(원판)의 넓이가 πr²(r=f(x))이므로 자연스럽게 제곱이 들어갑니다."
+  optionExplanations={['편의가 아닌 기하학적 근거입니다.', '맞습니다. 원의 넓이 공식에서 유래합니다.', '단위 문제가 아닌 기하학적 이유입니다.', '수학적 근거가 명확한 공식입니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="∫x cos x dx를 부분적분(u=x, dv=cos x dx)으로 풀면?"
+  options={['①x sin x + cos x + C', '②x sin x - cos x + C', '③x cos x - sin x + C', '④x sin x + C']}
+  correctAnswer={1}
+  explanation="du=dx, v=sin x이므로 ∫u dv=uv-∫v du = x sin x - ∫sin x dx = x sin x-(-cos x)+C = x sin x+cos x+C입니다."
+  optionExplanations={['맞습니다. x sin x + cos x + C입니다.', '부호가 잘못되었습니다.', 'u, dv 선택이 반영되지 않은 값입니다.', '적분 항(cos x)이 빠졌습니다.']}
+/>
+
+<Quiz
+  questionNumber={16}
+  question="이상적분 ∫₁^∞ (1/x²)dx는 수렴하는가, 발산하는가?"
+  options={['①수렴, 값은 1', '②발산', '③수렴, 값은 0', '④정의되지 않음']}
+  correctAnswer={1}
+  explanation="p=2>1이므로 p-적분 판정에 따라 수렴하며, 실제 계산 결과는 1입니다."
+  optionExplanations={['맞습니다. 1로 수렴합니다.', 'p>1이므로 수렴합니다.', '수렴값은 0이 아닌 1입니다.', '명확히 계산 가능한 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={17}
+  question="y''-5y'+6y=0의 특성방정식의 근이 r=2, 3일 때 일반해는?"
+  options={['①y=C1e^(2x)+C2e^(3x)', '②y=(C1+C2x)e^(2x)', '③y=C1cos2x+C2sin3x', '④y=C1e^(6x)']}
+  correctAnswer={1}
+  explanation="서로 다른 두 실근이므로 일반해는 각 근에 해당하는 지수함수의 선형결합입니다."
+  optionExplanations={['맞습니다. 서로 다른 두 실근의 지수함수 합입니다.', '이는 중근일 때의 형태입니다.', '이는 허근일 때의 형태입니다.', '근의 곱(6)을 잘못 사용했습니다.']}
+/>
+
+<Quiz
+  questionNumber={18}
+  question="극좌표 (r,θ)=(6, 180°)를 직교좌표로 바꾸면?"
+  options={['①(6,0)', '②(-6,0)', '③(0,6)', '④(0,-6)']}
+  correctAnswer={2}
+  explanation="x=6cos180°=-6, y=6sin180°=0이므로 (-6,0)입니다."
+  optionExplanations={['각도가 반영되지 않았습니다.', '맞습니다. (-6,0)입니다.', 'x,y가 뒤바뀐 값입니다.', '부호가 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={19}
+  question="f(x,y)=x²+y²-6x-8y+5의 임계점은?"
+  options={['①(3,4)', '②(6,8)', '③(-3,-4)', '④(0,0)']}
+  correctAnswer={1}
+  explanation="fx=2x-6=0→x=3, fy=2y-8=0→y=4이므로 임계점은 (3,4)입니다."
+  optionExplanations={['맞습니다. (3,4)입니다.', '계수 값 그대로를 사용한 잘못된 값입니다.', '부호가 잘못되었습니다.', '원점은 임계점 조건을 만족하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={20}
+  question="위 19번 문제에서 fxx=2, fyy=2, fxy=0일 때 (3,4)에서의 극값 종류는?"
+  options={['①극댓값', '②극솟값', '③안장점', '④판별 불가']}
+  correctAnswer={2}
+  explanation="D=fxxfyy-(fxy)²=2×2-0=4>0이고 fxx=2>0이므로 극솟값입니다."
+  optionExplanations={['fxx<0일 때가 극댓값입니다.', '맞습니다. D>0, fxx>0이므로 극솟값입니다.', 'D<0일 때가 안장점입니다.', 'D≠0이므로 명확히 판별 가능합니다.']}
+/>

@@ -34,6 +34,8 @@ const meta = {
   '33_multivariable-applications': '33. 다변수 함수 응용 — 경제·물리 모델',
   '34_sets-matrix-question-types': '34. 집합·행렬·벡터 예상기출문제',
   '35_calculus-question-types': '35. 미적분 예상기출문제',
+  '36_mock-exam-1': '36. 실전 모의고사 1회',
+  '37_mock-exam-2': '37. 실전 모의고사 2회',
 }
 
 export default meta
