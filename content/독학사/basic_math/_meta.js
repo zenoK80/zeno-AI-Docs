@@ -32,6 +32,8 @@ const meta = {
   '31_gradient-and-extrema': '31. 기울기 벡터, 극값 판별법',
   '32_multiple-integrals': '32. 이중·삼중적분',
   '33_multivariable-applications': '33. 다변수 함수 응용 — 경제·물리 모델',
+  '34_sets-matrix-question-types': '34. 집합·행렬·벡터 예상기출문제',
+  '35_calculus-question-types': '35. 미적분 예상기출문제',
 }
 
 export default meta

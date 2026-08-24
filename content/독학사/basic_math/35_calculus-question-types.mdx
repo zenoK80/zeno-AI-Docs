@@ -1,0 +1,145 @@
+---
+title: '35. 미적분 예상기출문제'
+description: '극한, 미분, 적분, 편미분법 범위를 중심으로 재구성한 예상기출 문제 15문항입니다.'
+---
+
+<Callout type="warning">
+  실제 기출 문제를 그대로 복제하지 않습니다. 공식 출제 범위를 바탕으로 재구성한 문제입니다.
+</Callout>
+
+이 문서는 15~33번 문서(미분법, 적분법, 편미분법)의 내용을 종합적으로 점검합니다.
+
+<Quiz
+  questionNumber={1}
+  question="lim(x→3) (x²-9)/(x-3)의 값은?"
+  options={['①0', '②3', '③6', '④9']}
+  correctAnswer={3}
+  explanation="(x²-9)/(x-3) = (x-3)(x+3)/(x-3) = x+3이므로, x→3일 때 극한값은 6입니다."
+  optionExplanations={['약분 후 값을 대입해야 합니다.', 'x값 자체입니다.', '맞습니다. 3+3=6입니다.', '9는 원래 분자의 상수항입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="함수가 x=a에서 연속이기 위한 조건이 아닌 것은?"
+  options={['①f(a)가 존재해야 한다', '②lim(x→a)f(x)가 존재해야 한다', '③극한값과 함숫값이 같아야 한다', '④f(x)가 다항함수여야 한다']}
+  correctAnswer={4}
+  explanation="연속의 세 조건은 함숫값 존재, 극한값 존재, 둘의 일치이며 다항함수일 필요는 없습니다."
+  optionExplanations={['연속의 필요 조건입니다.', '연속의 필요 조건입니다.', '연속의 필요 조건입니다.', '맞습니다. 다항함수 여부는 조건이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="f(x)=5x³-2x²+1의 도함수는?"
+  options={['①15x²-4x', '②5x²-2x', '③15x²-4x+1', '④3x²-2x']}
+  correctAnswer={1}
+  explanation="각 항을 미분: (5x³)'=15x², (-2x²)'=-4x, 1'=0을 더하면 15x²-4x입니다."
+  optionExplanations={['맞습니다. 15x²-4x입니다.', '계수가 미분되지 않은 값입니다.', '상수항의 미분(0)이 빠졌습니다.', '거듭제곱 미분이 적용되지 않았습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="y=(4x-1)³의 도함수는? (연쇄법칙 사용)"
+  options={['①3(4x-1)²', '②12(4x-1)²', '③4(4x-1)²', '④12(4x-1)³']}
+  correctAnswer={2}
+  explanation="겉미분 3(4x-1)²에 속미분(4x-1)'=4를 곱하면 12(4x-1)²입니다."
+  optionExplanations={['속미분(×4)이 빠졌습니다.', '맞습니다. 3×4=12를 곱한 값입니다.', '겉미분의 계수(3)가 빠졌습니다.', '지수가 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="f(x)=x³-3x²-9x+1의 극값을 구하기 위한 f'(x)=0의 해는?"
+  options={['①x=1, -3', '②x=3, -1', '③x=1, 3', '④x=-1, -3']}
+  correctAnswer={2}
+  explanation="f'(x)=3x²-6x-9=3(x²-2x-3)=3(x-3)(x+1)=0이므로 x=3 또는 x=-1입니다."
+  optionExplanations={['부호와 값이 잘못되었습니다.', '맞습니다. x=3, x=-1입니다.', '값이 잘못되었습니다.', '부호가 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="f'(x0)=0이고 f''(x0)<0일 때 x0에서의 극값 종류는?"
+  options={['①극댓값', '②극솟값', '③변곡점', '④판별 불가']}
+  correctAnswer={1}
+  explanation="2차 도함수가 음수(위로 볼록)이면서 1차 도함수가 0인 지점은 극댓값입니다."
+  optionExplanations={['맞습니다. 위로 볼록한 꼭대기가 극댓값입니다.', 'f\'\'(x0)>0일 때가 극솟값입니다.', '변곡점은 f\'\'(x0)=0일 때 의심되는 지점입니다.', '2차 도함수 판정법으로 명확히 판별됩니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="∫(6x²-4x+3)dx의 결과는?"
+  options={['①2x³-2x²+3x+C', '②6x³-4x²+3x+C', '③2x³-2x²+C', '④12x-4+C']}
+  correctAnswer={1}
+  explanation="각 항 적분: 6x³/3=2x³, -4x²/2=-2x², 3의 적분은 3x. 합치면 2x³-2x²+3x+C입니다."
+  optionExplanations={['맞습니다. 2x³-2x²+3x+C입니다.', '계수가 약분되지 않은 값입니다.', '3x항(마지막 항)이 빠졌습니다.', '이는 미분한 결과와 혼동한 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="∫₀² 3x²dx의 값은?"
+  options={['①6', '②8', '③12', '④24']}
+  correctAnswer={2}
+  explanation="F(x)=x³, [x³]₀² = 8-0 = 8입니다."
+  optionExplanations={['부정적분 결과와 혼동한 값입니다.', '맞습니다. 2³=8입니다.', '피적분함수에 대입한 값입니다.', '4배로 잘못 계산한 값입니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="정적분에서 적분상수 C가 필요 없는 이유는?"
+  options={['①원래부터 C가 존재하지 않아서', '②F(b)+C에서 F(a)+C를 빼는 과정에서 C가 상쇄되기 때문', '③C는 항상 0이라서', '④정적분은 적분이 아니라서']}
+  correctAnswer={2}
+  explanation="F(b)+C-(F(a)+C)=F(b)-F(a)로 뺄셈 과정에서 C가 자동으로 사라집니다."
+  optionExplanations={['부정적분에는 C가 필요합니다.', '맞습니다. 뺄셈 과정에서 상쇄됩니다.', 'C는 임의의 상수이며 항상 0인 것은 아닙니다.', '정적분도 적분 개념에 기반합니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="∫2x(x²+3)⁴dx를 치환적분(u=x²+3)으로 풀면?"
+  options={['①(x²+3)⁵/5+C', '②(x²+3)⁵+C', '③5(x²+3)⁴+C', '④(x²+3)⁴/4+C']}
+  correctAnswer={1}
+  explanation="du=2x dx이므로 ∫u⁴du = u⁵/5+C = (x²+3)⁵/5+C입니다."
+  optionExplanations={['맞습니다. (x²+3)⁵/5+C입니다.', '분모(5)로 나누지 않은 값입니다.', '이는 미분한 결과와 혼동한 값입니다.', '지수와 분모가 모두 잘못되었습니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="∫xe^x dx를 부분적분으로 풀 때 u와 dv의 올바른 선택은?"
+  options={['①u=e^x, dv=x dx', '②u=x, dv=e^x dx', '③u=xe^x, dv=dx', '④부분적분이 불가능하다']}
+  correctAnswer={2}
+  explanation="LIATE 순서상 대수함수(x)를 u로, 지수함수(e^x dx)를 dv로 선택하는 것이 표준적입니다."
+  optionExplanations={['이렇게 선택하면 오히려 더 복잡해집니다.', '맞습니다. u=x, dv=e^x dx가 표준적인 선택입니다.', '전체를 u로 두면 dv가 없어집니다.', '부분적분으로 풀 수 있는 전형적인 형태입니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="이상적분 ∫₁^∞ (1/x³)dx는 수렴하는가?"
+  options={['①수렴한다(p=3>1이므로)', '②발산한다', '③0이다', '④정의되지 않는다']}
+  correctAnswer={1}
+  explanation="p-적분에서 p=3>1이므로 이 이상적분은 수렴합니다."
+  optionExplanations={['맞습니다. p>1 조건을 만족해 수렴합니다.', 'p>1이므로 발산이 아닌 수렴입니다.', '수렴하지만 값은 0이 아닙니다(1/2로 수렴).', '수렴값이 명확히 계산됩니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="f(x,y)=x³y²+2xy의 x에 대한 편도함수 fx는?"
+  options={['①3x²y²+2y', '②2x³y+2x', '③3x²y²', '④x³+2y']}
+  correctAnswer={1}
+  explanation="y를 상수로 고정하고 x로 미분: (x³y²)'=3x²y², (2xy)'=2y. 합치면 3x²y²+2y입니다."
+  optionExplanations={['맞습니다. 3x²y²+2y입니다.', '이는 fy(y에 대한 편도함수)입니다.', '두 번째 항(2y)이 빠졌습니다.', '올바른 편미분 결과가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="기울기 벡터 ∇f가 가리키는 방향은?"
+  options={['①함수가 가장 느리게 변하는 방향', '②함수가 가장 가파르게 증가하는 방향', '③항상 원점 방향', '④무작위 방향']}
+  correctAnswer={2}
+  explanation="기울기 벡터는 그 지점에서 함숫값이 가장 빠르게 증가하는 방향을 가리키며, 머신러닝의 경사하강법에서도 이 원리를 사용합니다."
+  optionExplanations={['가장 느린 변화가 아닌 가장 가파른 변화 방향입니다.', '맞습니다. 최대 증가 방향입니다.', '원점과는 무관한 방향입니다.', '항상 특정한 방향(가장 가파른 증가)을 가리킵니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="헤시안 판별법에서 D=fxxfyy-(fxy)²이 D>0이고 fxx<0일 때의 결과는?"
+  options={['①극솟값', '②극댓값', '③안장점', '④판별 불가']}
+  correctAnswer={2}
+  explanation="D>0이고 fxx<0이면 위로 볼록한 지점, 즉 극댓값입니다."
+  optionExplanations={['fxx>0일 때가 극솟값입니다.', '맞습니다. D>0, fxx<0은 극댓값입니다.', 'D<0일 때가 안장점입니다.', 'D≠0이므로 명확히 판별 가능합니다.']}
+/>
