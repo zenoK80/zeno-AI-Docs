@@ -487,10 +487,11 @@
   width: 8px;
   height: 8px;
   background: var(--junction);
-  box-shadow: 0 0 0 2px var(--surface);
+  box-shadow: 0 0 0 3px var(--surface);
   opacity: 1;
   pointer-events: none;
   transform: translate(var(--junction-x), var(--junction-y)) rotate(45deg);
+  backface-visibility: hidden;
 }
 .gridJunctionLeft {
   left: 0;
