@@ -49,6 +49,10 @@ function NameForm() {
 
 `value={name}` 으로 state와 연결하고, `onChange`로 바꿉니다. 이 두 가지가 항상 함께 다닙니다.
 
+<Callout type="warning">
+  **실무에서 자주 만나는 경고:** `useState(undefined)`나 `useState()`로 초기값을 안 주고 `value={state}`를 쓰면, 콘솔에 "A component is changing an uncontrolled input to be controlled"라는 경고가 뜹니다. 처음에는 `value`가 `undefined`라 "비제어"로 시작했다가, 값이 입력되는 순간 "제어" 컴포넌트로 바뀌기 때문입니다. 처음부터 빈 문자열(`useState('')`)로 초기화하면 이 문제가 생기지 않습니다.
+</Callout>
+
 ---
 
 ## 여러 입력 필드 관리 — 객체 state
@@ -288,4 +292,13 @@ function LoginForm() {
   correctAnswer={3}
   explanation="오류 메시지를 state로 관리하면 조건부로 입력 필드 옆에 오류 메시지를 표시할 수 있습니다. 사용자 친화적이고 개별 필드 오류를 구분할 수 있습니다."
   optionExplanations={['console.error는 개발자 도구에서만 보입니다.', 'alert은 사용성이 나쁘고 어느 필드의 오류인지 알기 어렵습니다.', '맞습니다. 오류를 state로 관리해 인라인으로 표시합니다.', '유효성 검사 실패는 예외가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="useState(undefined)로 초기화한 상태를 input의 value에 연결하면 콘솔에 어떤 경고가 발생하는가?"
+  options={['①입력값이 너무 길다는 경고', '②비제어 컴포넌트가 제어 컴포넌트로 바뀐다는 경고', '③onChange가 없다는 경고', '④타입이 일치하지 않는다는 경고']}
+  correctAnswer={2}
+  explanation="value가 undefined면 처음엔 비제어 입력으로 동작하다가, 값이 입력되는 순간 value가 문자열을 갖게 되어 제어 컴포넌트로 전환됩니다. React는 이 전환을 경고합니다. useState('')처럼 빈 문자열로 초기화하면 방지할 수 있습니다."
+  optionExplanations={['길이와 관련된 경고가 아닙니다.', '맞습니다. undefined에서 값으로 바뀌며 비제어→제어 전환 경고가 발생합니다.', 'onChange 누락은 다른 경고(read-only 관련)를 발생시킵니다.', '타입 불일치 경고가 아닙니다.']}
 />
