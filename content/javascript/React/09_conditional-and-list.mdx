@@ -138,6 +138,29 @@ function ActiveUserList({ users }) {
 }
 ```
 
+### map 안에서 여러 요소를 반환해야 할 때 — key가 있는 Fragment
+
+`.map()` 콜백은 하나의 JSX만 반환해야 하지만, 항목마다 형제 요소 두 개(예: 용어와 설명)를 나란히 렌더링해야 할 때가 있습니다. 이때 일반 Fragment(`<>`)는 `key`를 받을 수 없으므로, 축약형이 아닌 **풀네임 `<Fragment key={...}>`**를 씁니다.
+
+```jsx
+import { Fragment } from 'react'
+
+function Glossary({ terms }) {
+  return (
+    <dl>
+      {terms.map(term => (
+        <Fragment key={term.id}>
+          <dt>{term.word}</dt>
+          <dd>{term.definition}</dd>
+        </Fragment>
+      ))}
+    </dl>
+  )
+}
+```
+
+`<>...</>`는 `<Fragment>...</Fragment>`의 축약형인데, 축약형 문법에는 props(key 포함)를 전달할 방법이 없습니다. key가 필요한 리스트 안에서는 반드시 `Fragment`를 명시적으로 import해서 씁니다.
+
 ---
 
 ## 빈 상태 처리 (Empty State)
@@ -286,4 +309,13 @@ function ArticleList() {
   correctAnswer={2}
   explanation="key는 같은 부모 요소의 형제 요소들 사이에서만 고유하면 됩니다. 다른 부모 아래의 요소들과는 중복이 허용됩니다."
   optionExplanations={['전체 앱 수준의 고유성은 필요하지 않습니다.', '맞습니다. 형제 요소끼리 고유하면 충분합니다.', '전체 트리에서 고유할 필요는 없습니다.', '화면 표시 여부가 아닌 형제 관계가 기준입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="map 콜백에서 각 항목마다 key가 있는 여러 형제 요소를 묶어 반환하려면?"
+  options={['①<>...</>축약형 Fragment에 key를 전달한다', '②import { Fragment }로 가져와 <Fragment key={...}>를 사용한다', '③div로 감싸되 key는 생략한다', '④배열로 감싸서 반환한다']}
+  correctAnswer={2}
+  explanation="축약형 Fragment(<>)는 props를 받을 수 없어 key를 전달할 방법이 없습니다. key가 필요한 경우 react에서 Fragment를 명시적으로 import해 <Fragment key={...}>로 사용해야 합니다."
+  optionExplanations={['축약형 Fragment는 어떤 props도 받을 수 없습니다.', '맞습니다. 풀네임 Fragment에만 key를 전달할 수 있습니다.', 'key 없이 리스트를 렌더링하면 경고가 발생하고 최적화가 저하됩니다.', '배열로 감싸도 각 요소에는 key가 필요합니다.']}
 />
