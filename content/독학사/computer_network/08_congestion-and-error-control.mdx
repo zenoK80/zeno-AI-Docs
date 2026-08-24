@@ -11,8 +11,8 @@ description: '슬라이딩 윈도우, TCP 혼잡 제어 알고리즘(Slow Start,
 
 | 구분 | 목적 | 주체 |
 |------|------|------|
-| **흐름 제어(Flow Control)** | 수신 측 버퍼 오버플로 방지 | 송신자-수신자 간 |
-| **혼잡 제어(Congestion Control)** | 네트워크 전체의 혼잡 방지 | 송신자-네트워크 간 |
+| **흐름 제어**(Flow Control) | 수신 측 버퍼 오버플로 방지 | 송신자-수신자 간 |
+| **혼잡 제어**(Congestion Control) | 네트워크 전체의 혼잡 방지 | 송신자-네트워크 간 |
 
 ## TCP 혼잡 제어 알고리즘
 
@@ -56,14 +56,14 @@ TCP는 다음 메커니즘으로 오류를 검출하고 복구합니다.
 
 | 메커니즘 | 설명 |
 |---------|------|
-| **체크섬(Checksum)** | 헤더와 데이터의 오류 검출 |
-| **확인 응답(ACK)** | 수신 확인, 순서 번호 기반 |
-| **재전송(Retransmission)** | ACK 미수신 시 타임아웃 후 재전송 |
-| **순서 번호(Sequence Number)** | 패킷 순서 추적 및 중복 검출 |
+| **체크섬**(Checksum) | 헤더와 데이터의 오류 검출 |
+| **확인 응답**(ACK) | 수신 확인, 순서 번호 기반 |
+| **재전송**(Retransmission) | ACK 미수신 시 타임아웃 후 재전송 |
+| **순서 번호**(Sequence Number) | 패킷 순서 추적 및 중복 검출 |
 
 ## 타임아웃과 RTT
 
-TCP는 **RTT(Round-Trip Time)**를 측정하여 동적으로 타임아웃 값을 조정합니다.
+TCP는 **RTT**(Round-Trip Time)를 측정하여 동적으로 타임아웃 값을 조정합니다.
 
 $\text{Timeout} = \text{EstimatedRTT} + 4 \times \text{DevRTT}$
 

@@ -224,7 +224,7 @@ grub2-set-default 0    # 첫 번째 항목을 기본으로
 <details>
 <summary>모범 답안 보기</summary>
 
-**LVM 구성 3단계: 물리 볼륨(PV) → 볼륨 그룹(VG) → 논리 볼륨(LV)**
+**LVM 구성 3단계: 물리 볼륨(PV) → 볼륨 그룹(VG) → 논리 볼륨**(LV)
 
 **1단계: 물리 볼륨(PV) 생성**
 
@@ -279,7 +279,7 @@ mount /dev/vg_data/lv_data /data
 df -h /data
 ```
 
-**6단계: 영구 마운트 설정 (/etc/fstab)**
+**6단계: 영구 마운트 설정 **(/etc/fstab)
 
 ```bash
 # /etc/fstab에 추가 (편집기로 또는 명령으로)
@@ -403,7 +403,7 @@ ssh -vvv user@서버IP
 mkdir -p /backup
 ```
 
-**2단계: rsync 백업 스크립트 작성 (선택적이지만 권장)**
+**2단계: rsync 백업 스크립트 작성 **(선택적이지만 권장)
 
 ```bash
 cat > /usr/local/bin/backup-home.sh << 'EOF'
@@ -472,7 +472,7 @@ systemctl status crond
 rsync -avz --delete --dry-run /home/ /backup/
 ```
 
-**5단계: 로그 확인 (실행 후)**
+**5단계: 로그 확인 **(실행 후)
 
 ```bash
 # cron 실행 기록 확인

@@ -9,7 +9,7 @@ description: '체인 룰을 이용한 역전파 알고리즘의 원리와 경사
 
 ## 신경망 학습의 목표
 
-신경망 학습은 **손실 함수(Loss Function)**의 값을 최소화하는 가중치를 찾는 최적화 문제입니다.
+신경망 학습은 **손실 함수**(Loss Function)의 값을 최소화하는 가중치를 찾는 최적화 문제입니다.
 
 $$L = \text{Loss}(\hat{y}, y)$$
 
@@ -29,7 +29,7 @@ $$w \leftarrow w - \eta \frac{\partial L}{\partial w}$$
 
 ## 체인 룰 (Chain Rule)
 
-역전파는 **합성 함수의 미분(체인 룰)**을 이용합니다.
+역전파는 **합성 함수의 미분**(체인 룰)을 이용합니다.
 
 $$\frac{\partial L}{\partial w} = \frac{\partial L}{\partial a} \cdot \frac{\partial a}{\partial z} \cdot \frac{\partial z}{\partial w}$$
 
@@ -55,7 +55,7 @@ w ← w - η × ∂L/∂w
 
 ## 계산 그래프
 
-복잡한 신경망의 역전파를 이해하기 위해 **계산 그래프(Computational Graph)**를 사용합니다.
+복잡한 신경망의 역전파를 이해하기 위해 **계산 그래프**(Computational Graph)를 사용합니다.
 
 - 순전파: 입력에서 출력 방향으로 계산
 - 역전파: 기울기를 출력에서 입력 방향으로 전파
@@ -74,7 +74,7 @@ w ─┘         b
 
 | 손실 함수 | 수식 | 사용 |
 |---------|------|------|
-| **MSE(평균 제곱 오차)** | $\frac{1}{n}\sum(y_i - \hat{y}_i)^2$ | 회귀 |
+| **MSE**(평균 제곱 오차) | $\frac{1}{n}\sum(y_i - \hat{y}_i)^2$ | 회귀 |
 | **Binary Cross-Entropy** | $-[y\log\hat{y} + (1-y)\log(1-\hat{y})]$ | 이진 분류 |
 | **Categorical Cross-Entropy** | $-\sum y_i \log\hat{y}_i$ | 다중 분류 |
 

@@ -9,7 +9,7 @@ description: '교차검증(k-fold), 혼동행렬, 정밀도/재현율/F1, ROC-AU
 
 ## 왜 모델 평가가 중요한가?
 
-훈련 데이터에서 100점을 받은 학생이 실전 시험에서는 60점을 받을 수 있습니다. 모델도 마찬가지입니다. 학습한 데이터에서는 잘 동작해도 새로운 데이터에서 실패할 수 있습니다. 올바른 평가 방법으로 **일반화 성능(generalization performance, 새로운 데이터에서의 성능)** 을 측정해야 합니다.
+훈련 데이터에서 100점을 받은 학생이 실전 시험에서는 60점을 받을 수 있습니다. 모델도 마찬가지입니다. 학습한 데이터에서는 잘 동작해도 새로운 데이터에서 실패할 수 있습니다. 올바른 평가 방법으로 **일반화 성능**(generalization performance, 새로운 데이터에서의 성능) 을 측정해야 합니다.
 
 ---
 
@@ -61,8 +61,8 @@ n개 데이터에서 k=n으로 설정합니다. 계산 비용이 매우 높지�
 
 |  | 예측: Positive(양성) | 예측: Negative(음성) |
 |--|---|---|
-| **실제: Positive(양성)** | TP (True Positive, 참 양성) | FN (False Negative, 거짓 음성) |
-| **실제: Negative(음성)** | FP (False Positive, 거짓 양성) | TN (True Negative, 참 음성) |
+| **실제: Positive**(양성) | TP (True Positive, 참 양성) | FN (False Negative, 거짓 음성) |
+| **실제: Negative**(음성) | FP (False Positive, 거짓 양성) | TN (True Negative, 참 음성) |
 
 - **TP:** 실제 암 환자를 암으로 올바르게 예측 ✓
 - **TN:** 실제 정상인을 정상으로 올바르게 예측 ✓
@@ -106,7 +106,7 @@ $$\text{Recall} = \frac{TP}{TP + FN}$$
 
 $$F1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}$$
 
-정밀도와 재현율의 **조화 평균(harmonic mean)** 입니다. 두 지표 사이의 균형이 필요할 때 사용합니다.
+정밀도와 재현율의 **조화 평균**(harmonic mean) 입니다. 두 지표 사이의 균형이 필요할 때 사용합니다.
 
 **조화 평균의 특성:** 두 값 중 하나라도 낮으면 결과가 크게 낮아집니다. 정밀도와 재현율이 모두 높아야 F1이 높습니다.
 

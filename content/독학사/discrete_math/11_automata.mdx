@@ -32,7 +32,7 @@ description: '유한 상태 기계(FSM), DFA, NFA, 정규 언어를 완전 초�
 
 ## 결정적 유한 오토마타 (DFA)
 
-**DFA(Deterministic Finite Automaton, 결정적 유한 오토마타)** 는 5-튜플 $(Q, \Sigma, \delta, q_0, F)$로 정의됩니다.
+**DFA**(Deterministic Finite Automaton, 결정적 유한 오토마타) 는 5-튜플 $(Q, \Sigma, \delta, q_0, F)$로 정의됩니다.
 
 | 구성 요소 | 기호 | 설명 |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ description: '유한 상태 기계(FSM), DFA, NFA, 정규 언어를 완전 초�
 
 ## 비결정적 유한 오토마타 (NFA)
 
-**NFA(Nondeterministic Finite Automaton, 비결정적 유한 오토마타)** 는 5-튜플 $(Q, \Sigma, \delta, q_0, F)$이지만 전이 함수가 다릅니다.
+**NFA**(Nondeterministic Finite Automaton, 비결정적 유한 오토마타) 는 5-튜플 $(Q, \Sigma, \delta, q_0, F)$이지만 전이 함수가 다릅니다.
 
 $$\delta: Q \times \Sigma_\epsilon \rightarrow \mathcal{P}(Q)$$
 
@@ -84,7 +84,7 @@ $$\delta: Q \times \Sigma_\epsilon \rightarrow \mathcal{P}(Q)$$
 | 다음 상태 수 | **정확히 1개** | 0개 이상 |
 | 입력 없는 전이 | 불가 | $\epsilon$-전이 가능 |
 | 구현 복잡도 | 단순 | 복잡 |
-| 계산 능력 | 정규 언어 | **정규 언어 (동일!)** |
+| 계산 능력 | 정규 언어 | **정규 언어 **(동일!) |
 
 <Callout type="warning">
   **중요:** NFA가 더 표현력이 강해 보이지만, **모든 NFA는 동등한 DFA로 변환할 수 있습니다.** 따라서 DFA와 NFA의 계산 능력(인식하는 언어의 집합)은 완전히 동일합니다.

@@ -9,7 +9,7 @@ description: 'IP 라우팅 원리, ARP, ICMP, IGMP의 역할과 동작 방식을
 
 ## 네트워크 계층의 역할
 
-**네트워크 계층(Network Layer)**은 서로 다른 네트워크 간 패킷 전달을 담당합니다.
+**네트워크 계층**(Network Layer)은 서로 다른 네트워크 간 패킷 전달을 담당합니다.
 
 - **라우팅(Routing):** 패킷의 최적 경로 선택
 - **포워딩(Forwarding):** 라우팅 테이블에 따라 다음 홉으로 패킷 전달
@@ -17,7 +17,7 @@ description: 'IP 라우팅 원리, ARP, ICMP, IGMP의 역할과 동작 방식을
 
 ## IP (Internet Protocol)
 
-IP는 **비연결형(Connectionless)**, **비신뢰성(Unreliable)** 프로토콜입니다. 패킷 순서나 전달을 보장하지 않으며, 신뢰성은 상위 계층(TCP)이 담당합니다.
+IP는 **비연결형**(Connectionless), **비신뢰성**(Unreliable) 프로토콜입니다. 패킷 순서나 전달을 보장하지 않으며, 신뢰성은 상위 계층(TCP)이 담당합니다.
 
 ### 라우팅 테이블 예시
 
@@ -42,11 +42,11 @@ IP는 **비연결형(Connectionless)**, **비신뢰성(Unreliable)** 프로토�
 **ARP**는 IP 주소를 MAC 주소로 변환하는 프로토콜입니다.
 
 1. 호스트 A가 192.168.1.5의 MAC 주소를 모름
-2. A가 **ARP 요청(브로드캐스트)** 전송: "192.168.1.5는 누구입니까?"
-3. 해당 IP를 가진 B만 **ARP 응답(유니캐스트)**으로 MAC 주소 전달
+2. A가 **ARP 요청**(브로드캐스트) 전송: "192.168.1.5는 누구입니까?"
+3. 해당 IP를 가진 B만 **ARP 응답**(유니캐스트)으로 MAC 주소 전달
 4. A는 B의 MAC 주소를 **ARP 캐시**에 저장
 
-**RARP(Reverse ARP)**는 MAC → IP 변환(현재 DHCP로 대체).
+**RARP**(Reverse ARP)는 MAC → IP 변환(현재 DHCP로 대체).
 
 ## ICMP (Internet Control Message Protocol)
 

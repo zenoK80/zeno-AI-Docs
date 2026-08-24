@@ -13,9 +13,9 @@ description: '접근 제어(DAC/MAC/RBAC), SQL 인젝션 방어, 감사 추적, 
 
 | 목표 | 설명 |
 |------|------|
-| **기밀성 (Confidentiality)** | 권한 없는 사용자의 데이터 접근 방지 |
-| **무결성 (Integrity)** | 데이터의 정확성과 일관성 유지 |
-| **가용성 (Availability)** | 권한 있는 사용자가 언제든지 데이터에 접근 가능 |
+| **기밀성 **(Confidentiality) | 권한 없는 사용자의 데이터 접근 방지 |
+| **무결성 **(Integrity) | 데이터의 정확성과 일관성 유지 |
+| **가용성 **(Availability) | 권한 있는 사용자가 언제든지 데이터에 접근 가능 |
 
 ## 접근 제어 (Access Control)
 
@@ -56,7 +56,7 @@ REVOKE INSERT ON employees FROM user_kim;
 
 ### RBAC (Role-Based Access Control, 역할 기반 접근 제어)
 
-사용자에게 **역할(Role)**을 부여하고, 역할에 권한을 할당합니다.
+사용자에게 **역할**(Role)을 부여하고, 역할에 권한을 할당합니다.
 
 ```sql
 -- 역할 생성
@@ -133,14 +133,14 @@ SQL 구조와 데이터를 분리하여 사용자 입력이 SQL 코드로 해석
 
 **2. 저장 프로시저 (Stored Procedure) 활용**
 
-**3. 입력값 유효성 검사 (Input Validation)**
+**3. 입력값 유효성 검사 **(Input Validation)
 - 허용 목록(Allowlist) 방식으로 안전한 문자만 허용
 - 특수 문자 이스케이프 처리
 
-**4. 최소 권한 원칙 (Least Privilege)**
+**4. 최소 권한 원칙 **(Least Privilege)
 - 애플리케이션 DB 계정에 필요한 최소한의 권한만 부여
 
-**5. WAF (Web Application Firewall)**
+**5. WAF **(Web Application Firewall)
 - SQL 인젝션 패턴 탐지 및 차단
 
 ## 감사 추적 (Audit Trail)

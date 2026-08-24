@@ -45,7 +45,7 @@ const Greeting = () => <h1>안녕하세요!</h1>
 
 ## Props — 컴포넌트에 데이터 전달하기
 
-**Props(properties)** 는 부모 컴포넌트가 자식 컴포넌트에게 전달하는 데이터입니다. HTML의 속성(attribute)처럼 작성하고, 컴포넌트 함수에서 객체로 받습니다.
+**Props**(properties) 는 부모 컴포넌트가 자식 컴포넌트에게 전달하는 데이터입니다. HTML의 속성(attribute)처럼 작성하고, 컴포넌트 함수에서 객체로 받습니다.
 
 ```jsx
 // 자식 컴포넌트 — props 객체를 매개변수로 받음
@@ -158,7 +158,7 @@ function GoodComponent({ name, onChangeName }) {
 
 ### Prop Drilling — props 전달의 한계
 
-컴포넌트 트리가 깊어지면, 최상위에서 최하위까지 props를 계속 한 단계씩 전달해야 하는 문제가 생깁니다. 이를 **Prop Drilling(props 구멍 뚫기)**이라고 부릅니다.
+컴포넌트 트리가 깊어지면, 최상위에서 최하위까지 props를 계속 한 단계씩 전달해야 하는 문제가 생깁니다. 이를 **Prop Drilling**(props 구멍 뚫기)이라고 부릅니다.
 
 ```jsx
 function App() {
@@ -283,7 +283,7 @@ function Example({
 - Props는 구조 분해로 받고, 기본값을 설정할 수 있다.
 - **Props는 읽기 전용** — 자식에서 props를 직접 변경할 수 없다.
 - **children**: 컴포넌트 태그 사이의 내용이 자동으로 전달되는 특별한 prop. 여러 슬롯이 필요하면 일반 props로 JSX를 전달.
-- **스프레드(`{...rest}`)**: 일부 props만 꺼내 쓰고 나머지는 자식 요소로 그대로 흘려보낼 때 사용.
+- **스프레드**(`{...rest}`): 일부 props만 꺼내 쓰고 나머지는 자식 요소로 그대로 흘려보낼 때 사용.
 - **Prop Drilling**: 중간 컴포넌트가 쓰지도 않는 props를 계속 전달만 하는 문제. 깊어지면 Context로 해결.
 
 ---

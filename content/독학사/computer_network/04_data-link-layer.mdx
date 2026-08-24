@@ -9,7 +9,7 @@ description: 'MAC 주소, CSMA/CD, 이더넷 프레임 구조와 ARQ 오류 제�
 
 ## 데이터 링크 계층의 역할
 
-**데이터 링크 계층(Data Link Layer)**은 동일 네트워크 내 두 노드 사이에서 신뢰성 있는 데이터 전달을 담당합니다.
+**데이터 링크 계층**(Data Link Layer)은 동일 네트워크 내 두 노드 사이에서 신뢰성 있는 데이터 전달을 담당합니다.
 
 - **프레이밍(Framing):** 비트 스트림을 프레임 단위로 구분
 - **오류 검출 및 정정:** CRC(Cyclic Redundancy Check)로 오류 검출
@@ -40,19 +40,19 @@ description: 'MAC 주소, CSMA/CD, 이더넷 프레임 구조와 ARQ 오류 제�
 
 ## CSMA/CD
 
-**CSMA/CD(Carrier Sense Multiple Access with Collision Detection)**는 이더넷이 사용하는 매체 접근 제어 방식입니다.
+**CSMA/CD**(Carrier Sense Multiple Access with Collision Detection)는 이더넷이 사용하는 매체 접근 제어 방식입니다.
 
 1. **CS(Carrier Sense):** 전송 전에 매체가 사용 중인지 확인
 2. **MA(Multiple Access):** 여러 장치가 동일 매체를 공유
-3. **CD(Collision Detection):** 충돌 발생을 감지하면 즉시 전송 중단 → **잼 신호(Jam Signal)** 전송 → **임의 시간(Back-off)** 대기 → 재전송
+3. **CD(Collision Detection):** 충돌 발생을 감지하면 즉시 전송 중단 → **잼 신호**(Jam Signal) 전송 → **임의 시간**(Back-off) 대기 → 재전송
 
 <Callout type="warning">
-  CSMA/CD는 유선 이더넷(반이중)에서 사용됩니다. 무선 네트워크(Wi-Fi)는 충돌 감지가 어렵기 때문에 **CSMA/CA(Collision Avoidance)**를 사용합니다.
+  CSMA/CD는 유선 이더넷(반이중)에서 사용됩니다. 무선 네트워크(Wi-Fi)는 충돌 감지가 어렵기 때문에 **CSMA/CA**(Collision Avoidance)를 사용합니다.
 </Callout>
 
 ## ARQ 오류 제어 방식
 
-**ARQ(Automatic Repeat reQuest)**는 오류가 발생한 프레임을 재전송하여 신뢰성을 보장합니다.
+**ARQ**(Automatic Repeat reQuest)는 오류가 발생한 프레임을 재전송하여 신뢰성을 보장합니다.
 
 | ARQ 방식 | 동작 | 특징 |
 |----------|------|------|

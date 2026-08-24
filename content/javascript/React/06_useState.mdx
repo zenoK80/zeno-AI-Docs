@@ -220,7 +220,7 @@ const [data, setData] = useState(() => heavyCalculation())
 - **불변성**: 배열·객체는 직접 수정하지 않고 스프레드 `...`나 `filter`, `map`으로 새 값을 만든다.
 - 이전 값 기반 업데이트에는 `setState(prev => prev + 1)` 형태가 안전하다.
 - 같은 컴포넌트를 여러 번 써도 각 인스턴스의 상태는 서로 독립적이다.
-- React는 한 이벤트 핸들러 안의 여러 setState를 **배칭(batching)**해 한 번만 리렌더링한다. 값을 여러 단계 바꾸려면 함수형 업데이트가 필수다.
+- React는 한 이벤트 핸들러 안의 여러 setState를 **배칭**(batching)해 한 번만 리렌더링한다. 값을 여러 단계 바꾸려면 함수형 업데이트가 필수다.
 
 ---
 

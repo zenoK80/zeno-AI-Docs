@@ -18,8 +18,8 @@ description: 'L1(라쏘)/L2(릿지) 정규화, 드롭아웃, 배치 정규화, A
 $$L_{\text{Lasso}} = \text{MSE} + \lambda \sum_{i} |w_i|$$
 
 **특징:**
-- 일부 가중치를 정확히 0으로 만드는 **희소성(Sparsity)** 유도
-- 자동으로 **특징 선택(Feature Selection)** 효과
+- 일부 가중치를 정확히 0으로 만드는 **희소성**(Sparsity) 유도
+- 자동으로 **특징 선택**(Feature Selection) 효과
 - 불필요한 특징이 많은 경우 유리
 
 ## L2 정규화 (Ridge Regression)
@@ -53,7 +53,7 @@ $$L_{\text{Elastic}} = \text{MSE} + \lambda_1 \sum|w_i| + \lambda_2 \sum w_i^2$$
 
 ## 드롭아웃 (Dropout)
 
-신경망 학습 시 무작위로 일부 뉴런을 **비활성화(0으로 설정)**하여 과적합을 방지합니다.
+신경망 학습 시 무작위로 일부 뉴런을 **비활성화**(0으로 설정)하여 과적합을 방지합니다.
 
 **원리:**
 - 훈련 시: 각 뉴런을 확률 p로 비활성화

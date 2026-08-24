@@ -1,9 +1,29 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useId, useState, type ReactNode } from 'react'
+import katex from 'katex'
 import styles from './quiz.module.css'
 
 const choiceMarkers = ['①', '②', '③', '④', '⑤', '⑥']
+
+// Quiz의 question/options/explanation은 일반 문자열 prop이라 MDX의
+// KaTeX 파이프라인을 거치지 않는다. "$...$" 인라인 수식만 직접 렌더링한다.
+function renderWithMath(text: string): ReactNode[] {
+  const parts = text.split(/(\$[^$]+\$)/g)
+  return parts.map((part, index) => {
+    if (part.startsWith('$') && part.endsWith('$') && part.length > 1) {
+      const expr = part.slice(1, -1)
+      try {
+        const html = katex.renderToString(expr, { throwOnError: false })
+        // eslint-disable-next-line react/no-danger
+        return <span key={index} dangerouslySetInnerHTML={{ __html: html }} />
+      } catch {
+        return <span key={index}>{part}</span>
+      }
+    }
+    return <span key={index}>{part}</span>
+  })
+}
 
 type QuizProps = {
   questionNumber: number
@@ -41,7 +61,7 @@ export function Quiz({
 
       <fieldset className={styles.fieldset}>
         <legend className={styles.question} id={`${quizId}-question`}>
-          {question}
+          {renderWithMath(question)}
         </legend>
 
         <div className={styles.options}>
@@ -74,7 +94,7 @@ export function Quiz({
                 <span className={styles.marker} aria-hidden="true">
                   {choiceMarkers[index] ?? optionNumber}
                 </span>
-                <span className={styles.optionText}>{option}</span>
+                <span className={styles.optionText}>{renderWithMath(option)}</span>
               </label>
             )
           })}
@@ -92,7 +112,7 @@ export function Quiz({
               ? '정답이에요.'
               : `오답이에요. 정답은 ${choiceMarkers[correctAnswer - 1] ?? correctAnswer}입니다.`}
           </p>
-          <p className={styles.explanation}>{explanation}</p>
+          <p className={styles.explanation}>{renderWithMath(explanation)}</p>
 
           <div className={styles.optionReview}>
             <p className={styles.optionReviewTitle}>선택지 해설</p>
@@ -100,7 +120,7 @@ export function Quiz({
               {options.map((_, index) => (
                 <li key={index}>
                   <strong>{choiceMarkers[index] ?? index + 1}</strong>{' '}
-                  {optionExplanations[index]}
+                  {renderWithMath(optionExplanations[index])}
                 </li>
               ))}
             </ul>

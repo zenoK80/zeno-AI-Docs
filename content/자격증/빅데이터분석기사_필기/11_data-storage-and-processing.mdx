@@ -9,7 +9,7 @@ description: 'HDFS 구조, MapReduce 처리 방식, NoSQL 4유형, Apache Spark,
 
 ## HDFS: 분산 파일 시스템
 
-**HDFS(Hadoop Distributed File System)** 는 대용량 파일을 여러 서버에 나누어 저장하는 분산 파일 시스템입니다.
+**HDFS**(Hadoop Distributed File System) 는 대용량 파일을 여러 서버에 나누어 저장하는 분산 파일 시스템입니다.
 
 ```mermaid
 flowchart TD
@@ -71,7 +71,7 @@ MapReduce의 한계: **디스크 기반 처리** → 각 단계마다 HDFS에 �
 
 ## NoSQL 데이터베이스 4유형
 
-관계형 데이터베이스(RDBMS)의 한계를 극복하기 위해 등장한 **NoSQL(Not Only SQL)** 은 4가지 유형으로 분류됩니다.
+관계형 데이터베이스(RDBMS)의 한계를 극복하기 위해 등장한 **NoSQL**(Not Only SQL) 은 4가지 유형으로 분류됩니다.
 
 | 유형 | 대표 제품 | 저장 구조 | 특징 | 사용 사례 |
 |------|----------|----------|------|----------|
@@ -103,9 +103,9 @@ Spark의 핵심 데이터 추상화 개념입니다.
 
 | 특성 | 설명 |
 |------|------|
-| **Resilient (탄력성)** | 장애 발생 시 자동으로 재계산하여 복구 |
-| **Distributed (분산)** | 여러 노드에 나뉘어 저장됨 |
-| **Dataset (데이터셋)** | 불변(Immutable)한 데이터 컬렉션 |
+| **Resilient **(탄력성) | 장애 발생 시 자동으로 재계산하여 복구 |
+| **Distributed **(분산) | 여러 노드에 나뉘어 저장됨 |
+| **Dataset **(데이터셋) | 불변(Immutable)한 데이터 컬렉션 |
 
 ### Spark 생태계
 
@@ -128,17 +128,17 @@ Spark의 핵심 데이터 추상화 개념입니다.
 | **대표 기술** | Amazon Redshift, Snowflake | Amazon S3, Azure Data Lake |
 
 <Callout type="info">
-  최근에는 데이터 웨어하우스와 데이터 레이크의 장점을 결합한 **데이터 레이크하우스(Data Lakehouse)** 가 주목받고 있습니다. 대표 기술: Delta Lake, Apache Iceberg
+  최근에는 데이터 웨어하우스와 데이터 레이크의 장점을 결합한 **데이터 레이크하우스**(Data Lakehouse) 가 주목받고 있습니다. 대표 기술: Delta Lake, Apache Iceberg
 </Callout>
 
 ## 핵심 정리
 
-- HDFS: **NameNode(메타데이터) + DataNode(블록 저장)**, 블록 128MB, 복제 계수 3
-- NameNode는 **SPOF(단일 장애점)** → HA 구성으로 해결
-- MapReduce: **Map(key-value 변환) → Shuffle&Sort(key 기준 정렬) → Reduce(집계)**
-- NoSQL 4유형: **Key-Value(Redis), Document(MongoDB), Column-Family(HBase), Graph(Neo4j)**
+- HDFS: **NameNode(메타데이터) + DataNode**(블록 저장), 블록 128MB, 복제 계수 3
+- NameNode는 **SPOF**(단일 장애점) → HA 구성으로 해결
+- MapReduce: **Map(key-value 변환) → Shuffle&Sort(key 기준 정렬) → Reduce**(집계)
+- NoSQL 4유형: **Key-Value(Redis), Document(MongoDB), Column-Family(HBase), Graph**(Neo4j)
 - Apache Spark: 인메모리 처리, MapReduce 대비 최대 100배 빠름
-- RDD: **Resilient(탄력성) + Distributed(분산) + Dataset(불변 데이터)**
+- RDD: **Resilient(탄력성) + Distributed(분산) + Dataset**(불변 데이터)
 - 데이터 웨어하우스: 정형·사전 정의 스키마 / 데이터 레이크: 모든 형태·원시 데이터
 
 ## 마무리 복습

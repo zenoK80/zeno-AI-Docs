@@ -11,11 +11,11 @@ description: '조건부 확률의 정의와 계산, 사건의 독립, 베이즈 
 
 날씨 앱이 "내일 비가 올 확률 40%"라고 알려 줍니다. 그런데 오늘 아침 하늘이 흐리다면, 그 40%가 여전히 유효할까요? 아마도 비가 올 확률이 더 높아질 것입니다.
 
-**조건부 확률(conditional probability, 컨디셔널 프로바빌리티)**은 이처럼 "추가 정보가 주어졌을 때 확률이 어떻게 바뀌는가"를 다룹니다. 현실의 거의 모든 확률 계산은 어떤 조건 아래에서 이루어집니다.
+**조건부 확률**(conditional probability, 컨디셔널 프로바빌리티)은 이처럼 "추가 정보가 주어졌을 때 확률이 어떻게 바뀌는가"를 다룹니다. 현실의 거의 모든 확률 계산은 어떤 조건 아래에서 이루어집니다.
 
 ## 조건부 확률이란
 
-어떤 사건 $B$가 이미 일어났다는 조건 아래에서 사건 $A$가 일어날 확률을 **조건부 확률(conditional probability)**이라 합니다.
+어떤 사건 $B$가 이미 일어났다는 조건 아래에서 사건 $A$가 일어날 확률을 **조건부 확률**(conditional probability)이라 합니다.
 
 $$P(A|B) = \frac{P(A \cap B)}{P(B)}, \quad P(B) > 0$$
 
@@ -40,7 +40,7 @@ $$P(\text{2번째 빨강} | \text{1번째 빨강}) = \frac{2}{4} = \frac{1}{2}$$
 
 ## 곱셈법칙 (일반형)
 
-조건부 확률의 정의를 변환하면 교사건의 확률을 구하는 **곱셈법칙(multiplication rule)**이 됩니다.
+조건부 확률의 정의를 변환하면 교사건의 확률을 구하는 **곱셈법칙**(multiplication rule)이 됩니다.
 
 $$P(A \cap B) = P(B) \times P(A|B) = P(A) \times P(B|A)$$
 
@@ -56,7 +56,7 @@ $$P(\text{빨}, \text{빨}) = \frac{3}{5} \times \frac{2}{4} = \frac{6}{20} = \f
 
 ## 사건의 독립
 
-사건 $B$가 일어났어도 사건 $A$의 확률이 변하지 않을 때 두 사건은 **독립(independent, 인디펜던트)**이라 합니다.
+사건 $B$가 일어났어도 사건 $A$의 확률이 변하지 않을 때 두 사건은 **독립**(independent, 인디펜던트)이라 합니다.
 
 $$A \text{와 } B \text{가 독립} \iff P(A|B) = P(A) \iff P(A \cap B) = P(A) \times P(B)$$
 
@@ -66,7 +66,7 @@ $$A \text{와 } B \text{가 독립} \iff P(A|B) = P(A) \iff P(A \cap B) = P(A) \
 
 **예:** 동전 두 번 던지기에서 첫 번째 앞면과 두 번째 앞면은 서로 영향을 주지 않으므로 독립입니다. 첫 번째가 앞면이든 뒷면이든 두 번째에서 앞면이 나올 확률은 항상 1/2입니다.
 
-반면, 비복원 추출로 공을 뽑는 경우처럼 앞의 결과가 뒤에 영향을 주면 **종속(dependent, 디펜던트)**입니다.
+반면, 비복원 추출로 공을 뽑는 경우처럼 앞의 결과가 뒤에 영향을 주면 **종속**(dependent, 디펜던트)입니다.
 
 <Callout type="warning">
   독립과 배반을 혼동하지 마세요.
@@ -102,16 +102,16 @@ $$P(\text{불량}) = 0.6 \times 0.02 + 0.4 \times 0.05 = 0.012 + 0.020 = 0.032$$
 
 ## 베이즈 정리
 
-**왜 필요할까요?** 전체 확률의 법칙이 "원인 → 결과"라면, **베이즈 정리(Bayes theorem, 베이즈 씨어럼)**는 반대로 "결과 → 원인"의 확률을 구합니다.
+**왜 필요할까요?** 전체 확률의 법칙이 "원인 → 결과"라면, **베이즈 정리**(Bayes theorem, 베이즈 씨어럼)는 반대로 "결과 → 원인"의 확률을 구합니다.
 
 이미 결과(A)를 알고 있을 때, 그 결과를 만든 원인($B_i$)의 확률을 역으로 구하는 공식입니다.
 
 $$P(B_i|A) = \frac{P(B_i) \times P(A|B_i)}{P(A)} = \frac{P(B_i) \times P(A|B_i)}{\sum_{j} P(B_j) \times P(A|B_j)}$$
 
 기호 설명:
-- $P(B_i)$: **사전 확률(prior probability, 프라이어)** — 결과를 보기 전 원인의 확률
-- $P(A|B_i)$: **우도(likelihood, 라이클리후드)** — 원인 $B_i$일 때 결과 A가 나올 확률
-- $P(B_i|A)$: **사후 확률(posterior probability, 포스테리어)** — 결과를 본 후 업데이트된 원인의 확률
+- $P(B_i)$: **사전 확률**(prior probability, 프라이어) — 결과를 보기 전 원인의 확률
+- $P(A|B_i)$: **우도**(likelihood, 라이클리후드) — 원인 $B_i$일 때 결과 A가 나올 확률
+- $P(B_i|A)$: **사후 확률**(posterior probability, 포스테리어) — 결과를 본 후 업데이트된 원인의 확률
 
 **쉽게 말하면:** "결과를 보고 나서 어느 원인이 더 그럴듯한가"를 계산하는 공식입니다.
 
@@ -131,11 +131,11 @@ $$P(A \text{ 공장} | \text{불량}) = \frac{0.6 \times 0.02}{0.032} = \frac{0.
 
 ## 핵심 정리
 
-- **조건부 확률(conditional probability)**: $P(A|B) = P(A \cap B)/P(B)$
-- **곱셈법칙(multiplication rule)**: $P(A \cap B) = P(A) \times P(B|A)$
-- **독립(independent)**: $P(A \cap B) = P(A) \times P(B)$이면 독립
+- **조건부 확률**(conditional probability): $P(A|B) = P(A \cap B)/P(B)$
+- **곱셈법칙**(multiplication rule): $P(A \cap B) = P(A) \times P(B|A)$
+- **독립**(independent): $P(A \cap B) = P(A) \times P(B)$이면 독립
 - **전체 확률의 법칙**: 원인별 가중 합산으로 전체 확률 계산
-- **베이즈 정리(Bayes theorem)**: 결과에서 원인의 사후 확률을 역산
+- **베이즈 정리**(Bayes theorem): 결과에서 원인의 사후 확률을 역산
 
 ## 마무리 복습
 

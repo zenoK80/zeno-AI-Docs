@@ -27,12 +27,12 @@ description: '투명성 4가지, 2PC(2단계 커밋), CAP 정리, 복제/분산 
 
 | 투명성 종류 | 설명 |
 |------------|------|
-| **위치 투명성 (Location Transparency)** | 데이터가 어느 사이트에 있는지 알 필요 없음 |
-| **분할 투명성 (Fragmentation Transparency)** | 데이터가 어떻게 분할되어 있는지 알 필요 없음 |
-| **복제 투명성 (Replication Transparency)** | 데이터가 어디에 복제되어 있는지 알 필요 없음 |
-| **병행 투명성 (Concurrency Transparency)** | 다른 트랜잭션의 동시 실행을 인식하지 않아도 됨 |
+| **위치 투명성 **(Location Transparency) | 데이터가 어느 사이트에 있는지 알 필요 없음 |
+| **분할 투명성 **(Fragmentation Transparency) | 데이터가 어떻게 분할되어 있는지 알 필요 없음 |
+| **복제 투명성 **(Replication Transparency) | 데이터가 어디에 복제되어 있는지 알 필요 없음 |
+| **병행 투명성 **(Concurrency Transparency) | 다른 트랜잭션의 동시 실행을 인식하지 않아도 됨 |
 
-추가로 **장애 투명성(Failure Transparency)**도 중요합니다: 일부 사이트 장애 시 시스템이 자동으로 처리.
+추가로 **장애 투명성**(Failure Transparency)도 중요합니다: 일부 사이트 장애 시 시스템이 자동으로 처리.
 
 ## 데이터 분할 (Fragmentation)
 
@@ -117,9 +117,9 @@ Brewer의 정리: 분산 시스템은 다음 세 가지 속성 중 **최대 2가
 
 | 속성 | 설명 |
 |------|------|
-| **C (Consistency, 일관성)** | 모든 노드가 항상 동일한 최신 데이터를 반환 |
-| **A (Availability, 가용성)** | 모든 요청이 성공 또는 실패 응답을 반환 (타임아웃 없음) |
-| **P (Partition Tolerance, 분단 허용성)** | 네트워크 분단(일부 노드 간 통신 불가)에도 시스템 계속 동작 |
+| **C **(Consistency, 일관성) | 모든 노드가 항상 동일한 최신 데이터를 반환 |
+| **A **(Availability, 가용성) | 모든 요청이 성공 또는 실패 응답을 반환 (타임아웃 없음) |
+| **P **(Partition Tolerance, 분단 허용성) | 네트워크 분단(일부 노드 간 통신 불가)에도 시스템 계속 동작 |
 
 **실용적 관점:** 네트워크 분단(P)은 항상 발생할 수 있으므로, 실제 선택은 **C vs A** 트레이드오프:
 

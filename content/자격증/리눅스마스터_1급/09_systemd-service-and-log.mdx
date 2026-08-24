@@ -9,7 +9,7 @@ description: 'systemd의 유닛 관리와 journalctl을 통한 로그 조회 방
 
 ## systemd란?
 
-systemd는 리눅스 시스템의 **PID 1** 프로세스로, 부팅 시 가장 먼저 실행되어 모든 프로세스를 관리하는 init 시스템입니다. 기존의 SysVinit 방식을 대체하며 **유닛(Unit)** 기반으로 서비스, 소켓, 타겟 등을 관리합니다.
+systemd는 리눅스 시스템의 **PID 1** 프로세스로, 부팅 시 가장 먼저 실행되어 모든 프로세스를 관리하는 init 시스템입니다. 기존의 SysVinit 방식을 대체하며 **유닛**(Unit) 기반으로 서비스, 소켓, 타겟 등을 관리합니다.
 
 ### 주요 유닛 타입
 
@@ -93,7 +93,7 @@ systemctl list-units --state=failed
 
 ## 런레벨과 systemd 타겟
 
-SysVinit의 런레벨은 systemd에서 **타겟(target)** 으로 대체됩니다.
+SysVinit의 런레벨은 systemd에서 **타겟**(target) 으로 대체됩니다.
 
 | SysVinit 런레벨 | systemd 타겟 | 설명 |
 |---------------|-------------|------|
