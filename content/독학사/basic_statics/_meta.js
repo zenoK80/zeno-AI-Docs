@@ -16,6 +16,9 @@ const meta = {
   '15_discrete-distributions-poisson': '15. 포아송분포와 초기하분포',
   '16_normal-distribution': '16. 정규분포와 표준정규분포',
   '17_other-distributions': '17. t분포, F분포, 카이제곱분포',
+  '18_sampling-distributions': '18. 표본평균의 분포와 중심극한정리',
+  '19_point-estimation': '19. 점추정 — 불편성, 일치성, 유효성',
+  '20_interval-estimation': '20. 신뢰구간',
 }
 
 export default meta
