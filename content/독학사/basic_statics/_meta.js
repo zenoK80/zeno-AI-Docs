@@ -1,14 +1,8 @@
 const meta = {
-  '01_population-sample-and-data-types': '01. 모집단·표본과 자료의 종류',
-  '02_frequency-tables-and-graphs': '02. 도수분포표와 그래프',
-  '03_central-tendency-and-dispersion': '03. 대표값과 산포도',
-  '04_probability-basics': '04. 확률의 기초',
-  '05_conditional-probability': '05. 조건부 확률과 독립',
-  '06_discrete-probability-distribution': '06. 이산확률분포',
-  '07_normal-distribution': '07. 정규분포',
-  '08_sampling-and-estimation': '08. 표본분포와 추정',
-  '09_hypothesis-testing': '09. 가설검정',
-  '10_correlation-and-regression': '10. 상관분석과 회귀분석',
+  '01_numbers-and-fractions': '01. 수와 분수, 소수, 퍼센트',
+  '02_data-tables-and-graphs': '02. 표와 그래프 읽기',
+  '03_sigma-notation': '03. 시그마(Σ) 표기법',
+  '04_functions-and-coordinates': '04. 함수와 좌표 기초',
 }
 
 export default meta
