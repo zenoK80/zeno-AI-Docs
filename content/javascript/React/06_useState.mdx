@@ -1,0 +1,224 @@
+---
+title: '06. useState — 상태 관리'
+description: 'useState 훅으로 컴포넌트 상태를 관리하고, 불변성 원칙과 상태 업데이트 패턴을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** useState가 무엇인지, 왜 일반 변수로는 부족한지 이해하고, 객체·배열 상태를 올바르게 업데이트하는 방법을 익힙니다.
+</Callout>
+
+## 왜 일반 변수로는 화면이 바뀌지 않나?
+
+React 컴포넌트는 함수입니다. 화면에 변화가 필요하면 함수를 다시 실행(리렌더링)합니다. 하지만 함수 안의 일반 변수는 함수가 다시 실행될 때마다 초기화됩니다.
+
+```jsx
+// ❌ 일반 변수 — 화면이 바뀌지 않음
+function Counter() {
+  let count = 0  // 리렌더링 시 항상 0으로 초기화
+
+  function handleClick() {
+    count++  // 값은 바뀌지만 리렌더링이 일어나지 않음
+    console.log(count)  // 숫자는 올라가지만 화면은 그대로
+  }
+
+  return <button onClick={handleClick}>{count}</button>
+}
+```
+
+React가 화면을 다시 그리려면 두 가지가 필요합니다.
+1. **값을 기억하는 공간** (리렌더링 후에도 유지)
+2. **값이 바뀌었다는 신호** (React가 리렌더링을 실행하도록)
+
+`useState`가 이 두 가지를 모두 제공합니다.
+
+---
+
+## useState 기본 사용법
+
+```jsx
+import { useState } from 'react'
+
+function Counter() {
+  const [count, setCount] = useState(0)
+  //    [현재값, 변경함수]  초기값
+
+  return (
+    <div>
+      <p>클릭 횟수: {count}</p>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+      <button onClick={() => setCount(count - 1)}>-1</button>
+      <button onClick={() => setCount(0)}>초기화</button>
+    </div>
+  )
+}
+```
+
+`useState(0)` 이 반환하는 배열을 구조 분해 해서 `[count, setCount]` 로 받습니다.
+- `count`: 현재 상태 값 (초기에는 0)
+- `setCount(새값)`: 상태를 바꾸고 리렌더링을 요청하는 함수
+
+> **쉽게 말하면:** `useState`는 React가 관리하는 "기억 공간"입니다. 값을 바꾸면 React가 자동으로 화면을 다시 그려줍니다.
+
+---
+
+## 다양한 타입의 상태
+
+숫자 뿐만 아니라 어떤 값이든 상태로 관리할 수 있습니다.
+
+```jsx
+function Examples() {
+  const [text, setText] = useState('')              // 문자열
+  const [isVisible, setIsVisible] = useState(false) // 불리언
+  const [items, setItems] = useState([])            // 배열
+  const [user, setUser] = useState(null)            // null
+  const [form, setForm] = useState({                // 객체
+    name: '',
+    email: '',
+  })
+
+  return (
+    <div>
+      <input value={text} onChange={e => setText(e.target.value)} />
+      <button onClick={() => setIsVisible(!isVisible)}>
+        {isVisible ? '숨기기' : '보이기'}
+      </button>
+    </div>
+  )
+}
+```
+
+---
+
+## 불변성(Immutability) — 배열·객체 상태 업데이트
+
+React는 상태가 바뀌었는지 참조(메모리 주소)를 비교합니다. 배열이나 객체를 **직접 수정하면 React가 변화를 감지하지 못합니다.**
+
+```jsx
+const [items, setItems] = useState(['사과', '바나나'])
+
+// ❌ 직접 수정 — React가 변화를 감지 못함
+function addItem() {
+  items.push('포도')  // 원본 배열을 변경
+  setItems(items)     // 참조가 같아 리렌더링 안 됨
+}
+
+// ✅ 새 배열/객체를 만들어서 교체
+function addItem() {
+  setItems([...items, '포도'])  // 새 배열 생성
+}
+
+function removeItem(index) {
+  setItems(items.filter((_, i) => i !== index))  // filter로 새 배열
+}
+```
+
+**객체 상태도 마찬가지:**
+
+```jsx
+const [user, setUser] = useState({ name: '김철수', age: 25 })
+
+// ❌ 직접 수정
+user.age = 26
+setUser(user)
+
+// ✅ 스프레드로 새 객체 생성
+setUser({ ...user, age: 26 })
+```
+
+---
+
+## 함수형 업데이트 — 이전 값 기반으로 업데이트
+
+`setCount(count + 1)` 대신 **함수를 전달**하면, 이전 상태를 확실히 받아 사용할 수 있습니다. 연속 업데이트나 비동기 상황에서 안전합니다.
+
+```jsx
+// 일반 업데이트 — 클릭이 빠르면 최신 count가 아닐 수도 있음
+setCount(count + 1)
+
+// 함수형 업데이트 — prev는 항상 최신 상태
+setCount(prev => prev + 1)
+```
+
+버튼을 여러 번 빠르게 클릭하거나 `setCount`를 연달아 호출할 때는 함수형 업데이트가 더 안전합니다.
+
+---
+
+## 상태 초기값 지연 초기화
+
+초기값 계산이 무거운 경우, 함수를 전달하면 처음 마운트될 때 한 번만 실행됩니다.
+
+```jsx
+// ❌ 매 렌더링마다 heavyCalculation()이 호출됨
+const [data, setData] = useState(heavyCalculation())
+
+// ✅ 첫 렌더링에만 호출됨
+const [data, setData] = useState(() => heavyCalculation())
+```
+
+---
+
+## 핵심 정리
+
+- 일반 변수는 리렌더링 시 초기화되고, 변경해도 화면이 갱신되지 않는다.
+- `useState(초기값)`은 `[현재값, 변경함수]` 배열을 반환한다.
+- 변경 함수를 호출하면 React가 리렌더링을 트리거한다.
+- **불변성**: 배열·객체는 직접 수정하지 않고 스프레드 `...`나 `filter`, `map`으로 새 값을 만든다.
+- 이전 값 기반 업데이트에는 `setState(prev => prev + 1)` 형태가 안전하다.
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="useState(0)의 반환값을 구조 분해 할당하는 올바른 코드는?"
+  options={['①const {count, setCount} = useState(0)', '②const [count, setCount] = useState(0)', '③const count = useState(0)', '④const [count] = useState(0, setCount)']}
+  correctAnswer={2}
+  explanation="useState는 [현재값, 변경함수] 형태의 배열을 반환합니다. 배열 구조 분해로 두 값을 받습니다."
+  optionExplanations={['객체 구조 분해입니다. useState는 배열을 반환합니다.', '맞습니다. 배열 구조 분해로 현재값과 변경함수를 받습니다.', '변경함수를 받지 못합니다.', 'useState는 매개변수를 두 개 받지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="React에서 배열 상태에 새 항목을 추가할 때 올바른 방법은?"
+  options={['①items.push(newItem); setItems(items)', '②setItems(items.push(newItem))', '③setItems([...items, newItem])', '④items[items.length] = newItem; setItems(items)']}
+  correctAnswer={3}
+  explanation="배열을 직접 수정하면 React가 변화를 감지하지 못합니다. 스프레드 연산자로 새 배열을 만들어야 합니다."
+  optionExplanations={['push는 원본 배열을 수정합니다. 참조가 같아 리렌더링되지 않습니다.', 'push의 반환값은 배열의 새 길이(숫자)입니다. 상태가 숫자로 바뀝니다.', '맞습니다. 스프레드로 새 배열을 만들어 교체합니다.', '직접 인덱스로 수정하면 참조가 같아 리렌더링되지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="객체 상태에서 특정 속성만 변경하는 올바른 방법은?"
+  options={['①setUser(user.name = 새이름)', '②user.name = 새이름; setUser(user)', '③setUser({...user, name: 새이름})', '④setUser(Object.assign(user, {name: 새이름}))']}
+  correctAnswer={3}
+  explanation="스프레드 연산자로 기존 객체를 복사하고 변경할 속성만 덮어씁니다. Object.assign도 원본을 수정하므로 권장하지 않습니다."
+  optionExplanations={['할당 표현식의 반환값은 할당된 값(문자열)입니다. 상태가 문자열이 됩니다.', '원본 객체를 수정하므로 React가 변화를 감지하지 못합니다.', '맞습니다. 스프레드로 새 객체를 만들어 교체합니다.', 'Object.assign은 첫 번째 인수를 수정합니다. 참조가 같아 리렌더링되지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="함수형 업데이트 setCount(prev => prev + 1)를 사용하는 주된 이유는?"
+  options={['①문법이 더 짧아서', '②연속 상태 업데이트 시 최신 상태 값을 확실히 참조하기 위해', '③배열 상태에만 작동하기 때문에', '④초기값을 지정할 수 있기 때문에']}
+  correctAnswer={2}
+  explanation="함수형 업데이트는 React가 상태를 일괄 처리할 때도 가장 최신 상태 값을 prev로 받아서 사용합니다. 클로저 문제를 방지합니다."
+  optionExplanations={['코드 길이는 이유가 아닙니다.', '맞습니다. 비동기 상황이나 연속 업데이트에서 안전합니다.', '어떤 타입의 상태에도 사용할 수 있습니다.', '초기값 지정은 useState의 매개변수로 합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="초기값이 무거운 계산일 때 성능을 최적화하는 방법은?"
+  options={['①useState(heavyCalc())', '②useState(() => heavyCalc())', '③useEffect(() => heavyCalc(), [])', '④useMemo(() => heavyCalc())']}
+  correctAnswer={2}
+  explanation="함수를 전달하면 React가 첫 렌더링에만 호출합니다. heavyCalc()처럼 직접 호출하면 매 렌더링마다 계산됩니다."
+  optionExplanations={['매 렌더링마다 heavyCalc()이 실행됩니다.', '맞습니다. 함수를 전달하면 첫 렌더링에만 실행됩니다.', 'useEffect는 렌더링 후 실행됩니다. 초기값 설정에 적합하지 않습니다.', 'useMemo는 계산 결과를 메모이제이션하는 다른 훅입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="다음 중 useState에 대한 설명으로 틀린 것은?"
+  options={['①훅이므로 컴포넌트 함수 최상위에서 호출해야 한다', '②하나의 컴포넌트에 여러 useState를 사용할 수 있다', '③상태를 직접 변경해도 리렌더링이 발생한다', '④초기값은 첫 렌더링에만 사용된다']}
+  correctAnswer={3}
+  explanation="상태를 직접 변경(예: count = 1)해도 React는 리렌더링하지 않습니다. 반드시 setCount처럼 변경 함수를 호출해야 합니다."
+  optionExplanations={['훅 규칙: 최상위에서만 호출해야 합니다.', '한 컴포넌트에 여러 useState를 쓸 수 있습니다.', '틀렸습니다. 변경 함수를 통해야만 리렌더링이 발생합니다.', '초기값은 처음 마운트 시에만 사용됩니다.']}
+/>

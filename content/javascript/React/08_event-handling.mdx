@@ -1,0 +1,248 @@
+---
+title: '08. 이벤트 처리'
+description: 'React의 이벤트 핸들러, 합성 이벤트, 폼 이벤트, 이벤트 버블링을 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** React에서 이벤트를 처리하는 방법, HTML 이벤트와의 차이점, 입력 값 다루기, 이벤트 전파 제어를 익힙니다.
+</Callout>
+
+## React 이벤트 핸들러
+
+HTML에서는 `onclick="함수()"` 처럼 문자열로 이벤트를 등록합니다. React에서는 JSX prop으로 **함수를 직접 전달**합니다.
+
+```jsx
+// HTML 방식
+<button onclick="handleClick()">클릭</button>
+
+// React 방식
+function Button() {
+  function handleClick() {
+    alert('클릭!')
+  }
+
+  return <button onClick={handleClick}>클릭</button>
+}
+```
+
+주요 차이점:
+- 이벤트 이름은 **camelCase**: `onclick` → `onClick`, `onchange` → `onChange`
+- **함수를 전달**하지 문자열을 전달하지 않는다
+- `onClick={handleClick}` — 괄호 없이 함수 자체를 전달. `onClick={handleClick()}` 은 실행 결과(보통 undefined)를 전달.
+
+---
+
+## 합성 이벤트 (SyntheticEvent)
+
+React는 브라우저마다 다른 이벤트를 **합성 이벤트(SyntheticEvent)** 로 통일합니다. 덕분에 크로스 브라우저 호환성 걱정 없이 `event.target.value` 같은 표준 속성을 씁니다.
+
+```jsx
+function InputExample() {
+  function handleChange(event) {
+    console.log(event.target.value)  // 입력된 값
+    console.log(event.type)          // 'change'
+  }
+
+  return <input onChange={handleChange} />
+}
+```
+
+---
+
+## 자주 쓰는 이벤트 핸들러
+
+```jsx
+function EventExamples() {
+  return (
+    <div>
+      {/* 마우스 이벤트 */}
+      <button onClick={() => console.log('클릭')}>클릭</button>
+      <div onMouseEnter={() => console.log('마우스 올림')}>호버</div>
+
+      {/* 키보드 이벤트 */}
+      <input
+        onKeyDown={e => {
+          if (e.key === 'Enter') console.log('엔터 키 누름')
+        }}
+      />
+
+      {/* 폼 이벤트 */}
+      <input onChange={e => console.log(e.target.value)} />
+
+      {/* 포커스 이벤트 */}
+      <input
+        onFocus={() => console.log('포커스 들어옴')}
+        onBlur={() => console.log('포커스 나감')}
+      />
+    </div>
+  )
+}
+```
+
+---
+
+## 이벤트 핸들러에 인수 전달하기
+
+이벤트 핸들러에 추가 데이터를 전달하려면 화살표 함수로 감쌉니다.
+
+```jsx
+function ItemList() {
+  const items = ['사과', '바나나', '포도']
+
+  function handleDelete(itemName) {
+    console.log(`${itemName} 삭제`)
+  }
+
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item}>
+          {item}
+          {/* 화살표 함수로 감싸서 인수 전달 */}
+          <button onClick={() => handleDelete(item)}>삭제</button>
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+---
+
+## 이벤트 버블링과 전파 제어
+
+**이벤트 버블링(Event Bubbling)** 은 자식 요소의 이벤트가 부모 요소로 전파되는 현상입니다.
+
+```jsx
+function BubblingExample() {
+  return (
+    <div onClick={() => console.log('div 클릭됨')}>
+      <button onClick={() => console.log('button 클릭됨')}>
+        클릭
+      </button>
+    </div>
+  )
+}
+// 버튼 클릭 시: "button 클릭됨" → "div 클릭됨" 순서로 출력
+```
+
+전파를 막으려면 `event.stopPropagation()`을 호출합니다.
+
+```jsx
+<button onClick={e => {
+  e.stopPropagation()  // 부모로 전파 차단
+  console.log('button만 실행됨')
+}}>
+  클릭
+</button>
+```
+
+폼의 기본 동작(페이지 새로고침)을 막으려면 `event.preventDefault()`를 사용합니다.
+
+```jsx
+function LoginForm() {
+  function handleSubmit(e) {
+    e.preventDefault()  // 폼 기본 제출 동작 차단
+    console.log('폼 제출')
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="email" />
+      <button type="submit">로그인</button>
+    </form>
+  )
+}
+```
+
+---
+
+## 이벤트 핸들러와 상태 함께 사용
+
+이벤트 핸들러에서 상태를 바꾸면 리렌더링이 일어납니다.
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div>
+      <p>카운트: {count}</p>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+      <button onClick={() => setCount(count - 1)}>-1</button>
+    </div>
+  )
+}
+
+function ToggleButton() {
+  const [isOn, setIsOn] = useState(false)
+
+  return (
+    <button
+      onClick={() => setIsOn(!isOn)}
+      style={{ backgroundColor: isOn ? 'green' : 'gray' }}
+    >
+      {isOn ? '켜짐' : '꺼짐'}
+    </button>
+  )
+}
+```
+
+---
+
+## 핵심 정리
+
+- React 이벤트 이름은 **camelCase**: `onClick`, `onChange`, `onKeyDown` 등.
+- 이벤트 핸들러에 **함수를 전달**. `onClick={fn}` (O), `onClick={fn()}` (X).
+- React가 합성 이벤트로 브라우저 차이를 통일. `e.target.value`로 입력 값 접근.
+- 추가 인수 전달: `onClick={() => fn(인수)}` 화살표 함수로 감싸기.
+- `e.stopPropagation()`: 이벤트 버블링 차단. `e.preventDefault()`: 기본 동작 차단.
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="React에서 버튼 클릭 이벤트를 등록하는 올바른 방법은?"
+  options={['①onclick={handleClick}', '②onClick=handleClick', '③onClick={handleClick}', '④onClick={handleClick()}']}
+  correctAnswer={3}
+  explanation="React에서 이벤트는 camelCase로 쓰고, 함수를 중괄호 안에 전달합니다. handleClick()은 함수를 즉시 실행한 결과(보통 undefined)를 전달합니다."
+  optionExplanations={['onclick은 HTML 방식입니다. JSX에서는 camelCase인 onClick을 씁니다.', '중괄호가 없으면 문자열로 처리됩니다.', '맞습니다. camelCase + 함수 참조를 중괄호로 전달합니다.', '()를 붙이면 렌더링 시 즉시 실행됩니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="이벤트 핸들러에서 event.target.value를 사용하는 이유는?"
+  options={['①이벤트 타입을 확인하기 위해', '②이벤트를 발생시킨 DOM 요소의 현재 값을 가져오기 위해', '③이벤트를 취소하기 위해', '④부모 요소로 이벤트를 전달하기 위해']}
+  correctAnswer={2}
+  explanation="event.target은 이벤트를 발생시킨 DOM 요소입니다. input 요소의 경우 event.target.value로 현재 입력된 값을 가져옵니다."
+  optionExplanations={['이벤트 타입은 event.type으로 확인합니다.', '맞습니다. 이벤트 발생 요소의 현재 값을 읽습니다.', '이벤트 취소는 preventDefault()로 합니다.', '이벤트 전달은 버블링이 자동으로 처리합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="폼 제출 시 페이지 새로고침을 막으려면?"
+  options={['①event.stopPropagation()', '②event.preventDefault()', '③return false', '④event.cancel()']}
+  correctAnswer={2}
+  explanation="event.preventDefault()는 이벤트의 기본 동작을 막습니다. 폼의 경우 페이지를 새로고침하는 기본 제출 동작을 막아줍니다."
+  optionExplanations={['stopPropagation은 이벤트 버블링(부모로 전파)을 막습니다.', '맞습니다. preventDefault가 기본 동작을 차단합니다.', 'return false는 일반 JS 이벤트 핸들러에서만 작동합니다. React에서는 효과 없습니다.', 'event.cancel()은 존재하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="이벤트 핸들러에 추가 데이터를 전달하는 올바른 방법은?"
+  options={['①onClick={handleClick(id)}', '②onClick={() => handleClick(id)}', '③onClick={handleClick, id}', '④onClick={handleClick.bind(id)}']}
+  correctAnswer={2}
+  explanation="화살표 함수로 감싸면 클릭 시 인수와 함께 핸들러를 호출할 수 있습니다. onClick={handleClick(id)}는 렌더링 시 즉시 실행됩니다."
+  optionExplanations={['렌더링 시 즉시 실행되는 형태입니다.', '맞습니다. 화살표 함수로 감싸서 클릭 시 호출합니다.', '이 문법은 JSX에서 지원되지 않습니다.', 'bind의 첫 번째 인수는 this 컨텍스트입니다. bind(null, id) 형태가 더 적합하나 화살표 함수가 더 명확합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="자식 버튼을 클릭했을 때 부모 div의 onClick도 실행되는 현상은?"
+  options={['①이벤트 캡처링', '②이벤트 버블링', '③이벤트 위임', '④이벤트 전달']}
+  correctAnswer={2}
+  explanation="이벤트 버블링은 자식 요소에서 발생한 이벤트가 부모 방향으로 전파되는 현상입니다. stopPropagation()으로 막을 수 있습니다."
+  optionExplanations={['이벤트 캡처링은 부모에서 자식 방향으로의 전파 단계입니다.', '맞습니다. 자식 → 부모 방향으로 전파되는 버블링입니다.', '이벤트 위임은 부모에 이벤트를 등록해 자식 이벤트를 처리하는 패턴입니다.', '정확한 용어가 아닙니다.']}
+/>

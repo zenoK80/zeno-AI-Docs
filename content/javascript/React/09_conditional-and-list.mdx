@@ -1,0 +1,289 @@
+---
+title: '09. 조건부 렌더링과 리스트'
+description: '복잡한 조건부 렌더링 패턴, 리스트 렌더링, 빈 상태(empty state) 처리를 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 삼항 연산자와 논리 연산자를 넘어 복잡한 조건부 렌더링 패턴을 다루고, 실무에서 자주 쓰는 리스트 렌더링과 빈 상태 처리 방법을 익힙니다.
+</Callout>
+
+## 조건부 렌더링 패턴 정리
+
+04장 JSX에서 기본을 익혔습니다. 여기서는 더 복잡한 상황을 다룹니다.
+
+### 삼항 연산자
+
+두 가지 중 하나를 선택할 때 씁니다.
+
+```jsx
+function LoginButton({ isLoggedIn }) {
+  return (
+    <button>
+      {isLoggedIn ? '로그아웃' : '로그인'}
+    </button>
+  )
+}
+```
+
+### 논리 AND(`&&`) — 하나만 있을 때
+
+```jsx
+function Notification({ count }) {
+  return (
+    <div>
+      <p>메일함</p>
+      {count > 0 && <span className="badge">{count}</span>}
+    </div>
+  )
+}
+```
+
+### 변수로 꺼내기 — 복잡한 조건일 때
+
+JSX가 길어지면 변수에 먼저 담습니다.
+
+```jsx
+function UserStatus({ user, isLoading, error }) {
+  let content
+
+  if (isLoading) {
+    content = <p>불러오는 중...</p>
+  } else if (error) {
+    content = <p className="error">오류: {error}</p>
+  } else if (!user) {
+    content = <p>사용자를 찾을 수 없습니다.</p>
+  } else {
+    content = (
+      <div>
+        <h2>{user.name}</h2>
+        <p>{user.email}</p>
+      </div>
+    )
+  }
+
+  return <div className="status">{content}</div>
+}
+```
+
+### 즉시 실행 함수 패턴
+
+JSX 안에서 바로 if 로직을 쓰고 싶을 때 사용합니다.
+
+```jsx
+function Example({ status }) {
+  return (
+    <div>
+      {(() => {
+        if (status === 'loading') return <Spinner />
+        if (status === 'error') return <ErrorMessage />
+        return <Content />
+      })()}
+    </div>
+  )
+}
+```
+
+---
+
+## 리스트 렌더링 심화
+
+### 중첩 리스트
+
+```jsx
+const categories = [
+  {
+    id: 1,
+    name: '과일',
+    items: ['사과', '바나나', '포도'],
+  },
+  {
+    id: 2,
+    name: '채소',
+    items: ['당근', '브로콜리'],
+  },
+]
+
+function CategoryList() {
+  return (
+    <ul>
+      {categories.map(category => (
+        <li key={category.id}>
+          <h3>{category.name}</h3>
+          <ul>
+            {category.items.map(item => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+### filter + map 조합 — 조건부 리스트
+
+```jsx
+function ActiveUserList({ users }) {
+  return (
+    <ul>
+      {users
+        .filter(user => user.isActive)
+        .map(user => (
+          <li key={user.id}>{user.name}</li>
+        ))
+      }
+    </ul>
+  )
+}
+```
+
+---
+
+## 빈 상태 처리 (Empty State)
+
+리스트가 비었을 때 아무것도 표시 안 하면 사용자는 오류인지 정상인지 알 수 없습니다. 빈 상태 메시지를 항상 제공하세요.
+
+```jsx
+function TodoList({ todos }) {
+  if (todos.length === 0) {
+    return (
+      <div className="empty-state">
+        <p>아직 할 일이 없습니다.</p>
+        <p>새 할 일을 추가해 보세요!</p>
+      </div>
+    )
+  }
+
+  return (
+    <ul>
+      {todos.map(todo => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+또는 한 컴포넌트 안에서 처리:
+
+```jsx
+function ProductList({ products }) {
+  return (
+    <section>
+      <h2>상품 목록</h2>
+      {products.length === 0 ? (
+        <p>상품이 없습니다.</p>
+      ) : (
+        <ul>
+          {products.map(product => (
+            <li key={product.id}>
+              {product.name} — {product.price.toLocaleString()}원
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+```
+
+---
+
+## 로딩·에러·빈 상태 삼중 처리
+
+실무에서 가장 흔한 리스트 컴포넌트 패턴입니다.
+
+```jsx
+function ArticleList() {
+  const [articles, setArticles] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch('/api/articles')
+        const data = await res.json()
+        setArticles(data)
+      } catch {
+        setError('기사를 불러오지 못했습니다.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  if (loading) return <p>로딩 중...</p>
+  if (error) return <p>{error}</p>
+  if (articles.length === 0) return <p>기사가 없습니다.</p>
+
+  return (
+    <ul>
+      {articles.map(article => (
+        <li key={article.id}>{article.title}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+---
+
+## 핵심 정리
+
+- 간단한 조건 → 삼항(`? :`), 있을 때만 렌더링 → `&&`, 복잡한 조건 → 변수로 꺼내기.
+- 리스트 렌더링: `.map()` + `key` prop. 중첩 리스트도 중첩 `.map()` 사용.
+- `.filter()` + `.map()` 조합으로 조건부 리스트 렌더링.
+- **빈 상태(empty state)**: 리스트가 비었을 때 사용자에게 알려주는 UI를 항상 제공.
+- 실무 패턴: 로딩 → 에러 → 빈 상태 → 데이터 순서로 처리.
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="JSX 안에서 복잡한 if-else 로직을 처리하는 가장 명확한 방법은?"
+  options={['①JSX 안에 if-else 직접 작성', '②&&와 삼항 연산자를 중첩해서 사용', '③렌더링할 내용을 변수에 담아 return 앞에서 결정', '④별도 컴포넌트를 만들어 조건을 props로 전달']}
+  correctAnswer={3}
+  explanation="복잡한 조건은 JSX 밖에서 변수로 먼저 결정하고, return에서는 그 변수를 렌더링하면 코드가 명확해집니다."
+  optionExplanations={['if-else 문은 JSX {} 안에 직접 쓸 수 없습니다.', '연산자 중첩은 코드가 읽기 어려워집니다.', '맞습니다. 변수로 꺼내는 방식이 가장 명확합니다.', '별도 컴포넌트도 좋은 방법이지만 항상 필요하지는 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="users 배열에서 isActive가 true인 항목만 렌더링하는 올바른 코드는?"
+  options={['①users.map(u => u.isActive && li)', '②users.filter(u => u.isActive).map(u => li)', '③users.find(u => u.isActive).map(u => li)', '④users.some(u => u.isActive).map(u => li)']}
+  correctAnswer={2}
+  explanation="filter로 조건에 맞는 항목만 추린 뒤 map으로 JSX를 생성합니다. find는 항목 하나만, some은 boolean을 반환합니다."
+  optionExplanations={['map 안에서 &&를 쓰면 false가 렌더링될 수 있습니다.', '맞습니다. filter로 걸러내고 map으로 렌더링합니다.', 'find는 조건을 만족하는 항목 하나만 반환합니다.', 'some은 조건을 하나라도 만족하는지 boolean으로 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="리스트 컴포넌트에서 빈 배열일 때 처리해야 하는 이유는?"
+  options={['①빈 배열을 map하면 에러가 나기 때문에', '②사용자가 로딩 실패인지 데이터 없음인지 구분할 수 있도록', '③React가 빈 배열을 렌더링하지 않기 때문에', '④빈 배열에서 key가 필요하기 때문에']}
+  correctAnswer={2}
+  explanation="빈 배열을 map하면 아무것도 렌더링되지 않습니다. 사용자는 데이터가 없는 건지 로딩 중인지 오류인지 알 수 없습니다. 빈 상태 메시지를 보여주면 UX가 개선됩니다."
+  optionExplanations={['빈 배열에서 map을 호출해도 에러가 나지 않습니다.', '맞습니다. 빈 상태를 명확히 알려줘야 좋은 UX입니다.', 'React는 빈 배열 map 결과인 빈 JSX를 정상적으로 렌더링합니다.', '빈 배열에서는 key가 필요하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="실무에서 리스트 데이터 패칭 시 처리해야 하는 세 가지 상태를 순서대로 나열한 것은?"
+  options={['①에러 → 로딩 → 데이터', '②데이터 → 로딩 → 에러', '③로딩 → 에러 → 데이터', '④로딩 → 데이터 → 에러']}
+  correctAnswer={3}
+  explanation="먼저 로딩 중인지 확인하고, 에러가 있으면 표시하고, 정상이면 데이터를 렌더링합니다. 로딩 확인을 먼저 해야 데이터가 없는 상태에서의 오류를 방지합니다."
+  optionExplanations={['로딩 상태를 먼저 처리해야 데이터 없는 상태의 오류를 방지합니다.', '로딩 중에는 아직 데이터가 없습니다.', '맞습니다. 로딩 → 에러 → 데이터 순서가 안전합니다.', '에러 상태도 확인해야 합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="중첩 배열을 렌더링할 때 안쪽 배열의 key는 어떤 범위에서 고유해야 하나?"
+  options={['①전체 앱에서 고유해야 한다', '②같은 부모 안의 형제 요소끼리 고유하면 된다', '③전체 컴포넌트 트리에서 고유해야 한다', '④화면에 보이는 요소끼리 고유하면 된다']}
+  correctAnswer={2}
+  explanation="key는 같은 부모 요소의 형제 요소들 사이에서만 고유하면 됩니다. 다른 부모 아래의 요소들과는 중복이 허용됩니다."
+  optionExplanations={['전체 앱 수준의 고유성은 필요하지 않습니다.', '맞습니다. 형제 요소끼리 고유하면 충분합니다.', '전체 트리에서 고유할 필요는 없습니다.', '화면 표시 여부가 아닌 형제 관계가 기준입니다.']}
+/>

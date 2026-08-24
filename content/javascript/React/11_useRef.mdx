@@ -1,0 +1,229 @@
+---
+title: '11. useRef — DOM 접근과 값 유지'
+description: 'useRef로 DOM 요소에 직접 접근하고, 렌더링 없이 값을 유지하는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** useRef가 무엇인지, DOM에 직접 접근할 때 언제 쓰는지, useState와의 차이(리렌더링 유발 여부)를 이해합니다.
+</Callout>
+
+## useRef란?
+
+`useRef`는 두 가지 용도로 쓰입니다.
+
+1. **DOM 요소에 직접 접근** — 포커스 이동, 스크롤, 미디어 재생 등
+2. **리렌더링 없이 값을 보관** — 이전 값 기억, 타이머 ID 저장 등
+
+`useRef(초기값)` 는 `{ current: 초기값 }` 형태의 객체를 반환합니다. `current` 값을 바꿔도 리렌더링이 일어나지 않습니다.
+
+> **쉽게 말하면:** `useRef`는 컴포넌트 함수 밖에 있는 "메모장"입니다. 적어도 화면이 바뀌지 않고, 함수가 재실행돼도 값이 유지됩니다.
+
+---
+
+## DOM 접근 — input 포커스
+
+```jsx
+function AutoFocusInput() {
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    // 컴포넌트가 마운트되면 자동 포커스
+    inputRef.current.focus()
+  }, [])
+
+  return (
+    <div>
+      <input ref={inputRef} type="text" placeholder="자동 포커스" />
+      <button onClick={() => inputRef.current.focus()}>
+        다시 포커스
+      </button>
+    </div>
+  )
+}
+```
+
+`ref={inputRef}` 로 DOM 요소에 ref를 연결하면, `inputRef.current` 가 실제 DOM 요소를 가리킵니다.
+
+---
+
+## DOM 접근 — 스크롤·미디어 제어
+
+```jsx
+function VideoPlayer() {
+  const videoRef = useRef(null)
+
+  function handlePlay() {
+    videoRef.current.play()
+  }
+
+  function handlePause() {
+    videoRef.current.pause()
+  }
+
+  return (
+    <div>
+      <video ref={videoRef} src="/video.mp4" />
+      <button onClick={handlePlay}>재생</button>
+      <button onClick={handlePause}>일시정지</button>
+    </div>
+  )
+}
+
+function ScrollToBottom() {
+  const bottomRef = useRef(null)
+
+  function scrollDown() {
+    bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  return (
+    <div>
+      <p>긴 내용...</p>
+      <button onClick={scrollDown}>맨 아래로</button>
+      <div ref={bottomRef} />
+    </div>
+  )
+}
+```
+
+---
+
+## 렌더링 없이 값 보관
+
+`useState`와 달리 `useRef`의 `current`를 바꿔도 리렌더링이 일어나지 않습니다. 타이머 ID, 이전 값, 렌더링 횟수 같은 것을 저장할 때 씁니다.
+
+```jsx
+// 타이머 ID 저장 — 나중에 clearInterval로 멈추기
+function StopwatchWithRef() {
+  const [seconds, setSeconds] = useState(0)
+  const [running, setRunning] = useState(false)
+  const timerRef = useRef(null)  // 타이머 ID 보관
+
+  function start() {
+    setRunning(true)
+    timerRef.current = setInterval(() => {
+      setSeconds(prev => prev + 1)
+    }, 1000)
+  }
+
+  function stop() {
+    setRunning(false)
+    clearInterval(timerRef.current)
+  }
+
+  return (
+    <div>
+      <p>{seconds}초</p>
+      <button onClick={start} disabled={running}>시작</button>
+      <button onClick={stop} disabled={!running}>정지</button>
+    </div>
+  )
+}
+```
+
+---
+
+## useState vs useRef 비교
+
+| 기준 | useState | useRef |
+| --- | --- | --- |
+| 값 변경 시 | 리렌더링 발생 | 리렌더링 없음 |
+| 주요 용도 | 화면에 표시되는 데이터 | DOM 접근, 타이머 ID, 이전 값 |
+| 값 읽기 | `state` | `ref.current` |
+
+```jsx
+// ❌ 렌더링 횟수를 useState로 세면 무한 루프
+function RenderCount() {
+  const [count, setCount] = useState(0)
+  // setCount(count + 1)를 렌더링 중에 호출하면 또 렌더링 → 무한 루프
+
+  // ✅ useRef를 쓰면 렌더링 없이 카운트 유지
+  const renderCount = useRef(0)
+  renderCount.current++
+
+  return <p>렌더링 횟수: {renderCount.current}</p>
+}
+```
+
+---
+
+## 이전 값 기억
+
+현재 값과 이전 값을 함께 보여주고 싶을 때 useRef로 이전 값을 저장합니다.
+
+```jsx
+function PreviousValue() {
+  const [count, setCount] = useState(0)
+  const prevCountRef = useRef(null)
+
+  useEffect(() => {
+    prevCountRef.current = count  // 렌더링 후 현재 값을 저장
+  })
+
+  return (
+    <div>
+      <p>현재: {count}</p>
+      <p>이전: {prevCountRef.current}</p>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+    </div>
+  )
+}
+```
+
+---
+
+## 핵심 정리
+
+- `useRef`는 `{ current: 값 }` 객체를 반환. `current` 변경 시 리렌더링 없음.
+- `ref={refObject}` 로 DOM 요소에 연결하면 `refObject.current`가 DOM 요소.
+- **DOM 접근 용도**: 포커스, 스크롤, 미디어 재생 등 React가 직접 제어하기 어려운 DOM 작업.
+- **값 보관 용도**: 타이머 ID, 이전 값, 렌더링 횟수 등 화면에 영향 없는 내부 데이터.
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="useRef가 반환하는 값의 형태는?"
+  options={['①현재 값만 담은 변수', '②[현재값, 변경함수] 배열', '③{ current: 초기값 } 객체', '④Promise 객체']}
+  correctAnswer={3}
+  explanation="useRef(초기값)는 { current: 초기값 } 형태의 객체를 반환합니다. current 속성을 통해 값에 접근하고 변경합니다."
+  optionExplanations={['단순 변수가 아니라 current 속성을 가진 객체입니다.', '[현재값, 변경함수]는 useState의 반환값입니다.', '맞습니다. { current: 초기값 } 객체를 반환합니다.', 'Promise가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="useRef와 useState의 가장 큰 차이는?"
+  options={['①useRef는 문자열만 저장 가능', '②useRef의 current를 변경해도 리렌더링이 발생하지 않는다', '③useRef는 초기값을 설정할 수 없다', '④useState는 DOM 접근에 사용할 수 없다']}
+  correctAnswer={2}
+  explanation="useState는 값을 변경하면 리렌더링이 발생합니다. useRef의 current는 변경해도 리렌더링이 없습니다. 화면에 표시할 데이터는 useState, 내부 값 보관은 useRef를 씁니다."
+  optionExplanations={['useRef는 어떤 타입이든 저장할 수 있습니다.', '맞습니다. 리렌더링 여부가 핵심 차이입니다.', 'useRef도 초기값을 설정할 수 있습니다.', 'useState도 DOM 자체는 건드리지 않지만, 이 설명은 핵심 차이가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="useRef로 input 요소에 포커스를 주는 올바른 코드는?"
+  options={['①inputRef.focus()', '②inputRef.current().focus()', '③inputRef.current.focus()', '④inputRef.value.focus()']}
+  correctAnswer={3}
+  explanation="ref 객체의 current 속성이 실제 DOM 요소를 가리킵니다. DOM 메서드(focus, blur, click 등)는 current에서 호출합니다."
+  optionExplanations={['ref 자체에는 focus 메서드가 없습니다.', 'current는 함수가 아닙니다.', '맞습니다. inputRef.current가 DOM 요소이므로 .focus()를 호출합니다.', 'value는 ref 객체의 속성이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="타이머 ID를 useRef로 저장하는 이유는?"
+  options={['①타이머 ID는 문자열이기 때문에', '②useState로 저장하면 타이머가 작동하지 않기 때문에', '③타이머 ID 변경 시 화면을 갱신할 필요가 없기 때문에', '④setInterval이 useRef와만 호환되기 때문에']}
+  correctAnswer={3}
+  explanation="타이머 ID는 clearInterval 호출 시 필요한 내부 데이터입니다. 화면에 표시되지 않으므로 변경해도 리렌더링이 필요 없습니다. useRef가 적합합니다."
+  optionExplanations={['타이머 ID는 숫자입니다.', 'useState로 저장해도 타이머는 작동합니다. 다만 불필요한 리렌더링이 생깁니다.', '맞습니다. 화면과 무관한 내부 데이터라 useRef가 적합합니다.', 'setInterval은 어디서든 사용할 수 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="컴포넌트 마운트 시 input에 자동으로 포커스를 주려면?"
+  options={['①render 메서드에서 inputRef.current.focus() 호출', '②useEffect(() => { inputRef.current.focus() }, []) 사용', '③input에 autoFocus 속성 사용 (HTML 속성)', '④②와 ③ 둘 다 가능']}
+  correctAnswer={4}
+  explanation="useEffect + ref로 포커스를 주거나, HTML의 autoFocus 속성을 JSX에서 그대로 쓸 수 있습니다. 두 방법 모두 마운트 시 포커스를 줍니다."
+  optionExplanations={['함수형 컴포넌트에는 render 메서드가 없습니다.', '가능합니다. 하지만 autoFocus 속성도 있습니다.', 'autoFocus도 가능합니다. 하지만 useEffect로도 가능합니다.', '맞습니다. 두 방법 모두 동작합니다.']}
+/>

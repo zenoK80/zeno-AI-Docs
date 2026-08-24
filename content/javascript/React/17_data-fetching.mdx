@@ -1,0 +1,257 @@
+---
+title: '17. 데이터 패칭'
+description: 'useEffect로 데이터 패칭, 로딩·에러 상태 관리, 경쟁 조건 방지 패턴을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 서버에서 데이터를 가져오는 다양한 패턴을 이해하고, 로딩/에러 상태 처리, 경쟁 조건 방지, 캐시 전략의 기초를 익힙니다.
+</Callout>
+
+## 기본 데이터 패칭 패턴
+
+07장 useEffect에서 패칭 기본을 익혔습니다. 여기서는 실무 패턴을 더 자세히 다룹니다.
+
+```jsx
+function useData(url) {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false  // 경쟁 조건 방지
+
+    async function fetchData() {
+      try {
+        setLoading(true)
+        setError(null)
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const json = await res.json()
+        if (!cancelled) setData(json)
+      } catch (err) {
+        if (!cancelled) setError(err.message)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    fetchData()
+
+    return () => { cancelled = true }  // 클린업: 응답 무시
+  }, [url])
+
+  return { data, loading, error }
+}
+```
+
+---
+
+## 경쟁 조건 (Race Condition)
+
+사용자가 빠르게 탭을 바꾸면 두 개의 요청이 동시에 진행됩니다. 두 번째 요청이 첫 번째보다 먼저 도착하면 잘못된 데이터가 표시됩니다.
+
+```
+클릭 A → 요청 A 시작 (느림)
+클릭 B → 요청 B 시작 (빠름)
+요청 B 완료 → B 데이터 표시
+요청 A 완료 → ⚠️ A 데이터가 B 위에 덮여씀
+```
+
+**해결책: `cancelled` 플래그 또는 `AbortController`**
+
+```jsx
+useEffect(() => {
+  const controller = new AbortController()
+
+  async function fetchData() {
+    try {
+      const res = await fetch(url, { signal: controller.signal })
+      const data = await res.json()
+      setData(data)
+    } catch (err) {
+      if (err.name !== 'AbortError') setError(err.message)
+    }
+  }
+
+  fetchData()
+  return () => controller.abort()  // 이전 요청 취소
+}, [url])
+```
+
+`AbortController`를 쓰면 클린업 시 네트워크 요청 자체를 취소합니다.
+
+---
+
+## 재시도 패턴
+
+API 요청 실패 시 재시도 버튼을 제공합니다.
+
+```jsx
+function RetryExample() {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [retryCount, setRetryCount] = useState(0)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true)
+        setError(null)
+        const res = await fetch('/api/data')
+        const json = await res.json()
+        setData(json)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [retryCount])  // retryCount가 바뀌면 다시 실행
+
+  if (loading) return <p>로딩 중...</p>
+  if (error) return (
+    <div>
+      <p>오류: {error}</p>
+      <button onClick={() => setRetryCount(c => c + 1)}>다시 시도</button>
+    </div>
+  )
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+```
+
+---
+
+## POST 요청 — 데이터 전송
+
+`GET`이 아닌 `POST`로 데이터를 보낼 때:
+
+```jsx
+function CreatePostForm() {
+  const [title, setTitle] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(null)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }),
+      })
+      if (!res.ok) throw new Error('게시물 생성 실패')
+      const newPost = await res.json()
+      console.log('생성됨:', newPost)
+      setTitle('')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        placeholder="제목"
+      />
+      <button type="submit" disabled={submitting}>
+        {submitting ? '저장 중...' : '게시물 작성'}
+      </button>
+      {error && <p>{error}</p>}
+    </form>
+  )
+}
+```
+
+---
+
+## TanStack Query 소개
+
+실무에서는 직접 useEffect로 패칭하는 대신 **TanStack Query(구 React Query)** 를 많이 씁니다.
+
+```jsx
+// 설치: npm install @tanstack/react-query
+
+import { useQuery } from '@tanstack/react-query'
+
+function UserList() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => fetch('/api/users').then(r => r.json()),
+  })
+
+  if (isLoading) return <p>로딩 중...</p>
+  if (error) return <p>에러: {error.message}</p>
+
+  return <ul>{data.map(u => <li key={u.id}>{u.name}</li>)}</ul>
+}
+```
+
+TanStack Query는 캐싱, 자동 재시도, 백그라운드 업데이트, 경쟁 조건 처리를 자동으로 해줍니다.
+
+---
+
+## 핵심 정리
+
+- 패칭 패턴: `loading` + `error` + `data` 세 상태로 관리.
+- **경쟁 조건**: `cancelled` 플래그 또는 `AbortController`로 이전 요청 무효화.
+- 재시도: 별도 `retryCount` state를 의존성에 넣어 이펙트 재실행.
+- POST 요청: `fetch`의 `method`, `headers`, `body` 옵션 사용.
+- 실무: TanStack Query 같은 라이브러리로 복잡성 줄이기.
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="데이터 패칭에서 경쟁 조건(Race Condition)이 발생하는 상황은?"
+  options={['①인터넷 연결이 느릴 때', '②컴포넌트가 빠르게 마운트·언마운트되거나 의존성이 빠르게 바뀌어 여러 요청이 동시에 진행될 때', '③useState를 잘못 사용할 때', '④API 서버가 오류를 반환할 때']}
+  correctAnswer={2}
+  explanation="사용자가 탭을 빠르게 전환하면 이전 요청 결과가 이후 요청 결과를 덮어쓸 수 있습니다. 이를 경쟁 조건이라 합니다."
+  optionExplanations={['느린 연결이 경쟁 조건을 악화시킬 수 있지만 주원인은 아닙니다.', '맞습니다. 여러 요청이 겹칠 때 응답 순서가 달라질 수 있습니다.', 'useState 사용과는 직접 관련 없습니다.', 'API 오류는 경쟁 조건과 다른 문제입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="AbortController를 useEffect 클린업에서 사용하는 이유는?"
+  options={['①메모리를 확보하기 위해', '②컴포넌트 언마운트나 의존성 변경 시 이전 네트워크 요청을 취소해 경쟁 조건을 방지하기 위해', '③fetch를 더 빠르게 만들기 위해', '④에러를 무시하기 위해']}
+  correctAnswer={2}
+  explanation="AbortController의 abort()를 클린업에서 호출하면 이전 요청이 취소됩니다. 최신 요청의 응답만 처리되어 경쟁 조건이 방지됩니다."
+  optionExplanations={['메모리 확보가 목적이 아닙니다.', '맞습니다. 이전 요청 취소로 경쟁 조건을 방지합니다.', '속도 향상이 목적이 아닙니다.', 'AbortError를 catch해서 별도 처리합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="API 실패 후 재시도 버튼을 구현할 때 useEffect를 다시 실행하는 방법은?"
+  options={['①useEffect를 직접 호출한다', '②의존성 배열에 넣은 retryCount state를 증가시킨다', '③컴포넌트를 강제로 리마운트한다', '④setLoading(true)를 호출한다']}
+  correctAnswer={2}
+  explanation="의존성 배열에 포함된 값이 바뀌면 useEffect가 다시 실행됩니다. retryCount를 늘리면 의존성이 바뀌어 다시 패칭을 시도합니다."
+  optionExplanations={['useEffect는 직접 호출할 수 없습니다.', '맞습니다. 의존성 변경으로 useEffect를 재실행합니다.', '리마운트는 더 극단적인 방법입니다.', 'setLoading은 useEffect를 재실행하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="JSON 데이터를 POST로 전송할 때 필요한 fetch 옵션은?"
+  options={['①method: POST만 설정하면 된다', '②method: POST, headers: Content-Type application/json, body: JSON.stringify(데이터)', '③method: POST, body: 데이터 객체 직접 전달', '④url에 파라미터로 추가한다']}
+  correctAnswer={2}
+  explanation="JSON을 보낼 때는 method: POST, Content-Type 헤더를 application/json으로 설정하고, body에 JSON.stringify()로 직렬화한 문자열을 전달해야 합니다."
+  optionExplanations={['Content-Type과 body가 없으면 데이터가 전송되지 않습니다.', '맞습니다. 세 가지 옵션이 모두 필요합니다.', '객체를 직접 body에 넣으면 [object Object]가 전송됩니다.', 'POST 요청에서는 쿼리 파라미터보다 body가 적합합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="TanStack Query 같은 데이터 패칭 라이브러리를 쓰는 이유가 아닌 것은?"
+  options={['①캐싱으로 같은 데이터를 반복 요청하지 않는다', '②경쟁 조건을 자동으로 처리한다', '③데이터베이스를 직접 쿼리한다', '④백그라운드에서 데이터를 최신 상태로 유지한다']}
+  correctAnswer={3}
+  explanation="TanStack Query는 클라이언트 사이드 라이브러리입니다. 데이터베이스를 직접 쿼리하는 것이 아니라 API 서버에 HTTP 요청을 보내는 것을 추상화합니다."
+  optionExplanations={['캐싱은 TanStack Query의 핵심 기능입니다.', '경쟁 조건 처리도 자동으로 합니다.', '틀렸습니다. 클라이언트에서 DB를 직접 쿼리할 수 없습니다.', '백그라운드 리패칭도 지원합니다.']}
+/>

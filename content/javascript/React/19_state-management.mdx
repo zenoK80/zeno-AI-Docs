@@ -1,0 +1,203 @@
+---
+title: '19. 상태 관리 전략'
+description: '로컬 상태, Context, Zustand를 언제 어떻게 선택할지 이해하고 Zustand 기본 사용법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 상태 관리 옵션(로컬 state, Context, 외부 라이브러리)의 차이를 이해하고, Zustand로 전역 상태를 간단하게 관리하는 방법을 익힙니다.
+</Callout>
+
+## 상태 관리 선택 기준
+
+React 앱의 상태는 크게 세 종류입니다.
+
+| 상태 종류 | 예시 | 적합한 도구 |
+| --- | --- | --- |
+| **로컬 UI 상태** | 모달 열림/닫힘, 입력 값 | useState |
+| **공유 상태** | 로그인 사용자, 테마 | Context API 또는 전역 상태 |
+| **서버 상태** | API에서 가져온 데이터 | TanStack Query |
+| **복잡한 전역 상태** | 장바구니, 채팅 메시지 | Zustand, Redux Toolkit |
+
+> **쉽게 말하면:** 한 컴포넌트만 쓰면 로컬 state, 여러 컴포넌트가 공유하면 Context 또는 전역 상태 라이브러리를 씁니다.
+
+---
+
+## 상태를 어디에 두나? — 상태 위치 결정
+
+```
+상태를 사용하는 컴포넌트가 하나뿐인가?
+  → YES: 해당 컴포넌트에 로컬 state
+
+상태를 여러 형제 컴포넌트가 공유하는가?
+  → YES: 공통 부모로 "상태 올리기(lifting state up)"
+
+상태가 앱 전반에 필요한가?
+  → YES: Context 또는 전역 상태 라이브러리
+```
+
+---
+
+## 상태 올리기 (Lifting State Up)
+
+두 자식 컴포넌트가 같은 상태를 필요로 하면, 공통 부모로 상태를 올립니다.
+
+```jsx
+function TemperatureConverter() {
+  const [celsius, setCelsius] = useState(0)
+  const fahrenheit = celsius * 9 / 5 + 32
+
+  return (
+    <div>
+      <CelsiusInput celsius={celsius} onCelsiusChange={setCelsius} />
+      <FahrenheitDisplay fahrenheit={fahrenheit} />
+    </div>
+  )
+}
+```
+
+---
+
+## Zustand — 간단한 전역 상태 라이브러리
+
+Zustand(독일어로 '상태')는 React Context 없이 전역 상태를 관리합니다. Redux보다 훨씬 간단합니다.
+
+```bash
+npm install zustand
+```
+
+### 스토어 만들기
+
+```jsx
+import { create } from 'zustand'
+
+const useCartStore = create((set) => ({
+  items: [],
+  totalCount: 0,
+
+  addItem: (product) =>
+    set((state) => ({
+      items: [...state.items, product],
+      totalCount: state.totalCount + 1,
+    })),
+
+  removeItem: (productId) =>
+    set((state) => ({
+      items: state.items.filter(item => item.id !== productId),
+      totalCount: state.totalCount - 1,
+    })),
+
+  clearCart: () => set({ items: [], totalCount: 0 }),
+}))
+```
+
+### 스토어 사용하기
+
+```jsx
+function CartIcon() {
+  const totalCount = useCartStore(state => state.totalCount)
+  return <span>장바구니 {totalCount}개</span>
+}
+
+function ProductCard({ product }) {
+  const addItem = useCartStore(state => state.addItem)
+
+  return (
+    <div>
+      <h3>{product.name}</h3>
+      <button onClick={() => addItem(product)}>담기</button>
+    </div>
+  )
+}
+
+function CartPage() {
+  const { items, removeItem, clearCart } = useCartStore(state => ({
+    items: state.items,
+    removeItem: state.removeItem,
+    clearCart: state.clearCart,
+  }))
+
+  return (
+    <div>
+      {items.map(item => (
+        <div key={item.id}>
+          {item.name}
+          <button onClick={() => removeItem(item.id)}>삭제</button>
+        </div>
+      ))}
+      <button onClick={clearCart}>전체 삭제</button>
+    </div>
+  )
+}
+```
+
+`Context.Provider`로 감쌀 필요 없이 어디서든 `useCartStore()`를 호출하면 됩니다.
+
+---
+
+## Zustand vs Context API 비교
+
+| 기준 | Context API | Zustand |
+| --- | --- | --- |
+| 설정 | Provider로 감싸야 함 | 없음 |
+| 리렌더링 | value 전체 변경 시 모든 구독자 | 선택한 slice만 |
+| 비동기 지원 | 직접 처리 | 액션 안에 async 가능 |
+| 디버깅 | 어려움 | devtools 지원 |
+| 적합한 상황 | 테마, 로그인 등 단순 공유 | 복잡한 전역 상태 |
+
+---
+
+## 핵심 정리
+
+- 상태 위치: 하나면 로컬, 형제 간 공유면 부모로 올리기, 앱 전반이면 전역 상태.
+- **상태 올리기**: 공통 부모에 상태를 두고 자식에 props로 전달.
+- **Zustand**: `create()`로 스토어 정의, `set()`으로 상태 업데이트. Provider 불필요.
+- 선택한 slice만 구독 → 불필요한 리렌더링 방지.
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="상태를 어디에 두어야 할지 결정하는 기준은?"
+  options={['①항상 최상위 컴포넌트에 둔다', '②상태를 사용하는 컴포넌트 중 가장 가까운 공통 조상에 둔다', '③항상 Context로 전역 상태로 만든다', '④상태가 바뀌는 컴포넌트에 둔다']}
+  correctAnswer={2}
+  explanation="상태는 그것을 사용하는 컴포넌트들의 가장 가까운 공통 조상에 두는 것이 원칙입니다. 불필요한 전역 상태를 피할 수 있습니다."
+  optionExplanations={['최상위에 두면 불필요한 리렌더링이 발생합니다.', '맞습니다. 최소 범위의 공통 조상이 적절한 위치입니다.', '모든 상태를 전역으로 만들 필요는 없습니다.', '상태가 바뀌는 곳과 읽는 곳이 다를 수 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="Zustand가 Context API보다 성능 면에서 유리한 이유는?"
+  options={['①Zustand는 메모리를 더 적게 쓴다', '②Zustand는 전체 스토어가 아닌 선택한 slice가 바뀔 때만 구독 컴포넌트를 리렌더링한다', '③Zustand는 JavaScript 엔진을 직접 최적화한다', '④Zustand는 서버에서 실행된다']}
+  correctAnswer={2}
+  explanation="Zustand에서 state => state.count처럼 특정 값만 선택하면, 선택한 값이 바뀔 때만 해당 컴포넌트가 리렌더링됩니다. Context는 value 변경 시 모든 구독 컴포넌트를 리렌더링합니다."
+  optionExplanations={['메모리 차이가 주된 이유는 아닙니다.', '맞습니다. 선택적 구독(selector)이 성능 이점입니다.', 'JS 엔진 최적화는 아닙니다.', 'Zustand는 클라이언트 라이브러리입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Zustand 스토어를 사용할 때 Context.Provider로 감싸지 않아도 되는 이유는?"
+  options={['①Zustand가 자동으로 Provider를 추가해서', '②Zustand는 React 컨텍스트가 아닌 모듈 수준 전역 변수로 상태를 관리하기 때문에', '③Zustand는 서버 상태를 관리하기 때문에', '④Zustand 스토어는 컴포넌트가 아니기 때문에']}
+  correctAnswer={2}
+  explanation="Zustand는 React의 Context 시스템을 사용하지 않습니다. JavaScript 모듈 수준에서 상태를 관리하므로 어디서든 import해서 바로 사용할 수 있습니다."
+  optionExplanations={['자동으로 Provider를 추가하지 않습니다.', '맞습니다. 모듈 수준 전역 변수로 Provider 없이 동작합니다.', '서버 상태와는 관련 없습니다.', '컴포넌트 여부가 이유는 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="서버에서 가져온 API 데이터를 관리하기에 가장 적합한 도구는?"
+  options={['①useState', '②Context API', '③TanStack Query (React Query)', '④Zustand']}
+  correctAnswer={3}
+  explanation="서버 상태(API 데이터)는 캐싱, 자동 재조회, 로딩/에러 상태 관리가 필요합니다. TanStack Query가 이 모든 기능을 제공합니다. Zustand나 Context는 클라이언트 상태에 적합합니다."
+  optionExplanations={['useState는 캐싱이나 자동 재조회 기능이 없습니다.', 'Context는 서버 상태 전용 기능이 없습니다.', '맞습니다. 서버 상태는 TanStack Query가 적합합니다.', 'Zustand는 클라이언트 UI 상태에 적합합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="상태 올리기(Lifting State Up)가 필요한 상황은?"
+  options={['①상태가 단순할 때', '②두 형제 컴포넌트가 같은 상태를 공유해야 할 때', '③컴포넌트가 하나일 때', '④서버에서 데이터를 가져올 때']}
+  correctAnswer={2}
+  explanation="두 형제 컴포넌트 A, B가 같은 상태를 공유해야 하면 공통 부모로 상태를 올리고 props로 전달합니다."
+  optionExplanations={['단순한 상태는 로컬에 두면 됩니다.', '맞습니다. 형제 간 공유 상태는 공통 부모로 올립니다.', '컴포넌트가 하나면 로컬 state로 충분합니다.', '서버 데이터는 TanStack Query로 처리합니다.']}
+/>

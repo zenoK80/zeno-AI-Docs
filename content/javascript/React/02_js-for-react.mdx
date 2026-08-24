@@ -1,0 +1,297 @@
+---
+title: '02. React를 위한 JavaScript 핵심'
+description: 'React 코드에 자주 등장하는 JavaScript 문법을 빠르게 정리합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** React 코드에서 매일 쓰이는 구조 분해, 화살표 함수, 배열 메서드, 모듈, 스프레드 연산자를 이해합니다. 이것들이 낯설면 React 코드가 어렵게 느껴집니다.
+</Callout>
+
+## 왜 JS 문법을 먼저 정리해야 하나?
+
+React 튜토리얼을 보다 보면 `const { name } = props`, `() => {}`, `.map()`, `...arr` 같은 코드가 아무 설명 없이 나옵니다. 이것들은 **최신 JavaScript(ES6+) 문법**입니다. React가 어려운 게 아니라 이 문법이 낯선 거라면, 여기서 한 번에 정리하면 됩니다.
+
+> **쉽게 말하면:** React를 배우는 것 중 절반은 사실 JavaScript 문법 익히기입니다.
+
+---
+
+## 구조 분해 할당 (Destructuring)
+
+객체나 배열에서 값을 꺼내는 간결한 방법입니다.
+
+```js
+// 객체 구조 분해
+const user = { name: '김철수', age: 25, city: '서울' }
+
+// 기존 방식
+const name = user.name
+const age = user.age
+
+// 구조 분해
+const { name, age } = user
+console.log(name) // '김철수'
+console.log(age)  // 25
+```
+
+React에서 props를 받을 때 매일 씁니다.
+
+```jsx
+// props를 구조 분해해서 바로 사용
+function UserCard({ name, age }) {
+  return <p>{name}님은 {age}세입니다.</p>
+}
+```
+
+배열도 구조 분해할 수 있습니다. `useState`가 배열을 반환하기 때문에 꼭 알아야 합니다.
+
+```js
+const [count, setCount] = useState(0)
+// useState(0)이 [현재값, 변경함수] 배열을 반환
+// count = 0, setCount = 변경 함수
+```
+
+---
+
+## 화살표 함수 (Arrow Function)
+
+함수를 더 짧게 쓰는 방법입니다. React에서 이벤트 핸들러나 콜백을 쓸 때 자주 사용합니다.
+
+```js
+// 기존 함수
+function add(a, b) {
+  return a + b
+}
+
+// 화살표 함수
+const add = (a, b) => {
+  return a + b
+}
+
+// 반환 값만 있으면 중괄호와 return 생략 가능
+const add = (a, b) => a + b
+
+// 매개변수가 하나면 괄호도 생략 가능
+const double = n => n * 2
+```
+
+```jsx
+// React에서 버튼 클릭 핸들러
+<button onClick={() => setCount(count + 1)}>+1</button>
+```
+
+---
+
+## 배열 메서드 — map, filter, find
+
+React 리스트 렌더링에 `map`이 필수입니다.
+
+```js
+const fruits = ['사과', '바나나', '포도']
+
+// map: 각 항목을 변환해서 새 배열 반환
+const upper = fruits.map(fruit => fruit.toUpperCase())
+// ['사과', '바나나', '포도'] → ['사과', '바나나', '포도'] (예시)
+
+// filter: 조건을 만족하는 항목만 모아서 새 배열 반환
+const numbers = [1, 2, 3, 4, 5]
+const evens = numbers.filter(n => n % 2 === 0)
+// [2, 4]
+
+// find: 조건을 처음 만족하는 항목 하나 반환
+const users = [
+  { id: 1, name: '김철수' },
+  { id: 2, name: '이영희' },
+]
+const user = users.find(u => u.id === 2)
+// { id: 2, name: '이영희' }
+```
+
+React에서 리스트를 렌더링할 때:
+
+```jsx
+const todos = ['장보기', '운동', '독서']
+
+function TodoList() {
+  return (
+    <ul>
+      {todos.map((todo, index) => (
+        <li key={index}>{todo}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+---
+
+## 스프레드 연산자 (Spread Operator) `...`
+
+배열이나 객체를 "펼쳐서" 복사하거나 합칠 때 씁니다.
+
+```js
+// 배열 펼치기
+const a = [1, 2, 3]
+const b = [4, 5, 6]
+const merged = [...a, ...b]  // [1, 2, 3, 4, 5, 6]
+
+// 배열에 항목 추가 (원본 불변)
+const withNew = [...a, 4]    // [1, 2, 3, 4]
+
+// 객체 펼치기
+const user = { name: '김철수', age: 25 }
+const updated = { ...user, age: 26 }  // { name: '김철수', age: 26 }
+```
+
+React 상태 업데이트에서 불변성을 지킬 때 꼭 씁니다.
+
+```js
+// 배열 상태에 새 항목 추가
+setTodos([...todos, newTodo])
+
+// 객체 상태에서 특정 필드만 바꾸기
+setUser({ ...user, name: '새이름' })
+```
+
+---
+
+## 모듈 (import / export)
+
+React는 컴포넌트를 파일 단위로 분리합니다. 파일 간 코드를 주고받는 문법이 모듈입니다.
+
+```js
+// Button.js — 내보내기(export)
+export function Button({ label, onClick }) {
+  return <button onClick={onClick}>{label}</button>
+}
+
+// 기본 내보내기(default export)
+export default Button
+```
+
+```js
+// App.js — 가져오기(import)
+import Button from './Button'                    // default export
+import { Button } from './Button'                // named export
+import { useState, useEffect } from 'react'      // React 훅
+```
+
+---
+
+## 삼항 연산자와 단축 평가
+
+조건문을 짧게 쓰는 방법입니다. JSX 안에서 조건부 렌더링에 쓰입니다.
+
+```js
+// 삼항 연산자: 조건 ? 참일 때 값 : 거짓일 때 값
+const message = isLoggedIn ? '환영합니다!' : '로그인하세요'
+
+// 단축 평가 (&&): 앞이 참이면 뒤를 실행
+const label = count > 0 && `${count}개 선택됨`
+```
+
+```jsx
+function Greeting({ isLoggedIn }) {
+  return (
+    <div>
+      {isLoggedIn ? <p>환영합니다!</p> : <p>로그인하세요</p>}
+      {isLoggedIn && <button>로그아웃</button>}
+    </div>
+  )
+}
+```
+
+---
+
+## Promise와 async/await
+
+서버에서 데이터를 가져오는 비동기 처리에 씁니다. React의 데이터 패칭 코드에서 항상 등장합니다.
+
+```js
+// async/await 기본 패턴
+async function fetchUser(id) {
+  const response = await fetch(`/api/users/${id}`)
+  const data = await response.json()
+  return data
+}
+
+// try-catch로 오류 처리
+async function fetchUser(id) {
+  try {
+    const response = await fetch(`/api/users/${id}`)
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('데이터 로드 실패:', error)
+  }
+}
+```
+
+---
+
+## 핵심 정리
+
+- **구조 분해** `const { a } = obj` — 객체/배열에서 값을 꺼낸다. `useState`의 `[state, setState]`가 이것.
+- **화살표 함수** `() => {}` — 이벤트 핸들러, 콜백에 항상 등장.
+- **map / filter / find** — 리스트 렌더링과 데이터 필터링에 필수.
+- **스프레드** `...` — 배열·객체를 복사하거나 합칠 때. 상태 불변성에 핵심.
+- **import / export** — 컴포넌트를 파일로 분리하고 가져오는 문법.
+- **삼항·단축 평가** — JSX 안에서 조건부 렌더링에 사용.
+- **async/await** — 서버 데이터를 기다리는 비동기 처리.
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="다음 코드의 실행 결과는? const { a, b } = { a: 1, b: 2, c: 3 }"
+  options={['①오류 발생', '②a = 1, b = 2', '③a = {a:1}, b = {b:2}', '④a = undefined, b = undefined']}
+  correctAnswer={2}
+  explanation="객체 구조 분해는 같은 이름의 속성 값을 꺼냅니다. c는 구조 분해에 포함되지 않았으므로 무시됩니다."
+  optionExplanations={['오류가 아닌 정상 동작입니다.', '맞습니다. 같은 이름의 속성 값을 가져옵니다.', '구조 분해는 값을 꺼내는 것이지 객체를 반환하지 않습니다.', '속성이 존재하므로 undefined가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="배열 [1, 2, 3, 4, 5]에서 짝수만 추출하는 올바른 코드는?"
+  options={['①arr.map(n => n % 2 === 0)', '②arr.filter(n => n % 2 === 0)', '③arr.find(n => n % 2 === 0)', '④arr.reduce(n => n % 2 === 0)']}
+  correctAnswer={2}
+  explanation="filter는 조건을 만족하는 항목만 모아 새 배열을 반환합니다. [2, 4]가 결과입니다."
+  optionExplanations={['map은 각 항목을 변환해 새 배열을 만듭니다. 결과는 [false, true, false, true, false]입니다.', '맞습니다. filter가 조건에 맞는 항목만 추출합니다.', 'find는 조건을 만족하는 첫 번째 항목 하나만 반환합니다.', 'reduce는 배열을 하나의 값으로 줄이는 메서드입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="스프레드 연산자를 사용해 배열 [1,2,3]에 4를 추가한 새 배열을 만드는 코드는?"
+  options={['①[1,2,3].push(4)', '②[...[1,2,3], 4]', '③[1,2,3].concat = 4', '④[1,2,3] + [4]']}
+  correctAnswer={2}
+  explanation="스프레드 연산자로 기존 배열을 펼치고 새 항목을 추가합니다. 원본 배열은 변경되지 않습니다."
+  optionExplanations={['push는 원본 배열을 직접 수정합니다. React 상태에서는 불변성을 지켜야 합니다.', '맞습니다. 스프레드로 새 배열을 만듭니다.', 'concat은 메서드로 호출해야 합니다. = 로 대입하는 것은 잘못된 문법입니다.', '배열끼리 + 연산은 문자열로 변환됩니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="다음 화살표 함수 중 올바르지 않은 것은?"
+  options={['①const fn = () => 42', '②const fn = x => x * 2', '③const fn = (a, b) => a + b', '④const fn = a, b => a + b']}
+  correctAnswer={4}
+  explanation="매개변수가 2개 이상이면 반드시 괄호로 감싸야 합니다. (a, b) => a + b가 올바른 형태입니다."
+  optionExplanations={['매개변수 없이 () => 값 형태는 올바릅니다.', '매개변수 하나일 때 괄호 생략 가능합니다.', '매개변수 여러 개는 괄호로 감쌉니다.', '매개변수가 2개인데 괄호가 없어 문법 오류입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="React에서 named export로 내보낸 함수 Button을 가져오는 import 문은?"
+  options={['①import Button from ./Button', '②import { Button } from ./Button', '③import * Button from ./Button', '④import default Button from ./Button']}
+  correctAnswer={2}
+  explanation="named export는 중괄호를 사용해 가져옵니다. default export는 중괄호 없이 import Button from ./Button 형태로 씁니다."
+  optionExplanations={['이것은 default export를 가져오는 방식입니다.', '맞습니다. named export는 중괄호로 감쌉니다.', '* 는 모든 export를 한 객체로 가져올 때 사용합니다.', 'import default는 존재하지 않는 문법입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="async/await를 사용할 때 await는 어디서만 사용할 수 있나?"
+  options={['①어디서나 사용 가능', '②async 함수 안에서만', '③Promise 체인 안에서만', '④try 블록 안에서만']}
+  correctAnswer={2}
+  explanation="await 키워드는 async로 선언된 함수 안에서만 사용할 수 있습니다."
+  optionExplanations={['async 함수 밖에서는 await를 쓸 수 없습니다.', '맞습니다. await는 async 함수 안에서만 사용합니다.', 'Promise 체인 외부의 async 함수에서도 사용 가능합니다.', 'try 블록 여부는 관계 없습니다.']}
+/>

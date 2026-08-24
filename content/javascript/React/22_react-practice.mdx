@@ -1,0 +1,188 @@
+---
+title: '22. React 핵심 종합 문제'
+description: 'React 전 범위 예상기출 문제 모음'
+---
+
+<Callout type="warning">
+  실제 기출 문제를 그대로 복제하지 않습니다. 공식 출제 범위를 바탕으로 재구성한 문제입니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="React에서 가상 DOM(Virtual DOM)이 존재하는 이유는?"
+  options={['①서버 사이드 렌더링을 지원하기 위해', '②실제 DOM 조작을 최소화해 성능을 개선하기 위해', '③CSS 애니메이션을 처리하기 위해', '④브라우저 호환성을 위해']}
+  correctAnswer={2}
+  explanation="가상 DOM은 변경 사항을 메모리에서 비교(diffing)한 후 실제 DOM에 최소한의 변경만 적용(reconciliation)합니다. 실제 DOM 조작 횟수를 줄여 성능을 개선합니다."
+  optionExplanations={['SSR은 가상 DOM의 목적이 아닙니다.', '맞습니다. DOM 조작 최소화가 핵심 목적입니다.', 'CSS 애니메이션과는 관련 없습니다.', '브라우저 호환은 합성 이벤트의 목적입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="JSX에서 올바르지 않은 것은?"
+  options={['①반드시 하나의 루트 요소로 감싸야 한다', '②className을 class 대신 사용한다', '③중괄호 {} 안에 if 문을 직접 쓸 수 있다', '④자기 닫기 태그를 사용해야 한다']}
+  correctAnswer={3}
+  explanation="JSX의 {} 안에는 표현식(값을 반환하는 코드)만 올 수 있습니다. if 문은 값을 반환하지 않는 문(statement)이라 직접 사용할 수 없습니다. 삼항 연산자나 변수로 대체합니다."
+  optionExplanations={['하나의 루트 요소는 JSX의 필수 규칙입니다.', 'class는 JS 예약어라 className을 씁니다.', '틀렸습니다. if 문은 표현식이 아니라 JSX {} 안에 쓸 수 없습니다.', '모든 태그를 닫아야 하는 것도 JSX 규칙입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="React 훅 규칙으로 올바른 것은?"
+  options={['①훅은 조건문 안에서 호출해도 된다', '②훅은 컴포넌트 함수의 최상위에서만 호출해야 한다', '③훅은 이벤트 핸들러 안에서 호출해도 된다', '④훅은 반드시 async 함수에서 호출해야 한다']}
+  correctAnswer={2}
+  explanation="훅 규칙: (1) 컴포넌트 최상위에서만 호출, (2) React 함수(컴포넌트, 커스텀 훅)에서만 호출. 조건문, 반복문, 중첩 함수 안에서는 호출 불가합니다."
+  optionExplanations={['조건문 안에서 호출하면 안 됩니다.', '맞습니다. 최상위에서만 호출해야 합니다.', '이벤트 핸들러 안에서 호출하면 안 됩니다.', 'async 함수 여부는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="배열 상태에서 특정 항목을 삭제하는 올바른 방법은?"
+  options={['①const idx = items.indexOf(item); items.splice(idx, 1); setItems(items)', '②setItems(items.filter(i => i.id !== targetId))', '③delete items[targetIndex]; setItems(items)', '④items.length = items.length - 1; setItems(items)']}
+  correctAnswer={2}
+  explanation="filter로 삭제할 항목을 제외한 새 배열을 만들어 setItems에 전달합니다. splice, delete, length 조작은 원본 배열을 수정해 React가 변화를 감지하지 못합니다."
+  optionExplanations={['splice는 원본을 수정합니다.', '맞습니다. filter로 새 배열을 만들어 교체합니다.', 'delete는 원본을 수정합니다.', 'length 수정은 원본을 변경합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="useEffect의 의존성 배열에 빈 배열 []을 전달하면 언제 실행되는가?"
+  options={['①매 렌더링마다', '②처음 마운트될 때 한 번', '③언마운트될 때', '④절대 실행되지 않음']}
+  correctAnswer={2}
+  explanation="빈 배열은 의존성이 없다는 의미입니다. 의존성이 변경될 일이 없으므로 처음 마운트 시 딱 한 번만 실행됩니다."
+  optionExplanations={['배열 없이 생략하면 매 렌더링마다 실행됩니다.', '맞습니다. 빈 배열은 마운트 시 1회 실행입니다.', '언마운트 시에는 클린업 함수가 실행됩니다.', '마운트 시 최소 한 번은 실행됩니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="props를 자식에서 직접 수정하면 안 되는 이유는?"
+  options={['①props는 읽기 전용이며, 직접 수정하면 단방향 데이터 흐름이 깨지고 예측 불가한 버그가 생긴다', '②props를 수정하면 빌드 에러가 발생한다', '③props 수정은 성능 문제를 일으킨다', '④props 수정은 항상 에러를 발생시킨다']}
+  correctAnswer={1}
+  explanation="React는 단방향 데이터 흐름을 따릅니다. props를 자식에서 수정하면 어디서 값이 바뀌었는지 추적이 어려워 디버깅이 매우 어렵습니다. 변경이 필요하면 부모에게 콜백으로 요청합니다."
+  optionExplanations={['맞습니다. 단방향 흐름을 유지하기 위해 읽기 전용입니다.', '빌드 에러보다는 런타임 버그가 생깁니다.', '성능보다 예측 불가성이 문제입니다.', '항상 에러가 나지는 않지만 버그가 생깁니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="Context API의 value가 변경되면 어떤 일이 발생하나?"
+  options={['①해당 Context를 Provider로 감싼 컴포넌트만 리렌더링', '②해당 Context를 useContext로 구독하는 모든 컴포넌트 리렌더링', '③앱 전체가 리렌더링', '④리렌더링 없이 값만 업데이트']}
+  correctAnswer={2}
+  explanation="Context의 value가 바뀌면 해당 Context를 useContext로 구독하는 모든 컴포넌트가 리렌더링됩니다. 자주 바뀌는 데이터는 Context 대신 Zustand를 고려합니다."
+  optionExplanations={['Provider 컴포넌트가 아닌 구독자들이 리렌더링됩니다.', '맞습니다. 해당 Context를 구독하는 모든 컴포넌트가 리렌더링됩니다.', '앱 전체가 아닌 구독자들만 리렌더링됩니다.', '리렌더링이 발생합니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="useRef와 useState의 차이에 대한 설명으로 올바른 것은?"
+  options={['①useRef는 DOM에만 접근할 수 있다', '②useRef는 current를 변경해도 리렌더링이 발생하지 않는다', '③useState는 DOM 접근에 사용된다', '④두 훅은 완전히 동일하다']}
+  correctAnswer={2}
+  explanation="useRef의 current를 변경해도 React는 리렌더링하지 않습니다. 화면에 표시되지 않는 내부 값(타이머 ID, DOM 요소)을 저장할 때 씁니다. useState는 변경 시 리렌더링이 발생합니다."
+  optionExplanations={['useRef는 어떤 값이든 저장 가능합니다.', '맞습니다. 리렌더링 없음이 useRef의 핵심 특징입니다.', 'DOM 접근은 useRef가 담당합니다.', '두 훅은 다릅니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="React.memo를 사용해도 자식이 리렌더링되는 상황은?"
+  options={['①부모가 리렌더링될 때', '②부모에서 인라인 객체나 함수를 props로 전달할 때', '③자식의 state가 바뀔 때', '④Context가 바뀔 때']}
+  correctAnswer={2}
+  explanation="인라인 객체 { } 나 화살표 함수 () => {} 는 렌더링마다 새 참조가 생성됩니다. React.memo의 얕은 비교에서 다른 값으로 판단해 리렌더링됩니다. useMemo/useCallback으로 해결합니다."
+  optionExplanations={['props가 같으면 부모가 리렌더링돼도 memo가 스킵합니다.', '맞습니다. 새 참조는 다른 값으로 인식됩니다.', '자식의 state 변경은 자식만 리렌더링됩니다.', 'Context 변경은 구독 여부와 관계 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="useCallback(() => fn, [deps])과 useMemo(() => fn, [deps])의 차이는?"
+  options={['①차이 없다', '②useCallback은 함수 자체를, useMemo는 함수 실행 결과 값을 메모이제이션한다', '③useCallback이 더 성능이 좋다', '④useMemo가 더 최신 API다']}
+  correctAnswer={2}
+  explanation="useCallback은 함수 자체를 메모이제이션합니다(의존성이 바뀌지 않으면 같은 함수 참조 유지). useMemo는 함수를 실행한 결과값을 메모이제이션합니다."
+  optionExplanations={['기능이 다릅니다.', '맞습니다. 함수 자체 vs 실행 결과가 차이입니다.', '성능 차이는 없습니다.', '두 훅 모두 같은 버전에서 도입됐습니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="React Router v6에서 현재 URL의 동적 파라미터를 읽는 훅은?"
+  options={['①useHistory', '②useLocation', '③useParams', '④useRoute']}
+  correctAnswer={3}
+  explanation="useParams()는 Route의 :paramName 패턴에 해당하는 URL 파라미터를 객체로 반환합니다. v6에서 useHistory는 삭제되고 useNavigate로 대체됐습니다."
+  optionExplanations={['useHistory는 v5에서 사용했습니다.', 'useLocation은 현재 URL 전체 정보를 반환합니다.', '맞습니다. useParams가 동적 파라미터를 반환합니다.', 'useRoute는 존재하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="폼의 제어 컴포넌트(Controlled Component) 특징은?"
+  options={['①DOM이 폼 값을 직접 관리한다', '②React state가 폼 입력 값의 단일 진실의 원천(Single Source of Truth)이다', '③onChange 핸들러가 필요 없다', '④defaultValue를 사용해 초기값을 설정한다']}
+  correctAnswer={2}
+  explanation="제어 컴포넌트는 value={state}와 onChange로 입력 값을 항상 state에서 가져옵니다. state가 단일 진실의 원천이라 언제든 현재 값을 정확히 알 수 있습니다."
+  optionExplanations={['DOM 관리는 비제어 컴포넌트의 특징입니다.', '맞습니다. state가 단일 진실의 원천입니다.', 'onChange로 state를 업데이트해야 합니다.', 'defaultValue는 비제어 컴포넌트의 초기값 설정입니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="커스텀 훅을 두 컴포넌트에서 각각 호출하면?"
+  options={['①두 컴포넌트가 상태를 공유한다', '②각 컴포넌트가 독립적인 상태 인스턴스를 가진다', '③두 번째 호출에서 에러가 발생한다', '④전역 상태가 생성된다']}
+  correctAnswer={2}
+  explanation="훅은 호출될 때마다 독립적인 상태를 생성합니다. 같은 커스텀 훅을 여러 컴포넌트에서 써도 각자의 상태를 가집니다. 공유가 필요하면 Context나 전역 상태를 씁니다."
+  optionExplanations={['상태를 공유하지 않습니다.', '맞습니다. 각 호출이 독립적인 상태를 가집니다.', '에러가 발생하지 않습니다.', '전역 상태가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="Portal이 해결하는 문제는?"
+  options={['①컴포넌트 간 통신 문제', '②부모 요소의 CSS(overflow, z-index)로 인해 시각적으로 잘리거나 가려지는 문제', '③상태 관리 복잡성', '④코드 스플리팅']}
+  correctAnswer={2}
+  explanation="모달, 드롭다운처럼 부모 DOM 바깥에 렌더링되어야 하는 UI에 Portal을 씁니다. 부모의 overflow: hidden이나 z-index 제약을 벗어납니다."
+  optionExplanations={['컴포넌트 간 통신은 props나 Context로 처리합니다.', '맞습니다. CSS 제약을 벗어나는 것이 Portal의 목적입니다.', '상태 관리와는 관련 없습니다.', '코드 스플리팅은 lazy()로 합니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="Error Boundary가 잡을 수 없는 오류는?"
+  options={['①자식 컴포넌트 렌더링 중 발생한 오류', '②이벤트 핸들러 안에서 발생한 오류', '③생명주기 메서드에서 발생한 오류', '④constructor에서 발생한 오류']}
+  correctAnswer={2}
+  explanation="Error Boundary는 렌더링 중, 생명주기 메서드, constructor에서 발생한 오류를 잡습니다. 이벤트 핸들러와 비동기 코드의 오류는 잡지 못합니다."
+  optionExplanations={['렌더링 중 오류는 잡습니다.', '맞습니다. 이벤트 핸들러 오류는 잡지 못합니다.', '생명주기 오류는 잡습니다.', 'constructor 오류도 잡습니다.']}
+/>
+
+<Quiz
+  questionNumber={16}
+  question="useReducer가 useState보다 적합한 상황은?"
+  options={['①상태가 단순한 boolean일 때', '②연관된 여러 상태가 함께 변경되고 전환 로직이 복잡할 때', '③상태가 하나의 숫자일 때', '④비동기 작업이 없을 때']}
+  correctAnswer={2}
+  explanation="useReducer는 여러 상태가 연관되어 있고 액션 타입에 따라 상태가 복잡하게 변경될 때 유리합니다. reducer 함수로 로직을 한 곳에 모을 수 있습니다."
+  optionExplanations={['단순 boolean은 useState로 충분합니다.', '맞습니다. 복잡하고 연관된 상태 관리에 유리합니다.', '숫자 하나는 useState로 충분합니다.', '비동기 여부와는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={17}
+  question="Zustand 스토어에서 set 함수 사용 시 이전 상태를 참조하는 올바른 방법은?"
+  options={['①set({ count: count + 1 })', '②set(state => ({ count: state.count + 1 }))', '③setState(prev => prev.count + 1)', '④store.count + 1']}
+  correctAnswer={2}
+  explanation="set에 함수를 전달하면 현재 상태(state)를 인수로 받아 새 상태를 반환할 수 있습니다. 이전 상태에 의존하는 업데이트 시 안전합니다."
+  optionExplanations={['count 변수에 스코프가 없으면 오래된 값을 참조할 수 있습니다.', '맞습니다. 함수를 전달해 현재 상태를 참조합니다.', 'Zustand에서는 setState가 아닌 set 함수를 씁니다.', '직접 store.count를 참조하면 최신 상태가 아닐 수 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={18}
+  question="React.lazy()로 컴포넌트를 로드할 때 반드시 함께 사용해야 하는 것은?"
+  options={['①ErrorBoundary', '②Suspense', '③Provider', '④Fragment']}
+  correctAnswer={2}
+  explanation="React.lazy()로 컴포넌트를 동적 로드하면 로딩 중일 때 표시할 fallback이 필요합니다. Suspense가 로딩 중인 자식 대신 fallback을 보여줍니다."
+  optionExplanations={['ErrorBoundary는 오류 처리용입니다. lazy와 함께 쓰면 좋지만 필수는 아닙니다.', '맞습니다. Suspense가 로딩 중 fallback을 제공합니다.', 'Provider는 Context와 관련됩니다.', 'Fragment는 루트 요소 중복 방지에 씁니다.']}
+/>
+
+<Quiz
+  questionNumber={19}
+  question="옵티미스틱 업데이트(Optimistic Update) 패턴에서 서버 요청이 실패할 경우 해야 할 일은?"
+  options={['①앱을 새로고침한다', '②미리 변경한 UI를 이전 상태로 되돌린다', '③에러를 무시한다', '④페이지를 이동한다']}
+  correctAnswer={2}
+  explanation="옵티미스틱 업데이트는 낙관적으로 UI를 먼저 변경합니다. 서버 요청 실패 시 변경 전 상태로 되돌려(rollback) 일관성을 유지합니다."
+  optionExplanations={['새로고침은 사용자 경험을 해칩니다.', '맞습니다. 실패 시 롤백이 필수입니다.', '에러 무시는 데이터 불일치를 만듭니다.', '페이지 이동은 적절하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={20}
+  question="forwardRef 없이 자식 컴포넌트에 ref를 전달하면?"
+  options={['①ref가 자식의 루트 DOM 요소에 자동으로 연결된다', '②ref가 컴포넌트를 통과하지 못하고 null이 된다', '③빌드 에러가 발생한다', '④자식의 state에 접근하게 된다']}
+  correctAnswer={2}
+  explanation="함수형 컴포넌트에 ref를 전달하면 기본적으로 컴포넌트를 통과하지 못해 null이 됩니다. forwardRef로 감싸야 ref가 자식 내부 DOM 요소까지 전달됩니다."
+  optionExplanations={['자동 연결이 되지 않습니다.', '맞습니다. forwardRef 없이는 ref가 null이 됩니다.', '경고는 나올 수 있지만 빌드 에러는 아닙니다.', 'state에 접근하는 것이 아닙니다.']}
+/>

@@ -1,0 +1,219 @@
+---
+title: '07. useEffect — 사이드 이펙트'
+description: 'useEffect 훅으로 데이터 패칭, 구독, DOM 조작 등의 사이드 이펙트를 처리하는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** useEffect가 무엇이고 언제 실행되는지, 의존성 배열로 실행 시점을 제어하는 방법, 클린업 함수가 필요한 이유를 이해합니다.
+</Callout>
+
+## 사이드 이펙트란?
+
+React 컴포넌트는 기본적으로 "상태를 받아서 화면을 그리는" 순수한 역할을 합니다. 하지만 실제 앱에서는 화면 그리기 외에도 여러 작업이 필요합니다.
+
+- 서버에서 데이터 가져오기 (fetch)
+- 타이머 설정 (setInterval, setTimeout)
+- 이벤트 리스너 등록 (addEventListener)
+- 로컬 스토리지 읽고 쓰기
+
+이런 작업들을 **사이드 이펙트(side effect)** 라고 합니다. 컴포넌트 안에서 직접 실행하면 렌더링마다 실행되거나 예상치 못한 문제가 생깁니다.
+
+> **쉽게 말하면:** `useEffect`는 "화면이 그려진 뒤에 이 코드를 실행해줘"라고 React에게 예약하는 훅입니다.
+
+---
+
+## useEffect 기본 사용법
+
+```jsx
+import { useState, useEffect } from 'react'
+
+function Timer() {
+  const [seconds, setSeconds] = useState(0)
+
+  useEffect(() => {
+    // 컴포넌트가 화면에 나타난 뒤 실행
+    console.log('화면에 나타났다!')
+  })
+
+  return <p>{seconds}초</p>
+}
+```
+
+`useEffect(콜백, 의존성배열)` 형태입니다. 의존성 배열 없이 쓰면 **매 렌더링마다** 실행됩니다.
+
+---
+
+## 의존성 배열로 실행 시점 제어
+
+```jsx
+useEffect(() => {
+  // 실행 코드
+}, 의존성배열)
+```
+
+| 의존성 배열 | 언제 실행되나 |
+| --- | --- |
+| 없음 (생략) | 매 렌더링마다 |
+| `[]` (빈 배열) | 처음 마운트될 때 한 번만 |
+| `[a, b]` | 처음 + a 또는 b가 바뀔 때마다 |
+
+```jsx
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null)
+
+  // userId가 바뀔 때마다 새로운 사용자 데이터를 불러옴
+  useEffect(() => {
+    fetch(`/api/users/${userId}`)
+      .then(res => res.json())
+      .then(data => setUser(data))
+  }, [userId])  // userId 가 의존성
+
+  if (!user) return <p>로딩 중...</p>
+  return <p>{user.name}님의 프로필</p>
+}
+```
+
+```jsx
+// 마운트될 때 한 번만 실행 — 이벤트 리스너 등록
+useEffect(() => {
+  window.addEventListener('resize', handleResize)
+}, [])  // 빈 배열
+```
+
+---
+
+## 클린업 함수 — 이펙트 뒤처리
+
+`useEffect`가 타이머나 이벤트 리스너를 등록하면, 컴포넌트가 사라질 때 **정리(cleanup)** 가 필요합니다. 정리하지 않으면 메모리 누수나 오류가 발생합니다.
+
+```jsx
+useEffect(() => {
+  // 이펙트 실행
+  const timerId = setInterval(() => {
+    setSeconds(prev => prev + 1)
+  }, 1000)
+
+  // 클린업 함수 — 컴포넌트 언마운트 또는 다음 이펙트 실행 전 호출됨
+  return () => {
+    clearInterval(timerId)
+  }
+}, [])
+```
+
+```jsx
+useEffect(() => {
+  window.addEventListener('resize', handleResize)
+
+  return () => {
+    window.removeEventListener('resize', handleResize)
+  }
+}, [])
+```
+
+클린업 함수는 두 가지 경우에 실행됩니다.
+1. 컴포넌트가 화면에서 사라질 때 (언마운트)
+2. 의존성이 바뀌어 이펙트가 다시 실행되기 직전
+
+---
+
+## 데이터 패칭 패턴
+
+가장 흔한 useEffect 사용 패턴입니다.
+
+```jsx
+function PostList() {
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        setLoading(true)
+        const res = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5')
+        const data = await res.json()
+        setPosts(data)
+      } catch (err) {
+        setError('데이터를 불러오지 못했습니다.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPosts()
+  }, [])
+
+  if (loading) return <p>로딩 중...</p>
+  if (error) return <p>{error}</p>
+
+  return (
+    <ul>
+      {posts.map(post => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+<Callout type="warning">
+  `useEffect` 콜백 자체에 `async`를 붙이지 마세요. `async` 함수는 Promise를 반환하는데, useEffect의 반환값은 클린업 함수여야 합니다. 내부에 별도 async 함수를 만들어 호출하세요.
+</Callout>
+
+---
+
+## 핵심 정리
+
+- **사이드 이펙트**: 화면 그리기 외의 작업 (fetch, 타이머, 이벤트 리스너 등). `useEffect`로 처리.
+- 의존성 배열 없음 → 매 렌더링, `[]` → 마운트 시 1회, `[a]` → a 변경 시마다.
+- **클린업**: 이펙트가 등록한 타이머·리스너를 `return () => {정리코드}`로 정리한다.
+- 데이터 패칭은 내부 async 함수를 선언해서 호출하는 패턴을 사용한다.
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="useEffect의 두 번째 인수로 빈 배열 []을 전달하면?"
+  options={['①매 렌더링마다 실행', '②컴포넌트가 처음 마운트될 때 한 번만 실행', '③절대 실행되지 않음', '④특정 상태가 바뀔 때 실행']}
+  correctAnswer={2}
+  explanation="빈 배열은 의존성이 없다는 의미입니다. 의존성이 바뀌는 경우가 없으므로 처음 마운트 시 딱 한 번만 실행됩니다."
+  optionExplanations={['배열 없이 생략했을 때 매 렌더링마다 실행됩니다.', '맞습니다. 빈 배열은 마운트 시 한 번만 실행됩니다.', '빈 배열이라도 최초 마운트 시에는 실행됩니다.', '특정 상태 의존은 [state]처럼 배열에 포함해야 합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="useEffect에서 클린업 함수를 작성하는 방법은?"
+  options={['①useEffect.cleanup(() => {})', '②useEffect의 콜백에서 함수를 return 한다', '③componentWillUnmount 메서드에 작성한다', '④useLayoutEffect를 사용한다']}
+  correctAnswer={2}
+  explanation="useEffect의 콜백 함수가 함수를 반환하면, 그 함수가 클린업으로 실행됩니다. 언마운트 시 또는 다음 이펙트 실행 직전에 호출됩니다."
+  optionExplanations={['useEffect.cleanup은 존재하지 않는 API입니다.', '맞습니다. return 함수가 클린업 함수입니다.', 'componentWillUnmount는 클래스 컴포넌트의 생명주기 메서드입니다.', 'useLayoutEffect도 클린업을 같은 방식으로 작성하지만 실행 타이밍이 다릅니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="userId props가 바뀔 때마다 새 데이터를 불러오려면 의존성 배열을 어떻게 써야 하나?"
+  options={['①[]', '②[userId]', '③생략', '④[user, userId]']}
+  correctAnswer={2}
+  explanation="의존성 배열에 userId를 넣으면 userId가 변경될 때마다 (그리고 처음 마운트 시) useEffect가 실행됩니다."
+  optionExplanations={['빈 배열은 마운트 시 한 번만 실행됩니다. userId가 바뀌어도 실행되지 않습니다.', '맞습니다. userId를 의존성에 넣으면 변경 시마다 실행됩니다.', '의존성 생략 시 매 렌더링마다 실행됩니다. 불필요한 요청이 많아집니다.', 'user 상태가 의존성에 있으면 데이터를 받은 뒤 또 실행되는 무한 루프가 생깁니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="useEffect 콜백에 async를 직접 붙이면 안 되는 이유는?"
+  options={['①async 함수는 useEffect에서 지원하지 않아서', '②async 함수가 Promise를 반환하는데 클린업 함수 자리에 Promise가 오면 안 되기 때문', '③성능이 느려지기 때문', '④데이터를 받지 못하기 때문']}
+  correctAnswer={2}
+  explanation="useEffect는 클린업 함수 또는 undefined를 반환해야 합니다. async 함수는 항상 Promise를 반환하므로, 클린업으로 쓸 수 없어 경고가 발생합니다."
+  optionExplanations={['async 함수 자체를 쓸 수 없는 게 아니라 반환값 문제입니다.', '맞습니다. Promise가 클린업 자리에 오면 React가 처리할 수 없습니다.', '성능 문제가 아닙니다.', '데이터를 받는 것은 가능하지만 클린업 반환값 문제가 생깁니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="setInterval을 useEffect 안에서 등록했을 때 클린업을 하지 않으면 발생하는 문제는?"
+  options={['①컴포넌트가 렌더링되지 않는다', '②interval이 중복 등록되어 메모리 누수와 예기치 않은 동작이 발생한다', '③setInterval이 자동으로 정리된다', '④빌드 오류가 발생한다']}
+  correctAnswer={2}
+  explanation="컴포넌트가 언마운트되거나 재렌더링되어도 클린업 없이는 이전에 등록한 interval이 계속 실행됩니다. 컴포넌트가 반복적으로 마운트·언마운트되면 interval이 쌓여 메모리 누수가 생깁니다."
+  optionExplanations={['렌더링 자체에는 문제가 없습니다.', '맞습니다. 클린업 없으면 중복 등록과 메모리 누수가 발생합니다.', 'setInterval은 자동으로 정리되지 않습니다.', '빌드 오류가 아닌 런타임 문제입니다.']}
+/>

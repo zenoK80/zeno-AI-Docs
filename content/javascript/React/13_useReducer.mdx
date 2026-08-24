@@ -1,0 +1,244 @@
+---
+title: '13. useReducer — 복잡한 상태 관리'
+description: 'useReducer로 복잡한 상태 로직을 액션 기반으로 구조화하는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** useState로 관리하기 복잡해진 상태를 useReducer로 리팩토링하는 이유와 방법을 이해하고, reducer 패턴의 구조를 익힙니다.
+</Callout>
+
+## 언제 useReducer를 쓰나?
+
+다음 상황에서 useState 대신 useReducer를 고려합니다.
+
+- 상태가 여러 개이고 서로 연관되어 있을 때
+- 다음 상태가 이전 상태에 의존할 때
+- 상태 업데이트 로직이 길고 복잡할 때
+
+```jsx
+// useState로 관리하기 복잡한 예
+const [todos, setTodos] = useState([])
+const [filter, setFilter] = useState('all')
+const [loading, setLoading] = useState(false)
+
+// 할 일 추가 시 todos 업데이트
+// 필터 변경 시 filter 업데이트
+// 비동기 작업 시 loading 업데이트
+// → 상태들이 얽혀 있어 로직이 흩어짐
+```
+
+---
+
+## useReducer 구조
+
+```
+dispatch(액션)
+     ↓
+reducer(현재상태, 액션) → 새 상태
+     ↓
+컴포넌트 리렌더링
+```
+
+**Reducer 함수**: 현재 상태와 액션을 받아 새 상태를 반환하는 순수 함수.
+**Action**: `{ type: '액션타입', payload: 데이터 }` 형태의 객체.
+**dispatch**: 액션을 보내는 함수.
+
+> **쉽게 말하면:** 은행 창구와 같습니다. "출금 5만원(액션)"을 접수(dispatch)하면 창구(reducer)에서 잔액(상태)을 업데이트합니다.
+
+---
+
+## 기본 사용 예제 — 카운터
+
+```jsx
+import { useReducer } from 'react'
+
+// reducer 함수: 액션 타입에 따라 상태를 업데이트
+function counterReducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 }
+    case 'DECREMENT':
+      return { count: state.count - 1 }
+    case 'RESET':
+      return { count: 0 }
+    default:
+      return state
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(counterReducer, { count: 0 })
+
+  return (
+    <div>
+      <p>카운트: {state.count}</p>
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}>+1</button>
+      <button onClick={() => dispatch({ type: 'DECREMENT' })}>-1</button>
+      <button onClick={() => dispatch({ type: 'RESET' })}>초기화</button>
+    </div>
+  )
+}
+```
+
+---
+
+## 실전 예제 — 할 일 목록
+
+```jsx
+const initialState = {
+  todos: [],
+  filter: 'all',
+}
+
+function todoReducer(state, action) {
+  switch (action.type) {
+    case 'ADD_TODO':
+      return {
+        ...state,
+        todos: [
+          ...state.todos,
+          { id: Date.now(), text: action.payload, done: false },
+        ],
+      }
+    case 'TOGGLE_TODO':
+      return {
+        ...state,
+        todos: state.todos.map(todo =>
+          todo.id === action.payload
+            ? { ...todo, done: !todo.done }
+            : todo
+        ),
+      }
+    case 'DELETE_TODO':
+      return {
+        ...state,
+        todos: state.todos.filter(todo => todo.id !== action.payload),
+      }
+    case 'SET_FILTER':
+      return { ...state, filter: action.payload }
+    default:
+      return state
+  }
+}
+
+function TodoApp() {
+  const [state, dispatch] = useReducer(todoReducer, initialState)
+  const [input, setInput] = useState('')
+
+  const visibleTodos = state.todos.filter(todo => {
+    if (state.filter === 'active') return !todo.done
+    if (state.filter === 'done') return todo.done
+    return true
+  })
+
+  return (
+    <div>
+      <input
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        placeholder="할 일 입력"
+      />
+      <button onClick={() => {
+        if (input.trim()) {
+          dispatch({ type: 'ADD_TODO', payload: input })
+          setInput('')
+        }
+      }}>
+        추가
+      </button>
+
+      <div>
+        {['all', 'active', 'done'].map(f => (
+          <button key={f} onClick={() => dispatch({ type: 'SET_FILTER', payload: f })}>
+            {f}
+          </button>
+        ))}
+      </div>
+
+      <ul>
+        {visibleTodos.map(todo => (
+          <li key={todo.id} style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>
+            {todo.text}
+            <button onClick={() => dispatch({ type: 'TOGGLE_TODO', payload: todo.id })}>
+              완료
+            </button>
+            <button onClick={() => dispatch({ type: 'DELETE_TODO', payload: todo.id })}>
+              삭제
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+```
+
+---
+
+## useState vs useReducer 선택 기준
+
+| 상황 | 추천 |
+| --- | --- |
+| 독립된 간단한 값 (count, isOpen) | useState |
+| 여러 상태가 함께 바뀌는 경우 | useReducer |
+| 상태 전환 로직이 복잡한 경우 | useReducer |
+| 테스트 코드 작성이 중요한 경우 | useReducer (reducer 순수 함수라 테스트 용이) |
+
+---
+
+## 핵심 정리
+
+- `useReducer(reducer, 초기상태)` — `[state, dispatch]` 반환.
+- **Reducer**: `(현재상태, 액션) => 새상태` 형태의 순수 함수. switch-case로 액션 타입 처리.
+- **Action**: `{ type: '액션명', payload: 데이터 }` 형태의 객체.
+- **dispatch**: 액션을 보내 상태 변경을 요청하는 함수.
+- 상태가 복잡하거나 서로 연관될 때 useReducer가 useState보다 관리하기 쉽다.
+
+---
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="useReducer가 반환하는 값은?"
+  options={['①[state, action]', '②[state, dispatch]', '③[reducer, dispatch]', '④{state, dispatch, action}']}
+  correctAnswer={2}
+  explanation="useReducer(reducer, 초기상태)는 [현재상태, dispatch함수] 배열을 반환합니다. dispatch로 액션을 보내면 reducer가 새 상태를 계산합니다."
+  optionExplanations={['action은 dispatch로 보내는 것입니다.', '맞습니다. state와 dispatch를 반환합니다.', 'reducer는 인수로 전달하는 함수입니다.', '객체가 아닌 배열을 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="reducer 함수의 올바른 형태는?"
+  options={['①reducer(action) => state', '②reducer(state, action) => newState', '③reducer(dispatch, state) => action', '④reducer(newState) => state']}
+  correctAnswer={2}
+  explanation="reducer는 현재 상태(state)와 액션(action)을 받아 새 상태를 반환하는 순수 함수입니다."
+  optionExplanations={['state도 인수로 받아야 합니다.', '맞습니다. 현재 상태와 액션을 받아 새 상태를 반환합니다.', '인수 순서가 틀렸습니다.', '현재 상태도 인수로 받아야 합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Redux/useReducer의 액션 객체의 일반적인 형태는?"
+  options={['①{ method: 타입, data: 값 }', '②{ type: 액션명, payload: 데이터 }', '③{ action: 명령, value: 값 }', '④{ name: 타입, args: 인수 }']}
+  correctAnswer={2}
+  explanation="컨벤션으로 { type: 액션명, payload: 데이터 } 형태를 씁니다. type은 무슨 액션인지, payload는 추가 데이터입니다."
+  optionExplanations={['method는 일반적인 컨벤션이 아닙니다.', '맞습니다. type과 payload가 표준 컨벤션입니다.', 'action이 아니라 type이 표준입니다.', 'name과 args는 사용하지 않는 컨벤션입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="reducer 함수에서 default 케이스를 처리하는 올바른 방법은?"
+  options={['①throw new Error(알 수 없는 액션)', '②return null', '③return state (현재 상태를 그대로 반환)', '④return {}']}
+  correctAnswer={3}
+  explanation="알 수 없는 액션에서는 현재 상태를 그대로 반환해야 합니다. null이나 빈 객체를 반환하면 상태가 잘못됩니다."
+  optionExplanations={['개발 중 디버깅 목적으로 쓸 수 있지만, 알려진 모든 액션을 처리했다면 현재 상태 반환이 더 안전합니다.', 'null을 반환하면 상태가 null이 됩니다.', '맞습니다. 알 수 없는 액션에서는 현재 상태를 그대로 반환합니다.', '빈 객체를 반환하면 상태가 초기화됩니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="useReducer가 useState보다 유리한 상황은?"
+  options={['①상태가 단순한 boolean일 때', '②여러 연관 상태가 함께 변경되고 로직이 복잡할 때', '③컴포넌트가 하나일 때', '④비동기 작업이 없을 때']}
+  correctAnswer={2}
+  explanation="useReducer는 복잡한 상태 전환 로직을 reducer 함수로 분리할 수 있어 테스트와 유지보수에 유리합니다. 단순한 값은 useState가 더 간결합니다."
+  optionExplanations={['단순한 boolean은 useState로 충분합니다.', '맞습니다. 복잡하고 연관된 상태 관리에 useReducer가 유리합니다.', '컴포넌트 수와는 관련 없습니다.', '비동기 여부와 관련 없습니다.']}
+/>
