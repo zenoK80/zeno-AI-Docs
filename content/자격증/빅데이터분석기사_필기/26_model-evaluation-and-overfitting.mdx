@@ -21,6 +21,19 @@ description: '혼동행렬 기반 분류 평가지표 계산, ROC-AUC 해석, �
 - **FP (Type I Error)**: 실제 음성을 양성으로 잘못 예측 (오경보)
 - **FN (Type II Error)**: 실제 양성을 음성으로 잘못 예측 (미탐지)
 
+아래는 뒤에서 계산할 예시(TP=80, FN=20, FP=10, TN=90)를 막대그래프로 본 것입니다. 맞게 예측한 TP·TN(막대가 긺)이 잘못 예측한 FP·FN(막대가 짧음)보다 훨씬 많아야 좋은 모델입니다.
+
+<DataBarChart
+  label="혼동행렬 4가지 경우의 건수"
+  unit="건"
+  data={[
+    { label: 'TP(진양성)', value: 80 },
+    { label: 'FN(미탐지)', value: 20 },
+    { label: 'FP(오탐지)', value: 10 },
+    { label: 'TN(진음성)', value: 90 },
+  ]}
+/>
+
 ## 분류 평가지표
 
 ### 수식 정리
