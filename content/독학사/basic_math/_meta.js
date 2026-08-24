@@ -19,6 +19,9 @@ const meta = {
   '18_differentiation-rules': '18. 합성함수 미분, 지수·로그·삼각 미분',
   '19_derivative-applications': '19. 증가·감소·오목볼록·극값 찾기',
   '20_optimization': '20. 최적화 문제와 선형근사',
+  '21_indefinite-integrals': '21. 부정적분 — 역도함수, 기본 공식',
+  '22_definite-integrals': '22. 정적분과 미적분학의 기본정리',
+  '23_area-and-volume': '23. 정적분의 응용 — 면적과 부피',
 }
 
 export default meta
