@@ -5,6 +5,10 @@ const meta = {
   '04_equations-and-inequalities': '04. 방정식과 부등식 — 일차·이차',
   '05_sets-and-operations': '05. 집합, 원소, 부분집합, 집합 연산',
   '06_functions': '06. 함수, 합성함수, 역함수',
+  '07_matrix-basics': '07. 행렬의 뜻과 기본 연산',
+  '08_matrix-multiplication': '08. 행렬 곱셈과 전치행렬',
+  '09_inverse-matrix': '09. 역행렬과 연립방정식 풀이',
+  '10_determinants': '10. 행렬식 — 2×2, 3×3, 역행렬 존재 조건',
 }
 
 export default meta
