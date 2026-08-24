@@ -23,6 +23,10 @@ const meta = {
   '22_mean-proportion-tests': '22. 평균과 비율 검정',
   '23_two-sample-tests': '23. 두 집단 비교 검정',
   '24_anova-one-way': '24. 일원배치 분산분석',
+  '25_anova-two-way': '25. 이원배치 분산분석',
+  '26_chi-square-test': '26. 카이제곱 검정 (독립성·적합도)',
+  '27_correlation': '27. 상관관계와 상관계수',
+  '28_simple-regression': '28. 단순회귀분석',
 }
 
 export default meta
