@@ -19,6 +19,10 @@ const meta = {
   '18_sampling-distributions': '18. 표본평균의 분포와 중심극한정리',
   '19_point-estimation': '19. 점추정 — 불편성, 일치성, 유효성',
   '20_interval-estimation': '20. 신뢰구간',
+  '21_hypothesis-testing-basics': '21. 가설, 유의수준, p값, 1종·2종 오류',
+  '22_mean-proportion-tests': '22. 평균과 비율 검정',
+  '23_two-sample-tests': '23. 두 집단 비교 검정',
+  '24_anova-one-way': '24. 일원배치 분산분석',
 }
 
 export default meta
