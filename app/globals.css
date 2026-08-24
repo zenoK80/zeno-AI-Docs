@@ -37,9 +37,17 @@ html {
 }
 
 body {
+  overflow-x: hidden;
   background: var(--background);
   color: var(--foreground);
   font-family: Montserrat, Pretendard, Arial, sans-serif;
+}
+
+/* 코드블록·테이블은 컨테이너 안에서만 가로 스크롤 */
+article pre,
+article table {
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .docs-navbar {
