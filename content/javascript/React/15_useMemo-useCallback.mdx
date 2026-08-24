@@ -123,6 +123,20 @@ const ExpensiveButton = React.memo(function({ onClick }) {
 
 `text`가 바뀌어도 `handleClick`은 재생성되지 않아 `ExpensiveButton`이 리렌더링되지 않습니다.
 
+> **useCallback은 사실 useMemo의 특수한 형태입니다.** `useCallback(fn, deps)`는 `useMemo(() => fn, deps)`와 정확히 같은 동작입니다. "함수 자체를 메모이제이션할 값으로 다루는 useMemo"라고 이해하면 두 훅의 관계가 명확해집니다.
+
+### React.memo의 "얕은 비교(Shallow Comparison)"란?
+
+React.memo는 새 props와 이전 props를 비교할 때, 객체 내부까지 전부 비교하지 않고 **한 단계(1 depth)만** 비교합니다.
+
+```js
+// 얕은 비교: 각 속성을 === 로만 비교 (내부까지 파고들지 않음)
+prevProps.user === nextProps.user       // 객체 자체의 참조 비교
+prevProps.count === nextProps.count     // 숫자는 값 비교
+```
+
+`user` 같은 객체 prop은 내용이 똑같아도 참조(메모리 주소)가 다르면 "다르다"고 판단합니다. 그래서 객체·배열·함수를 props로 넘길 때는 `useMemo`·`useCallback`으로 참조를 안정시켜야 React.memo가 제대로 작동합니다.
+
 ---
 
 ## 언제 쓰고 언제 안 쓰나?
