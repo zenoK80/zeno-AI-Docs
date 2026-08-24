@@ -159,6 +159,36 @@ Context는 Provider의 value가 바뀌면 해당 Context를 구독하는 **모�
 
 자주 바뀌는 데이터는 Zustand 같은 상태 관리 라이브러리가 적합합니다 (19장).
 
+### 흔한 실수 — value에 매번 새 객체를 전달
+
+```jsx
+// ❌ 렌더링마다 새 객체가 생성됨
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('light')
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {/* value={{...}} 는 매 렌더링마다 "새로운" 객체입니다 */}
+      {children}
+    </ThemeContext.Provider>
+  )
+}
+```
+
+`{ theme, toggleTheme }`처럼 객체 리터럴을 직접 넘기면, `ThemeProvider`가 리렌더링될 때마다(예: 부모의 다른 이유로) **내용은 같아도 매번 새로운 객체**가 만들어집니다. React는 참조(메모리 주소)가 다르면 "값이 바뀌었다"고 판단하므로, 모든 구독 컴포넌트가 불필요하게 리렌더링됩니다.
+
+```jsx
+// ✅ useMemo로 값이 실제로 바뀔 때만 새 객체 생성
+const value = useMemo(() => ({ theme, toggleTheme }), [theme])
+
+return (
+  <ThemeContext.Provider value={value}>
+    {children}
+  </ThemeContext.Provider>
+)
+```
+
+(`useMemo`는 15번 문서에서 자세히 다룹니다. 지금은 "Context에 객체를 넘길 때는 이 문제를 조심해야 한다"는 것만 기억해도 충분합니다.)
+
 ---
 
 ## 핵심 정리
