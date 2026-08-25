@@ -33,13 +33,21 @@ function greet(name) {
 greet(42)  // 런타임 오류: toUpperCase is not a function
 ```
 
-```ts
-// TypeScript — 컴파일 타임에 오류 감지
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="타입 오류 실습 — greet(42) 줄의 주석을 풀어 컴파일 오류를 확인해보세요"
+  files={{
+    '/index.ts': `// TypeScript — 컴파일 타임에 오류 감지
 function greet(name: string): string {
   return 'Hello, ' + name.toUpperCase()
 }
-greet(42)  // 컴파일 오류: Argument of type 'number' is not assignable to parameter of type 'string'
-```
+
+console.log(greet('Alice'))
+// greet(42)  // 주석을 풀면: Argument of type 'number' is not assignable to parameter of type 'string'`,
+  }}
+/>
 
 ## 타입 시스템의 장점
 

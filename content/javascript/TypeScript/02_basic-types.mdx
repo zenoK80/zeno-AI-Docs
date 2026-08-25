@@ -57,24 +57,30 @@ function processData(data: any) {
 
 any와 유사하지만 사용 전에 타입을 좁혀야 합니다. any보다 안전합니다.
 
-```ts
-let input: unknown = getUserInput()
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="unknown 타입 좁히기 실습"
+  files={{
+    '/index.ts': `let input: unknown = 'hello world'
 
 // unknown은 직접 사용 불가
-input.toUpperCase()  // 오류: Object is of type 'unknown'
+// input.toUpperCase()  // 오류: Object is of type 'unknown'
 
 // 타입을 좁힌 후 사용 가능
 if (typeof input === 'string') {
-  input.toUpperCase()  // OK
+  console.log(input.toUpperCase())  // OK
 }
 
 // any vs unknown
 let a: any = 'hello'
-a.nonExistent()  // 오류 없음 — any는 검사 안 함
+console.log(a.length)  // 오류 없음 — any는 검사 안 함
 
 let u: unknown = 'hello'
-u.nonExistent()  // 오류 발생 — unknown은 검사함
-```
+// console.log(u.length)  // 오류 발생 — unknown은 검사함`,
+  }}
+/>
 
 ## void
 
