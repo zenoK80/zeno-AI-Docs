@@ -20,5 +20,6 @@ const meta = {
   '19_generative-models': '19. 생성 모델 — Autoencoder, VAE, GAN',
   '20_llm-basics': '20. 대규모 언어모델 기초 — 사전학습·미세조정, BERT·GPT',
   '21_model-evaluation-and-deployment': '21. 평가·전이학습·배포',
+  '22_exam-practice': '22. 딥러닝 예상기출문제',
 }
 export default meta
