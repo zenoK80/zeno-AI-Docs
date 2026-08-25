@@ -10,6 +10,9 @@ const meta = {
   '09_memory-management': '09. 메모리 관리',
   '10_virtual-memory': '10. 가상 메모리',
   '11_file-management': '11. 파일 관리',
+  '12_io-and-device-management': '12. 입출력·장치 관리',
+  '13_unix-os': '13. UNIX 운영체제',
+  '14_linux-os': '14. Linux 운영체제',
 }
 
 export default meta
