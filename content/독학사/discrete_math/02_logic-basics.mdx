@@ -1,0 +1,183 @@
+---
+title: '02. 논리 기초 — 명제, 논리 연산, 진리표'
+description: '참과 거짓을 다루는 명제논리의 기본 연산과 진리표 작성법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 명제와 진리값을 이해하고, AND·OR·NOT·함의·동치 연산의 진리표를 직접 작성할 수 있게 됩니다.
+</Callout>
+
+## 왜 논리를 배우는가?
+
+컴퓨터 프로그램의 조건문(`if`), 회로의 논리 게이트, 데이터베이스의 조건 검색 등은 모두 "참(True) 또는 거짓(False)"을 판단하는 **논리**(Logic) 위에서 작동합니다. 이 문서는 그 논리 연산의 기본 규칙을 다룹니다.
+
+## 명제(Proposition)
+
+> **쉽게 말하면:** 명제는 "참인지 거짓인지 명확하게 판별할 수 있는 문장"입니다.
+
+**예시:** "2는 짝수다"(참인 명제), "1+1=3"(거짓인 명제). "오늘 날씨가 좋다"는 사람마다 판단이 달라 명제가 아닙니다(참/거짓을 객관적으로 판별할 수 없음).
+
+## 기본 논리 연산
+
+<Table>
+  <thead>
+    <tr><th>연산</th><th>기호</th><th>이름</th><th>의미</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>부정</td><td>$\lnot p$</td><td>NOT</td><td>$p$가 아니다</td></tr>
+    <tr><td>논리곱</td><td>$p \land q$</td><td>AND</td><td>$p$이고 $q$이다</td></tr>
+    <tr><td>논리합</td><td>$p \lor q$</td><td>OR</td><td>$p$이거나 $q$이다</td></tr>
+  </tbody>
+</Table>
+
+## 진리표(Truth Table)
+
+> **쉽게 말하면:** 진리표는 명제의 참/거짓 조합에 따라 결과가 어떻게 되는지 모두 나열한 표입니다.
+
+<Table>
+  <thead>
+    <tr><th>$p$</th><th>$q$</th><th>$p\land q$</th><th>$p\lor q$</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+    <tr><td>T</td><td>F</td><td>F</td><td>T</td></tr>
+    <tr><td>F</td><td>T</td><td>F</td><td>T</td></tr>
+    <tr><td>F</td><td>F</td><td>F</td><td>F</td></tr>
+  </tbody>
+</Table>
+
+**해석:** $\land$(AND)는 둘 다 참이어야만 참, $\lor$(OR)는 둘 중 하나만 참이어도 참입니다.
+
+## 함의(Implication) — 조건 명제
+
+$$
+p \to q
+$$
+
+> **쉽게 말하면:** "$p$이면 $q$이다"라는 뜻으로, $p$가 참인데 $q$가 거짓인 경우에만 전체가 거짓이 됩니다.
+
+<Table>
+  <thead>
+    <tr><th>$p$</th><th>$q$</th><th>$p\to q$</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>T</td><td>T</td><td>T</td></tr>
+    <tr><td>T</td><td>F</td><td>F</td></tr>
+    <tr><td>F</td><td>T</td><td>T</td></tr>
+    <tr><td>F</td><td>F</td><td>T</td></tr>
+  </tbody>
+</Table>
+
+<Callout type="warning">
+  **자주 틀리는 점:** $p$가 거짓일 때는 $q$가 무엇이든 $p\to q$가 항상 **참**이 됩니다("공허한 참", Vacuous Truth). "비가 오면 우산을 쓴다"는 약속에서, 비가 안 오는 날은 우산을 쓰든 안 쓰든 이 약속을 어긴 것이 아니라는 직관과 일치합니다. 이 부분을 직관적으로 "거짓 같다"고 착각하는 경우가 많아 시험에 자주 출제됩니다.
+</Callout>
+
+## 함의와 관련된 세 가지 변형
+
+<Table>
+  <thead>
+    <tr><th>이름</th><th>형태</th><th>원래 명제와의 관계</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>역(Converse)</td><td>$q \to p$</td><td>원래 명제와 진리값이 다를 수 있음</td></tr>
+    <tr><td>이(Inverse)</td><td>$\lnot p \to \lnot q$</td><td>원래 명제와 진리값이 다를 수 있음</td></tr>
+    <tr><td>대우(Contrapositive)</td><td>$\lnot q \to \lnot p$</td><td>원래 명제와 항상 같은 진리값(동치)</td></tr>
+  </tbody>
+</Table>
+
+<Callout type="info">
+  **대우가 왜 중요한가?** "$p\to q$"와 "그 대우 $\lnot q \to \lnot p$"는 논리적으로 완전히 동일한 명제입니다. 그래서 원래 명제를 직접 증명하기 어려울 때, 그 대우를 증명하는 것으로 대신하는 **대우 증명법**이 03번 문서에서 자주 활용됩니다.
+</Callout>
+
+## 동치(Biconditional)
+
+$$
+p \leftrightarrow q
+$$
+
+> **쉽게 말하면:** "$p$와 $q$가 서로 필요충분조건", 즉 $p$와 $q$의 참/거짓이 **항상 똑같이** 움직일 때 참이 됩니다.
+
+<Table>
+  <thead>
+    <tr><th>$p$</th><th>$q$</th><th>$p\leftrightarrow q$</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>T</td><td>T</td><td>T</td></tr>
+    <tr><td>T</td><td>F</td><td>F</td></tr>
+    <tr><td>F</td><td>T</td><td>F</td></tr>
+    <tr><td>F</td><td>F</td><td>T</td></tr>
+  </tbody>
+</Table>
+
+## 진리표로 논리식 검증하기
+
+**예시:** $p\to q$와 그 대우 $\lnot q \to \lnot p$가 정말 같은지 진리표로 확인합니다.
+
+<Table>
+  <thead>
+    <tr><th>$p$</th><th>$q$</th><th>$p\to q$</th><th>$\lnot q \to \lnot p$</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>T</td><td>T</td><td>T</td><td>T</td></tr>
+    <tr><td>T</td><td>F</td><td>F</td><td>F</td></tr>
+    <tr><td>F</td><td>T</td><td>T</td><td>T</td></tr>
+    <tr><td>F</td><td>F</td><td>T</td><td>T</td></tr>
+  </tbody>
+</Table>
+
+**확인:** 두 열의 값이 모든 경우에서 완전히 일치합니다 — 대우는 항상 원래 명제와 동치입니다.
+
+## 핵심 정리
+
+- **명제**: 참/거짓을 명확히 판별할 수 있는 문장.
+- **논리 연산**: 부정($\lnot$), 논리곱($\land$, 둘 다 참), 논리합($\lor$, 하나라도 참).
+- **함의** $p\to q$: $p$가 참이고 $q$가 거짓일 때만 거짓. $p$가 거짓이면 항상 참(공허한 참).
+- **대우**($\lnot q\to\lnot p$)는 원래 명제와 항상 동치. 역·이는 동치가 아닐 수 있음.
+- **동치** $p\leftrightarrow q$: 두 명제의 진리값이 항상 같을 때 참.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="p가 거짓(F)일 때 p→q의 진리값은? (q와 무관하게)"
+  options={['①항상 거짓', '②항상 참', '③q에 따라 다르다', '④판단할 수 없다']}
+  correctAnswer={2}
+  explanation="p가 거짓이면 함의 p→q는 q의 진리값과 무관하게 항상 참이 됩니다(공허한 참)."
+  optionExplanations={['p가 거짓일 때는 항상 참입니다.', '맞습니다. 공허한 참입니다.', 'q와 무관하게 항상 참으로 정해집니다.', '명확히 정해진 규칙이 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="원래 명제 p→q와 항상 같은 진리값(동치)을 갖는 것은?"
+  options={['①역(q→p)', '②이(¬p→¬q)', '③대우(¬q→¬p)', '④부정(¬(p→q))']}
+  correctAnswer={3}
+  explanation="대우(¬q→¬p)는 원래 명제와 논리적으로 항상 동치입니다."
+  optionExplanations={['역은 원래 명제와 다를 수 있습니다.', '이도 원래 명제와 다를 수 있습니다.', '맞습니다. 대우가 항상 동치입니다.', '부정은 원래 명제와 반대의 진리값을 갖습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="p∧q(논리곱)가 참이 되기 위한 조건은?"
+  options={['①p나 q 중 하나만 참이면 된다', '②p와 q가 모두 참이어야 한다', '③항상 참이다', '④항상 거짓이다']}
+  correctAnswer={2}
+  explanation="AND(∧)는 두 명제가 모두 참일 때만 전체가 참이 됩니다."
+  optionExplanations={['이는 OR(∨)에 대한 설명입니다.', '맞습니다. 둘 다 참이어야 합니다.', '조건에 따라 참/거짓이 결정됩니다.', 'p, q가 모두 참이면 참이 됩니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="p↔q(동치)가 참이 되는 경우는?"
+  options={['①p, q 중 하나만 참일 때', '②p와 q의 진리값이 항상 같을 때(둘 다 참이거나 둘 다 거짓)', '③p가 항상 참일 때', '④q가 항상 거짓일 때']}
+  correctAnswer={2}
+  explanation="동치(↔)는 p와 q의 진리값이 서로 일치할 때(둘 다 참 또는 둘 다 거짓) 참이 됩니다."
+  optionExplanations={['이 경우는 오히려 동치가 거짓이 됩니다.', '맞습니다. 진리값이 일치해야 참입니다.', 'p 값만으로는 결정되지 않습니다.', 'q 값만으로는 결정되지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="명제로 볼 수 없는 문장은?"
+  options={['①2는 소수이다', '②오늘 기분이 좋다(주관적 판단)', '③1+1=2이다', '④지구는 태양 주위를 돈다']}
+  correctAnswer={2}
+  explanation="'오늘 기분이 좋다'는 사람마다 판단이 달라 객관적으로 참/거짓을 판별할 수 없어 명제가 아닙니다."
+  optionExplanations={['참/거짓이 명확한 명제입니다.', '맞습니다. 주관적 판단은 명제가 아닙니다.', '참/거짓이 명확한 명제입니다.', '참/거짓이 명확한 명제입니다.']}
+/>
