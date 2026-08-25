@@ -39,10 +39,15 @@ type StringifiedUser = Stringify<User>
 
 ## 매핑 타입 — 키 재매핑
 
-```ts
-// as로 키 이름 변환
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="키 재매핑 실습"
+  files={{
+    '/index.ts': `// as로 키 이름 변환
 type Getters<T> = {
-  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K]
+  [K in keyof T as \`get\${Capitalize<string & K>}\`]: () => T[K]
 }
 
 interface User {
@@ -52,7 +57,22 @@ interface User {
 
 type UserGetters = Getters<User>
 // { getId: () => number; getName: () => string }
-```
+
+// 실제로 이 타입에 맞는 객체를 만들어보면
+function createGetters<T extends object>(obj: T): Getters<T> {
+  const getters = {} as Getters<T>
+  for (const key in obj) {
+    const getterName = 'get' + key[0].toUpperCase() + key.slice(1)
+    ;(getters as any)[getterName] = () => obj[key]
+  }
+  return getters
+}
+
+const userGetters = createGetters({ id: 1, name: 'Alice' } as User)
+console.log(userGetters.getId())
+console.log(userGetters.getName())`,
+  }}
+/>
 
 ## 조건부 타입 (Conditional Types)
 
