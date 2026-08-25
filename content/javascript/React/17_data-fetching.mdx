@@ -86,8 +86,15 @@ useEffect(() => {
 
 API 요청 실패 시 재시도 버튼을 제공합니다.
 
-```jsx
-function RetryExample() {
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  showConsole
+  label="실제 API로 데이터 패칭 실습 — 재시도 버튼도 눌러보세요"
+  files={{
+    '/App.js': `import { useState, useEffect } from 'react'
+
+export default function RetryExample() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -98,7 +105,8 @@ function RetryExample() {
       try {
         setLoading(true)
         setError(null)
-        const res = await fetch('/api/data')
+        const res = await fetch('https://jsonplaceholder.typicode.com/users?_limit=3')
+        if (!res.ok) throw new Error('HTTP ' + res.status)
         const json = await res.json()
         setData(json)
       } catch (err) {
@@ -117,9 +125,15 @@ function RetryExample() {
       <button onClick={() => setRetryCount(c => c + 1)}>다시 시도</button>
     </div>
   )
-  return <pre>{JSON.stringify(data, null, 2)}</pre>
-}
-```
+  return (
+    <div>
+      <ul>{data.map(u => <li key={u.id}>{u.name}</li>)}</ul>
+      <button onClick={() => setRetryCount(c => c + 1)}>다시 불러오기</button>
+    </div>
+  )
+}`,
+  }}
+/>
 
 ---
 
