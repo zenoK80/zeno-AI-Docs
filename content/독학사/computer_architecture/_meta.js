@@ -5,6 +5,9 @@ const meta = {
   '04_computer-architecture-overview': '04. 컴퓨터 구조 개요 — 폰 노이만 구조, 시스템 버스',
   '05_data-representation': '05. 데이터 표현 — 부호있는 수, 부동소수점, 문자 코드',
   '06_cpu-structure': '06. CPU 구조 — ALU, 레지스터, 명령어 사이클',
+  '07_control-unit': '07. 제어장치 — 마이크로프로그램 방식, 하드와이어드 방식',
+  '08_instruction-set': '08. 명령어 집합 — 형식, 주소 지정 방식, 명령어 종류',
+  '09_cpu-performance': '09. CPU 성능 — 파이프라이닝, 슈퍼스칼라, RISC vs CISC',
 }
 
 export default meta
