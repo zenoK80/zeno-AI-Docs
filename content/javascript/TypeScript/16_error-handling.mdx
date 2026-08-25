@@ -62,8 +62,13 @@ try {
 
 예외 대신 반환값으로 에러를 전달합니다.
 
-```ts
-type Ok<T> = { ok: true; value: T }
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="Result 패턴 실습"
+  files={{
+    '/index.ts': `type Ok<T> = { ok: true; value: T }
 type Err<E> = { ok: false; error: E }
 type Result<T, E = Error> = Ok<T> | Err<E>
 
@@ -85,14 +90,20 @@ async function parseJson(text: string): Promise<Result<unknown, SyntaxError>> {
 }
 
 async function main() {
-  const result = await parseJson('{"name": "Alice"}')
-  if (result.ok) {
-    console.log(result.value)
-  } else {
-    console.error('파싱 실패:', result.error.message)
+  const success = await parseJson('{"name": "Alice"}')
+  if (success.ok) {
+    console.log('성공:', success.value)
+  }
+
+  const failure = await parseJson('{invalid json}')
+  if (!failure.ok) {
+    console.error('파싱 실패:', failure.error.message)
   }
 }
-```
+
+main()`,
+  }}
+/>
 
 ## 커스텀 에러 클래스
 

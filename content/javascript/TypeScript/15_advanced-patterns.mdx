@@ -11,8 +11,13 @@ description: 'Builder 패턴, 타입 안전한 API 클라이언트, 에러 타�
 
 메서드 체이닝으로 복잡한 객체를 단계별로 구성합니다.
 
-```ts
-class QueryBuilder {
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="Builder 패턴 실습"
+  files={{
+    '/index.ts': `class QueryBuilder {
   private table: string = ''
   private conditions: string[] = []
   private orderByField: string = ''
@@ -39,15 +44,15 @@ class QueryBuilder {
   }
 
   build(): string {
-    let query = `SELECT * FROM ${this.table}`
+    let query = 'SELECT * FROM ' + this.table
     if (this.conditions.length) {
-      query += ` WHERE ${this.conditions.join(' AND ')}`
+      query += ' WHERE ' + this.conditions.join(' AND ')
     }
     if (this.orderByField) {
-      query += ` ORDER BY ${this.orderByField}`
+      query += ' ORDER BY ' + this.orderByField
     }
     if (this.limitCount) {
-      query += ` LIMIT ${this.limitCount}`
+      query += ' LIMIT ' + this.limitCount
     }
     return query
   }
@@ -60,7 +65,10 @@ const query = new QueryBuilder()
   .orderBy('name')
   .limit(10)
   .build()
-```
+
+console.log(query)`,
+  }}
+/>
 
 ## 타입 안전한 API 클라이언트
 
