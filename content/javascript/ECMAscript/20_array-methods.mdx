@@ -1,0 +1,230 @@
+---
+title: '20. 배열 메서드'
+description: 'map, filter, reduce, find 등 배열을 다루는 핵심 메서드를 실제 데이터로 계산해보며 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 상황에 맞는 배열 메서드를 선택하고, reduce의 동작 과정을 손으로 계산할 수 있습니다.
+</Callout>
+
+## 배열 메서드가 왜 중요한가?
+
+> **쉽게 말하면:** for문으로 배열을 하나씩 돌면서 할 수 있는 흔한 작업들(변환, 필터링, 압축)을, 이름이 붙은 전용 메서드로 훨씬 짧고 명확하게 표현한 것입니다.
+
+```js
+const numbers = [1, 2, 3, 4, 5]
+
+// for문 방식 — 각 숫자를 2배로
+const doubled1 = []
+for (let i = 0; i < numbers.length; i++) {
+  doubled1.push(numbers[i] * 2)
+}
+
+// map 방식 — 의도가 훨씬 명확하게 드러남
+const doubled2 = numbers.map(n => n * 2)
+
+console.log(doubled1, doubled2)  // 둘 다 [2, 4, 6, 8, 10]
+```
+
+## map — 변환해서 새 배열 만들기
+
+```js
+const prices = [1000, 2000, 3000]
+const withTax = prices.map(price => price * 1.1)
+console.log(withTax)  // [1100, 2200, 3300]
+```
+
+`map`은 배열의 **각 요소를 변환한 새 배열**을 반환합니다. 원본 배열의 길이와 항상 같은 길이를 유지합니다.
+
+## filter — 조건에 맞는 것만 걸러내기
+
+```js
+const scores = [45, 78, 92, 61, 88]
+const passed = scores.filter(score => score >= 60)
+console.log(passed)  // [78, 92, 61, 88]
+```
+
+`filter`는 콜백이 `true`를 반환하는 요소만 모아 새 배열을 만듭니다. 원본보다 짧거나 같은 길이가 됩니다.
+
+## find와 findIndex — 하나만 찾기
+
+```js
+const users = [
+  { id: 1, name: '철수' },
+  { id: 2, name: '영희' },
+]
+
+console.log(users.find(u => u.id === 2))       // { id: 2, name: '영희' } — 찾은 요소 자체
+console.log(users.findIndex(u => u.id === 2))  // 1 — 찾은 요소의 인덱스
+console.log(users.find(u => u.id === 99))      // undefined — 못 찾으면 undefined
+```
+
+## reduce — 배열을 하나의 값으로 압축하기
+
+`reduce`는 가장 강력하지만 처음엔 헷갈리는 메서드입니다. 배열의 모든 요소를 순회하며 **누적값**(accumulator)**을 계속 갱신**해 최종적으로 값 하나를 만듭니다.
+
+```js
+const cart = [
+  { name: '사과', price: 1000, qty: 3 },
+  { name: '바나나', price: 500, qty: 5 },
+]
+
+const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0)
+console.log(total)  // 5500
+```
+
+### reduce가 실제로 계산하는 과정 — 손으로 따라가기
+
+`cart.reduce((acc, item) => acc + item.price * item.qty, 0)`의 실행 과정을 한 단계씩 풀어보면:
+
+<Table>
+  <thead>
+    <tr><th>단계</th><th>acc(들어오는 값)</th><th>item</th><th>계산</th><th>반환값(다음 acc)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>시작</td><td>—</td><td>—</td><td>초기값 지정</td><td>0</td></tr>
+    <tr><td>1번째</td><td>0</td><td>사과(1000×3)</td><td>0 + 3000</td><td>3000</td></tr>
+    <tr><td>2번째</td><td>3000</td><td>바나나(500×5)</td><td>3000 + 2500</td><td>5500</td></tr>
+    <tr><td>종료</td><td colSpan={3}>더 이상 요소 없음</td><td>최종 결과 5500</td></tr>
+  </tbody>
+</Table>
+
+`reduce`의 두 번째 인수(`0`)는 **acc의 시작값**입니다. 생략하면 배열의 첫 번째 요소가 시작값으로 쓰이는데, 숫자 합산처럼 명확한 초기값이 필요한 경우에는 반드시 명시하는 것이 안전합니다.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="배열 메서드 종합 실습"
+  files={{
+    '/index.js': `const cart = [
+  { name: '사과', price: 1000, qty: 3 },
+  { name: '바나나', price: 500, qty: 5 },
+  { name: '포도', price: 3000, qty: 1 },
+]
+
+// map: 각 상품의 소계
+console.log(cart.map(item => item.price * item.qty))  // [3000, 2500, 3000]
+
+// filter: 2000원 이상인 상품만
+console.log(cart.filter(item => item.price >= 2000).map(i => i.name))  // ['포도']
+
+// find: 이름으로 찾기
+console.log(cart.find(item => item.name === '바나나'))
+
+// reduce: 전체 합계
+console.log(cart.reduce((acc, item) => acc + item.price * item.qty, 0))  // 8500`,
+  }}
+/>
+
+## some과 every — 조건 검사
+
+```js
+const scores = [80, 90, 70]
+
+console.log(scores.some(s => s >= 90))   // true — 하나라도 만족하면 true
+console.log(scores.every(s => s >= 90))  // false — 모두 만족해야 true
+console.log(scores.every(s => s >= 60))  // true
+```
+
+## forEach — 반환값 없이 그냥 실행만
+
+```js
+const fruits = ['사과', '바나나', '포도']
+fruits.forEach(fruit => console.log(fruit))
+// map과 달리 forEach는 undefined를 반환한다 — 새 배열이 필요 없을 때만 사용
+```
+
+<Callout type="warning">
+  `forEach`의 반환값을 변수에 저장하려 하면 `undefined`만 얻게 됩니다. 배열을 변형한 **새 배열이 필요하다면 `map`**을, 그냥 각 요소로 어떤 동작(로그 출력 등)만 하고 싶다면 `forEach`를 사용합니다.
+</Callout>
+
+## 메서드 체이닝 — 여러 메서드를 이어붙이기
+
+배열 메서드는 대부분 새 배열을 반환하므로, 뒤에 다른 메서드를 이어붙일 수 있습니다.
+
+```js
+const users = [
+  { name: '철수', age: 25, active: true },
+  { name: '영희', age: 17, active: true },
+  { name: '민수', age: 30, active: false },
+]
+
+const result = users
+  .filter(u => u.active)       // 활성 사용자만
+  .filter(u => u.age >= 18)    // 성인만
+  .map(u => u.name)            // 이름만 추출
+
+console.log(result)  // ['철수']
+```
+
+## 배열 메서드 선택 기준 정리
+
+<Table>
+  <thead>
+    <tr><th>하고 싶은 일</th><th>메서드</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>각 항목을 다른 형태로 바꾼 새 배열이 필요</td><td>map</td></tr>
+    <tr><td>조건에 맞는 항목들만 걸러낸 새 배열이 필요</td><td>filter</td></tr>
+    <tr><td>조건에 맞는 항목 딱 하나(값 또는 인덱스)만 필요</td><td>find / findIndex</td></tr>
+    <tr><td>배열 전체를 하나의 값으로 압축</td><td>reduce</td></tr>
+    <tr><td>하나라도/모두 조건을 만족하는지 boolean으로 확인</td><td>some / every</td></tr>
+    <tr><td>배열을 변형하지 않고 그냥 순회하며 무언가 실행</td><td>forEach</td></tr>
+  </tbody>
+</Table>
+
+## 핵심 정리
+
+- map은 변환된 새 배열, filter는 조건에 맞는 요소만 걸러낸 새 배열을 반환한다.
+- find는 조건에 맞는 첫 요소, findIndex는 그 인덱스를 반환하며 못 찾으면 각각 undefined, -1이다.
+- reduce는 초기값에서 시작해 각 요소를 누적 계산하며 값 하나로 압축한다.
+- some은 하나라도, every는 모두 조건을 만족하는지 검사한다.
+- forEach는 반환값이 없어 단순 반복 실행에만 쓰고, 새 배열이 필요하면 map을 쓴다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="원본 배열과 다른 길이가 될 수 있는 메서드는?"
+  options={['①map', '②filter', '③forEach', '④둘 다 항상 같은 길이']}
+  correctAnswer={2}
+  explanation="filter는 조건을 만족하는 요소만 골라내므로 원본보다 짧거나 같은 길이의 새 배열을 반환합니다. map은 항상 원본과 같은 길이입니다."
+  optionExplanations={['map은 항상 원본과 같은 길이입니다.', '맞습니다. 조건에 맞는 것만 남아 길이가 줄어들 수 있습니다.', 'forEach는 배열을 반환하지 않습니다.', 'filter는 길이가 달라질 수 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`[1,2,3].reduce((acc,n)=>acc+n, 10)`의 결과는?"
+  options={['①6', '②10', '③16', '④NaN']}
+  correctAnswer={3}
+  explanation="초기값 10에서 시작해 1,2,3을 순서대로 더합니다: 10+1=11, 11+2=13, 13+3=16."
+  optionExplanations={['초기값 10을 빠뜨린 계산입니다.', '초기값만 있고 배열 합산이 빠졌습니다.', '맞습니다. 10에서 시작해 1+2+3을 더한 값입니다.', '정상적으로 숫자가 계산됩니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="find()가 조건을 만족하는 요소를 찾지 못하면 반환하는 값은?"
+  options={['①null', '②undefined', '③-1', '④빈 배열 []']}
+  correctAnswer={2}
+  explanation="find()는 찾지 못하면 undefined를 반환합니다. -1을 반환하는 것은 findIndex()입니다."
+  optionExplanations={['null이 아닌 undefined입니다.', '맞습니다. find는 undefined를 반환합니다.', '-1은 findIndex의 실패 반환값입니다.', '배열이 아닌 단일 값(undefined)을 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="forEach와 map의 차이는?"
+  options={['①완전히 동일하다.', '②forEach는 새 배열을 반환하지 않고, map은 변환된 새 배열을 반환한다.', '③forEach만 배열에 사용할 수 있다.', '④map은 원본 배열을 직접 수정한다.']}
+  correctAnswer={2}
+  explanation="forEach는 반환값이 undefined입니다. 각 요소로 어떤 동작만 실행하고 싶을 때 씁니다. map은 반환값(변환된 새 배열)이 필요할 때 씁니다."
+  optionExplanations={['반환값에서 결정적 차이가 있습니다.', '맞습니다. 반환값 유무가 핵심 차이입니다.', '둘 다 배열에 사용합니다.', 'map은 원본을 수정하지 않고 새 배열을 만듭니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`[1,2,3].some(n => n > 5)`와 `[1,2,3].every(n => n > 0)`의 결과는?"
+  options={['①true, true', '②false, true', '③true, false', '④false, false']}
+  correctAnswer={2}
+  explanation="some은 5보다 큰 값이 하나도 없어 false. every는 모든 값이 0보다 커서 true입니다."
+  optionExplanations={['some의 조건을 만족하는 값이 없습니다.', '맞습니다. some은 false, every는 true입니다.', '결과가 반대로 되어 있습니다.', 'every 조건은 모두 만족합니다.']}
+/>

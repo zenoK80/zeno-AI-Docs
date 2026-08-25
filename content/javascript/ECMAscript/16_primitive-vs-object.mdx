@@ -1,0 +1,196 @@
+---
+title: '16. 원시값 vs 객체'
+description: '값에 의한 전달과 참조에 의한 전달의 차이를 이해하고, 얕은 복사와 깊은 복사의 필요성을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 원시값과 객체를 복사·전달할 때 왜 다르게 동작하는지 메모리 구조로 설명할 수 있게 됩니다.
+</Callout>
+
+## 이상한 현상 관찰하기
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="원시값 vs 객체 복사 비교"
+  files={{
+    '/index.js': `// 원시값(number) 복사
+let a = 10
+let b = a  // a의 "값"을 복사
+b = 20
+console.log('a:', a)  // 10 — a는 영향 안 받음
+console.log('b:', b)  // 20
+
+// 객체 복사
+let objA = { count: 10 }
+let objB = objA  // objA가 "가리키는 곳"을 복사
+objB.count = 20
+console.log('objA:', objA.count)  // 20 — objA도 바뀌어버림!
+console.log('objB:', objB.count)  // 20`,
+  }}
+/>
+
+`b = a`는 `a`에 영향을 주지 않았는데, `objB = objA`는 왜 `objA`까지 바꿔버렸을까요?
+
+## 값에 의한 전달 vs 참조에 의한 전달
+
+> **쉽게 말하면:** 원시값은 "복사본"을 주고받고, 객체는 "주소(위치를 가리키는 화살표)"를 주고받습니다.
+
+<Table>
+  <thead>
+    <tr><th>구분</th><th>원시 타입(string, number, boolean 등)</th><th>객체 타입(object, array, function)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>저장 방식</td><td>값 자체를 저장</td><td>메모리 주소(참조)를 저장</td></tr>
+    <tr><td>대입 시(<code>b = a</code>)</td><td>값을 복사</td><td>같은 주소를 가리키는 참조를 복사</td></tr>
+    <tr><td>비교(<code>===</code>)</td><td>값이 같으면 true</td><td>같은 주소를 가리켜야 true</td></tr>
+  </tbody>
+</Table>
+
+`let objB = objA`를 실행하면, `objB`에는 객체 `{ count: 10 }`의 **내용이 복사되는 것이 아니라**, 그 객체가 메모리 어디에 있는지 가리키는 **"주소"만 복사**됩니다. 그래서 `objA`와 `objB`는 서로 다른 이름이지만 **같은 객체를 가리키는 두 개의 화살표**가 됩니다. 어느 쪽으로 내용을 바꾸든 같은 객체가 바뀌므로, 둘 다 그 변화를 보게 됩니다.
+
+> **비유:** 원시값 복사는 "친구에게 사진을 인화해서 주는 것"과 같습니다. 내 사진을 낙서해도 친구 사진은 멀쩡합니다. 객체 복사는 "같은 사진이 걸린 방의 열쇠를 하나 더 만들어 주는 것"과 같습니다. 어느 열쇠로 방에 들어가 사진에 낙서하든, 그 방의 사진은 하나뿐이라 함께 바뀝니다.
+
+## 비교 연산에서도 같은 원리
+
+```js
+console.log(10 === 10)               // true — 값 자체가 같음
+console.log('a' === 'a')             // true — 값 자체가 같음
+
+console.log({} === {})               // false! — 서로 다른 객체(다른 주소)
+console.log([1, 2] === [1, 2])       // false! — 내용은 같지만 다른 객체
+
+const objA = { count: 1 }
+const objB = objA
+console.log(objA === objB)           // true — 같은 주소를 가리킴
+```
+
+`{}`와 `{}`는 내용이 완전히 같아 보여도, 매번 **새로운 객체**가 메모리에 만들어지므로 서로 다른 주소를 가리켜 `false`가 됩니다.
+
+## 함수에 전달할 때도 같은 원리 적용
+
+```js
+function changeValue(x) {
+  x = 100  // 매개변수 자체를 재할당
+}
+function changeProperty(obj) {
+  obj.count = 100  // 객체의 내부 프로퍼티를 변경
+}
+
+let num = 10
+changeValue(num)
+console.log(num)  // 10 — 원시값은 복사되어 전달되므로 원본 영향 없음
+
+let myObj = { count: 10 }
+changeProperty(myObj)
+console.log(myObj.count)  // 100 — 참조가 전달되어 원본이 바뀜!
+```
+
+<Callout type="warning">
+  **주의:** 함수 매개변수 자체를 다른 객체로 **재할당**하는 것은 원본에 영향을 주지 않습니다. 하지만 매개변수가 가리키는 객체의 **내부 프로퍼티를 변경**하면 원본까지 바뀝니다. 이 차이는 04번 문서에서 배운 "const는 재할당만 막을 뿐 내용 변경은 막지 못한다"는 규칙과 정확히 같은 원리입니다.
+  ```js
+  function reassign(obj) {
+    obj = { count: 999 }  // obj가 새 객체를 가리키게 됨 — 원본과 무관해짐
+  }
+  let original = { count: 10 }
+  reassign(original)
+  console.log(original.count)  // 10 — 영향 없음! (재할당은 원본에 영향 없음)
+  ```
+</Callout>
+
+## 얕은 복사(Shallow Copy) — 진짜 복사본 만들기
+
+객체가 서로 영향을 주지 않게 하려면, "주소 복사"가 아닌 "새 객체 만들기"가 필요합니다. 스프레드 문법(`...`)이나 `Object.assign()`으로 만들 수 있습니다.
+
+```js
+const original = { name: '철수', age: 25 }
+const copy = { ...original }  // 스프레드로 새 객체 생성
+
+copy.age = 30
+console.log(original.age)  // 25 — 원본은 영향받지 않음
+console.log(copy.age)      // 30
+```
+
+**"얕은" 복사인 이유:** 객체 안에 또 다른 객체(중첩 객체)가 있으면, 그 안쪽 객체는 여전히 같은 주소를 공유합니다.
+
+```js
+const original = { name: '철수', address: { city: '서울' } }
+const copy = { ...original }
+
+copy.address.city = '부산'
+console.log(original.address.city)  // '부산' — 중첩된 객체는 여전히 공유됨!
+```
+
+`{ ...original }`은 **한 단계**(1 depth)**만 새로 복사**합니다. `address`라는 프로퍼티 자체는 새 자리에 복사되지만, 그 값(`{ city: '서울' }`이라는 객체)은 여전히 원본과 같은 주소를 가리킵니다.
+
+## 깊은 복사(Deep Copy) — 중첩까지 완전히 분리
+
+중첩된 객체까지 완전히 독립시키려면 **깊은 복사**가 필요합니다.
+
+```js
+const original = { name: '철수', address: { city: '서울' } }
+
+// 방법 1: JSON을 이용 (함수나 undefined, Date 등은 제대로 복사 안 됨)
+const deepCopy1 = JSON.parse(JSON.stringify(original))
+
+// 방법 2: structuredClone (최신 브라우저·Node.js 내장 함수)
+const deepCopy2 = structuredClone(original)
+
+deepCopy2.address.city = '부산'
+console.log(original.address.city)  // '서울' — 원본이 전혀 영향받지 않음
+```
+
+## 핵심 정리
+
+- 원시값은 값 자체가 복사되어 전달되고, 객체는 메모리 주소(참조)가 복사되어 전달된다.
+- 내용이 같은 객체 리터럴끼리도 `===`로 비교하면 false다(서로 다른 주소).
+- 함수에 객체를 전달하면 참조가 전달되어, 내부 프로퍼티 변경이 원본에 반영된다(단, 매개변수 자체의 재할당은 원본에 영향 없음).
+- 스프레드(`{...obj}`)는 얕은 복사만 하므로 중첩 객체는 여전히 공유된다. 완전한 분리에는 `structuredClone` 같은 깊은 복사가 필요하다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="`let a=10; let b=a; b=20;` 실행 후 a의 값은?"
+  options={['①10', '②20', '③undefined', '④오류 발생']}
+  correctAnswer={1}
+  explanation="number는 원시 타입이므로 b=a는 값 자체를 복사합니다. b를 나중에 바꿔도 a는 영향받지 않습니다."
+  optionExplanations={['맞습니다. 원시값은 독립적으로 복사됩니다.', 'b의 변경이 a에 영향을 주지 않습니다.', 'a는 여전히 10을 유지합니다.', '정상적으로 실행됩니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`let objA={x:1}; let objB=objA; objB.x=2;` 실행 후 objA.x의 값은?"
+  options={['①1', '②2', '③undefined', '④오류 발생']}
+  correctAnswer={2}
+  explanation="객체는 참조가 복사되므로 objA와 objB는 같은 객체를 가리킵니다. objB를 통한 변경이 objA에도 그대로 반영됩니다."
+  optionExplanations={['objA도 함께 변경됩니다.', '맞습니다. 같은 객체를 공유하므로 함께 바뀝니다.', '값은 존재하므로 undefined가 아닙니다.', '정상적으로 실행됩니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`{} === {}`의 결과는?"
+  options={['①true', '②false', '③오류 발생', '④undefined']}
+  correctAnswer={2}
+  explanation="내용이 같아도 서로 다른 메모리 위치에 생성된 별개의 객체이므로, 참조(주소)가 달라 false입니다."
+  optionExplanations={['내용이 같아도 다른 객체라 false입니다.', '맞습니다. 서로 다른 참조를 가리킵니다.', '유효한 비교 연산입니다.', 'boolean 값을 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`const copy = {...original}`이 '얕은' 복사인 이유는?"
+  options={['①복사가 불완전하게 실패해서', '②최상위 프로퍼티만 새로 복사되고, 중첩된 객체는 여전히 원본과 같은 참조를 공유하기 때문', '③원본을 전혀 복사하지 않아서', '④숫자만 복사되기 때문']}
+  correctAnswer={2}
+  explanation="스프레드 문법은 한 단계(1 depth)만 새로운 객체로 만듭니다. 그 안에 중첩된 객체 프로퍼티는 여전히 원본과 같은 참조를 가리킵니다."
+  optionExplanations={['실패가 아닌 의도된 동작입니다.', '맞습니다. 한 단계까지만 독립적으로 복사됩니다.', '최상위 프로퍼티는 정상적으로 복사됩니다.', '모든 타입의 최상위 프로퍼티가 복사됩니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="함수 매개변수로 받은 객체를 완전히 새로운 객체로 재할당(`obj = {새 객체}`)하면 원본은?"
+  options={['①원본도 새 객체로 바뀐다.', '②원본은 영향받지 않는다 — 재할당은 매개변수가 다른 곳을 가리키게 할 뿐, 원본의 참조 자체를 바꾸지 않기 때문.', '③오류가 발생한다.', '④원본이 삭제된다.']}
+  correctAnswer={2}
+  explanation="매개변수 obj에 새 객체를 대입하는 것은 obj라는 지역 변수가 다른 곳을 가리키게 할 뿐입니다. 원본 변수가 가리키는 객체 자체는 전혀 건드리지 않으므로 원본은 그대로 유지됩니다."
+  optionExplanations={['원본은 그대로 유지됩니다.', '맞습니다. 재할당은 원본에 영향을 주지 않습니다.', '정상적으로 실행됩니다.', '삭제되지 않습니다.']}
+/>

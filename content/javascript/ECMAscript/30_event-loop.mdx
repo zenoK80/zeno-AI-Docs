@@ -1,0 +1,193 @@
+---
+title: '30. 이벤트 루프'
+description: '자바스크립트가 싱글 스레드인데도 어떻게 비동기 작업을 처리하는지, 콜 스택·태스크 큐·마이크로태스크 큐로 정확히 설명합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** `console.log(1); setTimeout(()=>console.log(2)); console.log(3)`이 왜 1, 3, 2 순서로 출력되는지 정확히 설명할 수 있습니다.
+</Callout>
+
+## 이상한 실행 순서 관찰하기
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="실행 순서 관찰"
+  files={{
+    '/index.js': `console.log('1. 동기 코드')
+
+setTimeout(() => {
+  console.log('2. setTimeout(0ms)')
+}, 0)
+
+Promise.resolve().then(() => {
+  console.log('3. Promise then')
+})
+
+console.log('4. 동기 코드')
+
+// 실행 순서를 예측해보세요. 정답은 아래 설명에서 확인합니다.`,
+  }}
+/>
+
+`setTimeout`을 0ms로 설정했는데도, 왜 즉시 실행되지 않고 동기 코드보다 나중에 실행될까요? 그리고 `setTimeout(0)`과 `Promise.then` 중 어느 것이 먼저 실행될까요? 이 답을 이해하려면 **이벤트 루프**(Event Loop)의 동작 원리를 알아야 합니다.
+
+## 자바스크립트는 싱글 스레드다
+
+> **쉽게 말하면:** 자바스크립트 엔진은 **한 번에 딱 한 가지 일만** 할 수 있습니다. 여러 작업을 동시에 처리하는 것처럼 보이는 건, 사실 아주 빠르게 작업을 번갈아 처리하기 때문입니다.
+
+자바스크립트는 **싱글 스레드**(single thread, 하나의 실행 흐름)로 동작합니다. 그런데 `setTimeout`, `fetch`, 이벤트 리스너처럼 "시간이 걸리는" 작업들이 어떻게 프로그램 전체를 멈추지 않고 처리될까요? 이 비밀이 **콜 스택** + **브라우저**(또는 Node.js)**의 도움** + **큐**(대기열)**로 이루어진 이벤트 루프 구조**에 있습니다.
+
+## 세 가지 핵심 구성 요소
+
+<Table>
+  <thead>
+    <tr><th>구성 요소</th><th>역할</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>콜 스택(Call Stack)</td><td>지금 당장 실행 중인 코드가 쌓이는 곳. 한 번에 하나씩만 처리(싱글 스레드)</td></tr>
+    <tr><td>태스크 큐 / 매크로태스크 큐(Task Queue)</td><td>setTimeout, 이벤트 핸들러 등이 대기하는 줄</td></tr>
+    <tr><td>마이크로태스크 큐(Microtask Queue)</td><td>Promise의 then/catch/finally가 대기하는 줄. 태스크 큐보다 항상 먼저 처리됨</td></tr>
+  </tbody>
+</Table>
+
+## 이벤트 루프의 규칙
+
+<Steps>
+### 콜 스택의 코드를 모두 실행한다 (동기 코드 우선)
+
+`console.log`처럼 즉시 실행 가능한 코드는 만나는 즉시 실행된다.
+
+### 콜 스택이 완전히 비면, 마이크로태스크 큐를 확인한다
+
+마이크로태스크 큐에 있는 모든 작업(Promise의 then 등)을 **큐가 빌 때까지 전부** 처리한다.
+
+### 마이크로태스크 큐가 다 비면, 태스크 큐에서 하나를 꺼내 실행한다
+
+setTimeout 콜백처럼 태스크 큐에 있던 작업을 **딱 하나만** 콜 스택으로 가져와 실행한다.
+
+### 2번으로 돌아간다
+
+이 과정이 프로그램이 끝날 때까지 무한히 반복된다. 이것이 "이벤트 루프"라는 이름의 이유다.
+</Steps>
+
+**핵심 규칙:** 마이크로태스크 큐는 태스크 큐보다 **항상 먼저, 그리고 완전히 비워질 때까지** 처리됩니다.
+
+## 위 예제의 실행 순서 분석
+
+```js
+console.log('1. 동기 코드')          // 콜 스택에서 즉시 실행
+
+setTimeout(() => {                   // 콜백을 "태스크 큐"에 등록만 하고 넘어감
+  console.log('2. setTimeout(0ms)')
+}, 0)
+
+Promise.resolve().then(() => {       // 콜백을 "마이크로태스크 큐"에 등록만 하고 넘어감
+  console.log('3. Promise then')
+})
+
+console.log('4. 동기 코드')          // 콜 스택에서 즉시 실행
+```
+
+<Steps>
+### 동기 코드부터 순서대로 실행
+
+'1. 동기 코드', '4. 동기 코드'가 먼저 출력된다. (setTimeout과 then은 콜백을 큐에 등록만 하고 즉시 다음 줄로 넘어간다)
+
+### 콜 스택이 비었으니 마이크로태스크 큐 확인
+
+Promise.then의 콜백이 마이크로태스크 큐에 있으므로 실행 → '3. Promise then' 출력
+
+### 마이크로태스크 큐가 비었으니 태스크 큐 확인
+
+setTimeout의 콜백을 실행 → '2. setTimeout(0ms)' 출력
+</Steps>
+
+**최종 순서: 1 → 4 → 3 → 2**
+
+`setTimeout(fn, 0)`이라고 해서 0ms 후 "즉시" 실행되는 것이 아니라, "지금 실행 중인 모든 동기 코드와 모든 마이크로태스크가 끝난 뒤에" 실행됩니다.
+
+## async/await도 결국 Promise다
+
+29번 문서의 `await`는 마이크로태스크 큐를 사용하는 Promise 기반 문법입니다.
+
+```js
+console.log('A')
+
+async function test() {
+  console.log('B')
+  await null              // 여기서 함수가 일시 정지되고, 이후 코드는 마이크로태스크로 예약됨
+  console.log('C')        // 이 줄은 마이크로태스크 큐에서 나중에 실행됨
+}
+
+test()
+console.log('D')
+
+// 실행 순서: A → B → D → C
+// (test 함수 안의 await 이전 코드는 동기적으로 즉시 실행되지만,
+//  await를 만나는 순간 그 이후 코드는 마이크로태스크로 미뤄진다)
+```
+
+## 실전 교훈 — 왜 이 지식이 필요한가?
+
+<Callout type="warning">
+  **자주 만나는 실수:** 반복문 안에서 `setTimeout`으로 순서를 제어하려 하거나, Promise와 setTimeout이 섞인 코드의 실행 순서를 잘못 예측해서 생기는 버그가 많습니다. "동기 코드 → 마이크로태스크(Promise) → 매크로태스크(setTimeout)" 순서를 기억해두면, 복잡한 비동기 코드의 실행 순서를 정확히 예측할 수 있습니다.
+</Callout>
+
+이 지식은 13번 문서에서 다룬 "클로저와 반복문의 stale closure 문제", 07번 React 문서의 "useEffect 타이밍 문제" 같은 여러 실전 버그를 이해하는 토대가 됩니다.
+
+## 핵심 정리
+
+- 자바스크립트는 싱글 스레드로, 콜 스택에서 한 번에 하나의 작업만 처리한다.
+- setTimeout 콜백은 태스크 큐(매크로태스크 큐)에, Promise의 then 콜백은 마이크로태스크 큐에 등록된다.
+- 이벤트 루프는 콜 스택이 빌 때마다 마이크로태스크 큐를 모두 비운 뒤, 태스크 큐에서 하나씩 꺼내 처리한다.
+- 마이크로태스크가 항상 매크로태스크보다 먼저 처리되므로, setTimeout(fn, 0)보다 Promise.then이 먼저 실행된다.
+- async/await도 내부적으로 Promise와 마이크로태스크 큐를 사용한다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="자바스크립트 엔진의 실행 방식은?"
+  options={['①멀티 스레드로 여러 작업을 동시에 처리한다.', '②싱글 스레드로 한 번에 하나의 작업만 콜 스택에서 처리한다.', '③작업마다 별도의 스레드를 새로 만든다.', '④비동기 작업은 별도의 프로그램이 처리한다.']}
+  correctAnswer={2}
+  explanation="자바스크립트 엔진 자체는 싱글 스레드입니다. 여러 작업이 동시에 진행되는 것처럼 보이는 것은 이벤트 루프가 작업을 빠르게 번갈아 처리하기 때문입니다."
+  optionExplanations={['멀티 스레드가 아닌 싱글 스레드입니다.', '맞습니다. 콜 스택은 한 번에 하나씩만 처리합니다.', '스레드를 새로 만들지 않습니다.', '완전히 별도의 프로그램은 아니며 같은 런타임 안에서 큐로 관리됩니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="마이크로태스크 큐와 태스크 큐 중 먼저 처리되는 것은?"
+  options={['①태스크 큐가 항상 먼저 처리된다.', '②마이크로태스크 큐가 항상 먼저, 그리고 완전히 비워질 때까지 처리된다.', '③둘은 동시에 처리된다.', '④무작위 순서로 처리된다.']}
+  correctAnswer={2}
+  explanation="콜 스택이 빌 때마다 이벤트 루프는 먼저 마이크로태스크 큐를 완전히 비웁니다. 그 후에야 태스크 큐에서 하나를 꺼내 처리합니다."
+  optionExplanations={['마이크로태스크가 먼저입니다.', '맞습니다. 마이크로태스크 우선 원칙입니다.', '동시에 처리되지 않고 순서가 정해져 있습니다.', '정해진 순서를 따릅니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`setTimeout(fn, 0)`이 0ms 뒤에 즉시 실행되지 않는 이유는?"
+  options={['①setTimeout이 고장 나서', '②현재 실행 중인 동기 코드와 마이크로태스크 큐가 모두 끝난 뒤에야 태스크 큐의 콜백이 실행되기 때문', '③0ms는 사실 3000ms를 의미해서', '④브라우저마다 다르게 동작해서']}
+  correctAnswer={2}
+  explanation="setTimeout(fn, 0)의 0ms는 '최소 대기 시간'일 뿐입니다. 실제 실행은 콜 스택이 비고 마이크로태스크 큐까지 모두 처리된 이후, 이벤트 루프가 태스크 큐에서 콜백을 꺼내올 때 이루어집니다."
+  optionExplanations={['정상 동작입니다.', '맞습니다. 실행 순서 규칙 때문입니다.', '실제로 0ms로 동작합니다(최소 대기 시간).', '이벤트 루프 원리는 표준화되어 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="Promise.resolve().then(fn)의 fn은 어느 큐에 등록되나요?"
+  options={['①태스크 큐(매크로태스크 큐)', '②마이크로태스크 큐', '③콜 스택에 즉시 실행', '④아무 큐에도 등록되지 않는다.']}
+  correctAnswer={2}
+  explanation="Promise의 then/catch/finally 콜백은 마이크로태스크 큐에 등록됩니다. 이 때문에 같은 시점에 등록된 setTimeout보다 먼저 실행됩니다."
+  optionExplanations={['태스크 큐는 setTimeout 등이 사용합니다.', '맞습니다. Promise는 마이크로태스크 큐를 사용합니다.', '즉시 실행되지 않고 큐에 등록된 뒤 나중에 실행됩니다.', '마이크로태스크 큐에 등록됩니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`console.log('A'); setTimeout(()=>console.log('B'),0); Promise.resolve().then(()=>console.log('C')); console.log('D')`의 실행 순서는?"
+  options={['①A, B, C, D', '②A, D, C, B', '③A, D, B, C', '④A, C, D, B']}
+  correctAnswer={2}
+  explanation="동기 코드(A, D)가 먼저, 그다음 마이크로태스크(C, Promise.then), 마지막으로 태스크 큐(B, setTimeout) 순서로 실행됩니다."
+  optionExplanations={['setTimeout이 동기 코드보다 먼저 실행되지 않습니다.', '맞습니다. 동기 → 마이크로태스크 → 태스크 순서입니다.', 'setTimeout(B)이 Promise(C)보다 먼저 실행되지 않습니다.', 'D보다 C가 먼저 출력되지 않습니다.']}
+/>

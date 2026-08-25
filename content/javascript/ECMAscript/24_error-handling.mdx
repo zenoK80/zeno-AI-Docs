@@ -1,0 +1,238 @@
+---
+title: '24. 에러 처리'
+description: 'try/catch/finally로 예외를 처리하고, 커스텀 에러 클래스를 만드는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 코드가 실행 중 실패할 수 있는 지점을 try/catch로 안전하게 감싸고, 의미 있는 에러 메시지를 만들 수 있습니다.
+</Callout>
+
+## 에러 처리가 필요한 이유
+
+> **쉽게 말하면:** 프로그램이 실행 중 예상치 못한 문제(파일 없음, 잘못된 입력 등)를 만나도, 전체 프로그램이 멈춰버리지 않고 "문제가 생겼다"를 우아하게 처리할 수 있게 해주는 것이 에러 처리입니다.
+
+```js
+console.log('시작')
+JSON.parse('이것은 잘못된 JSON')  // 여기서 에러 발생
+console.log('끝')  // 이 줄은 절대 실행되지 않는다! 프로그램이 멈춤
+```
+
+처리되지 않은 에러는 그 지점에서 프로그램 실행을 완전히 멈춥니다. `try/catch`는 이런 상황을 미리 대비하는 안전장치입니다.
+
+## try / catch / finally
+
+```js
+try {
+  // 실패할 수도 있는 코드
+  const data = JSON.parse('이것은 잘못된 JSON')
+  console.log(data)
+} catch (error) {
+  // try 블록에서 에러가 나면 이 블록이 실행됨
+  console.log('에러 발생:', error.message)
+} finally {
+  // 에러 발생 여부와 상관없이 항상 실행됨
+  console.log('정리 작업 완료')
+}
+
+console.log('프로그램 계속 실행됨')  // 이제 이 줄이 실행된다!
+```
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="try/catch/finally 실습"
+  files={{
+    '/index.js': `function parseUserInput(input) {
+  try {
+    const data = JSON.parse(input)
+    console.log('파싱 성공:', data)
+    return data
+  } catch (error) {
+    console.log('파싱 실패:', error.message)
+    return null
+  } finally {
+    console.log('처리 완료 —', input)
+  }
+}
+
+parseUserInput('{"name":"철수"}')  // 성공 케이스
+parseUserInput('잘못된 형식')       // 실패 케이스`,
+  }}
+/>
+
+## error 객체 살펴보기
+
+`catch (error)`로 받는 `error`는 정보를 담은 객체입니다.
+
+```js
+try {
+  null.someProperty  // TypeError 발생
+} catch (error) {
+  console.log(error.name)     // 'TypeError' — 에러의 종류
+  console.log(error.message)  // 'Cannot read properties of null (reading 'someProperty')'
+  console.log(error.stack)    // 에러가 어디서 발생했는지 추적 정보(스택 트레이스)
+}
+```
+
+## throw — 직접 에러를 발생시키기
+
+`throw`로 원하는 시점에 직접 에러를 발생시킬 수 있습니다.
+
+```js
+function divide(a, b) {
+  if (b === 0) {
+    throw new Error('0으로 나눌 수 없습니다')
+  }
+  return a / b
+}
+
+try {
+  console.log(divide(10, 0))
+} catch (error) {
+  console.log(error.message)  // '0으로 나눌 수 없습니다'
+}
+```
+
+`Error`는 자바스크립트에 내장된 기본 에러 클래스입니다. `new Error('메시지')`로 에러 객체를 만들고, `throw`로 던집니다.
+
+## 커스텀 에러 클래스 — Error를 상속하기
+
+실무에서는 에러의 종류를 구분하기 위해 `Error`를 상속한 나만의 에러 클래스를 자주 만듭니다. (`class`와 `extends`는 19번 문서 참고.)
+
+```js
+class ValidationError extends Error {
+  constructor(message, field) {
+    super(message)          // 부모(Error)의 message 설정
+    this.name = 'ValidationError'
+    this.field = field      // 커스텀 에러만의 추가 정보
+  }
+}
+
+function validateAge(age) {
+  if (age < 0) {
+    throw new ValidationError('나이는 음수일 수 없습니다', 'age')
+  }
+  return age
+}
+
+try {
+  validateAge(-5)
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.log(`${error.field} 검증 실패: ${error.message}`)
+  } else {
+    console.log('알 수 없는 오류')
+  }
+}
+```
+
+`instanceof`로 에러의 종류를 구분하면, 에러 종류별로 다르게 대응하는 코드를 작성할 수 있습니다.
+
+```js
+class NetworkError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = 'NetworkError'
+  }
+}
+class ValidationError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = 'ValidationError'
+  }
+}
+
+function handleError(error) {
+  if (error instanceof NetworkError) {
+    console.log('네트워크 문제입니다. 다시 시도해주세요.')
+  } else if (error instanceof ValidationError) {
+    console.log('입력값을 확인해주세요.')
+  } else {
+    console.log('알 수 없는 오류입니다.')
+  }
+}
+```
+
+## finally를 쓰는 이유 — 정리 작업 보장
+
+```js
+function readFile() {
+  console.log('파일 열기')
+  try {
+    throw new Error('읽기 실패')
+  } finally {
+    console.log('파일 닫기')  // 에러가 나도 반드시 실행됨 — 자원 정리에 필수
+  }
+}
+
+try {
+  readFile()
+} catch (error) {
+  console.log('에러 처리:', error.message)
+}
+// 출력 순서: '파일 열기' → '파일 닫기' → '에러 처리: 읽기 실패'
+```
+
+`finally`는 에러가 발생하든 안 하든, 심지어 `catch`에서 다시 에러를 던지더라도 **항상 실행**됩니다. 파일 닫기, 연결 종료처럼 "무슨 일이 있어도 꼭 해야 하는 정리 작업"에 사용합니다.
+
+## 자주 틀리는 점 — 모든 에러를 다 잡으려 하지 말 것
+
+<Callout type="warning">
+  `try/catch`로 코드 전체를 무작정 감싸는 것은 좋은 습관이 아닙니다. 정확히 **실패할 가능성이 있는 부분만** 감싸고, `catch`에서는 최소한 `console.error`로 무슨 문제인지 기록해야 합니다. 아무 처리 없이 `catch (e) {}`로 조용히 무시하면, 나중에 원인을 찾기 매우 어려운 버그가 됩니다.
+</Callout>
+
+## 핵심 정리
+
+- try 블록에서 에러가 나면 catch 블록이 실행되고, finally는 에러 여부와 상관없이 항상 실행된다.
+- error 객체는 name(에러 종류), message(설명), stack(발생 위치 추적)을 담고 있다.
+- throw new Error('메시지')로 직접 에러를 발생시킬 수 있다.
+- Error를 extends해 커스텀 에러 클래스를 만들면 instanceof로 에러 종류를 구분해 다르게 대응할 수 있다.
+- finally는 자원 정리처럼 반드시 실행되어야 하는 작업에 사용한다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="try 블록에서 에러가 발생하지 않으면 catch 블록은?"
+  options={['①그래도 실행된다.', '②실행되지 않는다.', '③프로그램이 멈춘다.', '④무한 반복된다.']}
+  correctAnswer={2}
+  explanation="catch 블록은 try 블록에서 실제로 에러가 발생했을 때만 실행됩니다. 에러가 없으면 건너뜁니다."
+  optionExplanations={['에러가 없으면 실행되지 않습니다.', '맞습니다. 에러가 있을 때만 실행됩니다.', '정상적으로 계속 진행됩니다.', '반복과는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="finally 블록이 실행되는 조건은?"
+  options={['①에러가 발생했을 때만', '②에러가 발생하지 않았을 때만', '③에러 발생 여부와 상관없이 항상', '④catch가 없을 때만']}
+  correctAnswer={3}
+  explanation="finally는 try 블록의 성공/실패와 관계없이 항상 실행됩니다. 자원 정리처럼 반드시 수행해야 하는 작업에 사용합니다."
+  optionExplanations={['에러 여부와 무관하게 실행됩니다.', '에러가 있어도 실행됩니다.', '맞습니다. 항상 실행이 보장됩니다.', 'catch 유무와 무관하게 실행됩니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="커스텀 에러 클래스가 `class ValidationError extends Error`처럼 Error를 상속하는 이유는?"
+  options={['①문법적으로 필수라서', '②instanceof로 에러 종류를 구분하고 message, stack 같은 기존 기능을 물려받기 위해', '③성능을 향상시키기 위해', '④콘솔에 색깔을 입히기 위해']}
+  correctAnswer={2}
+  explanation="Error를 상속하면 message, stack 같은 표준 기능을 그대로 사용할 수 있고, instanceof 검사로 에러의 종류를 구분해 다르게 처리할 수 있습니다."
+  optionExplanations={['문법적으로 강제되지는 않지만 관례이자 실용적 이유가 있습니다.', '맞습니다. 표준 기능 상속과 종류 구분이 목적입니다.', '성능과는 무관합니다.', '색상과는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`throw new Error('메시지')`가 하는 일은?"
+  options={['①콘솔에 메시지를 출력만 한다.', '②에러를 발생시켜 현재 실행을 중단하고, 가장 가까운 catch로 제어를 넘긴다.', '③프로그램을 완전히 종료한다.', '④경고창을 띄운다.']}
+  correctAnswer={2}
+  explanation="throw는 에러 객체를 던져 현재 실행 흐름을 즉시 중단시킵니다. try/catch로 감싸져 있다면 가장 가까운 catch 블록으로 제어가 넘어갑니다."
+  optionExplanations={['단순 출력이 아닌 실행 흐름 변경입니다.', '맞습니다. catch로 제어를 넘기는 것이 핵심 동작입니다.', 'catch로 처리되면 프로그램이 종료되지 않습니다.', 'alert과는 다른 동작입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`catch (e) {}`처럼 에러를 아무 처리 없이 무시하는 것이 위험한 이유는?"
+  options={['①프로그램이 더 빨라져서', '②문제가 발생해도 아무 흔적이 남지 않아 나중에 원인을 찾기 매우 어려워지기 때문', '③문법 오류를 일으켜서', '④메모리를 낭비해서']}
+  correctAnswer={2}
+  explanation="에러를 조용히 삼키면 실제로 문제가 발생했다는 사실 자체를 알 수 없게 됩니다. 최소한 console.error로 기록을 남기는 것이 안전합니다."
+  optionExplanations={['속도와는 무관합니다.', '맞습니다. 디버깅이 거의 불가능해지는 것이 문제입니다.', '유효한 문법입니다.', '메모리 낭비가 핵심 문제가 아닙니다.']}
+/>

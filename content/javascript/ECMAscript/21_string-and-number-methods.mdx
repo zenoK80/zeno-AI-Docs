@@ -1,0 +1,177 @@
+---
+title: '21. 문자열·숫자 메서드'
+description: '문자열을 자르고 검색하고 바꾸는 메서드, 숫자를 반올림하고 포맷하는 메서드를 실습으로 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 실무에서 가장 자주 쓰는 문자열·숫자 메서드를 직접 실행해보고 언제 무엇을 쓸지 판단합니다.
+</Callout>
+
+## 문자열은 왜 원시 타입인데 메서드를 쓸 수 있나?
+
+06번 문서에서 문자열이 원시 타입이라고 배웠습니다. 그런데 `'hello'.toUpperCase()`처럼 메서드를 호출할 수 있는 이유는, 자바스크립트가 문자열에 메서드를 호출하는 순간 **일시적으로 String 객체로 감싸서**(래핑, wrapping) **프로토타입**(18번 문서)**의 메서드를 빌려 쓰게 해주기** 때문입니다. 이 과정은 자동이라 신경 쓸 필요는 없지만, "원시값인데 왜 메서드가 되지?"라는 궁금증의 답입니다.
+
+## 문자열 메서드
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="문자열 메서드 실습"
+  files={{
+    '/index.js': `const text = '  Hello, World!  '
+
+console.log(text.trim())              // 'Hello, World!' — 양쪽 공백 제거
+console.log(text.toUpperCase())       // '  HELLO, WORLD!  '
+console.log(text.toLowerCase())       // '  hello, world!  '
+console.log(text.includes('World'))   // true — 포함 여부
+console.log(text.indexOf('World'))    // 9 — 시작 위치, 없으면 -1
+console.log(text.replace('World', '자바스크립트'))  // 첫 번째 일치만 교체
+console.log(text.trim().split(', '))  // ['Hello', 'World!'] — 구분자로 배열 분리
+
+const sentence = '자바스크립트를 배웁니다'
+console.log(sentence.slice(0, 6))     // '자바스크립트' — [시작, 끝) 인덱스로 자르기
+console.log(sentence.slice(-4))       // '배웁니다' — 음수는 끝에서부터
+console.log(sentence.startsWith('자바'))  // true
+console.log(sentence.length)          // 12 — 문자 개수`,
+  }}
+/>
+
+<Table>
+  <thead>
+    <tr><th>메서드</th><th>역할</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>trim()</td><td>양쪽 끝 공백 제거</td></tr>
+    <tr><td>toUpperCase() / toLowerCase()</td><td>대문자/소문자 변환</td></tr>
+    <tr><td>includes(str)</td><td>포함 여부(boolean)</td></tr>
+    <tr><td>indexOf(str)</td><td>시작 위치(없으면 -1)</td></tr>
+    <tr><td>slice(시작, 끝)</td><td>부분 문자열 추출 (끝 제외, 음수는 뒤에서부터)</td></tr>
+    <tr><td>split(구분자)</td><td>구분자로 나눠 배열로 변환</td></tr>
+    <tr><td>replace(old, new)</td><td>첫 번째 일치만 교체 (전체는 replaceAll)</td></tr>
+    <tr><td>startsWith / endsWith</td><td>특정 문자열로 시작/끝나는지 확인</td></tr>
+  </tbody>
+</Table>
+
+<Callout type="warning">
+  문자열 메서드는 **원본을 절대 바꾸지 않고 항상 새 문자열을 반환**합니다. 16번 문서에서 배운 대로 문자열은 원시값이라 애초에 "직접 수정"이 불가능합니다. `text.trim()`을 호출해도 `text` 자체는 그대로이며, 결과를 쓰려면 변수에 다시 담아야 합니다.
+</Callout>
+
+## 템플릿 리터럴 복습과 여러 줄 문자열
+
+```js
+const name = '철수'
+const age = 25
+
+// 템플릿 리터럴로 변수 삽입
+console.log(`${name}님은 ${age}세입니다`)
+
+// 여러 줄 문자열 — 백틱은 줄바꿈을 그대로 유지한다
+const multiline = `첫째 줄
+둘째 줄
+셋째 줄`
+console.log(multiline)
+```
+
+## 숫자 메서드
+
+```js
+const price = 1234.5678
+
+console.log(price.toFixed(2))         // '1234.57' — 소수점 2자리로 반올림 (문자열 반환!)
+console.log(Math.round(price))        // 1235 — 가장 가까운 정수로 반올림
+console.log(Math.floor(price))        // 1234 — 내림
+console.log(Math.ceil(price))         // 1235 — 올림
+console.log(Math.abs(-5))             // 5 — 절댓값
+console.log(Math.max(3, 7, 2))        // 7
+console.log(Math.min(3, 7, 2))        // 2
+console.log(Math.random())            // 0 이상 1 미만의 무작위 실수
+
+console.log(Number('42'))             // 42
+console.log(Number.isInteger(42))     // true
+console.log(Number.isInteger(42.5))   // false
+console.log((255).toString(16))       // 'ff' — 16진수로 변환
+```
+
+<Callout type="warning">
+  `toFixed()`는 숫자가 아닌 **문자열**을 반환합니다. `price.toFixed(2) + 1`을 하면 숫자 덧셈이 아니라 `'1234.571'`처럼 문자열 이어붙이기가 되어버리는 함정이 있습니다(8번 타입 변환 문서 참고). 계산이 더 필요하면 `Number(price.toFixed(2))`로 다시 숫자로 변환해야 합니다.
+</Callout>
+
+## 무작위 정수 만들기 — Math.random() 활용 패턴
+
+```js
+// 0 이상 max 미만의 무작위 정수
+function randomInt(max) {
+  return Math.floor(Math.random() * max)
+}
+
+console.log(randomInt(10))  // 0~9 중 하나
+
+// min 이상 max 이하의 무작위 정수
+function randomBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+console.log(randomBetween(1, 6))  // 주사위 굴리기: 1~6 중 하나
+```
+
+## 숫자 자릿수 구분(천 단위 콤마)
+
+```js
+const price = 1234567
+console.log(price.toLocaleString('ko-KR'))  // '1,234,567'
+```
+
+## 핵심 정리
+
+- 문자열 메서드는 원본을 바꾸지 않고 항상 새 문자열을 반환한다.
+- slice(시작, 끝)는 끝 인덱스를 포함하지 않으며, 음수는 뒤에서부터 센다.
+- toFixed()는 숫자가 아닌 문자열을 반환하므로, 이후 계산이 필요하면 다시 Number()로 변환해야 한다.
+- Math.floor/round/ceil은 각각 내림/반올림/올림을 수행한다.
+- Math.random()은 0 이상 1 미만의 실수를 반환하며, 정수 범위가 필요하면 Math.floor와 조합한다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="`'  hi  '.trim()`의 결과는?"
+  options={["①'  hi  '", "②'hi'", "③' hi'", "④'hi '"]}
+  correctAnswer={2}
+  explanation="trim()은 문자열 양쪽 끝의 공백을 모두 제거합니다. 중간 공백은 건드리지 않습니다."
+  optionExplanations={["공백이 제거되지 않은 원본입니다.", "맞습니다. 양쪽 공백이 모두 제거됩니다.", "왼쪽 공백만 남으면 안 됩니다.", "오른쪽 공백만 남으면 안 됩니다."]}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`(1234.5).toFixed(1)`의 반환 타입은?"
+  options={['①number', '②string', '③boolean', '④undefined']}
+  correctAnswer={2}
+  explanation="toFixed()는 숫자처럼 보이는 값을 만들지만 실제로는 문자열을 반환합니다. 이후 산술 계산에 바로 쓰면 문자열 이어붙이기가 발생할 수 있습니다."
+  optionExplanations={["숫자가 아닌 문자열입니다.", "맞습니다. toFixed는 항상 문자열을 반환합니다.", "boolean이 아닙니다.", "값이 존재하므로 undefined가 아닙니다."]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`'자바스크립트'.slice(0, 3)`의 결과는?"
+  options={["①'자바스'", "②'자바스크'", "③'바스크'", "④'자바스크립'"]}
+  correctAnswer={1}
+  explanation="slice(0, 3)은 인덱스 0부터 3 직전까지(0,1,2번 문자)를 추출합니다. '자'(0), '바'(1), '스'(2)가 선택되어 '자바스'가 됩니다."
+  optionExplanations={["맞습니다. 끝 인덱스 3은 포함되지 않아 0,1,2번째 문자만 선택됩니다.", "4개 문자를 포함하면 범위를 벗어납니다.", "시작 인덱스가 0이므로 '자'부터 시작해야 합니다.", "slice(0,3)은 3글자만 반환합니다."]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="Math.floor(), Math.round(), Math.ceil()의 차이는?"
+  options={['①모두 동일하게 반올림한다.', '②floor는 내림, round는 반올림, ceil은 올림한다.', '③floor는 올림, ceil은 내림한다.', '④round만 정수를 반환한다.']}
+  correctAnswer={2}
+  explanation="floor(바닥)는 소수점을 버려 내리고, round는 가장 가까운 정수로 반올림하며, ceil(천장)은 소수점이 있으면 올립니다."
+  optionExplanations={['각각 다른 방식으로 처리합니다.', '맞습니다. 내림, 반올림, 올림의 차이입니다.', '반대로 설명되었습니다.', '세 메서드 모두 정수를 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="0 이상 max 미만의 무작위 정수를 만드는 올바른 코드는?"
+  options={['①Math.random() * max', '②Math.floor(Math.random() * max)', '③Math.ceil(Math.random() * max)', '④Math.random(max)']}
+  correctAnswer={2}
+  explanation="Math.random()은 0~1 미만의 실수를 반환합니다. max를 곱한 뒤 Math.floor로 소수점을 버려야 0부터 max-1까지의 정수가 됩니다."
+  optionExplanations={['실수가 그대로 반환되어 정수가 아닙니다.', '맞습니다. floor로 소수점을 버려 정수 범위를 만듭니다.', 'ceil을 쓰면 0이 나올 확률이 매우 낮아지고 max가 나올 수 있어 부적절합니다.', 'Math.random()은 인수를 받지 않습니다.']}
+/>

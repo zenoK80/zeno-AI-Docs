@@ -1,0 +1,240 @@
+---
+title: '19. 클래스'
+description: 'class 문법으로 생성자, 메서드, 상속, static, private 필드를 정의하는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** class로 객체의 설계도를 만들고, extends로 상속하며, static과 private(#) 필드를 활용할 수 있습니다.
+</Callout>
+
+## 클래스란?
+
+> **쉽게 말하면:** 클래스는 "같은 모양의 객체를 여러 개 찍어낼 때 쓰는 설계도"입니다.
+
+18번 문서에서 배웠듯, class는 프로토타입 기반 상속을 더 읽기 쉽게 표현한 문법입니다.
+
+```js
+class Animal {
+  constructor(name) {
+    this.name = name  // 인스턴스마다 다르게 가질 데이터
+  }
+
+  makeSound() {
+    console.log(`${this.name}가 소리를 냅니다`)
+  }
+}
+
+const dog = new Animal('멍멍이')
+dog.makeSound()  // '멍멍이가 소리를 냅니다'
+```
+
+- `constructor`: `new`로 인스턴스를 만들 때 자동으로 호출되는 특별한 메서드. 초기값을 설정합니다.
+- `makeSound()`: 일반 메서드. `class` 안에서는 15번 문서의 메서드 축약 문법처럼 `function` 키워드 없이 씁니다.
+
+## 상속 — extends와 super
+
+기존 클래스의 기능을 물려받아 확장할 때 `extends`를 씁니다.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="클래스 상속 실습"
+  files={{
+    '/index.js': `class Animal {
+  constructor(name) {
+    this.name = name
+  }
+  makeSound() {
+    console.log(this.name + '가 소리를 냅니다')
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name)  // 부모(Animal)의 constructor 호출 — 반드시 가장 먼저!
+    this.breed = breed
+  }
+  makeSound() {
+    super.makeSound()  // 부모의 makeSound도 실행하고
+    console.log('멍멍!')  // 자식만의 동작 추가
+  }
+}
+
+const myDog = new Dog('바둑이', '진돗개')
+myDog.makeSound()
+console.log(myDog instanceof Animal)  // true — Dog는 Animal이기도 함
+console.log(myDog instanceof Dog)     // true`,
+  }}
+/>
+
+- `extends Animal`: Dog가 Animal의 모든 프로퍼티·메서드를 물려받는다는 뜻.
+- `super(name)`: 부모 클래스의 `constructor`를 호출. **자식 클래스의 constructor에서는 `this`를 쓰기 전에 반드시 `super()`를 먼저 호출해야 합니다.**
+- `super.makeSound()`: 부모의 메서드를 그대로 실행하고 싶을 때 사용.
+
+<Callout type="warning">
+  자식 클래스에 `constructor`가 있다면, `this.xxx`를 사용하기 전에 **반드시 `super(...)`를 호출**해야 합니다. 그렇지 않으면 `ReferenceError: Must call super constructor before accessing 'this'`가 발생합니다. 부모의 초기화가 먼저 끝나야 자식이 안전하게 `this`를 사용할 수 있기 때문입니다.
+</Callout>
+
+## static — 인스턴스가 아닌 클래스 자체에 속하는 것
+
+`static` 키워드가 붙은 프로퍼티·메서드는 **인스턴스가 아니라 클래스 자체**에 속합니다.
+
+```js
+class Counter {
+  static count = 0  // 클래스 전체가 공유하는 값
+
+  constructor() {
+    Counter.count++  // 인스턴스가 만들어질 때마다 증가
+  }
+
+  static getCount() {  // 인스턴스 없이 클래스 이름으로 바로 호출
+    return Counter.count
+  }
+}
+
+new Counter()
+new Counter()
+new Counter()
+
+console.log(Counter.getCount())  // 3
+console.log(Counter.count)       // 3
+
+const c = new Counter()
+// console.log(c.getCount())  // 오류! static 메서드는 인스턴스에서 호출 불가
+```
+
+`static`은 "이 클래스로 만든 인스턴스가 몇 개인지 세기", "설정값 저장하기"처럼 개별 인스턴스가 아닌 **클래스 전체에 필요한 데이터**를 다룰 때 사용합니다.
+
+## private 필드(`#`) — 진짜 비공개 프로퍼티
+
+13번 문서에서 클로저로 "비공개 변수"를 만드는 방법을 배웠습니다. class에는 `#`을 붙여 진짜 비공개 필드를 만드는 전용 문법이 있습니다.
+
+```js
+class BankAccount {
+  #balance  // # 붙은 프로퍼티는 클래스 외부에서 절대 접근 불가
+
+  constructor(initialBalance) {
+    this.#balance = initialBalance
+  }
+
+  deposit(amount) {
+    this.#balance += amount
+    return this.#balance
+  }
+
+  getBalance() {
+    return this.#balance
+  }
+}
+
+const account = new BankAccount(1000)
+console.log(account.getBalance())  // 1000
+account.deposit(500)
+console.log(account.getBalance())  // 1500
+
+console.log(account.#balance)  // SyntaxError! 클래스 외부에서는 #balance 자체를 언급할 수도 없음
+console.log(account.balance)   // undefined — #이 없는 balance는 애초에 존재하지 않는 프로퍼티
+```
+
+<Callout type="warning">
+  `#balance`(private)와 클로저로 만든 비공개 변수(13번 문서)의 차이: `#` 필드는 클래스 문법 안에서 명확하게 "이건 비공개다"라고 선언하는 표준화된 방법이고, 접근을 시도하면 `undefined`가 아니라 **문법 오류**가 발생해 더 엄격하게 보호됩니다.
+</Callout>
+
+## getter와 setter — 프로퍼티처럼 보이는 메서드
+
+메서드를 프로퍼티처럼 사용할 수 있게 해주는 문법입니다. 계산된 값을 프로퍼티처럼 노출하거나, 값을 대입할 때 검증 로직을 넣을 때 유용합니다.
+
+```js
+class Circle {
+  constructor(radius) {
+    this.radius = radius
+  }
+
+  get area() {                       // get: 괄호 없이 프로퍼티처럼 읽음
+    return Math.PI * this.radius ** 2
+  }
+
+  set radius(value) {                // set: 대입할 때 검증 로직 실행
+    if (value <= 0) throw new Error('반지름은 양수여야 합니다')
+    this._radius = value
+  }
+
+  get radius() {
+    return this._radius
+  }
+}
+
+const circle = new Circle(5)
+console.log(circle.area)    // 78.53... — area()가 아니라 area로 접근(괄호 없음)
+circle.radius = 10          // set radius가 실행됨
+console.log(circle.area)    // 314.15...
+// circle.radius = -1       // Error: 반지름은 양수여야 합니다
+```
+
+## 클래스는 호이스팅되지만 TDZ에 걸린다
+
+5번 문서에서 배운 개념이 class에도 그대로 적용됩니다.
+
+```js
+const dog = new Animal('멍멍이')  // ReferenceError — class도 TDZ에 걸림
+
+class Animal {
+  constructor(name) { this.name = name }
+}
+```
+
+## 핵심 정리
+
+- class는 constructor와 메서드로 객체의 설계도를 정의하는 문법이다.
+- extends로 상속하며, 자식 constructor에서는 this 사용 전 super()를 반드시 먼저 호출해야 한다.
+- static은 인스턴스가 아닌 클래스 자체에 속하는 프로퍼티·메서드를 정의한다.
+- `#`이 붙은 필드는 클래스 외부에서 절대 접근할 수 없는 진짜 비공개 프로퍼티다.
+- get/set으로 메서드를 프로퍼티처럼 사용할 수 있으며, set에 검증 로직을 넣을 수 있다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="자식 클래스의 constructor에서 super()를 먼저 호출하지 않고 this를 사용하면?"
+  options={['①정상 동작한다.', '②ReferenceError가 발생한다.', '③this가 undefined가 된다.', '④부모의 constructor가 자동으로 건너뛰어진다.']}
+  correctAnswer={2}
+  explanation="부모의 초기화(super 호출)가 끝나기 전에는 this를 사용할 수 없도록 자바스크립트가 강제합니다. super()를 먼저 호출해야 합니다."
+  optionExplanations={['에러가 발생합니다.', '맞습니다. super() 호출 전 this 접근은 에러입니다.', 'this가 아예 접근 불가능한 상태로 취급되어 에러가 납니다.', '자동으로 건너뛰어지지 않고 명시적으로 호출해야 합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="static 메서드의 특징은?"
+  options={['①인스턴스에서만 호출할 수 있다.', '②인스턴스가 아닌 클래스 이름으로 직접 호출한다.', '③private 필드에만 접근할 수 있다.', '④constructor 안에서만 정의할 수 있다.']}
+  correctAnswer={2}
+  explanation="static이 붙은 메서드는 클래스 자체에 속하며, ClassName.method() 형태로 호출합니다. 개별 인스턴스에서는 호출할 수 없습니다."
+  optionExplanations={['인스턴스가 아닌 클래스에서 호출합니다.', '맞습니다. 클래스 이름으로 직접 호출합니다.', 'private 필드 접근과는 무관합니다.', 'constructor 밖에서도 정의할 수 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`#balance` 같은 private 필드에 클래스 외부에서 접근하려 하면?"
+  options={['①undefined가 반환된다.', '②SyntaxError(문법 오류)가 발생한다.', '③정상적으로 값을 읽을 수 있다.', '④자동으로 public으로 바뀐다.']}
+  correctAnswer={2}
+  explanation="# 필드는 클래스 몸체 밖에서는 문법적으로 언급조차 할 수 없습니다. 접근을 시도하면 문법 오류가 발생해 조용히 undefined가 나오는 일반 프로퍼티보다 더 엄격하게 보호됩니다."
+  optionExplanations={['undefined가 아닌 문법 오류입니다.', '맞습니다. 문법 자체가 외부 접근을 차단합니다.', '읽을 수 없습니다.', '자동 변환되지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="get area() { ... }로 정의된 getter를 사용하는 방법은?"
+  options={['①circle.area()', '②circle.area', '③circle.get area()', '④circle.getArea()']}
+  correctAnswer={2}
+  explanation="getter는 괄호 없이 일반 프로퍼티처럼 접근합니다. 메서드처럼 보이지만 사용할 때는 함수 호출 문법을 쓰지 않습니다."
+  optionExplanations={['괄호를 붙이면 오류입니다.', '맞습니다. 프로퍼티처럼 괄호 없이 접근합니다.', '이런 문법은 없습니다.', '이런 이름의 메서드가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="class 선언 전에 new로 인스턴스를 만들려고 하면?"
+  options={['①정상 동작한다 — class는 함수 선언문처럼 호이스팅되기 때문에', '②ReferenceError가 발생한다 — class도 let/const처럼 TDZ의 영향을 받기 때문', '③undefined 인스턴스가 만들어진다.', '④class는 호이스팅되지 않아 완전히 무시된다.']}
+  correctAnswer={2}
+  explanation="class는 호이스팅되지만 함수 선언문과 달리 TDZ의 영향을 받습니다. 선언되기 전에 사용하려 하면 let/const와 마찬가지로 ReferenceError가 발생합니다."
+  optionExplanations={['함수 선언문과 다르게 동작합니다.', '맞습니다. class도 TDZ의 적용을 받습니다.', 'undefined가 아닌 오류가 발생합니다.', '호이스팅은 되지만 TDZ에 걸릴 뿐입니다.']}
+/>

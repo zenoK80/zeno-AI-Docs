@@ -1,0 +1,143 @@
+---
+title: '33. ECMAScript 핵심 퀴즈 1'
+description: '변수, 타입, 함수, 스코프, 클로저, this까지 문서 01~14의 핵심 개념을 종합 점검합니다.'
+---
+
+<Callout type="warning">
+  실제 기출 문제를 그대로 복제하지 않습니다. 앞서 배운 개념을 종합적으로 재구성한 문제입니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="`let`과 `const`의 공통점은?"
+  options={['①둘 다 재할당이 가능하다.', '②둘 다 블록 스코프이며 재선언이 불가능하다.', '③둘 다 호이스팅되지 않는다.', '④둘 다 함수 스코프이다.']}
+  correctAnswer={2}
+  explanation="let과 const는 블록 스코프를 공유하며 재선언을 허용하지 않습니다. 재할당 가능 여부만 다릅니다."
+  optionExplanations={['const는 재할당이 불가능합니다.', '맞습니다. 블록 스코프와 재선언 금지가 공통점입니다.', '둘 다 호이스팅되지만 TDZ에 걸립니다.', '함수 스코프는 var의 특징입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`console.log(x); let x = 5;`를 실행하면?"
+  options={['①undefined 출력', '②5 출력', '③ReferenceError 발생', '④SyntaxError 발생']}
+  correctAnswer={3}
+  explanation="let은 호이스팅되지만 TDZ에 걸려 초기화 전 접근 시 ReferenceError가 발생합니다."
+  optionExplanations={['var라면 undefined지만 let은 다릅니다.', '아직 초기화 전이라 5가 아닙니다.', '맞습니다. TDZ로 인한 ReferenceError입니다.', '런타임 오류이지 문법 오류가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`typeof null`의 결과는?"
+  options={["①'null'", "②'undefined'", "③'object'", "④'boolean'"]}
+  correctAnswer={3}
+  explanation="null은 원시 타입이지만 typeof는 역사적 버그로 'object'를 반환합니다."
+  optionExplanations={["'null'을 반환하지 않습니다.", "undefined와는 다른 값입니다.", "맞습니다. 유명한 역사적 버그입니다.", "boolean과는 무관합니다."]}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`1 + 2 + '3'`의 결과는?"
+  options={["①'33'", "②'123'", "③6", "④NaN"]}
+  correctAnswer={1}
+  explanation="왼쪽부터 계산됩니다. 1+2=3(숫자), 이후 3+'3'은 문자열 이어붙이기가 되어 '33'이 됩니다."
+  optionExplanations={["맞습니다. 숫자 계산 후 문자열이 이어붙습니다.", "숫자 계산이 먼저 끝난 뒤 문자열이 이어붙습니다.", "문자열이 섞여 숫자로 끝나지 않습니다.", "정상적으로 계산되는 값입니다."]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="다음 중 falsy 값이 아닌 것은?"
+  options={["①0", "②''", "③[]", "④NaN"]}
+  correctAnswer={3}
+  explanation="빈 배열은 truthy입니다. falsy 값은 false, 0, '', null, undefined, NaN 6개뿐입니다."
+  optionExplanations={["0은 falsy입니다.", "빈 문자열은 falsy입니다.", "맞습니다. 빈 배열은 truthy입니다.", "NaN은 falsy입니다."]}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="함수 선언문과 함수 표현식의 차이는?"
+  options={['①동작이 완전히 같다.', '②함수 선언문은 정의 전 호출이 가능하지만 함수 표현식은 불가능하다.', '③함수 표현식만 매개변수를 가질 수 있다.', '④함수 선언문은 화살표 함수의 별칭이다.']}
+  correctAnswer={2}
+  explanation="함수 선언문은 본문 전체가 호이스팅되어 정의 전 호출이 가능하지만, 함수 표현식은 변수 규칙을 따릅니다."
+  optionExplanations={['호이스팅 동작이 다릅니다.', '맞습니다. 정의 전 호출 가능 여부가 핵심 차이입니다.', '둘 다 매개변수를 가질 수 있습니다.', '별개의 문법입니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="화살표 함수가 일반 함수와 다른 결정적 차이는?"
+  options={['①매개변수를 받을 수 없다.', '②자신만의 this를 갖지 않고 바깥 스코프의 this를 물려받는다.', '③값을 반환할 수 없다.', '④이름을 가질 수 없다.']}
+  correctAnswer={2}
+  explanation="화살표 함수는 this 바인딩 자체를 하지 않고 정의된 위치의 바깥 this를 그대로 사용합니다."
+  optionExplanations={['매개변수를 받을 수 있습니다.', '맞습니다. this 처리 방식이 근본적으로 다릅니다.', '값을 반환할 수 있습니다.', '변수에 담아 이름을 줄 수 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="rest 파라미터(`...numbers`)로 받은 값의 타입은?"
+  options={['①arguments 객체', '②진짜 배열(Array)', '③객체 리터럴', '④문자열']}
+  correctAnswer={2}
+  explanation="rest 파라미터는 Array.isArray()에서 true인 진짜 배열입니다."
+  optionExplanations={['arguments와 달리 진짜 배열입니다.', '맞습니다. 진짜 배열로 수집됩니다.', '배열이지 일반 객체가 아닙니다.', '문자열이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="스코프 체인이 변수를 찾는 방향은?"
+  options={['①바깥에서 안쪽으로', '②안쪽에서 바깥쪽으로', '③양방향 모두 가능', '④무작위 순서']}
+  correctAnswer={2}
+  explanation="함수 내부에서 변수를 찾을 때 자기 스코프부터 시작해 점점 바깥쪽으로 나가며 찾습니다."
+  optionExplanations={['반대 방향입니다.', '맞습니다. 안쪽에서 바깥쪽으로만 찾습니다.', '한 방향으로만 찾습니다.', '정해진 순서가 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="클로저란?"
+  options={['①함수를 즉시 실행하는 문법', '②함수가 자신이 정의될 당시의 스코프를 기억해 계속 접근할 수 있게 하는 현상', '③변수를 암호화하는 기술', '④두 함수를 하나로 합치는 것']}
+  correctAnswer={2}
+  explanation="클로저는 함수와 그 함수가 정의된 렉시컬 스코프가 함께 묶여 계속 유지되는 현상입니다."
+  optionExplanations={['즉시 실행 함수는 다른 개념입니다.', '맞습니다. 스코프를 기억하는 것이 핵심입니다.', '암호화와는 무관합니다.', '함수 병합과는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="`for (var i=0;i<3;i++){ setTimeout(()=>console.log(i)) }`에서 출력되는 값은?"
+  options={['①0, 1, 2', '②3, 3, 3', '③0, 0, 0', '④undefined']}
+  correctAnswer={2}
+  explanation="var는 함수 스코프라서 모든 클로저가 같은 i를 공유합니다. 콜백 실행 시점에는 이미 i가 3이 되어 있습니다."
+  optionExplanations={['let을 썼을 때의 결과입니다.', '맞습니다. 모든 클로저가 최종값 3을 참조합니다.', '0으로 고정되지 않습니다.', 'i는 정의되어 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="`const fn = obj.method; fn()`처럼 메서드를 변수에 빼서 호출하면 this는?"
+  options={['①여전히 obj를 가리킨다.', '②undefined(또는 전역 객체)가 된다.', '③자동으로 fn을 가리킨다.', '④오류가 발생한다.']}
+  correctAnswer={2}
+  explanation="점 앞에 객체 없이 단독 호출되면 this는 obj와의 연결을 잃고 undefined(strict mode)가 됩니다."
+  optionExplanations={['obj와의 연결이 끊어집니다.', '맞습니다. 단독 호출 규칙이 적용됩니다.', 'this는 함수 자신을 가리키지 않습니다.', '문법 오류는 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="call과 apply의 차이는?"
+  options={['①call은 비동기, apply는 동기다.', '②call은 인수를 쉼표로 나열하고, apply는 인수를 배열로 전달한다.', '③apply만 this를 지정할 수 있다.', '④call은 새 함수를 반환한다.']}
+  correctAnswer={2}
+  explanation="call과 apply 모두 this를 지정하며 즉시 실행하지만, 나머지 인수 전달 방식이 다릅니다."
+  optionExplanations={['둘 다 동기 실행입니다.', '맞습니다. 인수 전달 방식이 다릅니다.', '둘 다 this를 지정할 수 있습니다.', '새 함수 반환은 bind의 특징입니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="`let objA={x:1}; let objB=objA; objB.x=2;` 실행 후 objA.x의 값은?"
+  options={['①1', '②2', '③undefined', '④오류 발생']}
+  correctAnswer={2}
+  explanation="객체는 참조가 복사되므로 objA와 objB는 같은 객체를 가리킵니다."
+  optionExplanations={['objA도 함께 변경됩니다.', '맞습니다. 같은 객체를 공유하므로 함께 바뀝니다.', '값은 존재합니다.', '정상적으로 실행됩니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="`const copy = {...original}`이 '얕은' 복사인 이유는?"
+  options={['①복사가 불완전하게 실패해서', '②최상위 프로퍼티만 새로 복사되고, 중첩된 객체는 여전히 원본과 참조를 공유하기 때문', '③원본을 전혀 복사하지 않아서', '④숫자만 복사되기 때문']}
+  correctAnswer={2}
+  explanation="스프레드는 한 단계까지만 새 객체로 만들며, 중첩 객체는 여전히 원본과 같은 참조를 가리킵니다."
+  optionExplanations={['실패가 아닌 의도된 동작입니다.', '맞습니다. 한 단계까지만 독립적으로 복사됩니다.', '최상위 프로퍼티는 정상 복사됩니다.', '모든 타입의 최상위 프로퍼티가 복사됩니다.']}
+/>

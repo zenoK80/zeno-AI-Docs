@@ -1,0 +1,187 @@
+---
+title: '02. 자바스크립트 실행 환경'
+description: '브라우저 콘솔, script 태그, Node.js로 자바스크립트 코드를 실제로 실행해보는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 코드를 눈으로만 읽지 않고 직접 실행해볼 수 있는 세 가지 방법(브라우저 콘솔, HTML 파일, Node.js)을 익힙니다.
+</Callout>
+
+## 왜 실행 환경부터 알아야 하나?
+
+> **쉽게 말하면:** 요리책만 읽고 요리를 안 해보면 맛을 알 수 없듯이, 코드도 직접 돌려봐야 진짜로 이해됩니다.
+
+이 시리즈의 모든 문서에는 `<CodePlayground>`라는 실습 상자가 들어있어서, 이 사이트 안에서 바로 코드를 실행하고 결과를 확인할 수 있습니다. 하지만 실제로 여러분이 자신의 컴퓨터에서 코드를 짤 때는 "이 코드를 어디에, 어떻게 입력해야 실행되는가"를 알아야 합니다. 이 문서에서는 세 가지 대표적인 실행 방법을 다룹니다.
+
+## 방법 1 — 브라우저 개발자 도구 콘솔
+
+가장 빠르게 자바스크립트를 실행해보는 방법입니다. 별도 설치가 필요 없습니다.
+
+<Steps>
+### 브라우저에서 아무 페이지나 엽니다
+
+크롬, 엣지, 웨일 등 어떤 브라우저든 상관없습니다.
+
+### 개발자 도구를 엽니다
+
+Windows에서는 `F12` 또는 `Ctrl+Shift+I`를 누릅니다. Mac에서는 `Cmd+Option+I`를 누릅니다.
+
+### Console(콘솔) 탭을 클릭합니다
+
+여러 탭 중 "Console"이라고 쓰인 탭을 찾아 클릭합니다.
+
+### 코드를 입력하고 Enter를 누릅니다
+
+```js
+console.log(1 + 2)
+```
+
+`3`이라는 결과가 바로 아래에 출력됩니다.
+</Steps>
+
+<Callout type="info">
+  콘솔은 **한 줄씩 즉시 실행**되는 대화형 환경입니다. 짧은 코드를 빠르게 시험해볼 때 유용합니다. 하지만 페이지를 새로고침하면 입력한 내용이 모두 사라집니다.
+</Callout>
+
+## 방법 2 — HTML 파일 안의 script 태그
+
+실제 웹 페이지에 자바스크립트를 넣는 표준적인 방법입니다.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>내 첫 페이지</title>
+</head>
+<body>
+  <h1>안녕하세요</h1>
+
+  <script>
+    console.log('이 코드는 페이지가 로딩될 때 실행됩니다.')
+    alert('환영합니다!')
+  </script>
+</body>
+</html>
+```
+
+`<script>` 태그 안에 자바스크립트 코드를 쓰면, 브라우저가 이 HTML 파일을 열 때 해당 코드를 실행합니다. `.html` 파일로 저장한 뒤 브라우저로 더블클릭해서 열면 바로 확인할 수 있습니다.
+
+### 외부 파일로 분리하기
+
+코드가 길어지면 `.js` 파일로 따로 빼는 것이 일반적입니다.
+
+```html
+<!-- index.html -->
+<body>
+  <h1>안녕하세요</h1>
+  <script src="app.js"></script>
+</body>
+```
+
+```js
+// app.js
+console.log('외부 파일에서 실행되는 코드입니다.')
+```
+
+<Callout type="warning">
+  `<script src="app.js">` 태그는 `<body>` 태그가 끝나기 **직전**에 두는 것이 좋습니다. HTML이 먼저 화면에 그려진 뒤 스크립트가 실행되어야, 아직 만들어지지 않은 `<h1>` 같은 요소를 자바스크립트가 찾다가 실패하는 문제를 피할 수 있습니다.
+</Callout>
+
+## 방법 3 — Node.js로 실행하기
+
+**Node.js**(Node 점 JS)는 브라우저 밖에서 자바스크립트를 실행할 수 있게 해주는 프로그램입니다. 서버 프로그램을 만들거나, 터미널에서 스크립트를 돌릴 때 사용합니다.
+
+<Steps>
+### Node.js를 설치합니다
+
+[nodejs.org](https://nodejs.org)에서 설치 파일을 받아 설치합니다.
+
+### 터미널을 엽니다
+
+Windows는 PowerShell이나 명령 프롬프트, Mac은 터미널 앱을 엽니다.
+
+### node 명령으로 REPL을 실행합니다
+
+```bash
+node
+```
+
+`>` 프롬프트가 나타나면 콘솔처럼 한 줄씩 코드를 입력할 수 있습니다. **REPL**(Read-Eval-Print Loop, 읽고-실행하고-출력하는-반복)이라고 부릅니다.
+
+### 파일로 실행합니다
+
+`app.js` 파일을 만들고 코드를 저장한 뒤, 터미널에서 실행합니다.
+
+```bash
+node app.js
+```
+</Steps>
+
+## 세 가지 방법 비교
+
+<Table>
+  <thead>
+    <tr><th>방법</th><th>필요한 것</th><th>주로 쓰는 상황</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>브라우저 콘솔</td><td>브라우저만</td><td>짧은 코드 즉석 테스트</td></tr>
+    <tr><td>HTML의 script 태그</td><td>브라우저, 텍스트 에디터</td><td>실제 웹 페이지 제작</td></tr>
+    <tr><td>Node.js</td><td>Node.js 설치</td><td>서버 프로그램, 터미널 스크립트</td></tr>
+  </tbody>
+</Table>
+
+이 문서 시리즈의 코드 실습 상자(`CodePlayground`)는 방법 2·3을 사이트 안에서 흉내 낸 것입니다. **Open Sandbox** 버튼을 누르면 실제 온라인 개발 환경에서도 열어볼 수 있습니다.
+
+## 핵심 정리
+
+- 브라우저 콘솔은 설치 없이 짧은 코드를 즉시 실행하기 좋습니다.
+- `<script>` 태그로 HTML 페이지 안에 자바스크립트를 넣을 수 있습니다.
+- Node.js는 브라우저 밖에서 자바스크립트를 실행하는 프로그램입니다.
+- `node app.js`로 파일을, `node`만 입력하면 REPL을 실행합니다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="브라우저 개발자 도구의 Console 탭에서 코드를 입력하면 언제 사라지나요?"
+  options={['①입력 즉시 사라진다.', '②페이지를 새로고침하면 사라진다.', '③절대 사라지지 않는다.', '④1분 후 자동 삭제된다.']}
+  correctAnswer={2}
+  explanation="콘솔에 입력한 코드는 그 페이지의 메모리에만 있어서, 새로고침하면 초기화됩니다."
+  optionExplanations={['입력 즉시 실행되고 결과가 남아 있습니다.', '맞습니다. 페이지가 다시 로딩되면 콘솔 내용도 초기화됩니다.', '새로고침하면 사라집니다.', '시간 제한으로 삭제되지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`<script>` 태그를 `</body>` 직전에 두는 것이 권장되는 이유는?"
+  options={['①파일 크기를 줄이기 위해', '②HTML 요소가 먼저 화면에 그려진 뒤 스크립트가 실행되게 하기 위해', '③코드를 숨기기 위해', '④브라우저 호환성 때문에']}
+  correctAnswer={2}
+  explanation="스크립트가 아직 만들어지지 않은 HTML 요소를 찾으려 하면 실패할 수 있습니다. body 끝에 두면 HTML이 먼저 준비된 후 스크립트가 실행됩니다."
+  optionExplanations={['파일 크기와는 관련 없습니다.', '맞습니다. HTML 준비 순서 때문입니다.', '코드 숨김 목적이 아닙니다.', '호환성 문제가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Node.js가 하는 역할은?"
+  options={['①HTML을 CSS로 변환한다.', '②브라우저 없이 자바스크립트를 실행할 수 있게 한다.', '③이미지를 편집한다.', '④데이터베이스 자체이다.']}
+  correctAnswer={2}
+  explanation="Node.js는 자바스크립트 엔진을 브라우저 밖에서 실행할 수 있게 하는 런타임입니다. 서버 프로그램이나 터미널 스크립트에 사용합니다."
+  optionExplanations={['변환 도구가 아닙니다.', '맞습니다. 브라우저 밖 실행 환경입니다.', '이미지 편집 도구가 아닙니다.', 'Node.js 자체는 데이터베이스가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="터미널에서 `node app.js`를 실행하면 어떤 일이 일어나나요?"
+  options={['①app.js 파일을 텍스트로 출력한다.', '②app.js 안의 자바스크립트 코드를 Node.js가 실행한다.', '③app.js를 삭제한다.', '④브라우저를 연다.']}
+  correctAnswer={2}
+  explanation="node 명령 뒤에 파일 경로를 주면 Node.js가 그 파일의 코드를 처음부터 끝까지 실행합니다."
+  optionExplanations={['단순 출력이 아닌 실행입니다.', '맞습니다. 파일 안의 코드를 실행합니다.', '삭제하지 않습니다.', '브라우저를 열지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="REPL이 의미하는 것은?"
+  options={['①Rapid Execution Programming Language', '②Read-Eval-Print Loop(읽고, 실행하고, 출력하는 반복)', '③React Extended Programming Layer', '④Remote Execution Process Line']}
+  correctAnswer={2}
+  explanation="REPL은 입력을 읽고(Read), 실행하고(Eval), 결과를 출력하는(Print) 과정을 반복(Loop)하는 대화형 환경을 뜻합니다. node 명령만 입력하면 REPL이 시작됩니다."
+  optionExplanations={['존재하지 않는 풀이입니다.', '맞습니다. Read-Eval-Print Loop의 약자입니다.', '존재하지 않는 풀이입니다.', '존재하지 않는 풀이입니다.']}
+/>

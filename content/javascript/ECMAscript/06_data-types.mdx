@@ -1,0 +1,169 @@
+---
+title: '06. 데이터 타입'
+description: '원시 타입 7가지와 typeof 연산자로 값의 종류를 구분하는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 자바스크립트의 원시 타입 7가지를 모두 나열하고, typeof로 각 값의 타입을 확인할 수 있습니다.
+</Callout>
+
+## 타입이 필요한 이유
+
+> **쉽게 말하면:** 값마다 "무엇을 할 수 있는지"가 다르기 때문에, 값의 종류(타입)를 구분해야 합니다.
+
+숫자는 더할 수 있지만 문자열끼리는 뺄셈이 되지 않습니다. 값이 "무슨 종류"인지 아는 것이 그 값으로 무엇을 할 수 있는지 판단하는 기준이 됩니다.
+
+## 원시 타입 7가지
+
+자바스크립트에는 **원시 타입**(primitive type)이 7가지 있습니다. "원시"라는 이름은 더 이상 쪼갤 수 없는 가장 기본적인 값이라는 뜻입니다.
+
+<Table>
+  <thead>
+    <tr><th>타입</th><th>예시</th><th>설명</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>string</td><td>'안녕'</td><td>문자열</td></tr>
+    <tr><td>number</td><td>42, 3.14</td><td>정수와 실수 모두 하나의 타입</td></tr>
+    <tr><td>boolean</td><td>true, false</td><td>참/거짓</td></tr>
+    <tr><td>undefined</td><td>undefined</td><td>값이 아직 할당되지 않음</td></tr>
+    <tr><td>null</td><td>null</td><td>값이 의도적으로 비어있음</td></tr>
+    <tr><td>symbol</td><td>Symbol('id')</td><td>항상 고유한 값 (32번 문서에서 자세히)</td></tr>
+    <tr><td>bigint</td><td>10n</td><td>매우 큰 정수 (number의 한계를 넘어설 때)</td></tr>
+  </tbody>
+</Table>
+
+## typeof — 타입을 확인하는 연산자
+
+**typeof**는 값의 타입을 문자열로 알려주는 연산자입니다.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="typeof 실습"
+  files={{
+    '/index.js': `console.log(typeof '안녕')     // 'string'
+console.log(typeof 42)         // 'number'
+console.log(typeof true)       // 'boolean'
+console.log(typeof undefined)  // 'undefined'
+console.log(typeof null)       // 'object' — 유명한 함정!
+console.log(typeof Symbol())   // 'symbol'
+console.log(typeof 10n)        // 'bigint'
+console.log(typeof {})         // 'object'
+console.log(typeof [])         // 'object' — 배열도 object로 나옴
+console.log(typeof function(){}) // 'function'`,
+  }}
+/>
+
+## number — 정수와 실수를 구분하지 않는다
+
+다른 언어(Java, C 등)는 정수(int)와 실수(float)를 다른 타입으로 나누지만, 자바스크립트는 **number 하나로 통합**되어 있습니다.
+
+```js
+const age = 25        // number
+const price = 19.99   // number — 같은 타입
+console.log(typeof age === typeof price)  // true
+```
+
+**특수한 number 값**도 있습니다.
+
+```js
+console.log(1 / 0)        // Infinity
+console.log(-1 / 0)       // -Infinity
+console.log(0 / 0)        // NaN — Not a Number(숫자가 아님)
+console.log(typeof NaN)   // 'number' — NaN도 number 타입!
+```
+
+<Callout type="warning">
+  `NaN`(Not a Number)은 이름과 달리 **number 타입**입니다. "계산 결과가 유효한 숫자가 아니다"를 나타내는 특수한 숫자값입니다. `NaN === NaN`은 `false`이므로, 값이 NaN인지 확인하려면 `Number.isNaN(value)`를 사용해야 합니다.
+</Callout>
+
+## undefined vs null — 둘 다 "없음"인데 다르다
+
+두 값 모두 "값이 없음"을 나타내지만, 의미가 다릅니다.
+
+- `undefined`: 값이 **아직 할당되지 않은** 상태. 자바스크립트가 자동으로 부여.
+- `null`: 값이 **의도적으로 비어있음**을 나타내기 위해 **개발자가 직접 넣는** 값.
+
+```js
+let name           // 선언만 하고 값을 안 줌
+console.log(name)  // undefined — "아직 정해지지 않았다"
+
+let selectedUser = null  // 개발자가 "일부러" 비워둠
+console.log(selectedUser)  // null — "의도적으로 없다"
+```
+
+> **비유:** `undefined`는 "이삿짐 상자에 아직 아무것도 안 넣은 상태"이고, `null`은 "상자를 열어보니 일부러 비워둔 것"입니다.
+
+## typeof null이 'object'인 이유 — 유명한 버그
+
+```js
+console.log(typeof null)  // 'object'
+```
+
+이것은 자바스크립트 초창기(1995년)의 **구현 버그**입니다. `null`은 원시 타입인데도 `typeof`가 `'object'`를 반환합니다. 이 버그는 이미 수많은 코드가 이 동작에 의존하게 되어, 표준을 수정하면 기존 웹사이트들이 깨질 위험이 있어 **지금까지도 고쳐지지 않고 있습니다**. 자바스크립트에서 유명한 "역사적 함정" 중 하나이니 꼭 기억해두세요.
+
+## 참조 타입(object)도 있다
+
+원시 타입 7가지 외에, 자바스크립트에는 **object**(객체) 타입이 하나 더 있습니다. 배열, 함수, 일반 객체가 모두 여기 속합니다. 원시 타입과 object의 근본적인 차이는 16번 문서에서 깊게 다룹니다.
+
+```js
+console.log(typeof {})           // 'object'
+console.log(typeof [])           // 'object'
+console.log(typeof function(){}) // 'function' — object의 특수한 형태지만 별도 표기
+```
+
+## 핵심 정리
+
+- 원시 타입은 string, number, boolean, undefined, null, symbol, bigint 7가지다.
+- `typeof`로 값의 타입을 문자열로 확인할 수 있다.
+- number는 정수·실수를 구분하지 않으며, NaN도 number 타입이다.
+- undefined는 "아직 없음", null은 "의도적으로 없음"이라는 의미 차이가 있다.
+- `typeof null`이 `'object'`인 것은 역사적 버그이며 수정되지 않았다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="자바스크립트의 원시 타입이 아닌 것은?"
+  options={['①string', '②number', '③object', '④boolean']}
+  correctAnswer={3}
+  explanation="object는 원시 타입이 아니라 참조 타입입니다. 원시 타입은 string, number, boolean, undefined, null, symbol, bigint 7가지입니다."
+  optionExplanations={['string은 원시 타입입니다.', 'number는 원시 타입입니다.', '맞습니다. object는 원시 타입이 아닙니다.', 'boolean은 원시 타입입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`typeof null`의 결과는?"
+  options={["①'null'", "②'undefined'", "③'object'", "④'boolean'"]}
+  correctAnswer={3}
+  explanation="null은 원시 타입이지만, typeof null은 자바스크립트 초창기의 구현 버그로 인해 'object'를 반환합니다. 하위 호환성 때문에 수정되지 않았습니다."
+  optionExplanations={["'null'을 반환하지 않습니다.", "'undefined'와는 다른 값입니다.", "맞습니다. 유명한 역사적 버그입니다.", "boolean과는 관련 없습니다."]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="undefined와 null의 의미 차이는?"
+  options={['①완전히 같은 의미다.', '②undefined는 아직 값이 할당되지 않은 상태, null은 개발자가 의도적으로 비워둔 값이다.', '③undefined는 숫자이고 null은 문자열이다.', '④null이 더 최신 문법이다.']}
+  correctAnswer={2}
+  explanation="undefined는 자바스크립트가 자동으로 부여하는 '아직 없음'이고, null은 개발자가 명시적으로 '비어있음'을 나타내기 위해 대입하는 값입니다."
+  optionExplanations={['의미가 다릅니다.', '맞습니다. 자동 부여 vs 의도적 대입의 차이입니다.', '둘 다 타입이 아니라 값입니다.', '최신/구식 문법의 차이가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`typeof NaN`의 결과는?"
+  options={["①'NaN'", "②'undefined'", "③'number'", "④'object'"]}
+  correctAnswer={3}
+  explanation="NaN(Not a Number)은 이름과 달리 number 타입에 속하는 특수한 값입니다. 유효하지 않은 숫자 계산 결과를 나타냅니다."
+  optionExplanations={["NaN은 독립된 타입이 아닙니다.", "undefined와는 다른 개념입니다.", "맞습니다. NaN도 number 타입입니다.", "object가 아닙니다."]}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="NaN인지 확인하는 올바른 방법은?"
+  options={['①value === NaN', '②Number.isNaN(value)', '③typeof value === "NaN"', '④value == null']}
+  correctAnswer={2}
+  explanation="NaN === NaN은 항상 false이기 때문에 직접 비교로는 확인할 수 없습니다. Number.isNaN()으로 정확히 검사해야 합니다."
+  optionExplanations={['NaN과의 === 비교는 항상 false입니다.', '맞습니다. Number.isNaN()이 올바른 방법입니다.', "typeof는 'number'를 반환하지 'NaN'을 반환하지 않습니다.", 'null 비교와는 무관합니다.']}
+/>

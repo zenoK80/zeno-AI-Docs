@@ -1,0 +1,190 @@
+---
+title: '18. 프로토타입'
+description: '자바스크립트가 객체 간 기능을 공유하는 프로토타입 체인의 동작 원리를 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 모든 배열이 `.map()`을 쓸 수 있는 이유를 프로토타입 체인으로 설명할 수 있게 됩니다.
+</Callout>
+
+## 궁금증에서 시작하기
+
+```js
+const arr = [1, 2, 3]
+console.log(arr.map(n => n * 2))  // [2, 4, 6]
+```
+
+`arr`는 그냥 `[1, 2, 3]`이라는 데이터를 담은 배열일 뿐인데, 어떻게 `.map()`이라는 기능을 쓸 수 있을까요? `arr` 안에 `map`이라는 함수를 직접 넣은 적이 없는데 말입니다. 이 답이 **프로토타입**(prototype)입니다.
+
+## 프로토타입이란?
+
+> **쉽게 말하면:** 프로토타입은 "모든 객체가 공유하는, 원본 기능이 저장된 참고서"입니다. 객체 자신에게 없는 기능을 요청받으면, 자바스크립트는 이 참고서를 찾아봅니다.
+
+모든 자바스크립트 객체는 **자신의 프로토타입**이라는 다른 객체를 내부적으로 연결하고 있습니다. 원하는 프로퍼티나 메서드가 객체 자신에게 없으면, 자바스크립트 엔진은 자동으로 그 객체의 프로토타입을 찾아봅니다. 거기에도 없으면 프로토타입의 프로토타입을 찾고, 이 과정을 계속 반복합니다. 이 연결 고리를 **프로토타입 체인**(prototype chain)이라고 부릅니다.
+
+## 프로토타입 체인 눈으로 확인하기
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="프로토타입 체인 실습"
+  files={{
+    '/index.js': `const arr = [1, 2, 3]
+
+console.log(arr.hasOwnProperty('map'))  // false — arr 자신은 map을 갖고 있지 않음!
+console.log(typeof arr.map)             // 'function' — 그런데 사용은 가능
+
+// arr의 프로토타입을 확인
+console.log(Object.getPrototypeOf(arr) === Array.prototype)  // true
+
+// Array.prototype 안에 map이 정말 있는지 확인
+console.log(Array.prototype.hasOwnProperty('map'))  // true — 여기 있다!`,
+  }}
+/>
+
+`arr` 자신에게는 `map`이 없지만(`hasOwnProperty`가 false), `arr`의 프로토타입인 `Array.prototype`에는 `map`이 있습니다. `arr.map()`을 호출하면 자바스크립트는 다음 순서로 찾습니다.
+
+<Steps>
+### arr 자신에게 map이 있는가?
+없음 → 다음 단계로
+
+### arr의 프로토타입(Array.prototype)에 map이 있는가?
+있음! → 이 함수를 사용
+
+### 만약 여기도 없었다면
+Array.prototype의 프로토타입(Object.prototype)까지 계속 찾아 올라간다
+</Steps>
+
+이렇게 배열 백만 개를 만들어도, `map`이라는 함수 자체는 `Array.prototype`에 **딱 하나만** 존재하고 모든 배열이 이를 공유합니다. 배열 하나하나에 `map` 함수를 복사해 넣지 않아도 되므로 메모리를 절약할 수 있습니다.
+
+## 직접 프로토타입 체인 만들어보기
+
+```js
+const animalPrototype = {
+  makeSound() {
+    console.log(`${this.name}가 소리를 냅니다`)
+  },
+}
+
+const dog = Object.create(animalPrototype)  // dog의 프로토타입을 animalPrototype으로 지정
+dog.name = '멍멍이'
+
+dog.makeSound()  // '멍멍이가 소리를 냅니다' — dog 자신에게 makeSound가 없지만 프로토타입에서 찾음
+
+console.log(dog.hasOwnProperty('makeSound'))  // false
+console.log(dog.hasOwnProperty('name'))       // true
+```
+
+`Object.create(부모객체)`는 "이 객체의 프로토타입을 부모객체로 지정하며 새 객체를 만들어라"는 뜻입니다. 이렇게 만든 `dog`는 자신에게 없는 기능(`makeSound`)을 프로토타입(`animalPrototype`)에서 빌려 씁니다.
+
+## 생성자 함수와 프로토타입
+
+객체를 여러 개 찍어낼 때는, 생성자 함수와 `prototype` 프로퍼티를 함께 씁니다.
+
+```js
+function Animal(name) {
+  this.name = name  // 각 인스턴스마다 고유하게 가질 데이터
+}
+
+// Animal로 만들어질 모든 객체가 공유할 기능은 prototype에 붙인다
+Animal.prototype.makeSound = function () {
+  console.log(`${this.name}가 소리를 냅니다`)
+}
+
+const dog = new Animal('멍멍이')
+const cat = new Animal('야옹이')
+
+dog.makeSound()  // '멍멍이가 소리를 냅니다'
+cat.makeSound()  // '야옹이가 소리를 냅니다'
+
+console.log(dog.makeSound === cat.makeSound)  // true — 같은 함수를 공유! 각자 복사본이 아님
+```
+
+`this.name`은 `new Animal(...)`로 만들어질 때마다 각 인스턴스에 **개별적으로** 저장되지만(14번 문서에서 배운 `new`의 규칙 3), `makeSound`는 `Animal.prototype`에 **딱 하나만** 존재하고 `dog`와 `cat`이 이를 공유합니다.
+
+## `__proto__`와 `Object.getPrototypeOf` — 프로토타입 확인 방법
+
+```js
+const dog = new Animal('멍멍이')
+
+console.log(dog.__proto__ === Animal.prototype)              // true (비표준이지만 널리 쓰임)
+console.log(Object.getPrototypeOf(dog) === Animal.prototype)  // true (표준 방법, 이걸 권장)
+```
+
+<Callout type="warning">
+  `__proto__`는 오랫동안 비공식적으로 쓰였지만, 표준 방법은 `Object.getPrototypeOf()`입니다. 실무 코드에서는 `__proto__`를 직접 조작하지 말고, 이 문서에서 배운 `Object.create()`나 19번 문서의 `class`를 사용하는 것이 안전합니다.
+</Callout>
+
+## 왜 지금은 class를 더 많이 쓰나?
+
+지금까지 본 프로토타입 문법(`function` + `.prototype`)은 동작 원리를 이해하는 데는 좋지만, 코드가 장황하고 상속 관계를 표현하기 번거롭습니다. ES6에서 등장한 `class` 문법(19번 문서)은 **이 프로토타입 체인 위에서 동작하는 더 읽기 쉬운 문법**일 뿐, 완전히 다른 새로운 개념이 아닙니다.
+
+```js
+class Animal {
+  constructor(name) {
+    this.name = name
+  }
+  makeSound() {
+    console.log(`${this.name}가 소리를 냅니다`)
+  }
+}
+
+const dog = new Animal('멍멍이')
+console.log(Object.getPrototypeOf(dog) === Animal.prototype)  // true — class도 결국 프로토타입 체인!
+```
+
+## 핵심 정리
+
+- 프로토타입은 객체가 자신에게 없는 프로퍼티·메서드를 찾을 때 참조하는 연결된 객체다.
+- 자신 → 자신의 프로토타입 → 그 프로토타입의 프로토타입… 순서로 찾아가는 것이 프로토타입 체인이다.
+- `Object.create(부모)`로 프로토타입을 직접 지정해 객체를 만들 수 있다.
+- 생성자 함수의 `prototype`에 메서드를 붙이면, 그 함수로 만든 모든 인스턴스가 메서드를 공유한다(메모리 절약).
+- ES6의 `class`는 프로토타입 체인 위에서 동작하는 더 읽기 쉬운 문법이다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="모든 배열이 .map()을 사용할 수 있는 이유는?"
+  options={['①모든 배열마다 map 함수가 개별적으로 복사되어 있어서', '②배열의 프로토타입인 Array.prototype에 map이 정의되어 있고, 프로토타입 체인을 통해 찾아 쓰기 때문', '③map은 자바스크립트의 예약어라서', '④자바스크립트 엔진이 매번 즉석에서 만들어주기 때문']}
+  correctAnswer={2}
+  explanation="map은 각 배열 인스턴스가 아니라 Array.prototype에 한 번만 정의되어 있습니다. 모든 배열이 프로토타입 체인을 통해 이 함수를 찾아 공유합니다."
+  optionExplanations={['개별 복사가 아닌 공유 방식입니다.', '맞습니다. 프로토타입 체인을 통한 공유입니다.', '예약어가 아닌 메서드 이름입니다.', '즉석 생성이 아닌 미리 정의된 공유 함수입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`Object.create(parentObj)`가 하는 일은?"
+  options={['①parentObj를 복사한다.', '②parentObj를 프로토타입으로 지정한 새 객체를 만든다.', '③parentObj를 삭제한다.', '④parentObj의 모든 프로퍼티를 직접 복사한다.']}
+  correctAnswer={2}
+  explanation="Object.create()는 인수로 받은 객체를 새로 만들 객체의 프로토타입으로 연결합니다. 복사가 아니라 참조 연결입니다."
+  optionExplanations={['복사가 아닌 프로토타입 연결입니다.', '맞습니다. 프로토타입 체인을 직접 만드는 방법입니다.', '삭제하지 않습니다.', '직접 복사가 아닌 참조 방식입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="생성자 함수의 prototype에 메서드를 붙이는 이유는?"
+  options={['①각 인스턴스마다 다른 동작을 하게 하려고', '②모든 인스턴스가 그 메서드를 공유해 메모리를 절약하기 위해', '③메서드를 숨기기 위해', '④상속을 막기 위해']}
+  correctAnswer={2}
+  explanation="prototype에 메서드를 한 번만 정의하면, 그 생성자로 만든 모든 인스턴스가 같은 함수를 공유합니다. 인스턴스마다 함수를 복사하지 않아 메모리 효율이 좋습니다."
+  optionExplanations={['모든 인스턴스가 동일한 메서드를 공유합니다.', '맞습니다. 메모리 절약이 핵심 이유입니다.', '숨기기가 목적이 아닙니다.', '오히려 상속(공유)을 위한 것입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`dog.hasOwnProperty('makeSound')`가 false인데 `dog.makeSound()`가 정상 실행되는 이유는?"
+  options={['①makeSound가 dog 자신의 프로퍼티는 아니지만, 프로토타입 체인에서 찾아 실행되기 때문', '②자바스크립트의 버그', '③makeSound가 전역 함수라서', '④hasOwnProperty가 잘못 동작해서']}
+  correctAnswer={1}
+  explanation="hasOwnProperty는 객체 '자신'이 직접 가진 프로퍼티만 확인합니다. makeSound는 dog 자신이 아닌 프로토타입에 있으므로 false지만, 메서드 호출 시에는 프로토타입 체인까지 찾아서 실행됩니다."
+  optionExplanations={['맞습니다. 자신에게 없어도 프로토타입 체인에서 찾아 사용합니다.', '버그가 아닌 정상 동작입니다.', '전역 함수가 아닌 프로토타입의 메서드입니다.', 'hasOwnProperty는 정확히 동작하고 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="ES6의 class 문법과 프로토타입의 관계는?"
+  options={['①class는 프로토타입과 완전히 무관한 새로운 개념이다.', '②class는 기존 프로토타입 체인 위에서 동작하는 더 읽기 쉬운 문법이다.', '③class를 쓰면 프로토타입이 비활성화된다.', '④class는 프로토타입보다 느리게 동작한다.']}
+  correctAnswer={2}
+  explanation="class는 새로운 상속 모델이 아니라, 기존의 프로토타입 기반 상속을 더 명확한 문법으로 표현한 것입니다. class로 만든 인스턴스도 여전히 프로토타입 체인을 통해 동작합니다."
+  optionExplanations={['프로토타입 위에서 동작하는 문법입니다.', '맞습니다. class는 프로토타입의 문법적 설탕(syntactic sugar)입니다.', '프로토타입은 여전히 내부적으로 사용됩니다.', '동작 방식이 같아 속도 차이는 미미합니다.']}
+/>

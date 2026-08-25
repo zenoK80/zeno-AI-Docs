@@ -1,0 +1,202 @@
+---
+title: '29. async/await'
+description: 'async/await로 Promise 기반 코드를 동기 코드처럼 읽기 쉽게 작성하는 방법과 에러 처리를 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** then 체이닝 대신 async/await로 비동기 코드를 작성하고, try/catch로 에러를 처리할 수 있습니다.
+</Callout>
+
+## async/await가 필요한 이유
+
+28번 문서에서 배운 `.then()` 체이닝은 단계가 많아지면 코드가 옆으로 계속 늘어져 읽기 어려워집니다.
+
+```js
+// then 체이닝 — 단계가 늘어날수록 들여쓰기가 깊어짐
+function loadUserData(id) {
+  return fetchUser(id)
+    .then(user => {
+      return fetchPosts(user.id).then(posts => {
+        return { user, posts }
+      })
+    })
+}
+```
+
+**`async`/`await`**는 이 코드를 **동기 코드처럼 보이게** 재작성할 수 있게 해주는 문법입니다. 내부 동작은 Promise와 완전히 같습니다.
+
+```js
+// async/await — 위에서 아래로 순서대로 읽힘
+async function loadUserData(id) {
+  const user = await fetchUser(id)
+  const posts = await fetchPosts(user.id)
+  return { user, posts }
+}
+```
+
+## async — 함수를 Promise를 반환하는 함수로 만들기
+
+함수 앞에 `async`를 붙이면, 그 함수는 **항상 Promise를 반환**하게 됩니다.
+
+```js
+async function greet() {
+  return '안녕하세요'
+}
+
+console.log(greet())  // Promise {<fulfilled>: '안녕하세요'} — 문자열이 아닌 Promise!
+greet().then(result => console.log(result))  // '안녕하세요'
+```
+
+## await — Promise가 끝날 때까지 기다리기
+
+`await`는 **async 함수 안에서만** 사용할 수 있습니다. Promise 앞에 붙이면, 그 Promise가 fulfilled될 때까지 함수 실행을 멈추고 기다린 뒤, 결과값을 꺼내줍니다.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="async/await 실습"
+  files={{
+    '/index.js': `function fetchUser(id) {
+  return new Promise(resolve => {
+    setTimeout(() => resolve({ id, name: '철수' }), 500)
+  })
+}
+
+function fetchPosts(userId) {
+  return new Promise(resolve => {
+    setTimeout(() => resolve(['게시글1', '게시글2']), 500)
+  })
+}
+
+async function loadUserData(id) {
+  console.log('로딩 시작')
+  const user = await fetchUser(id)       // fetchUser가 끝날 때까지 여기서 기다림
+  console.log('사용자 로딩 완료:', user.name)
+  const posts = await fetchPosts(user.id) // fetchPosts가 끝날 때까지 기다림
+  console.log('게시글 로딩 완료:', posts)
+  return { user, posts }
+}
+
+loadUserData(1).then(data => console.log('전체 완료:', data))`,
+  }}
+/>
+
+`await`가 있는 줄에서 실행이 "멈추는" 것처럼 보이지만, 실제로는 **그 시점의 나머지 코드를 나중에 실행하도록 예약**하고, 그동안 다른 코드가 실행될 수 있게 자리를 비켜줍니다(30번 이벤트 루프 문서에서 정확한 원리를 다룹니다). 프로그램 전체가 멈추는 것이 아닙니다.
+
+## try/catch로 에러 처리하기
+
+`.catch()` 대신, 일반 동기 코드처럼 `try/catch`(24번 문서)로 에러를 처리합니다.
+
+```js
+async function loadUserData(id) {
+  try {
+    const user = await fetchUser(id)
+    const posts = await fetchPosts(user.id)
+    return { user, posts }
+  } catch (error) {
+    console.log('데이터 로딩 실패:', error.message)
+    return null
+  }
+}
+```
+
+`await`한 Promise가 reject되면, 그 지점에서 즉시 `catch` 블록으로 넘어갑니다. 여러 `await`를 하나의 `try` 블록으로 감싸면, 어느 단계에서 실패하든 한 곳에서 처리할 수 있습니다.
+
+## 흔한 실수 — await 없이 쓰기
+
+```js
+async function loadUser(id) {
+  const user = fetchUser(id)  // await를 빠뜨림!
+  console.log(user)  // Promise {<pending>} — 아직 완료되지 않은 Promise 객체 자체가 출력됨
+}
+```
+
+<Callout type="warning">
+  `await`를 빠뜨리면 실제 결과값이 아니라 **아직 완료되지 않은 Promise 객체**를 얻게 됩니다. "왜 결과가 이상한 객체로 나오지?"라는 버그의 대부분은 `await`를 빠뜨린 경우입니다.
+</Callout>
+
+## 병렬 처리 — Promise.all과 함께 쓰기
+
+28번 문서에서 배운 병렬 실행 원칙은 `async/await`에서도 그대로 적용됩니다. **서로 의존하지 않는 작업을 `await`로 하나씩 순서대로 기다리면 불필요하게 느려집니다.**
+
+```js
+// ❌ 느림 — 서로 의존하지 않는데 순차적으로 기다림 (총 2초)
+async function loadSlowly() {
+  const user = await fetchUser(1)      // 1초
+  const config = await fetchConfig()   // 1초 (user와 무관한데도 순서대로 기다림)
+  return { user, config }
+}
+
+// ✅ 빠름 — 동시에 시작해서 병렬로 처리 (총 1초)
+async function loadFast() {
+  const [user, config] = await Promise.all([fetchUser(1), fetchConfig()])
+  return { user, config }
+}
+```
+
+## async 화살표 함수
+
+`async`는 화살표 함수 앞에도 붙일 수 있습니다.
+
+```js
+const loadUserData = async (id) => {
+  const user = await fetchUser(id)
+  return user
+}
+```
+
+## 핵심 정리
+
+- async 함수는 항상 Promise를 반환하며, 반환값은 자동으로 Promise로 감싸진다.
+- await는 async 함수 안에서만 사용 가능하며, Promise가 끝날 때까지 기다린 뒤 결과값을 꺼낸다.
+- try/catch로 await한 작업의 실패를 동기 코드와 같은 방식으로 처리할 수 있다.
+- await를 빠뜨리면 결과값이 아닌 완료되지 않은 Promise 객체를 얻게 된다.
+- 서로 의존하지 않는 작업은 await를 순서대로 여러 번 쓰지 말고 Promise.all로 병렬 처리해야 빠르다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="async 함수가 항상 반환하는 것은?"
+  options={['①원래 반환하려던 값 그대로', '②Promise', '③undefined', '④문자열']}
+  correctAnswer={2}
+  explanation="async 함수는 return한 값을 자동으로 Promise로 감싸서 반환합니다. return '문자열'이어도 실제 반환값은 그 문자열을 담은 Promise입니다."
+  optionExplanations={['그대로가 아닌 Promise로 감싸집니다.', '맞습니다. 항상 Promise로 감싸서 반환됩니다.', '반환값이 있다면 undefined가 아닙니다.', '문자열이 아닌 Promise 객체입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="await를 사용할 수 있는 곳은?"
+  options={['①어디서나 자유롭게', '②async 함수 내부에서만(또는 모듈 최상위)', '③일반 함수 내부에서만', '④전역 스코프에서만']}
+  correctAnswer={2}
+  explanation="await는 원칙적으로 async 함수 안에서만 사용할 수 있습니다(최신 환경에서는 모듈 최상위 await도 지원되지만, 기본은 async 함수 내부입니다)."
+  optionExplanations={['제약이 있습니다.', '맞습니다. async 함수 내부가 기본 사용처입니다.', 'async가 없는 일반 함수에서는 문법 오류입니다.', '전역이 아닌 async 함수 내부입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`const user = fetchUser(id)`처럼 await를 빠뜨리면 user에 담기는 것은?"
+  options={['①실제 사용자 데이터', '②완료되지 않은 Promise 객체', '③undefined', '④오류 발생']}
+  correctAnswer={2}
+  explanation="await 없이 Promise를 반환하는 함수를 호출하면, 결과값이 아니라 아직 pending 상태일 수 있는 Promise 객체 자체가 그대로 담깁니다."
+  optionExplanations={['실제 데이터가 아닌 Promise 객체입니다.', '맞습니다. Promise 자체가 담깁니다.', '값이 존재하므로 undefined가 아닙니다.', '문법 오류는 아니며 결과가 예상과 다를 뿐입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="async 함수에서 await한 Promise가 reject되면?"
+  options={['①함수가 아무 처리 없이 조용히 끝난다.', '②try/catch로 감쌌다면 catch 블록으로 제어가 넘어간다.', '③항상 프로그램이 완전히 멈춘다.', '④자동으로 재시도된다.']}
+  correctAnswer={2}
+  explanation="await한 Promise가 reject되면 그 지점에서 에러가 던져진 것처럼 동작합니다. try/catch로 감싸져 있으면 catch 블록에서 처리할 수 있습니다."
+  optionExplanations={['처리되지 않으면 에러가 전파됩니다.', '맞습니다. try/catch로 에러를 잡을 수 있습니다.', 'catch로 처리하면 프로그램이 멈추지 않습니다.', '자동 재시도 기능은 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="서로 의존하지 않는 두 비동기 작업을 `await a(); await b();`처럼 순서대로 쓰면?"
+  options={['①가장 빠른 방법이다.', '②불필요하게 순차 실행되어, Promise.all로 병렬 처리하는 것보다 느리다.', '③문법 오류가 발생한다.', '④b()가 실행되지 않는다.']}
+  correctAnswer={2}
+  explanation="서로 의존하지 않는 작업을 순서대로 await하면 각 작업의 시간이 합산되어 느려집니다. Promise.all로 동시에 시작하면 가장 오래 걸리는 작업 시간만 소요됩니다."
+  optionExplanations={['병렬 처리보다 느립니다.', '맞습니다. 불필요한 순차 실행은 비효율적입니다.', '문법적으로는 유효합니다.', 'b()도 정상적으로 실행됩니다.']}
+/>

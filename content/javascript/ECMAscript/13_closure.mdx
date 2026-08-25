@@ -1,0 +1,198 @@
+---
+title: '13. 클로저'
+description: '클로저가 왜 생기는지 스코프 체인으로 설명하고, 카운터·프라이빗 변수 같은 실전 활용 패턴을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 클로저가 정확히 무엇이고 왜 생기는지 설명하고, 데이터를 숨기는 실전 패턴에 활용할 수 있습니다.
+</Callout>
+
+## 클로저를 이해하기 전에 — 이상한 현상 관찰하기
+
+다음 코드를 먼저 실행해봅시다.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="클로저 현상 관찰"
+  files={{
+    '/index.js': `function makeCounter() {
+  let count = 0  // 이 변수는 makeCounter 함수가 끝나면 사라져야 할 것 같은데...
+
+  return function () {
+    count = count + 1
+    return count
+  }
+}
+
+const counter = makeCounter()  // makeCounter는 이미 실행이 끝났다!
+
+console.log(counter())  // 1
+console.log(counter())  // 2 — count가 기억되고 있다!
+console.log(counter())  // 3`,
+  }}
+/>
+
+`makeCounter()`는 이미 실행이 끝났습니다. 함수가 끝나면 그 안의 지역 변수(`count`)는 보통 사라집니다. 그런데 `counter()`를 호출할 때마다 `count` 값이 **계속 기억**되고 있습니다. 어떻게 이런 일이 가능할까요?
+
+## 클로저란?
+
+> **쉽게 말하면:** 클로저는 함수가 "자신이 태어난 곳(정의될 당시의 스코프)"을 기억하고, 그 함수가 바깥으로 옮겨져도 그 기억을 계속 가지고 다니는 현상입니다.
+
+**클로저**(closure)는 함수와 그 함수가 선언될 당시의 렉시컬 스코프(12번 문서에서 배운 개념)가 **함께 묶여서** 유지되는 것을 말합니다.
+
+`makeCounter` 함수 안에서 정의된 익명 함수(`return function() {...}`)는 `count` 변수를 참조합니다. 이 익명 함수가 `makeCounter` 밖으로 반환되어 나가도, **자신이 정의될 때 볼 수 있었던 스코프**(count가 있는 곳)**를 계속 붙잡고** 있습니다. 그래서 `makeCounter`의 실행이 끝난 뒤에도 `count`는 사라지지 않고 살아남습니다.
+
+> **비유:** 클로저는 "이사 갈 때 가져가는 배낭"과 같습니다. 함수가 원래 있던 장소(스코프)를 떠나 다른 곳에서 호출되어도, 자신이 필요로 하는 변수를 배낭에 담아 어디든 들고 다닙니다.
+
+## 클로저가 실제로 하는 일 — 독립된 상태 유지
+
+`makeCounter()`를 여러 번 호출하면, 각각 **독립적인** count를 갖습니다.
+
+```js
+const counterA = makeCounter()
+const counterB = makeCounter()
+
+console.log(counterA())  // 1
+console.log(counterA())  // 2
+console.log(counterB())  // 1 — counterA와 완전히 별개! 새로운 count가 만들어짐
+```
+
+`makeCounter()`를 호출할 때마다 **새로운 스코프**(그리고 그 안의 새로운 `count`)가 만들어지고, 반환된 함수는 각자 자신만의 스코프를 기억합니다.
+
+## 실전 활용 1 — 프라이빗 변수(데이터 숨기기)
+
+클로저의 가장 흔한 실전 용도는 외부에서 직접 건드릴 수 없는 "숨겨진" 데이터를 만드는 것입니다.
+
+```js
+function createBankAccount(initialBalance) {
+  let balance = initialBalance  // 이 변수는 함수 밖에서 직접 접근 불가능
+
+  return {
+    deposit(amount) {
+      balance += amount
+      return balance
+    },
+    withdraw(amount) {
+      if (amount > balance) {
+        console.log('잔액 부족')
+        return balance
+      }
+      balance -= amount
+      return balance
+    },
+    getBalance() {
+      return balance
+    },
+  }
+}
+
+const account = createBankAccount(1000)
+console.log(account.getBalance())  // 1000
+account.deposit(500)
+console.log(account.getBalance())  // 1500
+account.withdraw(2000)             // '잔액 부족'
+
+console.log(account.balance)  // undefined — balance는 직접 접근 불가! 오직 메서드로만 조작 가능
+```
+
+`balance`는 `createBankAccount` 함수의 지역 변수라서, `account.balance`처럼 직접 접근할 수 없습니다. 오직 `deposit`, `withdraw`, `getBalance`라는 정해진 통로로만 조작할 수 있습니다. 이것이 다른 언어의 `private`(비공개) 필드와 비슷한 효과를 냅니다.
+
+## 실전 활용 2 — 함수 팩토리(Function Factory)
+
+같은 로직에서 다른 값만 바꿔 여러 함수를 만들어낼 수 있습니다.
+
+```js
+function makeMultiplier(factor) {
+  return function (number) {
+    return number * factor  // factor를 기억하는 클로저
+  }
+}
+
+const double = makeMultiplier(2)
+const triple = makeMultiplier(3)
+
+console.log(double(5))  // 10 — factor=2를 기억
+console.log(triple(5))  // 15 — factor=3을 기억
+```
+
+## 클로저와 반복문 — 흔한 함정
+
+`for`문에서 `var`를 쓰면 클로저와 관련한 유명한 버그가 발생합니다.
+
+```js
+// ❌ var를 쓰면 예상과 다르게 동작
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log('var i:', i), 100)
+}
+// 결과: 'var i: 3'이 세 번 출력됨! (0, 1, 2가 아니라)
+
+// ✅ let을 쓰면 의도대로 동작
+for (let j = 0; j < 3; j++) {
+  setTimeout(() => console.log('let j:', j), 100)
+}
+// 결과: 'let j: 0', 'let j: 1', 'let j: 2' 순서대로 출력됨
+```
+
+**왜 이런 차이가 날까?** `var`는 함수 스코프이므로, 반복문 전체에서 **단 하나의 `i`**를 모든 클로저가 공유합니다. `setTimeout` 콜백이 실행될 시점(100ms 후)에는 이미 반복문이 끝나 `i`가 3이 되어 있어서, 모든 콜백이 같은 값(3)을 보게 됩니다.
+
+`let`은 블록 스코프이므로, **매 반복마다 새로운 `j`가 만들어져** 각 클로저가 자신만의 `j`를 기억합니다. 그래서 0, 1, 2가 각각 올바르게 출력됩니다.
+
+<Callout type="warning">
+  이 문제는 07번 문서에서 배운 useEffect의 stale closure(오래된 클로저) 문제와 같은 원리입니다. 반복문이나 비동기 콜백에서 값이 "그때 그 순간"이 아니라 "나중에 바뀐 값"으로 보이는 버그는 대부분 이 클로저·스코프 문제에서 비롯됩니다.
+</Callout>
+
+## 핵심 정리
+
+- 클로저는 함수가 자신이 정의될 당시의 스코프를 기억해, 바깥 함수 실행이 끝난 뒤에도 그 변수에 접근할 수 있게 하는 현상이다.
+- 클로저를 만드는 함수를 여러 번 호출하면 각각 독립된 스코프(독립된 상태)를 갖는다.
+- 클로저로 외부에서 직접 접근할 수 없는 "프라이빗" 변수를 만들 수 있다.
+- `var`로 만든 반복문에서 클로저를 쓰면 모든 클로저가 같은 변수를 공유해 예상과 다른 결과가 나온다. `let`을 쓰면 매 반복마다 독립된 변수가 생겨 이 문제가 해결된다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="클로저란 무엇인가요?"
+  options={['①함수를 즉시 실행하는 문법', '②함수가 자신이 정의될 당시의 스코프를 기억해 계속 접근할 수 있게 하는 현상', '③변수를 암호화하는 기술', '④두 함수를 하나로 합치는 것']}
+  correctAnswer={2}
+  explanation="클로저는 함수와 그 함수가 정의된 렉시컬 스코프가 함께 묶여, 바깥 함수 실행이 끝나도 그 스코프의 변수에 계속 접근 가능한 현상입니다."
+  optionExplanations={['즉시 실행 함수(IIFE)는 다른 개념입니다.', '맞습니다. 스코프를 기억하는 것이 핵심입니다.', '암호화와는 무관합니다.', '함수 병합과는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="makeCounter()를 두 번 호출해 counterA, counterB를 만들면?"
+  options={['①두 카운터가 같은 count를 공유한다.', '②각 카운터는 독립적인 count를 갖는다.', '③두 번째 호출은 에러가 난다.', '④counterB는 항상 0을 반환한다.']}
+  correctAnswer={2}
+  explanation="함수를 호출할 때마다 새로운 스코프가 생성됩니다. 각 클로저는 자신만의 독립된 count를 기억하므로 서로 영향을 주지 않습니다."
+  optionExplanations={['공유하지 않고 독립적입니다.', '맞습니다. 호출마다 새 스코프가 만들어집니다.', '정상적으로 여러 번 호출 가능합니다.', '독립적으로 카운트가 증가합니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="클로저로 프라이빗 변수를 만들 수 있는 이유는?"
+  options={['①private 키워드를 사용해서', '②함수 내부의 지역 변수는 클로저로 감싼 메서드를 통해서만 접근·조작할 수 있고 외부에서 직접 접근할 수 없기 때문', '③변수 이름 앞에 _를 붙여서', '④자바스크립트가 자동으로 암호화해서']}
+  correctAnswer={2}
+  explanation="지역 변수는 함수 스코프 안에만 존재하므로 외부에서 직접 참조할 수 없습니다. 클로저로 반환된 메서드만이 그 변수에 접근할 수 있는 유일한 통로가 됩니다."
+  optionExplanations={['ES6 클래스의 private 필드(#)와는 다른 방식입니다.', '맞습니다. 지역 변수 스코프 자체가 접근을 차단합니다.', '언더스코어는 관례일 뿐 실제 접근을 막지 않습니다.', '암호화가 아닌 스코프 격리입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`for (var i=0;i<3;i++){ setTimeout(()=>console.log(i)) }`에서 100ms 후 출력되는 값은?"
+  options={['①0, 1, 2', '②3, 3, 3', '③0, 0, 0', '④정의되지 않음(undefined)']}
+  correctAnswer={2}
+  explanation="var는 함수 스코프라서 반복문 전체가 하나의 i를 공유합니다. setTimeout 콜백이 실행되는 시점에는 이미 반복문이 끝나 i가 3이 되어 있어 모두 3이 출력됩니다."
+  optionExplanations={['let을 썼을 때의 결과입니다.', '맞습니다. 모든 클로저가 같은 i(최종값 3)를 참조합니다.', '0으로 고정되지 않습니다.', 'i는 정의되어 있어 undefined가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="위 문제에서 var 대신 let을 사용하면 결과가 달라지는 이유는?"
+  options={['①let이 더 빠르기 때문에', '②let은 블록 스코프라 매 반복마다 새로운 변수가 생성되어 각 클로저가 독립된 값을 기억하기 때문', '③setTimeout이 let에서만 동작하기 때문', '④let은 재할당이 안 되기 때문']}
+  correctAnswer={2}
+  explanation="let은 for문의 각 반복마다 새로운 바인딩(새로운 변수)을 만듭니다. 그래서 각 클로저가 자신만의 독립된 값을 기억하게 되어 0, 1, 2가 각각 올바르게 출력됩니다."
+  optionExplanations={['속도 차이가 이유가 아닙니다.', '맞습니다. 반복마다 새 스코프가 생성되는 것이 핵심입니다.', 'setTimeout은 둘 다 동일하게 동작합니다.', 'for문의 카운터 변수는 매 반복 재할당됩니다.']}
+/>

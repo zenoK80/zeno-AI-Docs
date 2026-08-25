@@ -1,0 +1,182 @@
+---
+title: '23. JSON'
+description: 'JSON.stringify와 JSON.parse로 자바스크립트 객체와 JSON 문자열을 서로 변환하는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 서버와 데이터를 주고받을 때 왜 JSON이 필요한지 이해하고 객체 ↔ 문자열 변환을 자유롭게 할 수 있습니다.
+</Callout>
+
+## JSON이 필요한 이유
+
+> **쉽게 말하면:** 자바스크립트 객체는 자바스크립트 안에서만 이해되는 형태입니다. 다른 프로그램(서버, 다른 언어)과 데이터를 주고받으려면, 모두가 이해할 수 있는 "공통 텍스트 형식"이 필요합니다. 그 형식이 JSON입니다.
+
+**JSON**(JavaScript Object Notation)은 이름 그대로 자바스크립트 객체 문법에서 유래했지만, 지금은 언어에 상관없이 데이터를 주고받는 **표준 텍스트 형식**입니다. 웹에서 서버와 브라우저가 데이터를 주고받을 때 거의 항상 JSON을 사용합니다.
+
+## JSON.stringify — 객체를 JSON 문자열로
+
+```js
+const user = {
+  name: '철수',
+  age: 25,
+  isActive: true,
+  hobbies: ['독서', '등산'],
+}
+
+const jsonString = JSON.stringify(user)
+console.log(jsonString)
+// '{"name":"철수","age":25,"isActive":true,"hobbies":["독서","등산"]}'
+console.log(typeof jsonString)  // 'string' — 객체가 아닌 문자열!
+```
+
+<Callout type="warning">
+  `JSON.stringify()`의 결과는 **문자열**입니다. 겉모습이 객체처럼 보여도 `jsonString.name`으로 접근할 수 없습니다. 문자열이기 때문입니다.
+</Callout>
+
+### 보기 좋게 들여쓰기
+
+```js
+console.log(JSON.stringify(user, null, 2))
+// {
+//   "name": "철수",
+//   "age": 25,
+//   ...
+// }
+```
+
+세 번째 인수(`2`)는 들여쓰기 칸 수입니다. 콘솔에 데이터를 예쁘게 출력하거나 디버깅할 때 유용합니다.
+
+## JSON.parse — JSON 문자열을 객체로
+
+```js
+const jsonString = '{"name":"철수","age":25}'
+const user = JSON.parse(jsonString)
+
+console.log(user)        // { name: '철수', age: 25 } — 진짜 객체
+console.log(user.name)   // '철수' — 이제 프로퍼티 접근 가능
+console.log(typeof user) // 'object'
+```
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="JSON 변환 실습"
+  files={{
+    '/index.js': `const user = { name: '철수', age: 25, hobbies: ['독서', '등산'] }
+
+// 객체 → JSON 문자열
+const json = JSON.stringify(user)
+console.log('직렬화:', json)
+console.log('타입:', typeof json)
+
+// JSON 문자열 → 객체
+const parsed = JSON.parse(json)
+console.log('역직렬화:', parsed)
+console.log('타입:', typeof parsed)
+console.log('이름:', parsed.name)`,
+  }}
+/>
+
+이 두 메서드는 방향이 정반대입니다.
+
+<Table>
+  <thead>
+    <tr><th>메서드</th><th>방향</th><th>다른 이름</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>JSON.stringify()</td><td>객체 → 문자열</td><td>직렬화(serialize)</td></tr>
+    <tr><td>JSON.parse()</td><td>문자열 → 객체</td><td>역직렬화(deserialize / parse)</td></tr>
+  </tbody>
+</Table>
+
+## JSON으로 변환되지 않는 값들
+
+JSON은 자바스크립트의 모든 값을 표현할 수 없습니다. 함수, `undefined`, `Symbol`은 `JSON.stringify` 과정에서 **조용히 사라집니다**.
+
+```js
+const data = {
+  name: '철수',
+  greet: function () { console.log('안녕') },  // 함수
+  nickname: undefined,                          // undefined
+  id: Symbol('id'),                             // Symbol
+}
+
+console.log(JSON.stringify(data))
+// '{"name":"철수"}' — greet, nickname, id 모두 사라짐!
+```
+
+<Callout type="warning">
+  이 동작은 에러 없이 조용히 일어나기 때문에 자주 놓치는 버그의 원인이 됩니다. 서버로 객체를 보내기 전에는 어떤 값이 포함되는지 `console.log(JSON.stringify(...))`로 먼저 확인하는 습관이 안전합니다.
+</Callout>
+
+## Date 객체는 문자열로 변환된다
+
+```js
+const event = { date: new Date('2026-01-01') }
+console.log(JSON.stringify(event))
+// '{"date":"2026-01-01T00:00:00.000Z"}' — Date가 ISO 문자열로 바뀜
+
+const parsed = JSON.parse(JSON.stringify(event))
+console.log(parsed.date instanceof Date)  // false! — 문자열로 남아있음, 자동으로 Date로 안 돌아옴
+```
+
+`JSON.parse`는 `Date`를 자동으로 복원해주지 않습니다. 다시 `Date` 객체가 필요하다면 `new Date(parsed.date)`처럼 직접 변환해야 합니다.
+
+## 실전 활용 — 16번 문서의 깊은 복사
+
+16번 문서에서 소개했던 `JSON.parse(JSON.stringify(obj))` 패턴이 바로 이 두 메서드를 연달아 쓴 깊은 복사 트릭입니다. 객체를 문자열로 만들었다가 다시 객체로 만들면, 원본과 완전히 분리된 새로운 객체가 만들어집니다. 단, 위에서 배운 대로 함수·undefined·Symbol·Date는 이 과정에서 온전히 보존되지 않는다는 한계가 있습니다.
+
+## 핵심 정리
+
+- JSON은 서로 다른 프로그램·언어가 데이터를 주고받기 위한 표준 텍스트 형식이다.
+- `JSON.stringify()`는 객체를 문자열로(직렬화), `JSON.parse()`는 문자열을 객체로(역직렬화) 변환한다.
+- 함수, undefined, Symbol은 stringify 과정에서 조용히 사라진다.
+- Date는 문자열로 변환되며, parse해도 자동으로 Date 객체로 복원되지 않는다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="`JSON.stringify({a:1})`의 반환 타입은?"
+  options={['①object', '②string', '③number', '④undefined']}
+  correctAnswer={2}
+  explanation="stringify는 이름 그대로 문자열(string)로 변환하는 메서드입니다. 겉모습이 객체처럼 보여도 실제 타입은 string입니다."
+  optionExplanations={['객체가 아닌 문자열입니다.', '맞습니다. 항상 문자열을 반환합니다.', '숫자가 아닙니다.', '값이 존재하므로 undefined가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`JSON.stringify({name:'철수', greet: function(){}})`의 결과에 포함되는 프로퍼티는?"
+  options={['①name과 greet 모두', '②name만 (greet은 사라짐)', '③greet만', '④아무것도 포함 안 됨']}
+  correctAnswer={2}
+  explanation="함수는 JSON으로 표현할 수 없는 값이라 stringify 과정에서 조용히 제외됩니다. 문자열인 name만 결과에 남습니다."
+  optionExplanations={['greet(함수)은 사라집니다.', '맞습니다. 함수 프로퍼티는 제외됩니다.', 'greet만 남지 않습니다.', 'name은 정상적으로 포함됩니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="JSON.stringify()의 세 번째 인수(예: 2)의 역할은?"
+  options={['①변환할 최대 깊이를 제한한다.', '②결과 문자열을 보기 좋게 들여쓰기한다.', '③변환 속도를 조절한다.', '④에러 발생 시 재시도 횟수를 지정한다.']}
+  correctAnswer={2}
+  explanation="세 번째 인수는 들여쓰기에 사용할 공백(또는 문자) 수입니다. 디버깅이나 로그 출력 시 가독성을 높이는 데 사용합니다."
+  optionExplanations={['깊이 제한이 아닙니다.', '맞습니다. 들여쓰기 칸 수를 지정합니다.', '속도 조절 옵션이 아닙니다.', '재시도와는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`JSON.parse(JSON.stringify({date: new Date()})).date`의 타입은?"
+  options={['①Date 객체', '②문자열(string)', '③숫자', '④undefined']}
+  correctAnswer={2}
+  explanation="Date는 stringify 과정에서 ISO 형식의 문자열로 변환되고, parse는 이를 다시 Date 객체로 자동 복원해주지 않습니다. 결과적으로 문자열로 남습니다."
+  optionExplanations={['자동으로 Date로 복원되지 않습니다.', '맞습니다. 문자열 상태로 남습니다.', '숫자가 아닌 문자열입니다.', '값이 존재하므로 undefined가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="JSON.stringify와 JSON.parse의 관계를 올바르게 설명한 것은?"
+  options={['①같은 방향으로 동작하는 동일한 메서드다.', '②stringify는 객체→문자열, parse는 문자열→객체로 서로 정반대 방향이다.', '③parse만 실제로 동작하고 stringify는 사용되지 않는다.', '④둘 다 배열에만 사용할 수 있다.']}
+  correctAnswer={2}
+  explanation="stringify(직렬화)와 parse(역직렬화)는 정반대 방향의 변환을 수행하는 짝을 이루는 메서드입니다."
+  optionExplanations={['정반대 방향입니다.', '맞습니다. 서로 반대 방향으로 변환합니다.', '둘 다 실무에서 자주 사용됩니다.', '객체와 배열 모두에 사용 가능합니다.']}
+/>

@@ -1,0 +1,210 @@
+---
+title: '31. 모듈'
+description: 'ESM의 import/export 문법과 CommonJS와의 차이, named export와 default export의 구분을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 코드를 파일 단위로 나누고, 필요한 부분만 정확히 가져다 쓰는 모듈 문법을 익힙니다.
+</Callout>
+
+## 모듈이 필요한 이유
+
+> **쉽게 말하면:** 모든 코드를 파일 하나에 몰아 쓰면 금방 수천 줄이 되어 관리가 어려워집니다. 모듈은 코드를 기능별 파일로 나누고, 필요한 부분만 서로 빌려 쓸 수 있게 하는 시스템입니다.
+
+옛날 방식(모듈 없이)에서는 `<script>` 태그를 여러 개 나열해 파일을 순서대로 로딩했고, 모든 변수가 **전역 스코프**를 공유해서 이름 충돌이 잦았습니다. 모듈은 각 파일이 **자신만의 스코프**를 갖게 하고, `export`한 것만 밖으로 공개합니다.
+
+## Named Export — 이름을 가진 여러 개 내보내기
+
+```js
+// math.js — 내보내기(export)
+export function add(a, b) {
+  return a + b
+}
+
+export function subtract(a, b) {
+  return a - b
+}
+
+export const PI = 3.14159
+```
+
+```js
+// main.js — 가져오기(import)
+import { add, subtract, PI } from './math.js'
+
+console.log(add(2, 3))       // 5
+console.log(subtract(5, 2))  // 3
+console.log(PI)               // 3.14159
+```
+
+한 파일에서 `export`는 **여러 번** 할 수 있고, 가져올 때는 **중괄호 `{}`** 안에 정확한 이름을 씁니다.
+
+## Default Export — 파일당 하나만 내보내기
+
+```js
+// Button.js — 기본 내보내기
+export default function Button() {
+  console.log('버튼')
+}
+```
+
+```js
+// main.js — 기본 가져오기 (중괄호 없음, 이름은 자유롭게 지정 가능)
+import Button from './Button.js'
+import MyButton from './Button.js'  // 다른 이름으로 가져와도 동일한 것을 가리킴
+
+Button()     // '버튼'
+MyButton()   // '버튼' — 같은 함수
+```
+
+<Table>
+  <thead>
+    <tr><th>구분</th><th>Named Export</th><th>Default Export</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>한 파일에 몇 개?</td><td>여러 개 가능</td><td>파일당 하나만</td></tr>
+    <tr><td>import 문법</td><td>중괄호 필수: <code>{'{ name }'}</code></td><td>중괄호 없음</td></tr>
+    <tr><td>import할 때 이름</td><td>export한 이름과 정확히 일치해야 함</td><td>자유롭게 다른 이름 사용 가능</td></tr>
+  </tbody>
+</Table>
+
+## 두 방식을 함께 쓰기
+
+```js
+// utils.js
+export default function mainFunction() { /* ... */ }
+export const helperA = () => {}
+export const helperB = () => {}
+```
+
+```js
+// main.js
+import mainFunction, { helperA, helperB } from './utils.js'
+```
+
+## 네임스페이스 가져오기 — 한 번에 모두
+
+```js
+import * as MathUtils from './math.js'
+
+console.log(MathUtils.add(1, 2))     // 5
+console.log(MathUtils.PI)            // 3.14159
+```
+
+`* as 이름`으로 가져오면, 그 파일의 모든 named export가 하나의 객체(`MathUtils`) 안에 프로퍼티로 모입니다.
+
+## 가져오면서 이름 바꾸기(as)
+
+```js
+import { add as sum, subtract as diff } from './math.js'
+
+console.log(sum(1, 2))  // 3 — add를 sum이라는 이름으로 사용
+```
+
+다른 파일에서 가져온 이름이 이미 쓰이고 있거나, 더 명확한 이름을 쓰고 싶을 때 유용합니다.
+
+## 모듈의 특별한 성질 — 한 번만 실행되고 캐시된다
+
+```js
+// counter.js
+console.log('counter.js 실행됨')
+export let count = 0
+export function increment() { count++ }
+```
+
+```js
+// a.js
+import { count, increment } from './counter.js'  // 'counter.js 실행됨' 출력
+increment()
+
+// b.js
+import { count } from './counter.js'  // 다시 출력되지 않음! 이미 로딩된 모듈을 재사용
+console.log(count)  // 1 — a.js에서 증가시킨 값이 그대로 유지됨(같은 모듈 인스턴스를 공유)
+```
+
+같은 모듈을 여러 파일에서 import해도, 그 모듈의 코드는 **처음 한 번만 실행**되고 이후에는 캐시된 결과(같은 값·같은 함수)를 공유합니다.
+
+## ESM vs CommonJS — 간단 비교
+
+지금까지 배운 `import`/`export`는 **ESM**(ECMAScript Modules, ES6에서 표준화)입니다. Node.js 초기부터 쓰이던 **CommonJS**(`require`/`module.exports`) 방식도 여전히 많은 코드에 남아 있습니다.
+
+```js
+// CommonJS (예전 Node.js 방식)
+const { add } = require('./math.js')
+module.exports = { add, subtract }
+
+// ESM (현재 표준)
+import { add } from './math.js'
+export { add, subtract }
+```
+
+<Table>
+  <thead>
+    <tr><th>구분</th><th>ESM</th><th>CommonJS</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>문법</td><td>import / export</td><td>require / module.exports</td></tr>
+    <tr><td>로딩 시점</td><td>정적(코드 실행 전 파악)</td><td>동적(실행 중 처리)</td></tr>
+    <tr><td>브라우저 지원</td><td>직접 지원(&lt;script type="module"&gt;)</td><td>브라우저에서 직접 지원 안 됨</td></tr>
+    <tr><td>현재 상태</td><td>표준, 권장됨</td><td>레거시 Node.js 코드에 남아있음</td></tr>
+  </tbody>
+</Table>
+
+<Callout type="warning">
+  두 방식은 문법이 호환되지 않으므로 한 파일 안에서 섞어 쓸 수 없습니다. 새로 작성하는 코드는 **ESM**(import/export)**을 사용**하는 것이 현재 표준입니다.
+</Callout>
+
+## 핵심 정리
+
+- named export는 파일당 여러 개 가능하며, import 시 중괄호와 정확한 이름이 필요하다.
+- default export는 파일당 하나만 가능하며, import 시 중괄호 없이 자유로운 이름을 쓸 수 있다.
+- `* as 이름`으로 모든 named export를 하나의 객체로 가져올 수 있다.
+- 같은 모듈은 여러 곳에서 import해도 코드가 딱 한 번만 실행되고 결과가 캐시되어 공유된다.
+- ESM(import/export)이 현재 표준이며, CommonJS(require)는 예전 Node.js 코드에 남아있는 방식이다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="named export를 가져올 때 필요한 문법은?"
+  options={['①중괄호 없이 자유로운 이름', '②중괄호 { } 안에 export한 것과 정확히 같은 이름', '③대괄호 [ ]', '④따옴표로 감싼 이름']}
+  correctAnswer={2}
+  explanation="named export는 export할 때 사용한 이름 그대로 중괄호 안에 명시해서 가져와야 합니다. default export만 자유로운 이름을 쓸 수 있습니다."
+  optionExplanations={['자유로운 이름은 default export의 특징입니다.', '맞습니다. 정확한 이름과 중괄호가 필요합니다.', '대괄호가 아닌 중괄호를 사용합니다.', '따옴표로 감싸지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="한 파일에서 default export를 몇 번 할 수 있나요?"
+  options={['①제한 없이 여러 번', '②딱 한 번만', '③최대 2번', '④0번(default export는 없음)']}
+  correctAnswer={2}
+  explanation="default export는 파일당 하나만 지정할 수 있습니다. 여러 개를 내보내고 싶다면 named export를 사용해야 합니다."
+  optionExplanations={['여러 번 하면 문법 오류입니다.', '맞습니다. 파일당 하나만 가능합니다.', '최대 2번이 아닌 1번입니다.', 'default export도 유효한 문법입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`import * as MathUtils from './math.js'`가 하는 일은?"
+  options={['①math.js의 default export만 가져온다.', '②math.js의 모든 named export를 하나의 객체(MathUtils)로 묶어 가져온다.', '③math.js 전체를 실행하지 않고 이름만 가져온다.', '④오류가 발생한다.']}
+  correctAnswer={2}
+  explanation="* as 이름 문법은 해당 모듈의 모든 named export를 프로퍼티로 가진 하나의 객체를 만들어줍니다."
+  optionExplanations={['default export가 아닌 모든 named export를 가져옵니다.', '맞습니다. 모든 named export가 하나의 객체로 묶입니다.', '모듈은 정상적으로 실행됩니다.', '유효한 문법입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="같은 모듈을 여러 파일에서 import하면?"
+  options={['①매번 새로 실행되어 독립적인 상태를 갖는다.', '②처음 한 번만 실행되고, 이후에는 캐시된 결과(같은 인스턴스)를 공유한다.', '③import할 때마다 오류가 발생한다.', '④가장 마지막에 import한 파일의 값만 유효하다.']}
+  correctAnswer={2}
+  explanation="모듈은 처음 로딩될 때 한 번만 실행되고, 이후 같은 모듈을 import하는 모든 곳은 캐시된 동일한 인스턴스를 공유합니다."
+  optionExplanations={['매번 새로 실행되지 않습니다.', '맞습니다. 캐시되어 공유되는 것이 모듈의 특징입니다.', '정상적으로 재사용됩니다.', '모든 import가 같은 인스턴스를 참조합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="ESM과 CommonJS의 관계는?"
+  options={['①완전히 호환되어 한 파일에서 자유롭게 섞어 쓸 수 있다.', '②문법이 다르며 한 파일 안에서 섞어 쓸 수 없다. 현재는 ESM이 표준으로 권장된다.', '③CommonJS가 최신 표준이다.', '④둘은 동일한 문법이다.']}
+  correctAnswer={2}
+  explanation="import/export(ESM)와 require/module.exports(CommonJS)는 서로 다른 모듈 시스템으로 한 파일에서 혼용할 수 없습니다. 현재는 ESM이 표준으로 자리잡았습니다."
+  optionExplanations={['호환되지 않아 섞어 쓸 수 없습니다.', '맞습니다. 서로 다른 시스템이며 ESM이 표준입니다.', 'ESM이 현재 표준입니다.', '문법이 서로 다릅니다.']}
+/>
