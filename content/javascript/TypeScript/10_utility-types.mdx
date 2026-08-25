@@ -60,8 +60,13 @@ config.host = 'other'  // 오류: 읽기 전용
 
 ## Pick - 특정 프로퍼티만 선택
 
-```ts
-interface User {
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="Pick 실습"
+  files={{
+    '/index.ts': `interface User {
   id: number
   name: string
   email: string
@@ -80,7 +85,11 @@ function getPublicProfile(user: User): PublicUser {
     email: user.email,
   }
 }
-```
+
+const user: User = { id: 1, name: 'Alice', email: 'a@test.com', password: 'secret', createdAt: new Date() }
+console.log(getPublicProfile(user))`,
+  }}
+/>
 
 ## Omit - 특정 프로퍼티를 제외
 
