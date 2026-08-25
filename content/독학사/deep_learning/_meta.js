@@ -11,5 +11,8 @@ const meta = {
   '10_gradient-descent-and-backprop': '10. 경사하강법과 역전파',
   '11_optimization': '11. 신경망 최적화 — SGD, Momentum, Adam',
   '12_training-problems-and-regularization': '12. 학습 문제와 정규화 — 기울기소실, Dropout, BatchNorm',
+  '13_cnn': '13. CNN — 합성곱, 필터, 패딩·스트라이드, 풀링',
+  '14_cnn-architectures': '14. 대표 CNN 모델 — LeNet부터 ResNet까지',
+  '15_rnn': '15. RNN — 시퀀스 데이터, 은닉 상태, 장기 의존성 문제',
 }
 export default meta
