@@ -11,5 +11,8 @@ const meta = {
   '10_normalization': '10. 정규화 — 함수적 종속, 1NF~5NF',
   '11_transaction': '11. 트랜잭션 — ACID, 상태 전이, 직렬성',
   '12_concurrency-control': '12. 동시성 제어 — 로킹, 2PL, 교착상태',
+  '13_recovery': '13. 회복 — 로그 기반 회복, 검사시점, 그림자 페이징',
+  '14_object-and-web-db': '14. 객체 DB·웹 DB',
+  '15_client-server-db': '15. 클라이언트/서버 DB — 미들웨어, 분산 DB',
 }
 export default meta
