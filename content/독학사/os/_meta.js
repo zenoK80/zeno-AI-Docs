@@ -13,6 +13,7 @@ const meta = {
   '12_io-and-device-management': '12. 입출력·장치 관리',
   '13_unix-os': '13. UNIX 운영체제',
   '14_linux-os': '14. Linux 운영체제',
+  '15_exam-practice': '15. 운영체제 예상기출문제',
 }
 
 export default meta
