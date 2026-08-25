@@ -69,7 +69,7 @@ const groups: SeriesGroup[] = [
         title: 'Web APIs',
         description: 'DOM, 이벤트, 네트워크처럼 브라우저가 제공하는 기능을 배웁니다.',
         href: '/javascript/WebAPIs/01_what-are-web-apis',
-        documentCount: 15,
+        documentCount: 22,
         preview: 'browser',
         accent: 'green',
       },
