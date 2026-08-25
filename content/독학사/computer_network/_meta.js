@@ -5,5 +5,8 @@ const meta = {
   '04_network-overview': '04. 네트워크 개요 — 정의, 분류, 성능 평가, 교환 방식',
   '05_osi-and-tcp-ip': '05. OSI 7계층·TCP/IP 참조모델',
   '06_physical-layer': '06. 물리 계층 — 신호 변환, 인코딩, 전송 매체',
+  '07_data-link-layer': '07. 데이터 링크 계층 — 프레임, 오류검출, 흐름제어, ARQ',
+  '08_lan-and-ethernet': '08. LAN과 이더넷 — MAC 주소, CSMA/CD, 스위치',
+  '09_network-layer-ip': '09. 네트워크 계층·IP — IP 주소, 서브넷팅, CIDR',
 }
 export default meta
