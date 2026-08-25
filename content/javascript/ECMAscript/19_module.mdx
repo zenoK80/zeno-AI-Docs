@@ -67,18 +67,30 @@ const calc = new Calculator()
 
 ## 혼합 사용
 
-```js
-// utils.js
-export const version = '1.0'
+named export와 default export를 한 파일에서 함께 쓸 수 있습니다. 아래는 실제로 두 파일로 나뉜 모듈을 가져와 실행하는 예시입니다.
 
-export function helper() {}
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="모듈 import/export 실습"
+  files={{
+    '/utils.js': `export const version = '1.0'
 
-export default function main() {}
-```
+export function helper(name) {
+  return \`\${name}님, 도우미가 도착했습니다.\`
+}
 
-```js
-import main, { version, helper } from './utils.js'
-```
+export default function main() {
+  return '메인 함수 실행됨'
+}`,
+    '/index.js': `import main, { version, helper } from './utils.js'
+
+console.log(version)
+console.log(helper('철수'))
+console.log(main())`,
+  }}
+/>
 
 ## 전체 가져오기
 

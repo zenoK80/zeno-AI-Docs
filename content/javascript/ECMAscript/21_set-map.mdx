@@ -40,8 +40,13 @@ console.log(unique)  // [1, 2, 3, 4]
 
 ## Set으로 집합 연산
 
-```js
-const a = new Set([1, 2, 3, 4])
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="Set 집합 연산 실습"
+  files={{
+    '/index.js': `const a = new Set([1, 2, 3, 4])
 const b = new Set([3, 4, 5, 6])
 
 const union = new Set([...a, ...b])         // 합집합
@@ -50,8 +55,9 @@ const difference = new Set([...a].filter(x => !b.has(x)))   // 차집합
 
 console.log([...union])        // [1, 2, 3, 4, 5, 6]
 console.log([...intersection]) // [3, 4]
-console.log([...difference])   // [1, 2]
-```
+console.log([...difference])   // [1, 2]`,
+  }}
+/>
 
 ## Map — 키-값 쌍 컬렉션
 

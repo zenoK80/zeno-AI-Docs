@@ -93,8 +93,13 @@ for (const n of count()) {
 
 제너레이터로 무한한 값을 게으르게(lazily) 생성할 수 있습니다.
 
-```js
-function* naturals() {
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="무한 시퀀스 실습 — take(n) 값을 바꿔보세요"
+  files={{
+    '/index.js': `function* naturals() {
   let n = 1
   while (true) {
     yield n++
@@ -108,8 +113,9 @@ function* take(n, iter) {
   }
 }
 
-console.log([...take(5, naturals())])  // [1, 2, 3, 4, 5]
-```
+console.log([...take(5, naturals())])  // [1, 2, 3, 4, 5]`,
+  }}
+/>
 
 ## yield*로 위임
 
