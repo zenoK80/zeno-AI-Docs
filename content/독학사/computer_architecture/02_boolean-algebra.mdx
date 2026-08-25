@@ -1,0 +1,194 @@
+---
+title: '02. 불 대수와 논리 게이트'
+description: 'AND, OR, NOT부터 XOR, NAND, NOR까지 논리 게이트와 드모르간 법칙을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 기본 논리 게이트의 진리표를 읽고, 불 대수 법칙과 드모르간 법칙으로 논리식을 간소화할 수 있게 됩니다.
+</Callout>
+
+## 왜 불 대수가 필요한가?
+
+01번 문서에서 배운 2진수(0과 1)는 컴퓨터 회로에서 "전압이 낮음/높음"이라는 두 가지 물리적 상태로 구현됩니다. **불 대수**(Boolean Algebra)는 이 0과 1로 이루어진 논리적 연산을 수학적으로 다루는 도구이며, 뒤에서 배울 CPU 내부 회로 전체가 이 불 대수 위에서 설계됩니다.
+
+## 논리 게이트(Logic Gate)
+
+> **쉽게 말하면:** 논리 게이트는 0과 1을 입력받아 정해진 규칙에 따라 0 또는 1을 출력하는 가장 작은 회로 부품입니다.
+
+### 기본 게이트
+
+<Table>
+  <thead>
+    <tr><th>게이트</th><th>기호(식)</th><th>동작</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>AND</td><td>$A \cdot B$</td><td>둘 다 1일 때만 1</td></tr>
+    <tr><td>OR</td><td>$A + B$</td><td>둘 중 하나라도 1이면 1</td></tr>
+    <tr><td>NOT</td><td>$\overline{A}$</td><td>입력을 반전(0↔1)</td></tr>
+  </tbody>
+</Table>
+
+### AND 게이트 진리표(Truth Table)
+
+<Table>
+  <thead>
+    <tr><th>$A$</th><th>$B$</th><th>$A \cdot B$</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td></tr>
+  </tbody>
+</Table>
+
+> **쉽게 말하면:** AND는 "두 조건을 모두 만족해야 통과"하는 문(door)과 같습니다.
+
+### OR 게이트 진리표
+
+<Table>
+  <thead>
+    <tr><th>$A$</th><th>$B$</th><th>$A+B$</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td></tr>
+  </tbody>
+</Table>
+
+## 확장 게이트 — XOR, NAND, NOR
+
+<Table>
+  <thead>
+    <tr><th>게이트</th><th>동작</th><th>이름 유래</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>XOR</td><td>두 입력이 서로 다를 때만 1(둘 다 같으면 0)</td><td>eXclusive OR — "배타적" OR</td></tr>
+    <tr><td>NAND</td><td>AND의 결과를 반전(NOT+AND)</td><td>Not AND</td></tr>
+    <tr><td>NOR</td><td>OR의 결과를 반전(NOT+OR)</td><td>Not OR</td></tr>
+  </tbody>
+</Table>
+
+### XOR 진리표
+
+<Table>
+  <thead>
+    <tr><th>$A$</th><th>$B$</th><th>$A \oplus B$</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td></tr>
+  </tbody>
+</Table>
+
+> **XOR이 유용한 이유:** XOR은 "두 값이 서로 다른지" 검사하는 데 사용되며, 뒤에서 배울 CPU의 덧셈 회로(가산기)를 만드는 데 핵심적인 역할을 합니다.
+
+<Callout type="warning">
+  **자주 틀리는 점:** NAND와 NOR는 각각 "AND 다음 NOT", "OR 다음 NOT"으로, **먼저 원래 연산을 하고 그 결과를 반전**시킵니다. "NOT을 먼저 적용한 뒤 AND/OR"이 아니라는 점에 유의해야 합니다.
+</Callout>
+
+## 불 대수의 기본 법칙
+
+<Table>
+  <thead>
+    <tr><th>법칙</th><th>식</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>교환법칙</td><td>$A+B=B+A$, $A\cdot B=B\cdot A$</td></tr>
+    <tr><td>결합법칙</td><td>$(A+B)+C=A+(B+C)$</td></tr>
+    <tr><td>분배법칙</td><td>$A\cdot(B+C)=A\cdot B+A\cdot C$</td></tr>
+    <tr><td>항등법칙</td><td>$A+0=A$, $A\cdot1=A$</td></tr>
+    <tr><td>보수법칙</td><td>$A+\overline{A}=1$, $A\cdot\overline{A}=0$</td></tr>
+  </tbody>
+</Table>
+
+## 드모르간 법칙(De Morgan's Law)
+
+05번 문서에서 배울 집합 연산의 드모르간 법칙과 정확히 같은 구조가 불 대수에도 그대로 적용됩니다.
+
+$$
+\overline{A+B} = \overline{A}\cdot\overline{B}, \qquad \overline{A\cdot B} = \overline{A}+\overline{B}
+$$
+
+> **쉽게 말하면:** 전체에 NOT을 취하면, OR와 AND가 서로 뒤바뀌고, 각 항에도 개별적으로 NOT이 붙습니다.
+
+**계산 예시:** $\overline{A\cdot B + C}$를 드모르간 법칙으로 전개합니다.
+
+$$
+\overline{A\cdot B + C} = \overline{A\cdot B}\cdot\overline{C} = (\overline{A}+\overline{B})\cdot\overline{C}
+$$
+
+**왜 드모르간이 중요한가?** 실제 회로에서는 NAND 게이트 하나만으로 AND, OR, NOT을 모두 만들 수 있다는 사실(NAND의 만능성, Universal Gate)이 드모르간 법칙과 밀접하게 연결됩니다. 이 덕분에 복잡한 회로도 NAND 게이트만으로 제작할 수 있어 생산 비용이 절감됩니다.
+
+## 논리식 간소화 예시
+
+$$
+F = A\cdot B + A\cdot \overline{B}
+$$
+
+분배법칙을 이용해 $A$를 묶어냅니다.
+
+$$
+F = A(B+\overline{B}) = A \cdot 1 = A
+$$
+
+**해석:** 복잡해 보이던 식이 결국 $A$ 하나로 간소화됩니다. 이렇게 게이트 개수를 줄이면 실제 회로의 크기와 비용을 줄일 수 있습니다.
+
+## 핵심 정리
+
+- **기본 게이트**: AND(둘 다 1), OR(하나라도 1), NOT(반전).
+- **XOR**: 서로 다를 때만 1. **NAND/NOR**: AND/OR 결과를 반전(순서 주의).
+- **불 대수 법칙**: 교환·결합·분배·항등·보수법칙.
+- **드모르간 법칙**: NOT을 취하면 AND↔OR가 뒤바뀜. NAND만으로 모든 게이트 구현 가능(만능 게이트).
+- 논리식 간소화는 실제 회로의 게이트 개수(비용)를 줄이는 데 사용된다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="AND 게이트에서 A=1, B=0일 때 출력은?"
+  options={['①0', '②1', '③불확정', '④에러']}
+  correctAnswer={1}
+  explanation="AND는 둘 다 1일 때만 1을 출력하므로, A=1, B=0이면 출력은 0입니다."
+  optionExplanations={['맞습니다. 둘 다 1이 아니므로 0입니다.', '둘 다 1이어야 1이 출력됩니다.', '논리 게이트는 항상 확정된 결과를 출력합니다.', '정상적인 동작이며 에러가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="XOR 게이트에서 A=1, B=1일 때 출력은?"
+  options={['①0', '②1', '③불확정', '④에러']}
+  correctAnswer={1}
+  explanation="XOR은 두 입력이 서로 다를 때만 1을 출력하므로, 둘 다 1이면 출력은 0입니다."
+  optionExplanations={['맞습니다. 두 값이 같으므로 0입니다.', '값이 같을 때는 0이 출력됩니다.', '항상 확정된 결과입니다.', '정상적인 동작입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="NAND 게이트의 동작을 올바르게 설명한 것은?"
+  options={['①NOT을 먼저 적용한 뒤 AND', '②AND를 먼저 적용한 뒤 NOT(결과를 반전)', '③OR과 완전히 같다', '④항상 0을 출력한다']}
+  correctAnswer={2}
+  explanation="NAND는 AND 연산을 먼저 수행한 뒤 그 결과를 반전시키는 게이트입니다."
+  optionExplanations={['순서가 반대로 설명되었습니다.', '맞습니다. AND 먼저, 그다음 반전입니다.', 'OR과는 다른 별개의 게이트입니다.', '입력에 따라 0 또는 1을 출력합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="드모르간 법칙에 따르면 (A·B)의 NOT은?"
+  options={['①A+B', '②Ā+B̄', '③Ā·B̄', '④A·B']}
+  correctAnswer={2}
+  explanation="드모르간 법칙에 따라 NOT(A·B) = Ā+B̄로, AND가 OR로 바뀌고 각 항에 NOT이 붙습니다."
+  optionExplanations={['NOT이 적용되지 않은 원래 식입니다.', '맞습니다. Ā+B̄입니다.', '이는 NOT(A+B)에 대한 결과입니다.', 'NOT이 적용되지 않은 원래 식입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="논리식 A·B + A·B̄를 간소화하면?"
+  options={['①A', '②B', '③A+B', '④A·B']}
+  correctAnswer={1}
+  explanation="분배법칙으로 A를 묶으면 A(B+B̄) = A×1 = A입니다."
+  optionExplanations={['맞습니다. A(B+B̄)=A입니다.', 'B가 아닌 A로 간소화됩니다.', '더 간소화될 수 있는 식입니다.', '이는 원래 식의 첫 항일 뿐입니다.']}
+/>
