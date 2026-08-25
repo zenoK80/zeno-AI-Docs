@@ -14,5 +14,7 @@ const meta = {
   '13_recovery': '13. 회복 — 로그 기반 회복, 검사시점, 그림자 페이징',
   '14_object-and-web-db': '14. 객체 DB·웹 DB',
   '15_client-server-db': '15. 클라이언트/서버 DB — 미들웨어, 분산 DB',
+  '16_dw-bigdata-mining': '16. 데이터웨어하우스·빅데이터·데이터마이닝',
+  '17_exam-practice': '17. 데이터베이스 예상기출문제',
 }
 export default meta
