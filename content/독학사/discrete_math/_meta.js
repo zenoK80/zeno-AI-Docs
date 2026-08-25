@@ -11,6 +11,9 @@ const meta = {
   '10_graph-theory': '10. 그래프 이론 — 정의, 용어, 표현 방법, 특수 그래프',
   '11_graph-applications': '11. 그래프 응용 — 오일러 경로, 해밀턴 순회, 최단거리, 평면 그래프',
   '12_trees': '12. 트리 — 개념, 이진 트리, 최소비용 생성 트리',
+  '13_matrices-in-discrete-math': '13. 행렬 — 기본 연산, 행렬식, 응용',
+  '14_recurrence-relations': '14. 점화식과 알고리즘 분석 — 피보나치, 분할 정복, Master 정리',
+  '15_formal-languages': '15. 오토마타와 언어 — 유한상태 오토마타, 형식 언어, 정규 언어',
 }
 
 export default meta
