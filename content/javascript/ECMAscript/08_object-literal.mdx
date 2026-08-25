@@ -51,10 +51,15 @@ console.log(person)
 
 ## 메서드
 
-객체의 프로퍼티 값이 함수인 경우를 **메서드**(method) 라 합니다.
+객체의 프로퍼티 값이 함수인 경우를 **메서드**(method) 라 합니다. `add`를 여러 번 이어붙여(체이닝) 결과가 어떻게 누적되는지 직접 실행해보세요.
 
-```js
-const calculator = {
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="메서드 체이닝 실습"
+  files={{
+    '/index.js': `const calculator = {
   value: 0,
   add(n) {
     this.value += n
@@ -65,9 +70,10 @@ const calculator = {
   },
 }
 
-calculator.add(5).add(3)
-console.log(calculator.result()) // 8
-```
+calculator.add(5).add(3).add(10)
+console.log(calculator.result()) // 18`,
+  }}
+/>
 
 ## ES6 단축 문법
 

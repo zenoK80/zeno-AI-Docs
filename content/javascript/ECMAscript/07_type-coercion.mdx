@@ -76,19 +76,25 @@ Boolean([])     // true
 
 ## == vs ===
 
-`==` (동등 연산자)는 타입이 다르면 변환 후 비교합니다. `===` (일치 연산자)는 타입과 값 모두 같아야 `true`입니다.
+`==` (동등 연산자)는 타입이 다르면 변환 후 비교합니다. `===` (일치 연산자)는 타입과 값 모두 같아야 `true`입니다. 아래 값들을 바꿔가며 `==`와 `===`의 결과가 언제 갈리는지 직접 확인해보세요.
 
-```js
-0 == false       // true  (false → 0)
-'' == false      // true  ('' → 0, false → 0)
-null == undefined // true  (특수 규칙)
-null == 0        // false
-NaN == NaN       // false (NaN은 자기 자신과도 같지 않음)
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="== vs === 비교 실습"
+  files={{
+    '/index.js': `console.log(0 == false)        // true  (false → 0)
+console.log('' == false)       // true  ('' → 0, false → 0)
+console.log(null == undefined) // true  (특수 규칙)
+console.log(null == 0)         // false
+console.log(NaN == NaN)        // false (NaN은 자기 자신과도 같지 않음)
 
-0 === false      // false
-'' === false     // false
-null === undefined // false
-```
+console.log(0 === false)       // false
+console.log('' === false)      // false
+console.log(null === undefined) // false`,
+  }}
+/>
 
 <Callout type="warning">
   예상치 못한 타입 변환 버그를 막으려면 항상 `===`와 `!==`를 사용하세요. `null` 체크는 `== null`이 null과 undefined를 함께 처리하는 편리한 예외입니다.

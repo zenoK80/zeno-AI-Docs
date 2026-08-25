@@ -111,16 +111,22 @@ do {
 
 ## break와 continue
 
-`break`는 반복문을 즉시 종료하고, `continue`는 현재 반복만 건너뜁니다.
+`break`는 반복문을 즉시 종료하고, `continue`는 현재 반복만 건너뜁니다. 숫자를 바꿔가며 결과가 어떻게 달라지는지 직접 실행해보세요.
 
-```js
-for (let i = 0; i < 10; i++) {
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="break vs continue 실습"
+  files={{
+    '/index.js': `for (let i = 0; i < 10; i++) {
   if (i === 3) continue   // 3은 건너뜀
   if (i === 6) break      // 6에서 종료
   console.log(i)
 }
-// 0 1 2 4 5
-```
+// 0 1 2 4 5`,
+  }}
+/>
 
 ## 핵심 정리
 

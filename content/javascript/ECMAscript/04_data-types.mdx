@@ -41,10 +41,15 @@ console.log(str)     // 'hello'
 
 ## typeof 연산자
 
-`typeof` 연산자는 값의 타입을 문자열로 반환합니다.
+`typeof` 연산자는 값의 타입을 문자열로 반환합니다. 아래 코드를 직접 수정해가며 각 값의 타입을 확인해보세요.
 
-```js
-console.log(typeof 42)          // 'number'
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="typeof 결과 직접 확인하기"
+  files={{
+    '/index.js': `console.log(typeof 42)          // 'number'
 console.log(typeof 'hello')     // 'string'
 console.log(typeof true)        // 'boolean'
 console.log(typeof undefined)   // 'undefined'
@@ -53,8 +58,9 @@ console.log(typeof 1n)          // 'bigint'
 console.log(typeof null)        // 'object'  ← 역사적 버그
 console.log(typeof {})          // 'object'
 console.log(typeof [])          // 'object'
-console.log(typeof function(){}) // 'function'
-```
+console.log(typeof function(){}) // 'function'`,
+  }}
+/>
 
 <Callout type="warning">
   `typeof null`이 `'object'`를 반환하는 것은 JavaScript의 오래된 버그입니다. `null`인지 확인하려면 `=== null`을 사용합니다.

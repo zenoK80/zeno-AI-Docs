@@ -82,12 +82,24 @@ isLoggedIn && showDashboard()
 
 ## 널 병합 연산자 (??)
 
-`||`는 `0`이나 `''`처럼 falsy한 값도 기본값으로 대체합니다. `null`이나 `undefined`일 때만 대체하려면 `??`를 씁니다.
+`||`는 `0`이나 `''`처럼 falsy한 값도 기본값으로 대체합니다. `null`이나 `undefined`일 때만 대체하려면 `??`를 씁니다. 아래에서 `count`의 값을 0, '', null, undefined로 바꿔가며 `||`와 `??`의 차이를 직접 확인해보세요.
 
-```js
-const count = 0 || 10    // 10 (0은 falsy)
-const count2 = 0 ?? 10   // 0  (null/undefined가 아님)
-```
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="|| vs ?? 비교 실습"
+  files={{
+    '/index.js': `const count = 0
+
+console.log(count || 10)   // 10 (0은 falsy이므로 대체됨)
+console.log(count ?? 10)   // 0  (null/undefined가 아니므로 그대로)
+
+const text = ''
+console.log(text || '기본값')  // '기본값' ('' 은 falsy)
+console.log(text ?? '기본값')  // '' (null/undefined가 아님)`,
+  }}
+/>
 
 ## 삼항 연산자
 

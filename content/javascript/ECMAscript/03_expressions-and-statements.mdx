@@ -57,13 +57,22 @@ const b = 2
 console.log(a + b)
 ```
 
-위 코드는 세미콜론 없이도 동작하지만, 아래처럼 예외가 생길 수 있습니다.
+위 코드는 세미콜론 없이도 동작하지만, 아래처럼 예외가 생길 수 있습니다. 직접 실행해서 콘솔 에러를 확인해보세요.
 
-```js
-const fn = () => {}
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="ASI 함정 실습 — 콘솔 에러를 직접 확인하세요"
+  files={{
+    '/index.js': `const fn = () => console.log('fn 호출됨')
 [1, 2, 3].forEach(fn)
-// ASI가 없으면 fn[1,2,3]... 으로 해석될 수 있음
-```
+// 세미콜론이 없으면 위 줄이 fn[1, 2, 3]... 으로 이어붙여 해석되어 에러가 납니다.
+// 아래처럼 세미콜론을 붙이면 정상 동작합니다.
+// const fn2 = () => console.log('fn2 호출됨');
+// [1, 2, 3].forEach(fn2)`,
+  }}
+/>
 
 <Callout type="warning">
   즉시 실행 함수, 배열 리터럴, 괄호로 시작하는 줄 앞에는 세미콜론을 명시하거나 문 끝에 항상 붙이는 일관된 스타일을 사용합니다.
