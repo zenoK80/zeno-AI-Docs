@@ -56,17 +56,23 @@ UI를 **컴포넌트**(component) 단위로 쪼개고, 데이터(상태)가 바�
 | **컴포넌트 기반** | UI를 독립적인 조각으로 분리해 재사용 가능하게 구성 |
 | **단방향 데이터 흐름** | 부모 → 자식으로만 데이터가 흐르므로 예측 가능 |
 
-```jsx
-// 선언형: count 상태만 바꾸면 React가 화면을 알아서 업데이트
-function Counter() {
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="선언형 UI 실습 — 버튼을 눌러 count 상태만 바꿔보세요"
+  files={{
+    '/App.js': `import { useState } from 'react'
+
+export default function Counter() {
   const [count, setCount] = useState(0)
   return (
     <button onClick={() => setCount(count + 1)}>
       클릭 횟수: {count}
     </button>
   )
-}
-```
+}`,
+  }}
+/>
 
 ---
 

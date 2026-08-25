@@ -179,25 +179,38 @@ function Notification({ count }) {
 
 배열의 `.map()`으로 여러 요소를 렌더링합니다. 각 요소에는 고유한 `key` prop이 필요합니다.
 
-```jsx
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="조건부·리스트 렌더링 실습 — 버튼을 눌러보세요"
+  files={{
+    '/App.js': `import { useState } from 'react'
+
 const fruits = [
   { id: 1, name: '사과', emoji: '🍎' },
   { id: 2, name: '바나나', emoji: '🍌' },
   { id: 3, name: '포도', emoji: '🍇' },
 ]
 
-function FruitList() {
+export default function App() {
+  const [isOnline, setIsOnline] = useState(false)
+
   return (
-    <ul>
-      {fruits.map(fruit => (
-        <li key={fruit.id}>
-          {fruit.emoji} {fruit.name}
-        </li>
-      ))}
-    </ul>
+    <div>
+      <button onClick={() => setIsOnline(!isOnline)}>상태 토글</button>
+      <p>{isOnline ? '온라인' : '오프라인'}</p>
+      <ul>
+        {fruits.map(fruit => (
+          <li key={fruit.id}>
+            {fruit.emoji} {fruit.name}
+          </li>
+        ))}
+      </ul>
+    </div>
   )
-}
-```
+}`,
+  }}
+/>
 
 **key는 왜 필요한가?** React가 리스트가 바뀔 때 어느 항목이 추가·삭제·이동됐는지 효율적으로 파악하기 위해서입니다. key는 형제 요소 사이에서 고유하면 됩니다.
 
