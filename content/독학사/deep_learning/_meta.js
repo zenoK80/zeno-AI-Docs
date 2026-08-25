@@ -14,5 +14,8 @@ const meta = {
   '13_cnn': '13. CNN — 합성곱, 필터, 패딩·스트라이드, 풀링',
   '14_cnn-architectures': '14. 대표 CNN 모델 — LeNet부터 ResNet까지',
   '15_rnn': '15. RNN — 시퀀스 데이터, 은닉 상태, 장기 의존성 문제',
+  '16_lstm-gru': '16. LSTM과 GRU — 셀 상태, 게이트 구조',
+  '17_nlp-and-embedding': '17. 자연어 처리와 임베딩 — 토큰화, Word2Vec',
+  '18_attention-and-transformer': '18. Attention과 Transformer — Self-Attention, Encoder·Decoder',
 }
 export default meta
