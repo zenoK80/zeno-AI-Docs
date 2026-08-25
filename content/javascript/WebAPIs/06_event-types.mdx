@@ -35,22 +35,26 @@ box.addEventListener('contextmenu', (e) => {
 
 ## 키보드 이벤트
 
-```js
-const input = document.querySelector('input')
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="키보드 이벤트 실습 — 입력창에 타이핑해보세요"
+  files={{
+    '/index.html': `<input type="text" placeholder="여기에 입력하세요" />
+<script src="/index.js"></script>`,
+    '/index.js': `const input = document.querySelector('input')
 
 input.addEventListener('keydown', (e) => {
   console.log('키 눌림:', e.key, e.code)
   if (e.key === 'Enter') console.log('엔터 입력')
-  if (e.ctrlKey && e.key === 's') {
-    e.preventDefault()
-    console.log('Ctrl+S')
-  }
 })
 
 input.addEventListener('keyup', (e) => {
   console.log('키 뗌:', e.key)
-})
-```
+})`,
+  }}
+/>
 
 `e.key`는 실제 문자('a', 'Enter'), `e.code`는 물리적 키 위치('KeyA', 'Enter')입니다.
 

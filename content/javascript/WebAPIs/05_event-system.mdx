@@ -46,19 +46,30 @@ button.addEventListener('click', (event) => {
 2. **타겟 단계**: 이벤트 발생 요소에서 처리합니다.
 3. **버블링 단계**: 이벤트 발생 요소에서 최상위로 올라갑니다.
 
-```js
-const parent = document.querySelector('.parent')
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="버블링 vs 캡처링 실습 — 버튼을 눌러 순서를 확인하세요"
+  files={{
+    '/index.html': `<div class="parent" style="padding:20px;border:1px solid #999;">
+  parent
+  <button class="child">child 클릭</button>
+</div>
+<script src="/index.js"></script>`,
+    '/index.js': `const parent = document.querySelector('.parent')
 const child = document.querySelector('.child')
 
 // 버블링 단계 처리 (기본)
 parent.addEventListener('click', () => console.log('parent 버블링'))
 child.addEventListener('click', () => console.log('child 버블링'))
-// child 클릭 시: child → parent 순으로 출력
+// child 클릭 시: child 버블링 → parent 버블링 순으로 출력
 
 // 캡처링 단계 처리 (세 번째 인수 true 또는 { capture: true })
 parent.addEventListener('click', () => console.log('parent 캡처링'), true)
-// child 클릭 시: parent 캡처링 → child 순으로 출력
-```
+// child 클릭 시: parent 캡처링 → child 버블링 → parent 버블링 순으로 출력`,
+  }}
+/>
 
 ## stopPropagation vs preventDefault
 
@@ -80,18 +91,27 @@ link.addEventListener('click', (e) => {
 
 개별 요소가 아닌 부모에 리스너를 달고, 이벤트가 버블링될 때 `event.target`으로 구분합니다.
 
-```js
-const list = document.querySelector('ul')
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  label="이벤트 위임 실습 — 항목을 클릭해보세요"
+  files={{
+    '/index.html': `<ul id="list">
+  <li>할 일 1</li>
+  <li>할 일 2</li>
+  <li>할 일 3</li>
+</ul>
+<style>.done { text-decoration: line-through; color: #999; }</style>
+<script src="/index.js"></script>`,
+    '/index.js': `const list = document.querySelector('#list')
 
 list.addEventListener('click', (event) => {
   if (event.target.tagName === 'LI') {
     event.target.classList.toggle('done')
   }
-  if (event.target.matches('.delete-btn')) {
-    event.target.closest('li').remove()
-  }
-})
-```
+})`,
+  }}
+/>
 
 장점:
 - 리스너 수가 적어 메모리 절약
