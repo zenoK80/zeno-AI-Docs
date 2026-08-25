@@ -6,5 +6,8 @@ const meta = {
   '05_ml-overview': '05. 머신러닝 개요 — AI·ML·DL 관계, 학습 유형',
   '06_learning-principles': '06. 학습 원리 — 모델, 손실함수, 비용함수, 경사하강법',
   '07_linear-regression': '07. 선형 회귀 — 최소제곱법, 경사하강법, 정규방정식',
+  '08_logistic-regression': '08. 로지스틱 회귀 — 시그모이드, 이진·다중 분류',
+  '09_knn': '09. K-최근접 이웃 — 거리 측정, K값 선택',
+  '10_naive-bayes': '10. 나이브 베이즈 — 베이즈 정리, 텍스트 분류',
 }
 export default meta
