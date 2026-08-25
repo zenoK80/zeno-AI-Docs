@@ -28,24 +28,30 @@ list.innerHTML = '<li>첫 번째</li><li>두 번째</li>'
 
 ## 요소 생성과 추가
 
-```js
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  label="요소 생성과 추가 실습"
+  files={{
+    '/index.html': `<ul id="list">
+  <li>기존 항목 1</li>
+  <li>기존 항목 2</li>
+</ul>
+<script src="/index.js"></script>`,
+    '/index.js': `const list = document.querySelector('#list')
+
 // 새 요소 생성
 const newItem = document.createElement('li')
 newItem.textContent = '새 항목'
 newItem.className = 'item active'
 
-// 부모에 추가
-const list = document.querySelector('ul')
-list.appendChild(newItem)    // 마지막에 추가
-list.prepend(newItem)        // 첫 번째에 추가
+// 마지막에 추가
+list.appendChild(newItem)
 
-// 특정 위치에 추가
-const referenceNode = list.querySelector('li:nth-child(2)')
-list.insertBefore(newItem, referenceNode)  // referenceNode 앞에
-
-// 여러 요소 한 번에
-list.append('텍스트', newItem, document.createElement('li'))
-```
+// 클래스와 스타일도 함께 확인해보세요
+newItem.style.color = 'crimson'`,
+  }}
+/>
 
 ## insertAdjacentHTML
 

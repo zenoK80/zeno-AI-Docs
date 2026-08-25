@@ -53,10 +53,19 @@ console.log(document.title)
 - HTML: 서버가 보낸 문서의 원본 구조
 - DOM: 브라우저가 메모리에 만든, JavaScript로 조작 가능한 문서 구조
 
-```js
-const message = document.querySelector('#message')
-message.textContent = '학습을 시작했어요!'
-```
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  label="DOM 조작 실습"
+  files={{
+    '/index.html': `<main>
+  <p id="message">아직 시작하지 않았어요.</p>
+</main>
+<script src="/index.js"></script>`,
+    '/index.js': `const message = document.querySelector('#message')
+message.textContent = '학습을 시작했어요!'`,
+  }}
+/>
 
 `querySelector()`는 문서에서 `#message`를 찾고, `textContent`는 그 요소의 글자를 바꿉니다. 사용자가 버튼을 누른 뒤 문구가 바뀌는 이유도 이런 DOM 조작 덕분입니다.
 

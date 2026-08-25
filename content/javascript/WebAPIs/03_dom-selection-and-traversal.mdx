@@ -54,23 +54,33 @@ const byTag = document.getElementsByTagName('p')           // HTMLCollection
 
 찾은 요소에서 상대적으로 다른 노드를 탐색합니다.
 
-```js
-const container = document.querySelector('#container')
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="DOM 트리 탐색 실습"
+  files={{
+    '/index.html': `<div id="container">
+  <h1 class="title">제목</h1>
+  <p>단락 1</p>
+  <p>단락 2</p>
+</div>
+<script src="/index.js"></script>`,
+    '/index.js': `const container = document.querySelector('#container')
 
 // 부모
-container.parentElement       // 부모 요소
-container.parentNode          // 부모 노드 (텍스트 노드 포함)
+console.log(container.parentElement.tagName) // 부모 요소 태그명
 
 // 자식
-container.children            // 자식 요소 컬렉션 (텍스트 노드 제외)
-container.childNodes          // 자식 노드 (텍스트 노드 포함)
-container.firstElementChild   // 첫 번째 자식 요소
-container.lastElementChild    // 마지막 자식 요소
+console.log(container.children.length)          // 자식 요소 개수(텍스트 노드 제외)
+console.log(container.firstElementChild.tagName) // 첫 번째 자식 요소
+console.log(container.lastElementChild.tagName)  // 마지막 자식 요소
 
 // 형제
-container.nextElementSibling   // 다음 형제 요소
-container.previousElementSibling // 이전 형제 요소
-```
+const title = document.querySelector('.title')
+console.log(title.nextElementSibling.textContent) // 다음 형제 요소`,
+  }}
+/>
 
 ## closest — 조상 탐색
 
