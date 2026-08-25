@@ -28,38 +28,19 @@ description: 'ERD의 엔터티와 관계가 CREATE TABLE과 JOIN으로 변환되
 
 아래 ERD를 SQL로 변환합니다.
 
-```mermaid
-erDiagram
-    고객 {
-        number 고객번호 PK
-        string 이름
-        string 이메일
-        string 등급
-    }
-    주문 {
-        number 주문번호 PK
-        number 고객번호 FK
-        date   주문일
-        number 총금액
-        string 배송상태
-    }
-    주문상품 {
-        number 주문번호 PK_FK
-        number 상품번호 PK_FK
-        number 수량
-        number 단가
-    }
-    상품 {
-        number 상품번호 PK
-        string 상품명
-        number 가격
-        string 카테고리
-    }
+<Table>
+  <thead>
+    <tr><th>엔터티</th><th>속성(타입, 구분)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>고객</td><td>고객번호(number, PK), 이름(string), 이메일(string), 등급(string)</td></tr>
+    <tr><td>주문</td><td>주문번호(number, PK), 고객번호(number, FK), 주문일(date), 총금액(number), 배송상태(string)</td></tr>
+    <tr><td>주문상품</td><td>주문번호(number, PK/FK), 상품번호(number, PK/FK), 수량(number), 단가(number)</td></tr>
+    <tr><td>상품</td><td>상품번호(number, PK), 상품명(string), 가격(number), 카테고리(string)</td></tr>
+  </tbody>
+</Table>
 
-    고객 ||--o{ 주문 : "한다"
-    주문 ||--|{ 주문상품 : "포함한다"
-    상품 ||--o{ 주문상품 : "포함된다"
-```
+**관계:** 고객 1 : 주문 0–N("한다") · 주문 1 : 주문상품 1–N("포함한다") · 상품 1 : 주문상품 0–N("포함된다")
 
 ### 2단계: CREATE TABLE 변환
 

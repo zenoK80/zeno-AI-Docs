@@ -34,12 +34,17 @@ console.log(dog.breathe()) // '숨쉬기' (animal에서 상속)
 3. 없으면 그 위의 [[Prototype]]으로 올라간다.
 4. `null`에 도달하면 `undefined`를 반환한다.
 
-```mermaid
-flowchart LR
-  dog["dog"] --> animal["animal"]
-  animal --> ObjProto["Object.prototype"]
-  ObjProto --> null["null"]
-```
+<Table>
+  <thead>
+    <tr><th>단계</th><th>객체</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>`dog`</td></tr>
+    <tr><td>2</td><td>`animal`(dog의 프로토타입)</td></tr>
+    <tr><td>3</td><td>`Object.prototype`(animal의 프로토타입)</td></tr>
+    <tr><td>4</td><td>`null`(체인의 끝)</td></tr>
+  </tbody>
+</Table>
 
 ## __proto__
 

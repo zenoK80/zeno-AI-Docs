@@ -15,13 +15,7 @@ description: '리눅스 부팅 5단계 과정, GRUB2 설정 방법, 싱글 유�
 BIOS/UEFI → GRUB2 → 커널 로드 → initramfs → systemd(PID 1)
 ```
 
-```mermaid
-flowchart LR
-  A["BIOS/UEFI\n하드웨어 초기화\nPOST 수행"] --> B["GRUB2\n부트로더\n커널 선택"]
-  B --> C["커널 로드\n/boot/vmlinuz-*\n메모리 적재"]
-  C --> D["initramfs\n임시 루트 파일시스템\n드라이버 로드"]
-  D --> E["systemd\nPID 1\n서비스 시작"]
-```
+부팅은 다음 순서로 진행됩니다: BIOS/UEFI → GRUB2 → 커널 로드 → initramfs → systemd.
 
 | 단계 | 역할 |
 |---|---|

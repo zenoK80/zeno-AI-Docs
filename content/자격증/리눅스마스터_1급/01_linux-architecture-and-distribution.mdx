@@ -11,14 +11,17 @@ description: '리눅스 아키텍처 계층 구조와 주요 배포판 계열을
 
 리눅스는 아래 4개 계층으로 구성된다. 상위 계층은 하위 계층의 서비스를 호출하며, 사용자는 셸을 통해 커널에 간접적으로 접근한다.
 
-```mermaid
-flowchart TB
-  APP[응용프로그램<br/>웹 브라우저, 편집기, 서버 데몬]
-  SHELL[셸<br/>bash / zsh / sh / ksh / csh]
-  KERNEL[리눅스 커널<br/>프로세스 · 메모리 · 파일시스템 · 장치 드라이버 · 네트워크]
-  HW[하드웨어<br/>CPU · 메모리 · 디스크 · NIC]
-  APP --> SHELL --> KERNEL --> HW
-```
+<Table>
+  <thead>
+    <tr><th>계층(위→아래)</th><th>구성 요소</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>응용프로그램</td><td>웹 브라우저, 편집기, 서버 데몬</td></tr>
+    <tr><td>셸</td><td>bash / zsh / sh / ksh / csh</td></tr>
+    <tr><td>리눅스 커널</td><td>프로세스 · 메모리 · 파일시스템 · 장치 드라이버 · 네트워크</td></tr>
+    <tr><td>하드웨어</td><td>CPU · 메모리 · 디스크 · NIC</td></tr>
+  </tbody>
+</Table>
 
 ## 커널(Kernel)
 
@@ -46,8 +49,8 @@ flowchart TB
 
 ### 터미널 vs 셸
 
-- **터미널(Terminal):** 입출력을 처리하는 인터페이스. 물리적 단말기, 터미널 에뮬레이터(gnome-terminal, iTerm2), 가상 콘솔(tty) 등
-- **셸(Shell):** 터미널 안에서 실행되는 **명령 해석 프로그램**. 터미널이 없으면 셸도 입력을 받을 수 없다.
+- **터미널**(Terminal)**:** 입출력을 처리하는 인터페이스. 물리적 단말기, 터미널 에뮬레이터(gnome-terminal, iTerm2), 가상 콘솔(tty) 등
+- **셸**(Shell)**:** 터미널 안에서 실행되는 **명령 해석 프로그램**. 터미널이 없으면 셸도 입력을 받을 수 없다.
 
 현재 사용 중인 셸 확인:
 

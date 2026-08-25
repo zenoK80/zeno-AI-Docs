@@ -46,16 +46,7 @@ button.addEventListener('click', () => {
 
 ## 브라우저가 언어와 기능을 연결한다
 
-```mermaid
-flowchart LR
-  JS["ECMAScript 코드"] --> Browser["브라우저"]
-  Browser --> DOM["DOM: 문서와 화면"]
-  Browser --> Event["Event: 사용자 입력"]
-  Browser --> Network["Fetch: 네트워크"]
-  Browser --> Storage["Storage: 데이터 저장"]
-```
-
-브라우저는 JavaScript 엔진으로 언어 코드를 실행하면서 화면·입력·통신·저장 기능을 객체와 메서드 형태로 연결합니다.
+브라우저는 JavaScript 엔진으로 언어 코드(ECMAScript)를 실행하면서, 화면(DOM)·입력(Event)·통신(Fetch)·저장(Storage) 기능을 객체와 메서드 형태로 연결합니다.
 
 | 하고 싶은 일 | 대표 Web API | 짧은 예 |
 | --- | --- | --- |

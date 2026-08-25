@@ -11,13 +11,17 @@ description: 'HDFS 구조, MapReduce 처리 방식, NoSQL 4유형, Apache Spark,
 
 **HDFS**(Hadoop Distributed File System) 는 대용량 파일을 여러 서버에 나누어 저장하는 분산 파일 시스템입니다.
 
-```mermaid
-flowchart TD
-  A["클라이언트"] --> B["NameNode\n(메타데이터 관리)"]
-  B --> C["DataNode 1\n블록 A, B"]
-  B --> D["DataNode 2\n블록 B, C"]
-  B --> E["DataNode 3\n블록 A, C"]
-```
+<Table>
+  <thead>
+    <tr><th>구성</th><th>보유 블록</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>클라이언트 → NameNode(메타데이터 관리)</td><td>-</td></tr>
+    <tr><td>DataNode 1</td><td>블록 A, B</td></tr>
+    <tr><td>DataNode 2</td><td>블록 B, C</td></tr>
+    <tr><td>DataNode 3</td><td>블록 A, C</td></tr>
+  </tbody>
+</Table>
 
 ### HDFS 구성 요소
 
@@ -30,8 +34,8 @@ flowchart TD
 ### HDFS 주요 특징
 
 - **블록 크기:** 기본 128MB (큰 파일을 블록으로 나누어 저장)
-- **복제 계수(Replication Factor):** 기본 3 (같은 블록을 3개 서버에 복사 → 장애 내성)
-- **단일 장애점(SPOF) 문제:** NameNode가 하나이므로 NameNode 장애 시 전체 중단 → HA(High Availability) 구성으로 해결
+- **복제 계수**(Replication Factor)**:** 기본 3(같은 블록을 3개 서버에 복사 → 장애 내성)
+- **단일 장애점**(SPOF) **문제:** NameNode가 하나이므로 NameNode 장애 시 전체 중단 → HA(High Availability) 구성으로 해결
 
 <Callout type="warning">
   **시험 포인트:** 블록 기본 크기는 128MB, 복제 계수 기본은 3입니다. NameNode는 SPOF(단일 장애점)라는 것도 중요합니다.
@@ -133,12 +137,12 @@ Spark의 핵심 데이터 추상화 개념입니다.
 
 ## 핵심 정리
 
-- HDFS: **NameNode(메타데이터) + DataNode**(블록 저장), 블록 128MB, 복제 계수 3
+- HDFS: **NameNode**(메타데이터) **+ DataNode**(블록 저장), 블록 128MB, 복제 계수 3
 - NameNode는 **SPOF**(단일 장애점) → HA 구성으로 해결
-- MapReduce: **Map(key-value 변환) → Shuffle&Sort(key 기준 정렬) → Reduce**(집계)
-- NoSQL 4유형: **Key-Value(Redis), Document(MongoDB), Column-Family(HBase), Graph**(Neo4j)
+- MapReduce: **Map**(key-value 변환) **→ Shuffle&Sort**(key 기준 정렬) **→ Reduce**(집계)
+- NoSQL 4유형: **Key-Value**(Redis)**, Document**(MongoDB)**, Column-Family**(HBase)**, Graph**(Neo4j)
 - Apache Spark: 인메모리 처리, MapReduce 대비 최대 100배 빠름
-- RDD: **Resilient(탄력성) + Distributed(분산) + Dataset**(불변 데이터)
+- RDD: **Resilient**(탄력성) **+ Distributed**(분산) **+ Dataset**(불변 데이터)
 - 데이터 웨어하우스: 정형·사전 정의 스키마 / 데이터 레이크: 모든 형태·원시 데이터
 
 ## 마무리 복습

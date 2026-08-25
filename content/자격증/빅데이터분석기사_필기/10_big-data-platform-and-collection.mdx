@@ -90,14 +90,19 @@ description: '빅데이터 5V 특징, 정형·반정형·비정형 데이터 유
 
 ## 빅데이터 플랫폼 구성 흐름
 
-```mermaid
-flowchart LR
-  A["데이터 소스\n(웹, IoT, DB, 로그)"] --> B["수집\n(Kafka, Flume, ETL)"]
-  B --> C["저장\n(HDFS, S3, NoSQL)"]
-  C --> D["처리\n(Spark, MapReduce)"]
-  D --> E["분석\n(SQL, ML, 통계)"]
-  E --> F["시각화\n(대시보드, 리포트)"]
-```
+<Table>
+  <thead>
+    <tr><th>단계</th><th>대표 기술</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>데이터 소스</td><td>웹, IoT, DB, 로그</td></tr>
+    <tr><td>수집</td><td>Kafka, Flume, ETL</td></tr>
+    <tr><td>저장</td><td>HDFS, S3, NoSQL</td></tr>
+    <tr><td>처리</td><td>Spark, MapReduce</td></tr>
+    <tr><td>분석</td><td>SQL, ML, 통계</td></tr>
+    <tr><td>시각화</td><td>대시보드, 리포트</td></tr>
+  </tbody>
+</Table>
 
 ## 람다 아키텍처(Lambda Architecture)
 
@@ -130,8 +135,8 @@ flowchart LR
 
 ## 핵심 정리
 
-- 빅데이터 5V: **Volume(대용량), Velocity(고속), Variety(다양성), Veracity(정확성), Value**(가치)
-- 데이터 유형: **정형(테이블), 반정형(JSON/XML), 비정형**(텍스트/이미지)
+- 빅데이터 5V: **Volume**(대용량)**, Velocity**(고속)**, Variety**(다양성)**, Veracity**(정확성)**, Value**(가치)
+- 데이터 유형: **정형**(테이블)**, 반정형**(JSON/XML)**, 비정형**(텍스트/이미지)
 - 수집 방식: 크롤링, Open API, 로그 수집(Flume), 스트리밍(Kafka), ETL, CDC
 - 람다 아키텍처: **배치 레이어 + 스피드 레이어 + 서빙 레이어**
 - 카파 아키텍처: 스트리밍만으로 처리하여 람다 아키텍처를 단순화

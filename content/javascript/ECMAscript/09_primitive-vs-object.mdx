@@ -36,11 +36,15 @@ console.log(objA.name)  // '영희' (같은 객체이므로 함께 변경됨)
 
 objA와 objB는 메모리의 같은 객체를 가리킵니다.
 
-```mermaid
-flowchart LR
-  objA["변수 objA"] --> obj["객체 {name: '철수'}"]
-  objB["변수 objB"] --> obj
-```
+<Table>
+  <thead>
+    <tr><th>변수</th><th>가리키는 대상</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>objA</td><td>메모리상의 객체 하나(`name: '영희'`)</td></tr>
+    <tr><td>objB</td><td>같은 객체(objA와 동일한 참조)</td></tr>
+  </tbody>
+</Table>
 
 ## 함수 인수로 전달할 때
 

@@ -34,21 +34,17 @@ description: '엔터티 간의 관계를 표현하는 방법과 1:1, 1:N, M:N �
 
 한 인스턴스가 반대편의 정확히 하나의 인스턴스와만 연결됩니다.
 
-```mermaid
-erDiagram
-    직원 {
-        number 직원번호 PK
-        string 이름
-        string 부서
-    }
-    사원증 {
-        number 사원증번호 PK
-        number 직원번호 FK
-        date   발급일
-        date   만료일
-    }
-    직원 ||--|| 사원증 : "발급된다"
-```
+<Table>
+  <thead>
+    <tr><th>엔터티</th><th>속성</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>직원</td><td>직원번호(PK), 이름, 부서</td></tr>
+    <tr><td>사원증</td><td>사원증번호(PK), 직원번호(FK), 발급일, 만료일</td></tr>
+  </tbody>
+</Table>
+
+**관계:** 직원 1 : 사원증 1("발급된다") — 한 직원에 사원증이 정확히 하나
 
 - 한 직원은 사원증을 하나만 가집니다
 - 하나의 사원증은 한 직원에게만 발급됩니다
@@ -58,22 +54,17 @@ erDiagram
 
 한 인스턴스가 반대편의 여러 인스턴스와 연결될 수 있습니다.
 
-```mermaid
-erDiagram
-    고객 {
-        number 고객번호 PK
-        string 이름
-        string 이메일
-        string 등급
-    }
-    주문 {
-        number 주문번호 PK
-        number 고객번호 FK
-        date   주문일
-        number 총금액
-    }
-    고객 ||--o{ 주문 : "한다"
-```
+<Table>
+  <thead>
+    <tr><th>엔터티</th><th>속성</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>고객</td><td>고객번호(PK), 이름, 이메일, 등급</td></tr>
+    <tr><td>주문</td><td>주문번호(PK), 고객번호(FK), 주문일, 총금액</td></tr>
+  </tbody>
+</Table>
+
+**관계:** 고객 1 : 주문 0–N("한다")
 
 - 한 고객은 여러 개의 주문을 할 수 있습니다 (1:N에서 N 쪽)
 - 하나의 주문은 반드시 하나의 고객에게 속합니다 (1:N에서 1 쪽)
@@ -83,21 +74,17 @@ erDiagram
 
 양쪽 모두 여러 개와 연결될 수 있습니다.
 
-```mermaid
-erDiagram
-    학생 {
-        number 학생번호 PK
-        string 이름
-        string 학과
-    }
-    강좌 {
-        number 강좌번호 PK
-        string 강좌명
-        string 교수명
-        number 학점
-    }
-    학생 }o--o{ 강좌 : "수강한다"
-```
+<Table>
+  <thead>
+    <tr><th>엔터티</th><th>속성</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>학생</td><td>학생번호(PK), 이름, 학과</td></tr>
+    <tr><td>강좌</td><td>강좌번호(PK), 강좌명, 교수명, 학점</td></tr>
+  </tbody>
+</Table>
+
+**관계:** 학생 0–N : 강좌 0–N("수강한다")
 
 - 한 학생은 여러 강좌를 수강할 수 있습니다
 - 하나의 강좌에는 여러 학생이 있을 수 있습니다
@@ -107,29 +94,18 @@ erDiagram
 
 M:N 관계는 중간에 **교차 엔터티**(Associative Entity)를 만들어 두 개의 1:N 관계로 변환합니다.
 
-```mermaid
-erDiagram
-    학생 {
-        number 학생번호 PK
-        string 이름
-        string 학과
-    }
-    수강내역 {
-        number 학생번호 PK_FK
-        number 강좌번호 PK_FK
-        string 수강년도
-        string 학기
-        string 성적
-    }
-    강좌 {
-        number 강좌번호 PK
-        string 강좌명
-        string 교수명
-        number 학점
-    }
-    학생 ||--o{ 수강내역 : "한다"
-    강좌 ||--o{ 수강내역 : "포함된다"
-```
+<Table>
+  <thead>
+    <tr><th>엔터티</th><th>속성</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>학생</td><td>학생번호(PK), 이름, 학과</td></tr>
+    <tr><td>수강내역</td><td>학생번호(PK/FK), 강좌번호(PK/FK), 수강년도, 학기, 성적</td></tr>
+    <tr><td>강좌</td><td>강좌번호(PK), 강좌명, 교수명, 학점</td></tr>
+  </tbody>
+</Table>
+
+**관계:** 학생 1 : 수강내역 0–N("한다") · 강좌 1 : 수강내역 0–N("포함된다")
 
 **수강내역** 테이블이 교차 엔터티입니다. 학생번호와 강좌번호를 복합 기본키로 가지며, 추가 정보(성적, 학기)도 담을 수 있습니다.
 
@@ -163,22 +139,17 @@ ERD에서: `고객 ||--o{ 주문` → 고객 쪽에 `||`(고객은 1명 필수),
 - 직원은 반드시 부서에 소속되어야 합니다 → **필수**
 - 부서는 직원이 없어도 됩니다 (새로 만든 빈 부서도 있을 수 있다) → **선택**
 
-```mermaid
-erDiagram
-    부서 {
-        number 부서번호 PK
-        string 부서명
-        string 위치
-    }
-    직원 {
-        number 직원번호 PK
-        string 이름
-        number 부서번호 FK
-        string 직급
-        number 급여
-    }
-    부서 ||--o{ 직원 : "소속된다"
-```
+<Table>
+  <thead>
+    <tr><th>엔터티</th><th>속성</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>부서</td><td>부서번호(PK), 부서명, 위치</td></tr>
+    <tr><td>직원</td><td>직원번호(PK), 이름, 부서번호(FK), 직급, 급여</td></tr>
+  </tbody>
+</Table>
+
+**관계:** 부서 1 : 직원 0–N("소속된다")
 
 ## 관계 읽기 연습
 
@@ -194,7 +165,7 @@ ERD 관계를 읽는 표준 방법은 **양방향으로 읽기**입니다.
 
 ## 관계와 외래키
 
-1:N 관계에서 외래키(FK)는 항상 **N 쪽(많은 쪽) 테이블**에 위치합니다.
+1:N 관계에서 외래키(FK)는 항상 **N 쪽**(많은 쪽) **테이블**에 위치합니다.
 
 | 관계 | 외래키 위치 |
 |------|-----------|

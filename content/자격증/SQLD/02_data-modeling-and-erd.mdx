@@ -72,7 +72,7 @@ CREATE TABLE 고객 (
 
 ## Crow's Foot 표기법
 
-SQLD에서 주로 사용하는 표기법은 **Crow's Foot(까마귀 발) 표기법**입니다. 관계의 양 끝에 기호를 붙여 "몇 개"와 "있어야 하는지"를 표현합니다.
+SQLD에서 주로 사용하는 표기법은 **Crow's Foot**(까마귀 발) **표기법**입니다. 관계의 양 끝에 기호를 붙여 "몇 개"와 "있어야 하는지"를 표현합니다.
 
 | 기호 | 의미 |
 |------|------|
@@ -85,40 +85,28 @@ SQLD에서 주로 사용하는 표기법은 **Crow's Foot(까마귀 발) 표기�
 
 아래 ERD는 고객, 주문, 상품의 관계를 표현합니다.
 
-```mermaid
-erDiagram
-    고객 {
-        number 고객번호 PK
-        string 이름
-        string 이메일
-        date   가입일
-        string 등급
-    }
-    주문 {
-        number 주문번호 PK
-        number 고객번호 FK
-        date   주문일
-        number 총금액
-        string 배송상태
-    }
-    주문상품 {
-        number 주문번호 PK_FK
-        number 상품번호 PK_FK
-        number 수량
-        number 단가
-    }
-    상품 {
-        number 상품번호 PK
-        string 상품명
-        number 가격
-        string 카테고리
-        number 재고수량
-    }
+<Table>
+  <thead>
+    <tr><th>엔터티</th><th>속성(타입, 구분)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>고객</td><td>고객번호(number, PK), 이름(string), 이메일(string), 가입일(date), 등급(string)</td></tr>
+    <tr><td>주문</td><td>주문번호(number, PK), 고객번호(number, FK), 주문일(date), 총금액(number), 배송상태(string)</td></tr>
+    <tr><td>주문상품</td><td>주문번호(number, PK/FK), 상품번호(number, PK/FK), 수량(number), 단가(number)</td></tr>
+    <tr><td>상품</td><td>상품번호(number, PK), 상품명(string), 가격(number), 카테고리(string), 재고수량(number)</td></tr>
+  </tbody>
+</Table>
 
-    고객 ||--o{ 주문 : "한다"
-    주문 ||--|{ 주문상품 : "포함한다"
-    상품 ||--o{ 주문상품 : "포함된다"
-```
+<Table>
+  <thead>
+    <tr><th>관계</th><th>표기</th><th>의미</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>고객 — 주문</td><td>고객 1 : 주문 0–N("한다")</td><td>고객 한 명은 주문을 0건 이상 가질 수 있고, 각 주문에는 반드시 고객이 1명 있음</td></tr>
+    <tr><td>주문 — 주문상품</td><td>주문 1 : 주문상품 1–N("포함한다")</td><td>주문 하나는 주문상품을 1건 이상 포함하고, 각 주문상품은 반드시 하나의 주문에 속함</td></tr>
+    <tr><td>상품 — 주문상품</td><td>상품 1 : 주문상품 0–N("포함된다")</td><td>상품 하나는 여러 주문상품에 포함될 수 있고, 각 주문상품은 반드시 하나의 상품을 가리킴</td></tr>
+  </tbody>
+</Table>
 
 ### ERD 읽는 방법
 

@@ -33,13 +33,13 @@ console.log(counter())  // 3
 
 JavaScript는 렉시컬 스코프(정의 위치 기준)이므로, 함수가 외부 스코프를 참조하면 그 스코프가 메모리에 유지됩니다.
 
-```mermaid
-flowchart TD
-  A["makeCounter() 호출"] --> B["count = 0 생성"]
-  B --> C["내부 함수 반환"]
-  C --> D["counter 변수에 저장"]
-  D --> E["counter() 호출 → count 참조 가능"]
-```
+<Steps>
+### 1단계: `makeCounter()` 호출
+### 2단계: `count = 0` 생성
+### 3단계: 내부 함수 반환
+### 4단계: `counter` 변수에 저장
+### 5단계: `counter()` 호출 → `count` 참조 가능
+</Steps>
 
 ## 데이터 은닉 패턴
 
