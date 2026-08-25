@@ -17,5 +17,8 @@ const meta = {
   '16_lstm-gru': '16. LSTM과 GRU — 셀 상태, 게이트 구조',
   '17_nlp-and-embedding': '17. 자연어 처리와 임베딩 — 토큰화, Word2Vec',
   '18_attention-and-transformer': '18. Attention과 Transformer — Self-Attention, Encoder·Decoder',
+  '19_generative-models': '19. 생성 모델 — Autoencoder, VAE, GAN',
+  '20_llm-basics': '20. 대규모 언어모델 기초 — 사전학습·미세조정, BERT·GPT',
+  '21_model-evaluation-and-deployment': '21. 평가·전이학습·배포',
 }
 export default meta
