@@ -11,6 +11,8 @@ const meta = {
   '10_thread-binary-tree': '10. 스레드 이진 트리',
   '11_heap-and-bst': '11. 히프와 이진 탐색 트리',
   '12_b-tree': '12. m원 탐색 트리와 B-트리',
+  '13_graph': '13. 그래프 — 인접행렬·인접리스트, BFS·DFS',
+  '14_graph-algorithms': '14. 그래프 알고리즘 — 최소비용 신장트리, 최단경로',
 }
 
 export default meta
