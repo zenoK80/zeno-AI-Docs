@@ -8,5 +8,8 @@ const meta = {
   '07_sql-ddl-dml': '07. SQL DDL·DML — CREATE·ALTER·DROP, INSERT·UPDATE·DELETE',
   '08_sql-advanced': '08. SQL 고급 — 조인, 서브쿼리, 뷰, 권한',
   '09_query-processing': '09. 질의 처리와 최적화',
+  '10_normalization': '10. 정규화 — 함수적 종속, 1NF~5NF',
+  '11_transaction': '11. 트랜잭션 — ACID, 상태 전이, 직렬성',
+  '12_concurrency-control': '12. 동시성 제어 — 로킹, 2PL, 교착상태',
 }
 export default meta
