@@ -86,9 +86,21 @@ input.reportValidity()
 
 ## 커스텀 유효성 검사
 
-```js
-const passwordInput = document.querySelector('#password')
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="비밀번호 일치 검사 실습 — 두 입력값을 다르게 입력해보세요"
+  files={{
+    '/index.html': `<form novalidate>
+  <input id="password" type="password" placeholder="비밀번호" /><br/>
+  <input id="confirm-password" type="password" placeholder="비밀번호 확인" /><br/>
+  <button type="submit">제출</button>
+</form>
+<script src="/index.js"></script>`,
+    '/index.js': `const passwordInput = document.querySelector('#password')
 const confirmInput = document.querySelector('#confirm-password')
+const form = document.querySelector('form')
 
 function validatePasswords() {
   if (passwordInput.value !== confirmInput.value) {
@@ -100,7 +112,14 @@ function validatePasswords() {
 
 passwordInput.addEventListener('input', validatePasswords)
 confirmInput.addEventListener('input', validatePasswords)
-```
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault()
+  console.log('checkValidity:', confirmInput.checkValidity())
+  console.log('validationMessage:', confirmInput.validationMessage)
+})`,
+  }}
+/>
 
 ## novalidate와 수동 검사
 

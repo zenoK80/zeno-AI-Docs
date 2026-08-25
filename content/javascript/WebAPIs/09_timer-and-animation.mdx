@@ -56,21 +56,34 @@ setTimeout(tick, 1000)  // 시작
 
 브라우저가 다음 화면을 그리기 직전에 콜백을 호출합니다. 애니메이션에 최적입니다.
 
-```js
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  label="requestAnimationFrame 실습 — 시작 버튼을 눌러보세요"
+  files={{
+    '/index.html': `<button id="start">애니메이션 시작</button>
+<div id="track" style="position:relative;width:100%;height:40px;background:#eee;margin-top:10px;">
+  <div id="box" style="position:absolute;left:0;top:0;width:30px;height:30px;background:crimson;"></div>
+</div>
+<script src="/index.js"></script>`,
+    '/index.js': `const box = document.querySelector('#box')
 let position = 0
-const box = document.querySelector('.box')
 
 function animate() {
   position += 2
-  box.style.transform = `translateX(${position}px)`
+  box.style.transform = \`translateX(\${position}px)\`
 
   if (position < 300) {
-    requestAnimationFrame(animate)  // 다음 프레임에 계속
+    requestAnimationFrame(animate)
   }
 }
 
-requestAnimationFrame(animate)  // 시작
-```
+document.querySelector('#start').addEventListener('click', () => {
+  position = 0
+  requestAnimationFrame(animate)
+})`,
+  }}
+/>
 
 ## setTimeout vs setInterval vs requestAnimationFrame
 

@@ -11,25 +11,38 @@ description: 'localStorage, sessionStorage, Cookie의 차이와 사용법을 코
 
 탭/브라우저를 닫아도 데이터가 유지됩니다. 같은 출처(origin)라면 모든 탭에서 공유됩니다.
 
-```js
-// 저장
-localStorage.setItem('theme', 'dark')
-localStorage.setItem('user', JSON.stringify({ name: '철수', age: 20 }))
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="localStorage 실습 — 저장하고 새로고침해도 유지되는지 확인해보세요"
+  files={{
+    '/index.html': `<button id="save">저장</button>
+<button id="load">읽기</button>
+<button id="remove">삭제</button>
+<script src="/index.js"></script>`,
+    '/index.js': `document.querySelector('#save').addEventListener('click', () => {
+  localStorage.setItem('theme', 'dark')
+  localStorage.setItem('user', JSON.stringify({ name: '철수', age: 20 }))
+  console.log('저장 완료')
+})
 
-// 읽기
-const theme = localStorage.getItem('theme')  // 'dark'
-const user = JSON.parse(localStorage.getItem('user'))  // 객체
+document.querySelector('#load').addEventListener('click', () => {
+  const theme = localStorage.getItem('theme')
+  const user = JSON.parse(localStorage.getItem('user'))
+  console.log('theme:', theme)
+  console.log('user:', user)
+})
 
-// 삭제
-localStorage.removeItem('theme')
-localStorage.clear()  // 전체 삭제
+document.querySelector('#remove').addEventListener('click', () => {
+  localStorage.removeItem('theme')
+  localStorage.clear()
+  console.log('삭제 완료')
+})`,
+  }}
+/>
 
-// 전체 순회
-for (let i = 0; i < localStorage.length; i++) {
-  const key = localStorage.key(i)
-  console.log(key, localStorage.getItem(key))
-}
-```
+`setItem(key, value)`로 저장하고 `getItem(key)`로 읽습니다. `removeItem(key)`는 특정 키만, `clear()`는 전체를 삭제합니다.
 
 <Callout type="warning">
   localStorage는 문자열만 저장합니다. 객체는 `JSON.stringify()`로 직렬화하고 `JSON.parse()`로 역직렬화해야 합니다.

@@ -92,29 +92,33 @@ console.log(`카메라 ${cameras.length}개, 마이크 ${mics.length}개`)
 
 파일 인풋이나 드래그 앤 드롭으로 받은 파일을 처리합니다.
 
-```js
-const fileInput = document.querySelector('#file')
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="File API 실습 — 실제 텍스트 파일을 선택해보세요"
+  files={{
+    '/index.html': `<input type="file" id="file" accept=".txt,text/plain" />
+<script src="/index.js"></script>`,
+    '/index.js': `const fileInput = document.querySelector('#file')
 
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0]
+  if (!file) return
 
   console.log('파일명:', file.name)
   console.log('크기:', file.size, 'bytes')
   console.log('타입:', file.type)
   console.log('마지막 수정:', new Date(file.lastModified))
 
-  // 텍스트 파일 읽기
   const reader = new FileReader()
   reader.onload = (event) => {
-    console.log(event.target.result)  // 파일 내용
+    console.log('내용:', event.target.result)
   }
   reader.readAsText(file, 'UTF-8')
-
-  // 이미지 미리보기
-  const img = document.querySelector('#preview')
-  img.src = URL.createObjectURL(file)
-})
-```
+})`,
+  }}
+/>
 
 ## FileReader 메서드
 
