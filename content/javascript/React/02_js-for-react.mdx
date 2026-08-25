@@ -186,6 +186,32 @@ console.log(total) // 5500
 
 > **쉽게 말하면:** `reduce`는 "장바구니 영수증을 한 줄씩 읽으면서 누적 합계를 계속 더해가는 계산기"입니다.
 
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="map·filter·reduce 실습"
+  files={{
+    '/index.js': `const cart = [
+  { name: '사과', price: 1000, qty: 3 },
+  { name: '바나나', price: 500, qty: 5 },
+  { name: '포도', price: 3000, qty: 1 },
+]
+
+// map: 항목별 소계 계산
+const subtotals = cart.map(item => item.price * item.qty)
+console.log('소계:', subtotals)
+
+// filter: 2000원 이상인 상품만
+const expensive = cart.filter(item => item.price >= 2000)
+console.log('비싼 상품:', expensive.map(i => i.name))
+
+// reduce: 전체 합계
+const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0)
+console.log('총합:', total)`,
+  }}
+/>
+
 ### 배열 메서드 선택 기준
 
 | 하고 싶은 일 | 메서드 |
