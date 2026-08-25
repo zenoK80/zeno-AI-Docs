@@ -28,7 +28,22 @@ console.log(cat.speak())  // '고양이이(가) 소리를 냅니다.'
 
 ## 상속 (extends, super)
 
-```js
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="클래스 상속(extends, super) 실습"
+  files={{
+    '/index.js': `class Animal {
+  constructor(name) {
+    this.name = name
+  }
+
+  speak() {
+    return \`\${this.name}이(가) 소리를 냅니다.\`
+  }
+}
+
 class Dog extends Animal {
   constructor(name, breed) {
     super(name)           // 부모 클래스 constructor 호출
@@ -36,18 +51,20 @@ class Dog extends Animal {
   }
 
   speak() {
-    return `${this.name}이(가) 멍멍!`
+    return \`\${this.name}이(가) 멍멍!\`
   }
 
   info() {
-    return `${super.speak()} / 품종: ${this.breed}`
+    return \`\${super.speak()} / 품종: \${this.breed}\`
   }
 }
 
 const dog = new Dog('초코', '포메라니안')
 console.log(dog.speak())   // '초코이(가) 멍멍!'
 console.log(dog.info())    // '초코이(가) 소리를 냅니다. / 품종: 포메라니안'
-```
+console.log(dog instanceof Animal) // true (상속 체인)`,
+  }}
+/>
 
 `super()`는 자식 클래스의 `constructor`에서 반드시 `this`를 사용하기 전에 호출해야 합니다.
 
