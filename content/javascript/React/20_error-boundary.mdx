@@ -29,8 +29,13 @@ React에서 컴포넌트가 렌더링 중 오류를 던지면 앱 전체가 흰 
 
 Error Boundary는 아직 **클래스 컴포넌트**로만 구현 가능합니다.
 
-```jsx
-import { Component } from 'react'
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  showConsole
+  label="Error Boundary 실습 — 버튼을 눌러 오류를 발생시켜보세요"
+  files={{
+    '/App.js': `import { Component, useState } from 'react'
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -56,21 +61,27 @@ class ErrorBoundary extends Component {
   }
 }
 
+function BuggyWidget() {
+  const [crash, setCrash] = useState(false)
+  if (crash) {
+    throw new Error('위젯 렌더링 실패!')
+  }
+  return <button onClick={() => setCrash(true)}>오류 발생시키기</button>
+}
+
 // 사용
-function App() {
+export default function App() {
   return (
     <div>
-      <Header />
+      <h3>Header (정상 유지됨)</h3>
       <ErrorBoundary fallback={<p>날씨 정보를 불러올 수 없습니다.</p>}>
-        <WeatherWidget />
-      </ErrorBoundary>
-      <ErrorBoundary fallback={<p>추천 목록을 불러올 수 없습니다.</p>}>
-        <Recommendations />
+        <BuggyWidget />
       </ErrorBoundary>
     </div>
   )
-}
-```
+}`,
+  }}
+/>
 
 ---
 

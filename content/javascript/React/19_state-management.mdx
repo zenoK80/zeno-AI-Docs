@@ -41,8 +41,28 @@ React 앱의 상태는 크게 세 종류입니다.
 
 두 자식 컴포넌트가 같은 상태를 필요로 하면, 공통 부모로 상태를 올립니다.
 
-```jsx
-function TemperatureConverter() {
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="상태 올리기 실습 — 섭씨 값을 입력하면 두 컴포넌트가 함께 갱신됩니다"
+  files={{
+    '/App.js': `import { useState } from 'react'
+
+function CelsiusInput({ celsius, onCelsiusChange }) {
+  return (
+    <input
+      type="number"
+      value={celsius}
+      onChange={e => onCelsiusChange(Number(e.target.value))}
+    />
+  )
+}
+
+function FahrenheitDisplay({ fahrenheit }) {
+  return <p>화씨: {fahrenheit.toFixed(1)}°F</p>
+}
+
+export default function TemperatureConverter() {
   const [celsius, setCelsius] = useState(0)
   const fahrenheit = celsius * 9 / 5 + 32
 
@@ -52,8 +72,9 @@ function TemperatureConverter() {
       <FahrenheitDisplay fahrenheit={fahrenheit} />
     </div>
   )
-}
-```
+}`,
+  }}
+/>
 
 ---
 
