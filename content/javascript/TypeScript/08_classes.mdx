@@ -151,14 +151,19 @@ class Car extends Vehicle {
 
 ## 추상 클래스
 
-```ts
-abstract class Shape {
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="추상 클래스 실습"
+  files={{
+    '/index.ts': `abstract class Shape {
   abstract getArea(): number      // 서브클래스에서 반드시 구현
   abstract getPerimeter(): number
 
   // 공통 구현 제공 가능
   describe(): string {
-    return `넓이: ${this.getArea()}, 둘레: ${this.getPerimeter()}`
+    return \`넓이: \${this.getArea().toFixed(2)}, 둘레: \${this.getPerimeter().toFixed(2)}\`
   }
 }
 
@@ -178,8 +183,9 @@ class Circle extends Shape {
 
 // const shape = new Shape()  // 오류: 추상 클래스는 직접 인스턴스화 불가
 const circle = new Circle(5)
-console.log(circle.describe())
-```
+console.log(circle.describe())`,
+  }}
+/>
 
 ## implements — 인터페이스 구현
 

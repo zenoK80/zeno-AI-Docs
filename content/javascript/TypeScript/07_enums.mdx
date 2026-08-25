@@ -111,8 +111,13 @@ type Role = typeof Role[keyof typeof Role]  // 'ADMIN' | 'USER' | 'GUEST'
 
 ## enum 활용 패턴
 
-```ts
-enum Permission {
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="비트 마스킹 enum 실습"
+  files={{
+    '/index.ts': `enum Permission {
   Read = 1 << 0,   // 1 (0001)
   Write = 1 << 1,  // 2 (0010)
   Execute = 1 << 2, // 4 (0100)
@@ -124,14 +129,11 @@ function hasPermission(user: number, permission: Permission): boolean {
 }
 
 const userPermissions = Permission.Read | Permission.Write  // 3
-hasPermission(userPermissions, Permission.Read)    // true
-hasPermission(userPermissions, Permission.Execute) // false
-
-// 타입 가드와 함께
-function isDirection(value: unknown): value is Direction {
-  return Object.values(Direction).includes(value as Direction)
-}
-```
+console.log('Read 권한:', hasPermission(userPermissions, Permission.Read))
+console.log('Execute 권한:', hasPermission(userPermissions, Permission.Execute))
+console.log('Admin 권한:', hasPermission(Permission.Admin, Permission.Write))`,
+  }}
+/>
 
 ## 핵심 정리
 
