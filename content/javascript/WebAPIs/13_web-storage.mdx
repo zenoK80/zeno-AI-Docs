@@ -1,0 +1,175 @@
+---
+title: '13. Web Storage와 쿠키'
+description: 'localStorage, sessionStorage, Cookie 세 가지 저장 방법의 차이와 적합한 사용 시나리오를 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 세 가지 클라이언트 저장 방법의 차이를 이해하고, 상황에 맞는 저장소를 선택할 수 있습니다.
+</Callout>
+
+## localStorage — 영구 저장
+
+탭이나 브라우저를 닫아도 데이터가 유지됩니다. 같은 출처(11번 문서에서 배운 개념)라면 모든 탭에서 공유됩니다.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="localStorage 실습 — 저장하고 새로고침해도 유지되는지 확인해보세요"
+  files={{
+    '/index.html': `<button id="save">저장</button>
+<button id="load">읽기</button>
+<button id="remove">삭제</button>
+<script src="/index.js"></script>`,
+    '/index.js': `document.querySelector('#save').addEventListener('click', () => {
+  localStorage.setItem('theme', 'dark')
+  localStorage.setItem('user', JSON.stringify({ name: '철수', age: 20 }))
+  console.log('저장 완료')
+})
+
+document.querySelector('#load').addEventListener('click', () => {
+  const theme = localStorage.getItem('theme')
+  const user = JSON.parse(localStorage.getItem('user'))
+  console.log('theme:', theme)
+  console.log('user:', user)
+})
+
+document.querySelector('#remove').addEventListener('click', () => {
+  localStorage.removeItem('theme')
+  localStorage.clear()
+  console.log('삭제 완료')
+})`,
+  }}
+/>
+
+<Callout type="warning">
+  localStorage는 **문자열만** 저장할 수 있습니다. 객체는 `JSON.stringify()`로 직렬화해서 저장하고, 읽을 때 `JSON.parse()`로 역직렬화해야 합니다(ECMAScript 23번 문서 참고).
+</Callout>
+
+## sessionStorage — 탭 단위 저장
+
+문법은 localStorage와 완전히 동일하지만, 탭(또는 창)을 닫으면 데이터가 사라집니다.
+
+```js
+sessionStorage.setItem('step', '2')
+const step = sessionStorage.getItem('step')  // '2'
+sessionStorage.removeItem('step')
+```
+
+## localStorage vs sessionStorage vs Cookie 비교
+
+<Table>
+  <thead>
+    <tr><th></th><th>localStorage</th><th>sessionStorage</th><th>Cookie</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>만료</td><td>없음(영구)</td><td>탭 닫으면 삭제</td><td>설정한 시간에 따름</td></tr>
+    <tr><td>용량</td><td>약 5MB</td><td>약 5MB</td><td>약 4KB</td></tr>
+    <tr><td>서버 전송</td><td>안 됨</td><td>안 됨</td><td>모든 HTTP 요청마다 자동 전송</td></tr>
+    <tr><td>접근 주체</td><td>JS</td><td>JS</td><td>JS, 서버 모두</td></tr>
+    <tr><td>적합한 용도</td><td>설정, 테마</td><td>폼 임시 저장</td><td>로그인 인증, 세션</td></tr>
+  </tbody>
+</Table>
+
+## Cookie — 서버와 자동으로 오가는 유일한 저장소
+
+```js
+document.cookie = 'name=철수; expires=Fri, 31 Dec 2026 23:59:59 GMT; path=/'
+document.cookie = 'lang=ko; max-age=86400; SameSite=Strict; Secure'
+
+console.log(document.cookie)  // 'name=철수; lang=ko' — 모든 쿠키가 하나의 문자열로
+
+function getCookie(name) {
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const [key, value] = cookie.trim().split('=')
+    if (key === name) return value
+  }
+  return null
+}
+
+document.cookie = 'name=; expires=Thu, 01 Jan 1970 00:00:00 GMT'  // 만료 시간을 과거로 설정해 삭제
+```
+
+쿠키의 가장 중요한 특징: **같은 도메인으로 보내는 모든 HTTP 요청에 자동으로 포함되어 전송됩니다.** 이 성질 때문에 로그인 세션 유지에 적합하지만, 동시에 CSRF 같은 공격의 대상이 되기도 합니다.
+
+## 쿠키 속성으로 보안 강화하기
+
+```
+Set-Cookie: token=abc123;
+  HttpOnly;         // JavaScript에서 document.cookie로 접근 불가(XSS 방어)
+  Secure;           // HTTPS에서만 전송
+  SameSite=Strict;  // 다른 사이트에서 오는 요청에는 포함 안 됨(CSRF 방어)
+  Max-Age=3600;     // 1시간 후 만료
+  Path=/api;        // 특정 경로에만 전송
+```
+
+<Callout type="warning">
+  `HttpOnly` 쿠키는 JavaScript(`document.cookie`)로 **읽을 수도 쓸 수도 없습니다.** 서버만 설정·삭제할 수 있습니다. 인증 토큰처럼 민감한 값은 XSS 공격으로 훔쳐가지 못하도록 반드시 `HttpOnly`로 설정하는 것이 실무 표준입니다.
+</Callout>
+
+## storage 이벤트 — 다른 탭의 변경 감지
+
+```js
+window.addEventListener('storage', (event) => {
+  console.log('변경된 키:', event.key)
+  console.log('이전 값:', event.oldValue)
+  console.log('새 값:', event.newValue)
+})
+```
+
+**같은 출처의 다른 탭**에서 localStorage가 변경될 때만 현재 탭에서 발생합니다. 같은 탭 안에서 직접 변경한 경우에는 발생하지 않습니다. 여러 탭을 열어둔 사용자에게 "다른 탭에서 로그아웃하면 이 탭도 자동 로그아웃"같은 기능을 만들 때 사용합니다.
+
+## 핵심 정리
+
+- localStorage는 영구 저장, sessionStorage는 탭 단위 저장이며 둘 다 문자열만 저장하고 서버로 자동 전송되지 않는다.
+- 쿠키는 용량이 작지만 모든 HTTP 요청에 자동 포함되어 서버 인증에 적합하다.
+- HttpOnly 쿠키는 JavaScript로 접근할 수 없어 XSS 공격을 방어하고, SameSite는 CSRF를 방어한다.
+- storage 이벤트는 같은 출처의 "다른 탭"에서 localStorage가 변경될 때만 발생한다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="localStorage와 sessionStorage의 가장 큰 차이는?"
+  options={['①저장 용량이 다르다.', '②localStorage는 탭을 닫아도 유지되고, sessionStorage는 탭/창을 닫으면 삭제된다.', '③sessionStorage가 더 안전하다.', '④두 API는 동일하다.']}
+  correctAnswer={2}
+  explanation="localStorage는 브라우저를 종료해도 데이터가 유지되지만, sessionStorage는 탭(또는 창)을 닫으면 삭제됩니다."
+  optionExplanations={['두 API의 용량은 비슷합니다(약 5MB).', '맞습니다. 데이터 유지 기간이 핵심 차이입니다.', '보안 특성은 기본적으로 같습니다.', '지속 시간이 다릅니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="localStorage에 객체를 저장하는 올바른 방법은?"
+  options={["①localStorage.setItem('user', { name: '철수' })", "②localStorage.setItem('user', JSON.stringify({ name: '철수' }))", "③localStorage.user = { name: '철수' }", "④localStorage.set({ user: { name: '철수' } })"]}
+  correctAnswer={2}
+  explanation="localStorage는 문자열만 저장하므로 객체는 JSON.stringify()로 직렬화해서 저장하고, 읽을 때 JSON.parse()로 역직렬화해야 합니다."
+  optionExplanations={["객체를 직접 넣으면 '[object Object]'로 저장됩니다.", "맞습니다. JSON.stringify()로 직렬화해야 합니다.", "프로퍼티 직접 할당으로는 동작하지 않습니다.", "set() 메서드는 없습니다."]}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="Cookie가 localStorage보다 유리한 상황은?"
+  options={['①큰 용량의 데이터를 저장할 때', '②서버에 요청할 때마다 자동으로 인증 정보를 전달해야 할 때', '③탭 간에 데이터를 공유할 때', '④JavaScript에서 빠르게 접근해야 할 때']}
+  correctAnswer={2}
+  explanation="쿠키는 HTTP 요청마다 서버에 자동으로 전송되므로, 세션 ID나 인증 토큰을 서버에 자동 전달하는 데 적합합니다."
+  optionExplanations={['쿠키는 약 4KB로 용량이 작습니다.', '맞습니다. 서버 자동 전송이 쿠키의 핵심 장점입니다.', 'localStorage도 같은 출처 탭 간에 공유됩니다.', 'JavaScript 접근은 localStorage가 더 편리합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`HttpOnly` 쿠키 속성의 역할은?"
+  options={['①HTTPS에서만 전송되도록 한다.', '②JavaScript에서 document.cookie로 접근할 수 없게 한다.', '③쿠키 만료 기간을 설정한다.', '④크로스 사이트 요청을 차단한다.']}
+  correctAnswer={2}
+  explanation="HttpOnly 속성이 설정된 쿠키는 JavaScript에서 접근할 수 없어, XSS 공격으로 쿠키가 탈취되는 것을 방어합니다."
+  optionExplanations={['HTTPS 전용은 Secure 속성입니다.', '맞습니다. JS 접근 차단으로 XSS를 방어합니다.', 'Max-Age나 Expires가 만료 기간을 설정합니다.', 'SameSite 속성이 CSRF를 방어합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`storage` 이벤트는 어떤 상황에서 발생하나요?"
+  options={['①같은 탭에서 localStorage를 변경할 때', '②같은 출처의 다른 탭에서 localStorage를 변경할 때', '③sessionStorage가 만료될 때', '④쿠키가 삭제될 때']}
+  correctAnswer={2}
+  explanation="storage 이벤트는 같은 출처의 다른 탭에서 localStorage가 변경될 때 현재 탭에서 발생합니다. 같은 탭에서는 발생하지 않습니다."
+  optionExplanations={['같은 탭에서 변경 시에는 발생하지 않습니다.', '맞습니다. 다른 탭의 변경을 감지합니다.', 'sessionStorage 만료 이벤트는 없습니다.', '쿠키 삭제와 관련이 없습니다.']}
+/>

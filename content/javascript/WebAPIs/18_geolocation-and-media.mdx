@@ -1,0 +1,187 @@
+---
+title: '18. Geolocation과 미디어 API'
+description: 'Geolocation, MediaDevices, File API를 사용하는 방법과 권한 요청 흐름을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 위치 정보, 카메라·마이크, 파일 처리 API의 사용법과 사용자 권한이 필요한 이유를 이해합니다.
+</Callout>
+
+## 왜 이런 API들은 항상 "권한"이 필요할까?
+
+위치, 카메라, 마이크는 모두 사용자의 **매우 민감한 개인 정보**입니다. 웹사이트가 코드 한 줄로 몰래 이런 정보에 접근할 수 있다면 심각한 사생활 침해가 됩니다. 그래서 이 API들은 공통적으로 **브라우저가 사용자에게 팝업으로 명시적 허가를 구하고**, 사용자가 "허용"을 눌러야만 동작합니다.
+
+## Geolocation API — 위치 정보
+
+```js
+navigator.geolocation.getCurrentPosition(
+  (position) => {
+    const { latitude, longitude, accuracy } = position.coords
+    console.log(`위도: ${latitude}, 경도: ${longitude}`)
+    console.log(`정확도: ${accuracy}m`)
+  },
+  (error) => {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        console.error('위치 접근 권한이 거부되었습니다')
+        break
+      case error.POSITION_UNAVAILABLE:
+        console.error('위치 정보를 가져올 수 없습니다')
+        break
+      case error.TIMEOUT:
+        console.error('요청 시간이 초과되었습니다')
+        break
+    }
+  },
+  { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+)
+```
+
+`getCurrentPosition`은 성공 콜백과 실패 콜백을 각각 별도로 받는 **콜백 기반 API**입니다(Promise가 아님 — 오래전에 설계된 API의 흔적입니다).
+
+## 위치 변화 지속 감시
+
+```js
+const watchId = navigator.geolocation.watchPosition(
+  (position) => console.log('위치 변경:', position.coords),
+  (error) => console.error(error)
+)
+
+navigator.geolocation.clearWatch(watchId)  // 감시 중단
+```
+
+`getCurrentPosition`은 한 번만, `watchPosition`은 사용자가 이동할 때마다 계속 콜백을 호출합니다.
+
+## MediaDevices API — 카메라·마이크
+
+```js
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: 1280, height: 720 },
+      audio: true,
+    })
+
+    const video = document.querySelector('video')
+    video.srcObject = stream
+    await video.play()
+
+    // 사용이 끝나면 반드시 트랙을 정지해야 카메라 표시등이 꺼짐
+    stream.getTracks().forEach(track => track.stop())
+  } catch (err) {
+    if (err.name === 'NotAllowedError') {
+      console.error('카메라 권한이 거부되었습니다')
+    }
+  }
+}
+```
+
+<Callout type="warning">
+  `getUserMedia`가 반환한 `stream`을 다 사용한 뒤 `track.stop()`을 호출하지 않으면, 카메라·마이크가 계속 활성 상태로 남아 브라우저 탭의 녹화 표시등이 꺼지지 않습니다. 사용이 끝나면 반드시 정리해야 합니다.
+</Callout>
+
+## File API — 사용자가 선택한 파일 다루기
+
+```js
+const fileInput = document.querySelector('#file')
+
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+
+  console.log('파일명:', file.name)
+  console.log('크기:', file.size, 'bytes')
+  console.log('타입:', file.type)
+
+  const reader = new FileReader()
+  reader.onload = (event) => {
+    console.log('내용:', event.target.result)
+  }
+  reader.readAsText(file, 'UTF-8')
+})
+```
+
+## FileReader의 다양한 읽기 메서드
+
+<Table>
+  <thead>
+    <tr><th>메서드</th><th>결과</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>readAsText(file)</td><td>텍스트 문자열</td></tr>
+    <tr><td>readAsDataURL(file)</td><td>base64로 인코딩된 Data URL(이미지 미리보기에 유용)</td></tr>
+    <tr><td>readAsArrayBuffer(file)</td><td>ArrayBuffer(이진 데이터 처리용)</td></tr>
+  </tbody>
+</Table>
+
+```js
+const reader = new FileReader()
+reader.onload = (e) => { /* e.target.result에 결과가 담김 */ }
+reader.onprogress = (e) => { /* e.loaded / e.total로 진행률 계산 */ }
+reader.onerror = (e) => { /* 읽기 실패 처리 */ }
+
+reader.readAsDataURL(file)  // 이미지 즉시 미리보기에 자주 사용
+```
+
+```js
+// 이미지 미리보기 실전 패턴
+const img = document.querySelector('#preview')
+img.src = URL.createObjectURL(file)  // 파일에 대한 임시 브라우저 URL(blob:) 생성
+```
+
+`URL.createObjectURL()`은 `FileReader.readAsDataURL()`보다 더 가볍고 빠릅니다. 파일 전체를 base64 문자열로 변환하지 않고, 브라우저 메모리 안의 파일을 가리키는 짧은 URL만 만들기 때문입니다.
+
+## 핵심 정리
+
+- Geolocation, 카메라·마이크, 클립보드 같은 민감한 API는 공통적으로 사용자의 명시적 허가가 필요하다.
+- getCurrentPosition은 한 번, watchPosition은 위치가 바뀔 때마다 계속 콜백을 호출한다.
+- getUserMedia로 얻은 스트림은 사용이 끝나면 track.stop()으로 반드시 정리해야 한다.
+- FileReader로 사용자가 선택한 파일을 텍스트, Data URL, ArrayBuffer 등으로 읽을 수 있다.
+- URL.createObjectURL()은 base64 변환 없이 가볍게 파일 미리보기 URL을 만든다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="Geolocation, 카메라, 마이크 API가 공통적으로 요구하는 것은?"
+  options={['①로그인', '②사용자의 명시적 권한 허가', '③결제 정보', '④특정 브라우저 확장 프로그램']}
+  correctAnswer={2}
+  explanation="이 API들은 민감한 개인 정보에 접근하므로, 브라우저가 팝업으로 사용자에게 명시적 허가를 구해야만 동작합니다."
+  optionExplanations={['로그인 여부와는 무관합니다.', '맞습니다. 사용자 허가가 공통 요구사항입니다.', '결제 정보와는 무관합니다.', '확장 프로그램이 필요하지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="getCurrentPosition과 watchPosition의 차이는?"
+  options={['①동일하다.', '②getCurrentPosition은 한 번만, watchPosition은 위치가 바뀔 때마다 계속 콜백을 호출한다.', '③watchPosition은 오류를 처리할 수 없다.', '④getCurrentPosition은 Promise를 반환한다.']}
+  correctAnswer={2}
+  explanation="getCurrentPosition은 단발성 조회이고, watchPosition은 사용자가 이동할 때마다 반복적으로 콜백을 호출하는 지속 감시입니다."
+  optionExplanations={['호출 빈도가 다릅니다.', '맞습니다. 단발성 vs 지속 감시의 차이입니다.', 'watchPosition도 오류 콜백을 받습니다.', '둘 다 콜백 기반 API입니다(Promise 아님).']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="getUserMedia로 얻은 stream 사용 후 track.stop()을 호출하지 않으면?"
+  options={['①자동으로 5분 뒤 정지된다.', '②카메라·마이크가 계속 활성 상태로 남아 녹화 표시등이 꺼지지 않는다.', '③브라우저가 자동으로 오류를 낸다.', '④아무 영향이 없다.']}
+  correctAnswer={2}
+  explanation="stream을 명시적으로 정지하지 않으면 카메라·마이크가 계속 켜진 상태로 남아, 사용자에게 계속 녹화 중이라는 표시가 나타납니다."
+  optionExplanations={['자동 정지 시간은 없습니다.', '맞습니다. 명시적으로 정지해야 합니다.', '오류 없이 조용히 계속 활성 상태로 남습니다.', '사용자 경험과 프라이버시에 영향을 줍니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="FileReader.readAsDataURL()이 반환하는 결과는?"
+  options={['①파일의 텍스트 내용', '②base64로 인코딩된 Data URL 문자열', '③ArrayBuffer 객체', '④File 객체']}
+  correctAnswer={2}
+  explanation="readAsDataURL()은 파일 내용을 base64로 인코딩된 data: URL 문자열로 반환합니다. 이미지를 src에 직접 설정할 때 유용합니다."
+  optionExplanations={['텍스트 내용은 readAsText()의 결과입니다.', '맞습니다. data:image/png;base64,... 형태의 문자열입니다.', 'ArrayBuffer는 readAsArrayBuffer()의 결과입니다.', 'File 객체가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="URL.createObjectURL(file)이 FileReader.readAsDataURL()보다 유리한 점은?"
+  options={['①더 안전하다.', '②파일 전체를 base64로 변환하지 않고 가벼운 임시 URL만 생성해 더 빠르다.', '③모든 브라우저에서 지원된다는 점만 다르다.', '④파일 크기 제한이 없다.']}
+  correctAnswer={2}
+  explanation="createObjectURL은 파일 내용을 문자열로 변환하는 무거운 작업 없이, 메모리 안의 파일을 가리키는 짧은 blob: URL만 생성하므로 더 가볍고 빠릅니다."
+  optionExplanations={['보안 수준이 핵심 차이가 아닙니다.', '맞습니다. 변환 없이 가벼운 참조만 만드는 것이 이점입니다.', '둘 다 널리 지원됩니다.', '파일 크기 제한과는 별개의 이야기입니다.']}
+/>

@@ -1,0 +1,148 @@
+---
+title: '11. CORS와 네트워크 심화'
+description: '왜 fetch가 "CORS 오류"로 막히는지, 같은 출처 정책과 CORS의 동작 원리를 이해합니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** "Access to fetch has been blocked by CORS policy" 오류가 왜 발생하는지 원리부터 이해하고 대응할 수 있습니다.
+</Callout>
+
+## 처음 만나는 CORS 오류
+
+`fetch()`로 다른 사이트의 API를 호출하다 보면 언젠가 이런 오류를 만납니다.
+
+```
+Access to fetch at 'https://api.example.com/data' from origin 'https://myapp.com'
+has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present
+```
+
+서버는 정상적으로 응답했는데도, **브라우저가 그 응답을 우리 코드에게 전달하는 것을 스스로 막습니다.** 왜 이런 보호 장치가 있을까요?
+
+## 같은 출처 정책(Same-Origin Policy) — 왜 필요한가?
+
+> **쉽게 말하면:** 브라우저는 기본적으로 "지금 보고 있는 사이트의 코드가, 다른 사이트의 데이터를 몰래 훔쳐보지 못하게" 막습니다. 이 기본 보호 규칙이 **같은 출처 정책**입니다.
+
+만약 이 정책이 없다면, 여러분이 은행 사이트에 로그인한 상태로 악성 사이트를 열었을 때, 그 악성 사이트의 JavaScript가 `fetch('https://mybank.com/account')`를 몰래 호출해 잔액 정보를 훔쳐볼 수 있습니다. 같은 출처 정책은 이런 공격을 막기 위한 브라우저의 기본 방어선입니다.
+
+### 출처(Origin)란?
+
+**출처**는 `프로토콜 + 호스트(도메인) + 포트`의 조합입니다. 이 셋 중 **하나라도 다르면** 다른 출처로 취급됩니다.
+
+기준 URL을 `https://myapp.com:443`이라고 할 때:
+
+<Table>
+  <thead>
+    <tr><th>비교 URL</th><th>같은 출처?</th><th>이유</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>https://myapp.com/page2</td><td>같음</td><td>경로만 다름, 프로토콜·호스트·포트 동일</td></tr>
+    <tr><td>http://myapp.com</td><td>다름</td><td>프로토콜이 다름(https vs http)</td></tr>
+    <tr><td>https://api.myapp.com</td><td>다름</td><td>서브도메인이 달라 호스트가 다름</td></tr>
+    <tr><td>https://myapp.com:8080</td><td>다름</td><td>포트가 다름</td></tr>
+  </tbody>
+</Table>
+
+## CORS — 서버가 허락을 표시하는 방법
+
+**CORS**(Cross-Origin Resource Sharing, 교차 출처 리소스 공유)는 "다른 출처라도 서버가 명시적으로 허락하면 접근을 허용해주는" 예외 규칙입니다.
+
+<Steps>
+### 브라우저가 다른 출처로 요청을 보낸다
+프론트엔드(myapp.com)가 백엔드(api.example.com)로 fetch 요청을 보낸다.
+
+### 서버가 응답에 특별한 헤더를 포함시킨다
+`Access-Control-Allow-Origin: https://myapp.com`처럼, "이 출처의 요청은 허용한다"는 헤더를 응답에 담아 보낸다.
+
+### 브라우저가 이 헤더를 확인한다
+헤더가 없거나 요청 출처와 일치하지 않으면, 브라우저는 정상적으로 도착한 응답을 우리 JavaScript 코드에게 넘겨주지 않고 차단한다.
+</Steps>
+
+<Callout type="warning">
+  **CORS 오류는 서버 쪽 설정 문제이지, 클라이언트**(fetch를 호출한) **쪽 코드의 버그가 아닙니다.** 프론트엔드 코드에서 CORS 오류를 "고칠" 방법은 없습니다. API 서버가 `Access-Control-Allow-Origin` 헤더를 올바르게 설정해야 해결됩니다. 개발 중이라면 서버 설정을 바꾸거나, 개발 서버의 프록시 기능을 사용하는 것이 일반적인 우회 방법입니다.
+</Callout>
+
+## Preflight 요청 — OPTIONS로 미리 물어보기
+
+`Content-Type: application/json`으로 POST 요청을 보내는 등 "단순 요청"의 범위를 벗어나면, 브라우저는 실제 요청을 보내기 전에 **먼저 서버에게 허락을 구하는 요청**을 자동으로 보냅니다. 이를 **프리플라이트**(preflight, 사전 비행) 요청이라 합니다.
+
+```
+1. 브라우저가 자동으로 OPTIONS 요청을 먼저 보냄 (개발자가 직접 호출한 적 없음)
+2. 서버가 "이 메서드와 헤더를 허용한다"고 응답
+3. 브라우저가 실제 POST 요청을 보냄
+```
+
+개발자 도구의 Network 탭에서 요청을 하나 보냈는데 `OPTIONS` 요청이 하나 더 보인다면, 바로 이 프리플라이트입니다.
+
+## credentials — 쿠키를 함께 보낼지 결정
+
+```js
+fetch('https://api.example.com/profile', {
+  credentials: 'include',  // 쿠키를 포함해서 요청(로그인 세션 유지 등에 필요)
+})
+```
+
+<Table>
+  <thead>
+    <tr><th>값</th><th>동작</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>omit</td><td>쿠키를 절대 포함하지 않음</td></tr>
+    <tr><td>same-origin (기본값)</td><td>같은 출처일 때만 쿠키 포함</td></tr>
+    <tr><td>include</td><td>다른 출처여도 항상 쿠키 포함(서버도 CORS 설정에서 명시적으로 허용해야 함)</td></tr>
+  </tbody>
+</Table>
+
+## 핵심 정리
+
+- 같은 출처 정책은 다른 사이트의 악성 코드가 우리 데이터를 몰래 읽는 것을 막는 브라우저의 기본 보호 장치다.
+- 출처는 프로토콜+호스트+포트의 조합이며, 셋 중 하나만 달라도 다른 출처다.
+- CORS는 서버가 응답 헤더로 "이 출처는 허용한다"고 명시하는 예외 규칙이며, 서버 쪽에서 해결해야 하는 문제다.
+- 단순 요청 범위를 벗어나면 브라우저가 자동으로 OPTIONS 프리플라이트 요청을 먼저 보낸다.
+- credentials 옵션으로 다른 출처 요청에 쿠키를 포함할지 결정할 수 있다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="같은 출처 정책(Same-Origin Policy)이 존재하는 이유는?"
+  options={['①웹사이트 로딩 속도를 높이기 위해', '②다른 사이트의 악성 코드가 사용자의 민감한 데이터를 몰래 읽지 못하게 막기 위해', '③서버 비용을 절감하기 위해', '④검색 엔진 최적화를 위해']}
+  correctAnswer={2}
+  explanation="같은 출처 정책은 악성 사이트가 사용자가 로그인해 둔 다른 사이트(은행 등)의 데이터에 몰래 접근하는 것을 막는 브라우저의 기본 보안 장치입니다."
+  optionExplanations={['속도 향상이 목적이 아닙니다.', '맞습니다. 보안이 핵심 목적입니다.', '비용 절감과는 무관합니다.', 'SEO와는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="https://myapp.com과 https://api.myapp.com이 같은 출처인가요?"
+  options={['①같은 출처다.', '②다른 출처다 — 서브도메인이 다르면 호스트가 다른 것으로 취급된다.', '③프로토콜이 달라서 다른 출처다.', '④포트가 달라서 다른 출처다.']}
+  correctAnswer={2}
+  explanation="출처는 프로토콜, 호스트, 포트로 정해집니다. myapp.com과 api.myapp.com은 서브도메인이 다르므로 호스트가 다르고, 따라서 다른 출처입니다."
+  optionExplanations={['서브도메인 차이로 다른 출처입니다.', '맞습니다. 호스트(서브도메인)가 다릅니다.', '프로토콜은 둘 다 https로 같습니다.', '포트 차이가 원인이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="CORS 오류가 발생했을 때 올바른 해결 방향은?"
+  options={['①fetch() 호출 코드를 이리저리 수정해본다.', '②서버(API 제공자) 쪽에서 Access-Control-Allow-Origin 헤더를 올바르게 설정해야 한다.', '③브라우저를 재설치한다.', '④CORS 오류는 해결할 수 없다.']}
+  correctAnswer={2}
+  explanation="CORS는 서버가 응답 헤더로 허용 여부를 알려주는 방식이므로, 클라이언트 코드가 아니라 서버 설정을 통해서만 근본적으로 해결됩니다."
+  optionExplanations={['클라이언트 코드 수정으로는 해결되지 않습니다.', '맞습니다. 서버 쪽 설정이 근본 해결책입니다.', '브라우저 문제가 아닙니다.', '서버 설정으로 해결 가능합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="프리플라이트(preflight) 요청이 하는 일은?"
+  options={['①실제 요청을 대신 처리한다.', '②단순 요청 범위를 벗어나는 요청 전, 브라우저가 자동으로 OPTIONS 요청을 보내 서버의 허용 여부를 미리 확인한다.', '③사용자가 직접 호출해야 하는 요청이다.', '④요청 속도를 높이는 캐싱 기법이다.']}
+  correctAnswer={2}
+  explanation="프리플라이트는 개발자가 직접 호출하지 않아도 브라우저가 자동으로 보내는 사전 확인 요청으로, 서버가 실제 요청을 허용하는지 먼저 확인합니다."
+  optionExplanations={['실제 요청을 대신하지 않고 사전 확인만 합니다.', '맞습니다. 자동으로 전송되는 사전 확인 요청입니다.', '개발자가 직접 호출하지 않고 브라우저가 자동으로 보냅니다.', '캐싱 기법이 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`credentials: 'include'` 옵션을 사용하는 이유는?"
+  options={['①요청 속도를 높이기 위해', '②다른 출처로 요청을 보낼 때도 쿠키(로그인 세션 등)를 함께 전송하기 위해', '③CORS 오류를 완전히 무시하기 위해', '④요청을 암호화하기 위해']}
+  correctAnswer={2}
+  explanation="credentials: 'include'는 다른 출처로 요청을 보낼 때도 쿠키를 포함시켜, 로그인 세션이 필요한 API 호출에 사용됩니다."
+  optionExplanations={['속도와는 무관합니다.', '맞습니다. 쿠키 포함 여부를 제어합니다.', 'CORS 정책 자체를 무시하지는 못합니다.', '암호화 기능이 아닙니다.']}
+/>

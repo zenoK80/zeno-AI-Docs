@@ -1,0 +1,184 @@
+---
+title: '17. Clipboard와 Drag and Drop'
+description: '클립보드 복사·붙여넣기와 드래그 앤 드롭으로 파일을 받는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** "복사" 버튼과 파일 드래그 앤 드롭 업로드 같은 실전 UI 기능을 직접 구현할 수 있습니다.
+</Callout>
+
+## Clipboard API — 클립보드 복사
+
+"복사되었습니다" 버튼을 만들 때 사용합니다.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="클립보드 복사 실습"
+  files={{
+    '/index.html': `<input id="code" value="EXAMPLE-COUPON-1234" readonly />
+<button id="copy">복사하기</button>
+<script src="/index.js"></script>`,
+    '/index.js': `document.querySelector('#copy').addEventListener('click', async () => {
+  const code = document.querySelector('#code').value
+  try {
+    await navigator.clipboard.writeText(code)
+    console.log('복사 완료:', code)
+  } catch (err) {
+    console.error('복사 실패:', err)
+  }
+})`,
+  }}
+/>
+
+`navigator.clipboard.writeText()`는 Promise를 반환하는 비동기 API입니다(ECMAScript 28번 문서 참고). 클립보드는 민감한 사용자 데이터에 접근하는 기능이라, **HTTPS 환경**과 **사용자의 직접적인 상호작용**(버튼 클릭 등) 없이는 대부분 브라우저가 호출을 거부합니다.
+
+## 클립보드 읽기
+
+```js
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText()
+    console.log('클립보드 내용:', text)
+  } catch (err) {
+    console.error('읽기 실패 — 권한이 필요합니다:', err)
+  }
+}
+```
+
+<Callout type="warning">
+  클립보드 **읽기**(`readText`)는 쓰기보다 더 엄격하게 제한됩니다. 사용자가 명시적으로 권한을 허용해야 하며, 악의적인 사이트가 사용자 모르게 클립보드 내용(비밀번호 등)을 훔쳐보지 못하도록 하는 보안 장치입니다.
+</Callout>
+
+## Drag and Drop API — 파일을 끌어다 놓기
+
+파일 업로드 UI에서 자주 보는 "여기에 파일을 끌어다 놓으세요" 기능입니다.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  label="Drag and Drop 실습 — 파일을 끌어다 놓아보세요"
+  files={{
+    '/index.html': `<div id="drop-zone" style="width:100%;height:150px;border:2px dashed #999;display:flex;align-items:center;justify-content:center;">
+  여기에 파일을 끌어다 놓으세요
+</div>
+<div id="result"></div>
+<script src="/index.js"></script>`,
+    '/index.js': `const dropZone = document.querySelector('#drop-zone')
+const result = document.querySelector('#result')
+
+// dragover에서 반드시 preventDefault를 호출해야 drop 이벤트가 발생함
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault()
+  dropZone.style.borderColor = 'crimson'
+})
+
+dropZone.addEventListener('dragleave', () => {
+  dropZone.style.borderColor = '#999'
+})
+
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault()
+  dropZone.style.borderColor = '#999'
+
+  const files = e.dataTransfer.files
+  result.textContent = '받은 파일: ' + [...files].map(f => f.name).join(', ')
+})`,
+  }}
+/>
+
+## dragover에서 preventDefault가 필요한 이유
+
+<Callout type="warning">
+  브라우저의 **기본 동작은 드롭을 거부**하는 것입니다(파일을 끌어다 놓으면 새 탭에서 파일이 열리는 것이 기본 동작). `dragover` 이벤트에서 `e.preventDefault()`를 호출하지 않으면, `drop` 이벤트 자체가 아예 발생하지 않습니다. 이 한 줄을 빠뜨리는 것이 드래그 앤 드롭 구현에서 가장 흔한 실수입니다.
+</Callout>
+
+## 드래그 앤 드롭 관련 이벤트 흐름
+
+<Table>
+  <thead>
+    <tr><th>이벤트</th><th>발생 시점</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>dragenter</td><td>드래그한 항목이 대상 영역에 처음 들어올 때</td></tr>
+    <tr><td>dragover</td><td>드래그한 항목이 대상 영역 위에서 계속 움직일 때(반복 발생)</td></tr>
+    <tr><td>dragleave</td><td>드래그한 항목이 대상 영역을 벗어날 때</td></tr>
+    <tr><td>drop</td><td>대상 영역에 항목을 놓았을 때</td></tr>
+  </tbody>
+</Table>
+
+## dataTransfer — 드래그되는 데이터 담기
+
+```js
+// 요소 자체를 드래그 가능하게 만들기(HTML 요소 사이의 드래그)
+const item = document.querySelector('.draggable')
+item.setAttribute('draggable', 'true')
+
+item.addEventListener('dragstart', (e) => {
+  e.dataTransfer.setData('text/plain', item.id)  // 드래그할 데이터 담기
+})
+
+const target = document.querySelector('.drop-target')
+target.addEventListener('drop', (e) => {
+  e.preventDefault()
+  const draggedId = e.dataTransfer.getData('text/plain')
+  console.log('드래그된 요소 ID:', draggedId)
+})
+```
+
+`e.dataTransfer`는 드래그 중인 데이터를 담는 특별한 객체로, 파일뿐 아니라 텍스트나 요소 ID 같은 임의의 데이터도 실어 나를 수 있습니다.
+
+## 핵심 정리
+
+- Clipboard API는 비동기(Promise) 방식이며, HTTPS와 사용자 상호작용이 있어야 대부분 동작한다.
+- 클립보드 읽기는 쓰기보다 더 엄격한 권한이 필요한 보안 민감 기능이다.
+- dragover 이벤트에서 preventDefault()를 호출하지 않으면 drop 이벤트가 아예 발생하지 않는다.
+- e.dataTransfer로 파일뿐 아니라 텍스트, 요소 식별자 등 임의의 데이터를 드래그로 실어 나를 수 있다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="navigator.clipboard.writeText()의 반환 타입은?"
+  options={['①문자열', '②Promise', '③boolean', '④undefined']}
+  correctAnswer={2}
+  explanation="클립보드 API는 비동기로 동작하므로 Promise를 반환하며, await 또는 .then()으로 결과를 처리해야 합니다."
+  optionExplanations={['문자열이 아닌 Promise를 반환합니다.', '맞습니다. 비동기 API라 Promise를 반환합니다.', 'boolean이 아닙니다.', 'Promise 객체를 반환합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="클립보드 쓰기가 대부분 HTTPS와 사용자 상호작용을 요구하는 이유는?"
+  options={['①기술적 제약으로 어쩔 수 없어서', '②악의적인 사이트가 사용자 모르게 클립보드를 조작하지 못하도록 하는 보안 장치이기 때문', '③속도를 높이기 위해서', '④브라우저 버그 때문에']}
+  correctAnswer={2}
+  explanation="클립보드는 민감한 사용자 데이터를 담을 수 있어, 명시적인 사용자 동작 없이 스크립트가 마음대로 접근하지 못하도록 제한됩니다."
+  optionExplanations={['보안 목적의 의도된 제약입니다.', '맞습니다. 보안이 핵심 이유입니다.', '속도와는 무관합니다.', '버그가 아닌 의도된 보안 정책입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="dragover 이벤트에서 e.preventDefault()를 호출하지 않으면?"
+  options={['①drop 이벤트가 정상적으로 발생한다.', '②drop 이벤트 자체가 발생하지 않는다 — 브라우저의 기본 동작(드롭 거부)이 유지되기 때문.', '③dragover 이벤트가 무한 반복된다.', '④파일이 자동으로 업로드된다.']}
+  correctAnswer={2}
+  explanation="브라우저는 기본적으로 드롭을 거부합니다. dragover에서 preventDefault를 호출해야 이 기본 동작이 취소되어 drop 이벤트가 발생할 수 있습니다."
+  optionExplanations={['drop 이벤트가 발생하지 않습니다.', '맞습니다. 이것이 드래그 앤 드롭 구현의 가장 흔한 실수입니다.', '무한 반복되지 않습니다.', '자동 업로드가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="드래그 앤 드롭 이벤트 중 대상 영역에 파일을 실제로 놓았을 때 발생하는 이벤트는?"
+  options={['①dragenter', '②dragover', '③dragleave', '④drop']}
+  correctAnswer={4}
+  explanation="drop 이벤트는 사용자가 드래그한 항목을 실제로 놓았을 때 발생하며, 여기서 파일 데이터를 꺼낼 수 있습니다."
+  optionExplanations={['dragenter는 처음 진입할 때입니다.', 'dragover는 영역 위에서 움직일 때 반복 발생합니다.', 'dragleave는 영역을 벗어날 때입니다.', '맞습니다. drop이 실제 놓는 순간의 이벤트입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="e.dataTransfer로 전달할 수 있는 데이터는?"
+  options={['①파일만 가능하다.', '②파일뿐 아니라 텍스트나 요소 식별자 같은 임의의 데이터도 담을 수 있다.', '③이미지 파일만 가능하다.', '④JSON 객체를 직접 전달할 수 있다(직렬화 없이).']}
+  correctAnswer={2}
+  explanation="dataTransfer는 파일 외에도 setData/getData로 텍스트나 커스텀 문자열 데이터를 자유롭게 담아 전달할 수 있습니다."
+  optionExplanations={['파일 외의 데이터도 담을 수 있습니다.', '맞습니다. 다양한 형태의 데이터를 담을 수 있습니다.', '이미지에 국한되지 않습니다.', '객체는 문자열로 직렬화해서 전달해야 합니다.']}
+/>

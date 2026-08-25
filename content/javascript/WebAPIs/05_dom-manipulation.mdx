@@ -1,0 +1,182 @@
+---
+title: '05. DOM 조작'
+description: 'innerHTML, textContent, createElement로 DOM 내용을 읽고 바꾸고 새 요소를 추가·삭제하는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 요소의 내용·속성·스타일·클래스를 자유자재로 바꾸고, 새 요소를 만들어 트리에 추가·제거할 수 있습니다.
+</Callout>
+
+## 내용 읽기와 변경 — textContent vs innerHTML
+
+```js
+const title = document.querySelector('h1')
+
+// textContent: 텍스트만 다룸(HTML 태그는 그냥 글자로 취급)
+console.log(title.textContent)
+title.textContent = '<b>새 제목</b>'  // '<b>새 제목</b>'라는 글자 그대로 화면에 표시됨
+
+// innerHTML: HTML 마크업까지 해석
+const list = document.querySelector('ul')
+list.innerHTML = '<li>첫 번째</li><li>두 번째</li>'  // 진짜 <li> 요소 두 개가 생성됨
+```
+
+<Callout type="warning">
+  `innerHTML`에 사용자가 입력한 문자열을 그대로 넣으면 **XSS**(Cross-Site Scripting) 공격에 취약해집니다. 사용자가 `<script>악성코드</script>`를 입력했는데 이를 innerHTML로 그대로 삽입하면, 그 스크립트가 실제로 실행될 수 있습니다. 사용자 입력은 반드시 `textContent`로 처리하거나, 꼭 HTML이 필요하면 DOMPurify 같은 검증 라이브러리로 정화해야 합니다.
+</Callout>
+
+## 요소 생성과 추가 — createElement, appendChild
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  label="요소 생성과 추가 실습"
+  files={{
+    '/index.html': `<ul id="list">
+  <li>기존 항목 1</li>
+  <li>기존 항목 2</li>
+</ul>
+<script src="/index.js"></script>`,
+    '/index.js': `const list = document.querySelector('#list')
+
+// 1단계: 새 요소를 메모리에서 생성 (아직 화면에는 없음)
+const newItem = document.createElement('li')
+newItem.textContent = '새 항목'
+newItem.className = 'item active'
+
+// 2단계: 트리에 실제로 추가해야 화면에 나타남
+list.appendChild(newItem)
+
+newItem.style.color = 'crimson'`,
+  }}
+/>
+
+`createElement`로 만든 요소는 **아직 DOM 트리에 연결되지 않은 상태**입니다. `appendChild` 같은 메서드로 실제 위치에 붙여야 화면에 나타납니다. 이 2단계(생성 → 부착) 구조를 기억해두면 "만들었는데 왜 안 보이지?"라는 흔한 실수를 피할 수 있습니다.
+
+## insertAdjacentHTML — 정확한 위치에 삽입
+
+`appendChild`는 항상 맨 끝에 추가하지만, `insertAdjacentHTML`은 4가지 위치를 선택할 수 있습니다.
+
+```js
+const container = document.querySelector('#container')
+
+container.insertAdjacentHTML('beforebegin', '<p>컨테이너 앞</p>')   // 컨테이너 요소 자체보다 앞
+container.insertAdjacentHTML('afterbegin', '<p>내부 첫 번째</p>')   // 컨테이너 내부의 맨 앞
+container.insertAdjacentHTML('beforeend', '<p>내부 마지막</p>')     // 컨테이너 내부의 맨 뒤
+container.insertAdjacentHTML('afterend', '<p>컨테이너 뒤</p>')      // 컨테이너 요소 자체보다 뒤
+```
+
+## 요소 제거, 교체, 복제
+
+```js
+const item = document.querySelector('.item')
+
+item.remove()  // 자기 자신을 트리에서 제거
+
+const newEl = document.createElement('span')
+item.replaceWith(newEl)  // item을 newEl로 교체
+
+const clone = item.cloneNode(true)  // true: 자식 노드까지 깊은 복사, false: 자기 자신만
+```
+
+## 속성 조작
+
+```js
+const img = document.querySelector('img')
+
+img.getAttribute('src')           // 속성 값 읽기
+img.setAttribute('alt', '설명')   // 속성 설정
+img.removeAttribute('disabled')   // 속성 제거
+img.hasAttribute('hidden')        // 속성 존재 여부(boolean)
+
+// data-* 속성은 dataset으로 카멜케이스로 접근
+const el = document.querySelector('[data-user-id]')
+console.log(el.dataset.userId)          // data-user-id 값
+el.dataset.createdAt = '2026'           // data-created-at="2026"으로 설정됨
+```
+
+## 클래스 조작 — classList
+
+```js
+const el = document.querySelector('.card')
+
+el.classList.add('active')           // 추가
+el.classList.remove('disabled')      // 제거
+el.classList.toggle('hidden')        // 없으면 추가, 있으면 제거
+el.classList.contains('active')      // 존재 여부(boolean)
+el.classList.replace('old', 'new')   // 교체
+```
+
+`className = 'a b c'`처럼 문자열을 직접 대입하는 것보다, `classList`를 사용하면 기존 클래스를 실수로 지우지 않고 안전하게 클래스 하나씩만 조작할 수 있습니다.
+
+## 스타일 조작
+
+```js
+const box = document.querySelector('.box')
+
+// 인라인 스타일 직접 설정 — 프로퍼티 이름은 카멜케이스
+box.style.backgroundColor = 'red'   // CSS의 background-color
+box.style.fontSize = '20px'
+
+// 실제로 적용된 최종 스타일(CSS 파일 포함) 읽기
+const computed = getComputedStyle(box)
+console.log(computed.color)
+```
+
+<Callout type="warning">
+  `box.style.color`는 **인라인 스타일**(`style="..."` 속성으로 직접 지정한 값)만 읽습니다. CSS 파일이나 `<style>` 태그로 지정한 스타일은 여기 나타나지 않습니다. 실제 화면에 렌더링된 최종 값을 알고 싶다면 반드시 `getComputedStyle()`을 사용해야 합니다.
+</Callout>
+
+## 핵심 정리
+
+- textContent는 텍스트만, innerHTML은 HTML 마크업까지 해석하며, 사용자 입력을 innerHTML에 그대로 넣으면 XSS 위험이 있다.
+- createElement로 만든 요소는 appendChild 등으로 트리에 붙여야 화면에 나타난다.
+- classList로 클래스를 안전하게 추가·제거·토글하고, dataset으로 data-* 속성에 접근한다.
+- style 프로퍼티는 인라인 스타일만 읽으며, 최종 적용된 스타일은 getComputedStyle()로 확인한다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="textContent와 innerHTML의 차이는?"
+  options={['①textContent가 항상 더 빠르다.', '②textContent는 텍스트만 처리하고, innerHTML은 HTML 마크업을 해석해 실제 요소를 생성한다.', '③innerHTML은 읽기만 가능하다.', '④두 프로퍼티는 동일하다.']}
+  correctAnswer={2}
+  explanation="textContent는 넣은 문자열을 그대로 글자로 취급하지만, innerHTML은 HTML 태그 문자열을 실제 DOM 요소로 파싱해 생성합니다."
+  optionExplanations={['속도 차이가 핵심 구분이 아닙니다.', '맞습니다. 처리하는 내용의 종류가 다릅니다.', 'innerHTML은 읽기와 쓰기 모두 가능합니다.', '처리 방식이 명확히 다릅니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="사용자 입력을 innerHTML에 직접 삽입하면 안 되는 이유는?"
+  options={['①렌더링 속도가 느려지기 때문에', '②악성 스크립트가 실행될 수 있는 XSS 공격에 취약해지기 때문에', '③HTML 태그가 자동으로 이스케이프되기 때문에', '④innerHTML은 텍스트만 지원하기 때문에']}
+  correctAnswer={2}
+  explanation="innerHTML은 HTML을 파싱해 렌더링하므로, 사용자 입력에 script 태그 같은 악성 코드가 포함되면 그대로 실행될 위험이 있습니다."
+  optionExplanations={['보안 문제가 핵심입니다.', '맞습니다. 악성 스크립트 실행 위험이 있습니다.', 'innerHTML은 이스케이프하지 않고 그대로 파싱합니다.', 'HTML 마크업을 지원하는 것이 오히려 위험 요인입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="`document.createElement('li')`로 만든 요소가 화면에 즉시 나타나지 않는 이유는?"
+  options={['①문법 오류이기 때문에', '②아직 DOM 트리에 붙지 않은 메모리상의 객체일 뿐이라서, appendChild 등으로 트리에 추가해야 하기 때문에', '③CSS가 없어서', '④브라우저 캐시 때문에']}
+  correctAnswer={2}
+  explanation="createElement는 요소를 메모리에서 생성만 합니다. 실제 화면(DOM 트리)에 나타나려면 appendChild, insertAdjacentHTML 등으로 트리의 특정 위치에 연결해야 합니다."
+  optionExplanations={['정상적인 문법입니다.', '맞습니다. 생성과 부착은 별개 단계입니다.', 'CSS 유무와는 무관합니다.', '캐시 문제가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="`el.style.color`로 읽을 수 있는 값은?"
+  options={['①CSS 파일에 정의된 모든 스타일', '②해당 요소의 인라인 스타일(style 속성)로 직접 지정한 값만', '③브라우저 기본 스타일 전체', '④getComputedStyle()과 완전히 동일한 값']}
+  correctAnswer={2}
+  explanation="style 프로퍼티는 style 속성으로 직접 지정한 인라인 스타일만 읽습니다. CSS 파일이나 style 태그로 지정한 값은 포함되지 않습니다."
+  optionExplanations={['CSS 파일의 스타일은 포함되지 않습니다.', '맞습니다. 인라인 스타일만 읽습니다.', '기본 스타일과는 무관합니다.', '최종 적용된 값은 getComputedStyle()로 확인해야 합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`classList.toggle('active')`의 동작은?"
+  options={["①'active' 클래스를 항상 추가한다.", "②'active' 클래스를 항상 제거한다.", "③'active' 클래스가 없으면 추가하고, 있으면 제거한다.", "④오류가 발생한다."]}
+  correctAnswer={3}
+  explanation="toggle()은 클래스가 없으면 추가하고 있으면 제거하는 전환 동작을 합니다. ON/OFF 상태 전환에 유용합니다."
+  optionExplanations={["항상 추가하려면 add()를 씁니다.", "항상 제거하려면 remove()를 씁니다.", "맞습니다. 있으면 제거, 없으면 추가합니다.", "정상적으로 동작합니다."]}
+/>

@@ -1,0 +1,189 @@
+---
+title: '12. WebSocket — 실시간 통신'
+description: 'fetch와 다른 WebSocket의 양방향 통신 방식을 이해하고 실시간 채팅 같은 기능의 기초를 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** fetch로는 실시간 채팅을 구현하기 어려운 이유를 이해하고, WebSocket으로 양방향 통신을 구현할 수 있습니다.
+</Callout>
+
+## fetch의 한계 — 항상 클라이언트가 먼저 물어봐야 한다
+
+10번 문서에서 배운 `fetch()`는 **요청-응답**(request-response) 방식입니다. 클라이언트가 "데이터 주세요"라고 요청해야만 서버가 응답합니다. 서버가 먼저 클라이언트에게 "새 메시지 왔어요!"라고 알려줄 방법이 없습니다.
+
+```js
+// 새 메시지가 왔는지 계속 물어봐야 하는 비효율적인 방식(폴링)
+setInterval(async () => {
+  const res = await fetch('/api/messages/new')
+  const messages = await res.json()
+  // 메시지가 없어도 계속 요청을 보냄 — 낭비
+}, 1000)
+```
+
+## WebSocket — 연결을 유지한 채 양방향으로 통신
+
+**WebSocket**은 클라이언트와 서버 사이에 **한 번 연결을 맺으면 계속 유지되는 통로**를 만듭니다. 이 통로를 통해 서버든 클라이언트든 **원하는 시점에 먼저 메시지를 보낼 수 있습니다**.
+
+<Table>
+  <thead>
+    <tr><th>구분</th><th>fetch (HTTP)</th><th>WebSocket</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>통신 방향</td><td>클라이언트 → 서버 → 클라이언트(한 번의 왕복으로 끝)</td><td>양방향, 연결이 유지되는 동안 계속</td></tr>
+    <tr><td>연결</td><td>매 요청마다 새로 연결</td><td>한 번 연결해서 계속 유지</td></tr>
+    <tr><td>서버가 먼저 보내기</td><td>불가능</td><td>가능</td></tr>
+    <tr><td>적합한 용도</td><td>일반적인 데이터 조회·전송</td><td>채팅, 실시간 알림, 협업 도구, 실시간 게임</td></tr>
+  </tbody>
+</Table>
+
+## WebSocket 기본 사용법
+
+```js
+const socket = new WebSocket('wss://echo.websocket.org')  // wss:// — 암호화된 WebSocket(https와 짝)
+
+// 연결이 열렸을 때
+socket.addEventListener('open', () => {
+  console.log('연결됨')
+  socket.send('안녕하세요')  // 서버로 메시지 전송
+})
+
+// 서버로부터 메시지를 받았을 때
+socket.addEventListener('message', (event) => {
+  console.log('받은 메시지:', event.data)
+})
+
+// 연결이 닫혔을 때
+socket.addEventListener('close', () => {
+  console.log('연결 종료')
+})
+
+// 오류가 발생했을 때
+socket.addEventListener('error', (error) => {
+  console.error('오류:', error)
+})
+```
+
+`ws://`는 일반 HTTP와 짝을 이루는 암호화되지 않은 프로토콜이고, `wss://`(WebSocket Secure)는 HTTPS와 짝을 이루는 암호화된 프로토콜입니다. 실무에서는 항상 `wss://`를 사용합니다.
+
+## WebSocket의 상태 — readyState
+
+```js
+console.log(socket.readyState)
+// 0: CONNECTING(연결 중)
+// 1: OPEN(연결됨, 통신 가능)
+// 2: CLOSING(닫는 중)
+// 3: CLOSED(닫힘)
+```
+
+메시지를 보내기 전에 연결이 실제로 열려 있는지(`readyState === WebSocket.OPEN`) 확인하는 것이 안전합니다.
+
+```js
+function sendSafely(socket, message) {
+  if (socket.readyState === WebSocket.OPEN) {
+    socket.send(message)
+  } else {
+    console.warn('연결이 아직 준비되지 않았습니다')
+  }
+}
+```
+
+## 실전 패턴 — 재연결 로직
+
+네트워크가 불안정하면 WebSocket 연결이 끊길 수 있습니다. 실무에서는 연결이 끊기면 자동으로 재연결을 시도하는 로직을 함께 구현합니다.
+
+```js
+function connect() {
+  const socket = new WebSocket('wss://example.com/chat')
+
+  socket.addEventListener('close', () => {
+    console.log('연결 끊김, 3초 후 재연결 시도')
+    setTimeout(connect, 3000)  // 재귀적으로 다시 연결 시도
+  })
+
+  socket.addEventListener('message', (event) => {
+    console.log('메시지:', event.data)
+  })
+
+  return socket
+}
+
+connect()
+```
+
+## JSON으로 구조화된 메시지 주고받기
+
+WebSocket은 문자열만 보낼 수 있으므로, 객체를 보내려면 JSON으로 직렬화해야 합니다(ECMAScript 23번 문서에서 배운 JSON.stringify/parse가 여기서도 그대로 쓰입니다).
+
+```js
+// 보내기
+socket.send(JSON.stringify({ type: 'chat', text: '안녕하세요', userId: 1 }))
+
+// 받기
+socket.addEventListener('message', (event) => {
+  const data = JSON.parse(event.data)
+  if (data.type === 'chat') {
+    console.log(`${data.userId}: ${data.text}`)
+  }
+})
+```
+
+## 연결 종료
+
+```js
+socket.close(1000, '정상 종료')  // 코드 1000: 정상 종료를 의미하는 표준 코드
+```
+
+## 핵심 정리
+
+- fetch는 클라이언트가 매번 요청해야 하는 단방향 요청-응답 방식이라 실시간 알림에 부적합하다.
+- WebSocket은 한 번 연결을 맺으면 유지되는 통로를 통해 서버·클라이언트 모두 원하는 시점에 메시지를 보낼 수 있는 양방향 통신이다.
+- readyState로 현재 연결 상태(CONNECTING, OPEN, CLOSING, CLOSED)를 확인할 수 있다.
+- WebSocket은 문자열만 전송 가능하므로, 객체 데이터는 JSON.stringify/parse로 변환해서 주고받는다.
+- 네트워크 단절에 대비해 close 이벤트에서 재연결 로직을 구현하는 것이 실전 패턴이다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="fetch와 WebSocket의 핵심 차이는?"
+  options={['①완전히 동일한 기술이다.', '②fetch는 클라이언트가 요청해야만 응답받는 단방향 방식, WebSocket은 서버도 먼저 메시지를 보낼 수 있는 양방향 방식이다.', '③WebSocket은 텍스트만 다루고 fetch는 모든 데이터를 다룬다.', '④fetch가 항상 더 빠르다.']}
+  correctAnswer={2}
+  explanation="fetch는 요청-응답 한 번으로 끝나는 방식이라 서버가 먼저 데이터를 보낼 수 없지만, WebSocket은 연결이 유지되어 양쪽 모두 원하는 시점에 메시지를 보낼 수 있습니다."
+  optionExplanations={['서로 다른 통신 방식입니다.', '맞습니다. 단방향 요청-응답 vs 양방향 지속 연결의 차이입니다.', 'fetch도 다양한 데이터 타입(JSON, blob 등)을 다룹니다.', '용도가 달라 단순 속도 비교는 부적절합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="`wss://`가 의미하는 것은?"
+  options={['①일반 HTTP와 같은 프로토콜', '②HTTPS와 짝을 이루는 암호화된 WebSocket 프로토콜', '③파일 전송 전용 프로토콜', '④더 이상 사용되지 않는 구식 프로토콜']}
+  correctAnswer={2}
+  explanation="wss(WebSocket Secure)는 https와 짝을 이루는 암호화된 WebSocket 프로토콜로, 실무에서 표준으로 사용됩니다."
+  optionExplanations={['ws가 암호화되지 않은 버전입니다.', '맞습니다. HTTPS에 대응하는 암호화된 WebSocket입니다.', '파일 전송 전용이 아닙니다.', '현재도 표준으로 사용됩니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="readyState가 1(OPEN)일 때 의미하는 것은?"
+  options={['①연결이 아직 시도 중이다.', '②연결이 열려 통신이 가능한 상태다.', '③연결이 닫히는 중이다.', '④연결이 완전히 닫혔다.']}
+  correctAnswer={2}
+  explanation="readyState 1은 OPEN 상태로, 연결이 성공적으로 열려 메시지를 주고받을 수 있는 상태입니다."
+  optionExplanations={['연결 시도 중은 0(CONNECTING)입니다.', '맞습니다. 1은 OPEN(통신 가능) 상태입니다.', '닫는 중은 2(CLOSING)입니다.', '닫힘은 3(CLOSED)입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="WebSocket으로 객체 데이터를 주고받으려면?"
+  options={['①객체를 그대로 send()에 전달한다.', '②JSON.stringify로 문자열로 변환해서 보내고, 받을 때는 JSON.parse로 다시 객체로 변환한다.', '③객체는 WebSocket으로 전송할 수 없다.', '④자동으로 객체가 변환되어 전송된다.']}
+  correctAnswer={2}
+  explanation="WebSocket의 send()는 문자열(또는 바이너리)만 전송할 수 있으므로, 객체는 JSON.stringify로 직렬화해서 보내고 받는 쪽에서 JSON.parse로 역직렬화해야 합니다."
+  optionExplanations={['객체를 그대로 보내면 [object Object] 같은 문자열이 될 수 있습니다.', '맞습니다. JSON 직렬화/역직렬화가 필요합니다.', '전송 자체는 가능하지만 변환이 필요합니다.', '자동 변환은 없어 직접 처리해야 합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="close 이벤트에서 재연결 로직을 구현하는 이유는?"
+  options={['①연결을 영구적으로 끊기 위해', '②네트워크 불안정 등으로 연결이 끊겼을 때 자동으로 다시 연결을 시도해 서비스 안정성을 높이기 위해', '③서버 부하를 늘리기 위해', '④디버깅 메시지를 출력하기 위해서만']}
+  correctAnswer={2}
+  explanation="실시간 서비스는 연결이 예기치 않게 끊길 수 있습니다. close 이벤트에서 재연결을 시도하면 사용자가 별도 조치 없이도 서비스가 자동으로 복구됩니다."
+  optionExplanations={['영구 종료가 목적이 아닙니다.', '맞습니다. 자동 복구를 통한 안정성 향상이 목적입니다.', '서버 부하 증가가 목적이 아닙니다.', '디버깅이 주목적이 아닌 실전 안정성 패턴입니다.']}
+/>

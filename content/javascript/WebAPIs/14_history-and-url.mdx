@@ -1,0 +1,182 @@
+---
+title: '14. History API와 URL'
+description: 'pushState로 새로고침 없이 주소를 바꾸는 원리와, URL 객체로 주소를 분해·조립하는 방법을 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** SPA(싱글 페이지 앱)가 페이지 새로고침 없이 주소창을 바꾸는 원리를 이해하고, URL을 안전하게 다룰 수 있습니다.
+</Callout>
+
+## 왜 History API가 필요한가?
+
+일반적으로 브라우저는 주소가 바뀌면 서버에 새 페이지를 요청하고 화면을 통째로 다시 그립니다. 하지만 React 같은 SPA는 페이지를 새로고침하지 않고 **JavaScript가 화면 일부만 바꾸면서, 주소창의 URL도 함께 바꾸고 싶어합니다.** 이때 사용하는 것이 **History API**입니다.
+
+## pushState — 새로고침 없이 주소 바꾸기
+
+```js
+console.log(location.pathname)  // 예: '/home'
+
+history.pushState({ page: 'about' }, '', '/about')
+// 1. 주소창이 '/about'으로 바뀜(새로고침 없이!)
+// 2. 브라우저의 방문 기록에 새 항목이 추가됨
+// 3. 서버로는 아무 요청도 보내지 않음
+
+console.log(location.pathname)  // '/about' — 바뀌었지만 페이지는 새로고침 안 됨
+```
+
+`pushState(state, title, url)`의 세 인수:
+- `state`: 이 기록과 함께 저장할 임의의 데이터(나중에 popstate에서 꺼낼 수 있음)
+- `title`: 대부분의 브라우저가 무시함(관례상 빈 문자열 전달)
+- `url`: 바꿀 새 주소
+
+## replaceState — 기록을 남기지 않고 주소만 교체
+
+```js
+history.replaceState({ page: 'login' }, '', '/login')
+// pushState와 달리 새 기록을 "추가"하지 않고 현재 기록을 "덮어씀"
+// 뒤로가기를 눌러도 이 상태로는 돌아오지 않음
+```
+
+리다이렉트처럼 "뒤로가기 버튼을 눌렀을 때 이 페이지로 돌아오면 안 되는" 상황에 사용합니다.
+
+## popstate — 뒤로가기·앞으로가기 감지
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="History API 실습"
+  files={{
+    '/index.html': `<button id="go-about">/about으로 이동</button>
+<button id="go-contact">/contact로 이동</button>
+<p id="current"></p>
+<script src="/index.js"></script>`,
+    '/index.js': `const current = document.querySelector('#current')
+
+function render() {
+  current.textContent = '현재 경로: ' + location.pathname
+}
+
+document.querySelector('#go-about').addEventListener('click', () => {
+  history.pushState({ page: 'about' }, '', '/about')
+  render()
+})
+
+document.querySelector('#go-contact').addEventListener('click', () => {
+  history.pushState({ page: 'contact' }, '', '/contact')
+  render()
+})
+
+// 사용자가 브라우저의 뒤로가기/앞으로가기 버튼을 눌렀을 때
+window.addEventListener('popstate', (event) => {
+  console.log('popstate 발생, state:', event.state)
+  render()
+})
+
+render()`,
+  }}
+/>
+
+<Callout type="warning">
+  `pushState`로 주소를 바꾸는 것 자체는 **`popstate` 이벤트를 발생시키지 않습니다.** `popstate`는 오직 사용자가 브라우저의 뒤로가기/앞으로가기 버튼(또는 `history.back()` 등)을 눌렀을 때만 발생합니다. React Router 같은 라이브러리가 이 두 가지 경우를 모두 처리해 화면을 갱신해주는 이유가 여기에 있습니다.
+</Callout>
+
+## URL 객체 — 주소를 안전하게 분해·조립하기
+
+문자열을 직접 자르고 합치는 대신, `URL` 객체를 쓰면 실수 없이 주소를 다룰 수 있습니다.
+
+```js
+const url = new URL('https://shop.example.com:8080/products?category=shoes&page=2#reviews')
+
+console.log(url.protocol)   // 'https:'
+console.log(url.hostname)   // 'shop.example.com'
+console.log(url.port)       // '8080'
+console.log(url.pathname)   // '/products'
+console.log(url.search)     // '?category=shoes&page=2'
+console.log(url.hash)       // '#reviews'
+```
+
+## URLSearchParams — 쿼리 파라미터 다루기
+
+```js
+const params = new URLSearchParams(url.search)
+
+console.log(params.get('category'))   // 'shoes'
+console.log(params.get('page'))       // '2'
+
+params.set('page', '3')       // 값 변경
+params.append('sort', 'price') // 새 파라미터 추가
+params.delete('category')     // 파라미터 제거
+
+console.log(params.toString())  // 'page=3&sort=price'
+
+// 모든 파라미터 순회
+for (const [key, value] of params) {
+  console.log(key, value)
+}
+```
+
+`URLSearchParams`는 특수문자를 자동으로 URL 인코딩/디코딩해줘서, `?name=철수 김`처럼 공백이 포함된 값을 직접 `encodeURIComponent`로 처리할 필요가 없습니다.
+
+## 실전 패턴 — 현재 페이지의 쿼리 파라미터 읽기
+
+```js
+// 현재 페이지 주소: https://example.com/search?q=자바스크립트&page=1
+const params = new URLSearchParams(window.location.search)
+console.log(params.get('q'))     // '자바스크립트'
+console.log(params.get('page'))  // '1'
+```
+
+## 핵심 정리
+
+- pushState는 새 기록을 추가하며 새로고침 없이 주소를 바꾸고, replaceState는 현재 기록을 덮어쓴다.
+- popstate는 사용자가 뒤로가기/앞으로가기를 누를 때만 발생하며, pushState 호출 자체로는 발생하지 않는다.
+- URL 객체로 주소를 protocol, hostname, pathname 등으로 안전하게 분해할 수 있다.
+- URLSearchParams로 쿼리 파라미터를 get/set/append/delete하며 자동으로 URL 인코딩을 처리한다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="history.pushState()가 하는 일은?"
+  options={['①페이지를 새로고침하며 서버에 새 요청을 보낸다.', '②서버 요청 없이 주소창의 URL을 바꾸고 방문 기록에 새 항목을 추가한다.', '③현재 페이지를 완전히 삭제한다.', '④쿠키를 초기화한다.']}
+  correctAnswer={2}
+  explanation="pushState는 서버에 요청을 보내지 않고 URL만 바꾸며, 브라우저의 방문 기록에 새 항목을 추가합니다."
+  optionExplanations={['서버 요청 없이 동작합니다.', '맞습니다. 새로고침 없는 URL 변경이 핵심입니다.', '페이지를 삭제하지 않습니다.', '쿠키와는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="pushState와 replaceState의 차이는?"
+  options={['①완전히 동일하다.', '②pushState는 새 기록을 추가하고, replaceState는 현재 기록을 덮어써 새 기록을 남기지 않는다.', '③replaceState만 페이지를 새로고침한다.', '④pushState는 URL을 바꿀 수 없다.']}
+  correctAnswer={2}
+  explanation="pushState는 방문 기록에 새 항목을 추가하지만, replaceState는 현재 기록 자체를 교체해 뒤로가기로 그 상태에 다시 도달할 수 없게 합니다."
+  optionExplanations={['기록 처리 방식이 다릅니다.', '맞습니다. 기록 추가 여부가 핵심 차이입니다.', '둘 다 새로고침하지 않습니다.', '둘 다 URL을 바꿀 수 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="popstate 이벤트가 발생하는 경우는?"
+  options={['①pushState를 호출할 때마다', '②사용자가 브라우저의 뒤로가기/앞으로가기 버튼을 누를 때', '③페이지가 처음 로딩될 때', '④모든 클릭 이벤트마다']}
+  correctAnswer={2}
+  explanation="popstate는 pushState 호출 자체로는 발생하지 않고, 오직 사용자가 방문 기록을 이동(뒤로가기/앞으로가기)할 때만 발생합니다."
+  optionExplanations={['pushState 자체는 popstate를 발생시키지 않습니다.', '맞습니다. 방문 기록 이동 시 발생합니다.', '초기 로딩 시에는 발생하지 않습니다.', '클릭과는 직접 관련 없습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="URLSearchParams를 사용하는 이유는?"
+  options={['①HTML을 파싱하기 위해', '②쿼리 파라미터를 get/set/delete로 편하게 다루고 URL 인코딩을 자동으로 처리하기 위해', '③쿠키를 관리하기 위해', '④CSS 선택자를 만들기 위해']}
+  correctAnswer={2}
+  explanation="URLSearchParams는 쿼리 문자열을 파싱해 파라미터를 쉽게 읽고 수정할 수 있게 하며, 특수문자 인코딩도 자동으로 처리합니다."
+  optionExplanations={['HTML 파싱과는 무관합니다.', '맞습니다. 쿼리 파라미터 조작과 자동 인코딩이 핵심입니다.', '쿠키 관리 기능이 아닙니다.', 'CSS와는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="`new URL('https://shop.com:8080/a?b=1#c').pathname`의 값은?"
+  options={["①'https://shop.com:8080/a?b=1#c'", "②'/a'", "③'?b=1'", "④'#c'"]}
+  correctAnswer={2}
+  explanation="pathname은 호스트와 쿼리, 해시를 제외한 경로 부분만을 나타냅니다."
+  optionExplanations={["전체 URL이 아닌 경로 부분만입니다.", "맞습니다. pathname은 경로 부분입니다.", "쿼리 부분은 search 프로퍼티입니다.", "해시 부분은 hash 프로퍼티입니다."]}
+/>
