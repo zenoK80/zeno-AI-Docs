@@ -13,6 +13,7 @@ const meta = {
   '12_storage-devices': '12. 보조기억장치 — 자기디스크, 광기억장치, SSD, RAID',
   '13_io-and-bus': '13. 입출력과 버스 — 시스템버스, 장치 제어기, 인터럽트, DMA',
   '14_parallel-processing': '14. 병렬 처리 — 성능 평가, Flynn 분류, 병렬 컴퓨터',
+  '15_exam-practice': '15. 컴퓨터구조 예상기출문제',
 }
 
 export default meta
