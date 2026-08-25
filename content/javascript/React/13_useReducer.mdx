@@ -51,8 +51,12 @@ reducer(현재상태, 액션) → 새 상태
 
 ## 기본 사용 예제 — 카운터
 
-```jsx
-import { useReducer } from 'react'
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="useReducer 카운터 실습"
+  files={{
+    '/App.js': `import { useReducer } from 'react'
 
 // reducer 함수: 액션 타입에 따라 상태를 업데이트
 function counterReducer(state, action) {
@@ -68,7 +72,7 @@ function counterReducer(state, action) {
   }
 }
 
-function Counter() {
+export default function Counter() {
   const [state, dispatch] = useReducer(counterReducer, { count: 0 })
 
   return (
@@ -79,8 +83,9 @@ function Counter() {
       <button onClick={() => dispatch({ type: 'RESET' })}>초기화</button>
     </div>
   )
-}
-```
+}`,
+  }}
+/>
 
 ---
 

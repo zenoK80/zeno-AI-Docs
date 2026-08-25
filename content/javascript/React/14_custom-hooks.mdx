@@ -169,7 +169,13 @@ function SearchBar() {
 
 ### useToggle
 
-```jsx
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="커스텀 훅(useToggle) 실습"
+  files={{
+    '/App.js': `import { useState } from 'react'
+
 function useToggle(initial = false) {
   const [value, setValue] = useState(initial)
   const toggle = () => setValue(prev => !prev)
@@ -177,7 +183,7 @@ function useToggle(initial = false) {
 }
 
 // 사용
-function Modal() {
+export default function Modal() {
   const [isOpen, toggleOpen] = useToggle()
   return (
     <>
@@ -185,8 +191,9 @@ function Modal() {
       {isOpen && <div className="modal">모달 내용</div>}
     </>
   )
-}
-```
+}`,
+  }}
+/>
 
 ---
 
