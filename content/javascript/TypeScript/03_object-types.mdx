@@ -40,8 +40,13 @@ const item: Product = {
 
 ## readonly 프로퍼티
 
-```ts
-interface Config {
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="readonly 실습 — config.apiUrl 줄의 주석을 풀어 컴파일 오류를 확인해보세요"
+  files={{
+    '/index.ts': `interface Config {
   readonly apiUrl: string
   readonly maxRetries: number
   timeout: number
@@ -54,8 +59,10 @@ const config: Config = {
 }
 
 config.timeout = 3000       // OK
-config.apiUrl = 'other'     // 오류: readonly 프로퍼티는 변경 불가
-```
+console.log(config)
+// config.apiUrl = 'other'  // 주석을 풀면: readonly 프로퍼티는 변경 불가`,
+  }}
+/>
 
 ## type alias
 

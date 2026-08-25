@@ -83,8 +83,13 @@ const config = {
 
 공통 리터럴 프로퍼티로 유니온 타입을 구별하는 패턴입니다.
 
-```ts
-type Circle = {
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="판별 유니온 실습"
+  files={{
+    '/index.ts': `type Circle = {
   kind: 'circle'    // 판별자 (discriminant)
   radius: number
 }
@@ -116,7 +121,12 @@ function getArea(shape: Shape): number {
       return _exhaustive
   }
 }
-```
+
+console.log('원 넓이:', getArea({ kind: 'circle', radius: 5 }).toFixed(2))
+console.log('직사각형 넓이:', getArea({ kind: 'rectangle', width: 4, height: 3 }))
+console.log('삼각형 넓이:', getArea({ kind: 'triangle', base: 6, height: 4 }))`,
+  }}
+/>
 
 ## 유니온 타입의 함정
 
