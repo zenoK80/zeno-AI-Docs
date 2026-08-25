@@ -5,5 +5,8 @@ const meta = {
   '04_probability-for-dl': '04. 딥러닝을 위한 확률·통계 — 기댓값, 베이즈 정리, MLE',
   '05_dl-overview': '05. 딥러닝 개요 — AI·ML·DL 관계, 발전 역사, 활용 분야',
   '06_neural-network-basics': '06. 신경망 기초 — 인공 뉴런, 퍼셉트론, 단층·다층',
+  '07_activation-functions': '07. 활성화 함수 — Sigmoid·Tanh·ReLU·Softmax',
+  '08_forward-pass': '08. 순전파 — 가중합, 행렬 연산, 출력층 해석',
+  '09_loss-functions': '09. 손실 함수 — MSE, Cross Entropy',
 }
 export default meta
