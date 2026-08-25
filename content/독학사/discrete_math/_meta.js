@@ -14,6 +14,7 @@ const meta = {
   '13_matrices-in-discrete-math': '13. 행렬 — 기본 연산, 행렬식, 응용',
   '14_recurrence-relations': '14. 점화식과 알고리즘 분석 — 피보나치, 분할 정복, Master 정리',
   '15_formal-languages': '15. 오토마타와 언어 — 유한상태 오토마타, 형식 언어, 정규 언어',
+  '16_exam-practice': '16. 이산수학 예상기출문제',
 }
 
 export default meta
