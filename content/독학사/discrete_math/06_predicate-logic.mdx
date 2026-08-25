@@ -1,0 +1,143 @@
+---
+title: '06. 술어 논리 — 한정자, 부울 대수, 논리 회로 간소화'
+description: '변수를 포함하는 명제를 다루는 술어논리와 전칭·존재 한정자, 부울 대수의 회로 간소화를 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 문서의 목표:** 술어와 한정자를 이용해 복잡한 명제를 표현하고, 부울 대수로 논리 회로를 간소화할 수 있게 됩니다.
+</Callout>
+
+## 왜 술어 논리가 필요한가?
+
+02번 문서의 명제논리는 "2는 짝수다"처럼 고정된 하나의 문장만 다룰 수 있었습니다. 하지만 "모든 자연수는 0보다 크거나 같다"처럼 **변수를 포함하는** 일반적인 진술은 명제논리만으로 표현하기 어렵습니다. **술어논리**(Predicate Logic)는 이 한계를 극복합니다.
+
+## 술어(Predicate)
+
+> **쉽게 말하면:** 술어는 "변수가 들어있어서, 그 변수 값이 정해져야 비로소 참/거짓이 판별되는 문장"입니다.
+
+**예시:** $P(x)$: "$x$는 짝수다"라는 술어. $P(4)$는 참, $P(3)$는 거짓입니다.
+
+## 한정자(Quantifier)
+
+> **쉽게 말하면:** 한정자는 "이 술어가 얼마나 많은 대상에 대해 성립하는지"를 나타내는 기호입니다.
+
+<Table>
+  <thead>
+    <tr><th>한정자</th><th>기호</th><th>읽는 법</th><th>의미</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>전칭 한정자(Universal)</td><td>$\forall x\, P(x)$</td><td>모든 x에 대해</td><td>모든 대상 $x$에서 $P(x)$가 참</td></tr>
+    <tr><td>존재 한정자(Existential)</td><td>$\exists x\, P(x)$</td><td>어떤 x가 존재하여</td><td>$P(x)$가 참인 $x$가 적어도 하나 존재</td></tr>
+  </tbody>
+</Table>
+
+**예시:** $\forall x\, (x>0)$("모든 $x$는 0보다 크다")는 자연수 범위에서는 참이지만, 정수 전체 범위에서는 거짓입니다(음수가 존재하므로) — **범위**(정의역)를 명확히 해야 한정자 명제의 참/거짓을 판별할 수 있습니다.
+
+## 한정자의 부정 — 드모르간 법칙의 확장
+
+$$
+\lnot(\forall x\, P(x)) \equiv \exists x\, \lnot P(x)
+$$
+$$
+\lnot(\exists x\, P(x)) \equiv \forall x\, \lnot P(x)
+$$
+
+> **쉽게 말하면:** "모든 x가 P를 만족하는 것은 아니다"는 "P를 만족하지 않는 x가 존재한다"는 뜻이고, "P를 만족하는 x가 없다"는 "모든 x가 P를 만족하지 않는다"는 뜻입니다.
+
+<Callout type="warning">
+  **자주 틀리는 점:** $\lnot(\forall x\,P(x))$를 $\forall x\,\lnot P(x)$로 잘못 바꾸는 실수가 흔합니다. "모든 학생이 100점을 받은 것은 아니다"($\lnot\forall$)는 "100점을 못 받은 학생이 **적어도 한 명 있다**"($\exists\lnot$)는 뜻이지, "**모든** 학생이 100점을 못 받았다"($\forall\lnot$)는 훨씬 강한 뜻이 아닙니다. 한정자를 부정하면 반드시 $\forall \leftrightarrow \exists$가 서로 뒤바뀝니다.
+</Callout>
+
+## 두 개 이상의 한정자
+
+$$
+\forall x\,\exists y\, P(x,y)
+$$
+
+> **쉽게 말하면:** "모든 x에 대해, (그 x에 맞는) y가 각각 존재한다"는 뜻입니다.
+
+<Callout type="info">
+  **한정자의 순서가 중요한 이유:** $\forall x\,\exists y\,P(x,y)$와 $\exists y\,\forall x\,P(x,y)$는 **서로 다른 의미**입니다. 앞은 "각 $x$마다 (다를 수 있는) $y$가 존재"하면 되지만, 뒤는 "모든 $x$에 대해 동시에 통하는 **하나의** $y$가 존재"해야 합니다. 예를 들어 "모든 사람에게는 (각자의) 부모가 있다"($\forall x\,\exists y$)는 참이지만, "모든 사람의 부모인 (단 한 명의) 사람이 존재한다"($\exists y\,\forall x$)는 명백히 거짓입니다.
+</Callout>
+
+## 부울 대수(Boolean Algebra) — 논리와 회로의 연결
+
+컴퓨터구조 과목에서 배운 논리 게이트(AND, OR, NOT)는 이 문서의 $\land,\lor,\lnot$과 완전히 같은 수학 체계(부울 대수)를 공유합니다.
+
+<Table>
+  <thead>
+    <tr><th>논리</th><th>회로</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>$p\land q$</td><td>AND 게이트</td></tr>
+    <tr><td>$p\lor q$</td><td>OR 게이트</td></tr>
+    <tr><td>$\lnot p$</td><td>NOT 게이트</td></tr>
+  </tbody>
+</Table>
+
+## 논리 회로 간소화
+
+> **쉽게 말하면:** 논리식을 05번 문서의 법칙(분배·드모르간 등)으로 정리해 더 짧게 만들면, 실제 회로에 필요한 게이트 개수도 줄어들어 비용이 절감됩니다.
+
+**계산 예시:** $F = (p\land q)\lor(p\land\lnot q)$를 간소화합니다.
+
+$$
+F = p\land(q\lor\lnot q) \quad (\text{분배법칙}) = p\land 1 \quad (q\lor\lnot q\text{는 항진명제}) = p
+$$
+
+**해석:** 게이트 4개(AND 2개+OR 1개+NOT 1개)가 필요했던 회로가, 간소화 후에는 아무 게이트도 필요 없이 그냥 $p$ 신호 하나로 대체됩니다.
+
+## 핵심 정리
+
+- **술어**: 변수를 포함해 값이 정해져야 참/거짓이 판별되는 문장.
+- **전칭 한정자** $\forall$(모든 x): **존재 한정자** $\exists$(어떤 x가 존재).
+- 한정자의 부정은 $\forall\leftrightarrow\exists$가 서로 뒤바뀜: $\lnot\forall x P(x)\equiv\exists x\lnot P(x)$.
+- 한정자가 두 개 이상이면 **순서가 의미를 바꿈**: $\forall x\exists y$ ≠ $\exists y\forall x$.
+- **부울 대수**: 논리 연산과 논리 회로(게이트)는 같은 수학 구조. 논리 법칙으로 회로를 간소화해 게이트 수를 줄일 수 있다.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="술어(Predicate)의 정의로 옳은 것은?"
+  options={['①항상 참인 문장', '②변수를 포함해, 값이 정해져야 비로소 참/거짓이 판별되는 문장', '③숫자로만 이루어진 문장', '④질문 문장']}
+  correctAnswer={2}
+  explanation="술어는 P(x)처럼 변수를 포함해, x에 구체적인 값이 대입되어야 참/거짓을 판별할 수 있는 문장입니다."
+  optionExplanations={['항상 참인 것은 항진명제입니다.', '맞습니다. 변수와 값 대입이 핵심입니다.', '숫자만으로 이루어진 것이 아닙니다.', '질문 문장과는 다른 개념입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="¬(∀x P(x))와 논리적으로 동치인 것은?"
+  options={['①∀x ¬P(x)', '②∃x ¬P(x)', '③∀x P(x)', '④∃x P(x)']}
+  correctAnswer={2}
+  explanation="전칭 한정자의 부정은 존재 한정자로 바뀌면서 술어도 부정됩니다: ¬∀x P(x) ≡ ∃x ¬P(x)."
+  optionExplanations={['한정자 자체(∀)가 바뀌지 않은 잘못된 형태입니다.', '맞습니다. ∃x ¬P(x)입니다.', '부정이 적용되지 않은 원래 형태입니다.', '부정이 빠진 형태입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="∀x∃y P(x,y)와 ∃y∀x P(x,y)의 관계는?"
+  options={['①항상 같은 의미다', '②일반적으로 서로 다른 의미다(순서가 중요)', '③둘 다 항상 거짓이다', '④한정자는 순서를 바꿔도 무방하다']}
+  correctAnswer={2}
+  explanation="두 한정자의 순서에 따라 의미가 달라지며, 일반적으로 서로 다른 명제를 나타냅니다."
+  optionExplanations={['순서에 따라 의미가 달라질 수 있습니다.', '맞습니다. 순서가 의미를 바꿉니다.', '상황에 따라 참일 수도 거짓일 수도 있습니다.', '순서를 바꾸면 의미가 달라질 수 있어 주의가 필요합니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="논리곱(∧)에 대응하는 논리 게이트는?"
+  options={['①OR 게이트', '②AND 게이트', '③NOT 게이트', '④NAND 게이트']}
+  correctAnswer={2}
+  explanation="논리곱(∧)은 AND 게이트에 정확히 대응됩니다."
+  optionExplanations={['OR 게이트는 논리합(∨)에 대응합니다.', '맞습니다. AND 게이트입니다.', 'NOT 게이트는 부정(¬)에 대응합니다.', 'NAND는 AND 다음에 NOT을 적용한 별도 게이트입니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="(p∧q)∨(p∧¬q)를 부울 대수 법칙으로 간소화한 결과는?"
+  options={['①p', '②q', '③p∧q', '④p∨q']}
+  correctAnswer={1}
+  explanation="분배법칙으로 p를 묶으면 p∧(q∨¬q)=p∧1=p로 간소화됩니다."
+  optionExplanations={['맞습니다. p로 간소화됩니다.', 'q가 아닌 p로 간소화됩니다.', '더 간소화될 수 있는 식입니다.', '이는 원래 식과 다른 형태입니다.']}
+/>
