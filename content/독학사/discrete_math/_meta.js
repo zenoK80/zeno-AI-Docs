@@ -5,6 +5,9 @@ const meta = {
   '04_number-systems-and-algorithms': '04. 수의 표현과 알고리즘 표현·분석',
   '05_proposition-and-logic': '05. 명제 논리 — 동치, 항진·모순, 추론 규칙',
   '06_predicate-logic': '06. 술어 논리 — 한정자, 부울 대수, 논리 회로 간소화',
+  '07_relations': '07. 관계 — 표현, 성질, 동치관계와 분할',
+  '08_order-relations-and-functions': '08. 순서관계와 함수 — 반순서, 해세도표, 함수의 종류',
+  '09_counting': '09. 셈 원리 — 곱의 법칙, 포함-배제, 순열과 조합',
 }
 
 export default meta
