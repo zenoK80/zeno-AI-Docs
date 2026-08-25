@@ -130,7 +130,13 @@ const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 ## useReducer 타입
 
-```tsx
+<CodePlayground
+  template="react-ts"
+  activeFile="/App.tsx"
+  label="타입이 있는 useReducer 실습"
+  files={{
+    '/App.tsx': `import { useReducer } from 'react'
+
 type CounterAction =
   | { type: 'increment' }
   | { type: 'decrement' }
@@ -149,7 +155,7 @@ function reducer(state: CounterState, action: CounterAction): CounterState {
   }
 }
 
-function Counter() {
+export default function Counter() {
   const [state, dispatch] = useReducer(reducer, { count: 0 })
   return (
     <div>
@@ -158,8 +164,9 @@ function Counter() {
       <button onClick={() => dispatch({ type: 'reset', payload: 0 })}>리셋</button>
     </div>
   )
-}
-```
+}`,
+  }}
+/>
 
 ## FC vs 함수 컴포넌트 직접 정의
 
