@@ -147,14 +147,31 @@ function BubblingExample() {
 버블링(올라감)  ←  div ← button
 ```
 
-```jsx
-<div onClickCapture={() => console.log('1. div 캡처')} onClick={() => console.log('4. div 버블')}>
-  <button onClickCapture={() => console.log('2. button 캡처')} onClick={() => console.log('3. button 버블')}>
-    클릭
-  </button>
-</div>
-// 클릭 시 순서: 1 → 2 → 3 → 4
-```
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  showConsole
+  label="캡처링·버블링 순서 실습 — 버튼을 클릭해보세요"
+  files={{
+    '/App.js': `export default function App() {
+  return (
+    <div
+      onClickCapture={() => console.log('1. div 캡처')}
+      onClick={() => console.log('4. div 버블')}
+      style={{ padding: 20, border: '1px solid #999' }}
+    >
+      <button
+        onClickCapture={() => console.log('2. button 캡처')}
+        onClick={() => console.log('3. button 버블')}
+      >
+        클릭
+      </button>
+    </div>
+  )
+}
+// 클릭 시 순서: 1 → 2 → 3 → 4`,
+  }}
+/>
 
 ### 이벤트 위임(Event Delegation) — React가 내부적으로 하는 최적화
 

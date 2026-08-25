@@ -59,8 +59,15 @@ function NameForm() {
 
 입력 필드가 여러 개라면 객체 state 하나로 관리합니다.
 
-```jsx
-function RegistrationForm() {
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  showConsole
+  label="여러 입력 필드 관리 실습"
+  files={{
+    '/App.js': `import { useState } from 'react'
+
+export default function RegistrationForm() {
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -106,8 +113,9 @@ function RegistrationForm() {
       <button type="submit">가입</button>
     </form>
   )
-}
-```
+}`,
+  }}
+/>
 
 `e.target.name` 으로 어떤 필드인지 알고, `[name]: value` 처럼 계산된 속성 이름으로 해당 필드만 업데이트합니다.
 

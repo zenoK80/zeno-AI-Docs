@@ -124,29 +124,46 @@ function Counter() {
 
 `useEffect`가 타이머나 이벤트 리스너를 등록하면, 컴포넌트가 사라질 때 **정리**(cleanup) 가 필요합니다. 정리하지 않으면 메모리 누수나 오류가 발생합니다.
 
-```jsx
-useEffect(() => {
-  // 이펙트 실행
-  const timerId = setInterval(() => {
-    setSeconds(prev => prev + 1)
-  }, 1000)
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="클린업 함수 실습 — 마운트/언마운트 버튼을 눌러 콘솔을 확인하세요"
+  showConsole
+  files={{
+    '/App.js': `import { useState, useEffect } from 'react'
 
-  // 클린업 함수 — 컴포넌트 언마운트 또는 다음 이펙트 실행 전 호출됨
-  return () => {
-    clearInterval(timerId)
-  }
-}, [])
-```
+function Timer() {
+  const [seconds, setSeconds] = useState(0)
 
-```jsx
-useEffect(() => {
-  window.addEventListener('resize', handleResize)
+  useEffect(() => {
+    console.log('타이머 시작')
+    const timerId = setInterval(() => {
+      setSeconds(prev => prev + 1)
+    }, 1000)
 
-  return () => {
-    window.removeEventListener('resize', handleResize)
-  }
-}, [])
-```
+    // 클린업 함수 — 컴포넌트 언마운트 또는 다음 이펙트 실행 전 호출됨
+    return () => {
+      console.log('타이머 정리')
+      clearInterval(timerId)
+    }
+  }, [])
+
+  return <p>{seconds}초</p>
+}
+
+export default function App() {
+  const [showTimer, setShowTimer] = useState(true)
+  return (
+    <div>
+      <button onClick={() => setShowTimer(!showTimer)}>
+        {showTimer ? '타이머 언마운트' : '타이머 마운트'}
+      </button>
+      {showTimer && <Timer />}
+    </div>
+  )
+}`,
+  }}
+/>
 
 클린업 함수는 두 가지 경우에 실행됩니다.
 1. 컴포넌트가 화면에서 사라질 때 (언마운트)
