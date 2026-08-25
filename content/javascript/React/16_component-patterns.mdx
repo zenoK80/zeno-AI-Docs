@@ -53,7 +53,13 @@ function App() {
 
 탭, 아코디언 같이 서로 연관된 여러 컴포넌트를 하나의 그룹으로 만드는 패턴입니다.
 
-```jsx
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="Compound Component 실습 — 탭을 클릭해보세요"
+  files={{
+    '/App.js': `import { createContext, useContext, useState } from 'react'
+
 const TabContext = createContext(null)
 
 function Tabs({ defaultTab, children }) {
@@ -73,7 +79,7 @@ function Tab({ id, children }) {
   const { activeTab, setActiveTab } = useContext(TabContext)
   return (
     <button
-      className={activeTab === id ? 'active' : ''}
+      style={{ fontWeight: activeTab === id ? 'bold' : 'normal' }}
       onClick={() => setActiveTab(id)}
     >
       {children}
@@ -93,7 +99,7 @@ Tabs.Tab = Tab
 Tabs.Panel = TabPanel
 
 // 사용 — 직관적인 API
-function App() {
+export default function App() {
   return (
     <Tabs defaultTab="info">
       <Tabs.List>
@@ -104,8 +110,9 @@ function App() {
       <Tabs.Panel id="review"><p>리뷰 목록</p></Tabs.Panel>
     </Tabs>
   )
-}
-```
+}`,
+  }}
+/>
 
 ---
 
@@ -113,36 +120,42 @@ function App() {
 
 컴포넌트가 렌더링할 내용을 **함수 props**로 받아 유연하게 UI를 결정합니다.
 
-```jsx
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="Render Props 실습 — 상자 안에서 마우스를 움직여보세요"
+  files={{
+    '/App.js': `import { useState } from 'react'
+
 // 마우스 위치를 추적하는 로직 분리
 function MouseTracker({ render }) {
   const [position, setPosition] = useState({ x: 0, y: 0 })
 
   function handleMouseMove(e) {
-    setPosition({ x: e.clientX, y: e.clientY })
+    const rect = e.currentTarget.getBoundingClientRect()
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top })
   }
 
   return (
-    <div onMouseMove={handleMouseMove} style={{ height: '200px', border: '1px solid gray' }}>
+    <div onMouseMove={handleMouseMove} style={{ height: '200px', border: '1px solid gray', position: 'relative' }}>
       {render(position)}
     </div>
   )
 }
 
 // 사용 — 표시 방식만 달리
-function App() {
+export default function App() {
   return (
-    <>
-      <MouseTracker render={({ x, y }) => <p>좌표: {x}, {y}</p>} />
-      <MouseTracker render={({ x, y }) => (
-        <div style={{ position: 'relative' }}>
-          <span style={{ position: 'absolute', left: x, top: y }}>●</span>
-        </div>
-      )} />
-    </>
+    <MouseTracker render={({ x, y }) => (
+      <>
+        <p>좌표: {Math.round(x)}, {Math.round(y)}</p>
+        <span style={{ position: 'absolute', left: x, top: y }}>●</span>
+      </>
+    )} />
   )
-}
-```
+}`,
+  }}
+/>
 
 현재는 커스텀 훅이 Render Props를 대부분 대체합니다. 라이브러리 API에서 자주 보이므로 알아두세요.
 

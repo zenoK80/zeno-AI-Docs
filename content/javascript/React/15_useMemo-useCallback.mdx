@@ -57,8 +57,24 @@ function App() {
 
 의존성이 바뀔 때만 재계산합니다.
 
-```jsx
-function App() {
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  showConsole
+  label="useMemo + React.memo 실습 — count 버튼을 눌러도 리스트가 리렌더링 안 되는지 콘솔로 확인하세요"
+  files={{
+    '/App.js': `import { useState, useMemo, memo } from 'react'
+
+const ExpensiveList = memo(function ExpensiveList({ items }) {
+  console.log('ExpensiveList 렌더링')
+  return (
+    <ul>
+      {items.map(item => <li key={item.id}>{item.name}</li>)}
+    </ul>
+  )
+})
+
+export default function App() {
   const [count, setCount] = useState(0)
 
   // items가 렌더링마다 새 배열로 만들어지는 문제 해결
@@ -70,11 +86,12 @@ function App() {
   return (
     <div>
       <button onClick={() => setCount(count + 1)}>count: {count}</button>
-      <ExpensiveList items={items} />  {/* 이제 items가 바뀌지 않아 리렌더링 안 함 */}
+      <ExpensiveList items={items} />
     </div>
   )
-}
-```
+}`,
+  }}
+/>
 
 무거운 계산에도 씁니다.
 
