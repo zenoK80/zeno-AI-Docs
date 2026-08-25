@@ -106,8 +106,13 @@ function assertNonNull<T>(value: T | null): T {
 
 같은 함수 이름으로 다른 시그니처를 정의합니다.
 
-```ts
-// 오버로드 시그니처
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="함수 오버로딩 실습"
+  files={{
+    '/index.ts': `// 오버로드 시그니처
 function process(input: string): string
 function process(input: number): number
 function process(input: string[]): string[]
@@ -123,10 +128,13 @@ function process(input: string | number | string[]): string | number | string[] 
   }
 }
 
-const result1: string = process('hello')   // OK
-const result2: number = process(42)         // OK
-const result3: string[] = process(['a', 'b']) // OK
-```
+const result1: string = process('hello')      // OK
+const result2: number = process(42)            // OK
+const result3: string[] = process(['a', 'b'])  // OK
+
+console.log(result1, result2, result3)`,
+  }}
+/>
 
 ## this 타입
 

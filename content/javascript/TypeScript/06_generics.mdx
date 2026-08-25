@@ -75,8 +75,13 @@ const listResponse: ApiResponse<User[]> = {
 
 ## 제네릭 클래스
 
-```ts
-class Stack<T> {
+<CodePlayground
+  template="vanilla-ts"
+  activeFile="/index.ts"
+  showConsole
+  label="제네릭 클래스 실습"
+  files={{
+    '/index.ts': `class Stack<T> {
   private items: T[] = []
 
   push(item: T): void {
@@ -99,11 +104,15 @@ class Stack<T> {
 const numberStack = new Stack<number>()
 numberStack.push(1)
 numberStack.push(2)
-numberStack.pop()  // 타입: number | undefined
+console.log('pop:', numberStack.pop())  // 타입: number | undefined
+console.log('size:', numberStack.size)
 
 const stringStack = new Stack<string>()
 stringStack.push('hello')
-```
+stringStack.push('world')
+console.log('peek:', stringStack.peek())`,
+  }}
+/>
 
 ## extends 제약
 
