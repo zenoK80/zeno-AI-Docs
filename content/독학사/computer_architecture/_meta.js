@@ -11,6 +11,8 @@ const meta = {
   '10_memory-hierarchy': '10. 기억장치 계층 — 계층 구조, 주기억장치 RAM·ROM',
   '11_cache-memory': '11. 캐시 기억장치 — 동작 원리, 사상 방식, 쓰기 정책',
   '12_storage-devices': '12. 보조기억장치 — 자기디스크, 광기억장치, SSD, RAID',
+  '13_io-and-bus': '13. 입출력과 버스 — 시스템버스, 장치 제어기, 인터럽트, DMA',
+  '14_parallel-processing': '14. 병렬 처리 — 성능 평가, Flynn 분류, 병렬 컴퓨터',
 }
 
 export default meta
