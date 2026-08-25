@@ -8,5 +8,8 @@ const meta = {
   '07_data-link-layer': '07. 데이터 링크 계층 — 프레임, 오류검출, 흐름제어, ARQ',
   '08_lan-and-ethernet': '08. LAN과 이더넷 — MAC 주소, CSMA/CD, 스위치',
   '09_network-layer-ip': '09. 네트워크 계층·IP — IP 주소, 서브넷팅, CIDR',
+  '10_ip-support-protocols': '10. IP 지원 프로토콜 — ARP, ICMP, IGMP, NAT',
+  '11_routing': '11. 라우팅 — 정적·동적 라우팅, RIP·OSPF·BGP',
+  '12_transport-layer': '12. 전송 계층 — 포트, TCP vs UDP, 3-way handshake',
 }
 export default meta
