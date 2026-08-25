@@ -11,24 +11,35 @@ description: '무한 스크롤, 지연 로딩, 애니메이션 트리거에 Inte
 
 특정 요소가 **뷰포트**(화면에 보이는 영역)나 다른 요소 안으로 진입하거나 이탈할 때 콜백을 호출합니다. 스크롤 이벤트 대신 사용해 성능을 개선합니다.
 
-```js
-const observer = new IntersectionObserver((entries) => {
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="Intersection Observer 실습 — 회색 상자 안을 스크롤해보세요"
+  files={{
+    '/index.html': `<div id="scroller" style="height:150px;overflow-y:auto;border:1px solid #999;">
+  <div style="height:250px;padding:10px;">스크롤을 내려보세요 ↓</div>
+  <div class="watch-me" style="height:80px;background:coral;padding:10px;">감시 대상 박스</div>
+  <div style="height:250px;padding:10px;">스크롤을 더 내려보세요 ↓</div>
+</div>
+<script src="/index.js"></script>`,
+    '/index.js': `const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
-      console.log('화면에 보입니다:', entry.target)
+      console.log('화면에 보입니다:', entry.intersectionRatio.toFixed(2))
     } else {
-      console.log('화면에서 벗어났습니다:', entry.target)
+      console.log('화면에서 벗어났습니다')
     }
   })
+}, {
+  root: document.querySelector('#scroller'),
+  threshold: [0, 1],
 })
 
 const target = document.querySelector('.watch-me')
-observer.observe(target)
-
-// 감시 중단
-observer.unobserve(target)
-observer.disconnect()  // 모든 감시 중단
-```
+observer.observe(target)`,
+  }}
+/>
 
 ## IntersectionObserverEntry 속성
 
