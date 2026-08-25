@@ -11,5 +11,7 @@ const meta = {
   '10_ip-support-protocols': '10. IP 지원 프로토콜 — ARP, ICMP, IGMP, NAT',
   '11_routing': '11. 라우팅 — 정적·동적 라우팅, RIP·OSPF·BGP',
   '12_transport-layer': '12. 전송 계층 — 포트, TCP vs UDP, 3-way handshake',
+  '13_application-layer': '13. 응용 계층 — DNS, HTTP·HTTPS, FTP, 이메일, DHCP',
+  '14_network-security': '14. 네트워크 보안 — 암호화, 디지털서명, SSL/TLS, 방화벽·VPN',
 }
 export default meta

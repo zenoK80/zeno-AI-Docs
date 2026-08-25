@@ -1,0 +1,156 @@
+---
+title: '13. 응용 계층 — DNS, HTTP·HTTPS, FTP, SMTP·POP3·IMAP, DHCP'
+description: 'OSI 7계층인 응용 계층의 대표 프로토콜 DNS, HTTP, FTP, 이메일 프로토콜, DHCP를 익힙니다.'
+---
+
+<Callout type="info">
+  **이번 목표:** DNS의 이름 변환 과정을 이해하고, HTTP·FTP·이메일 프로토콜의 역할과 DHCP의 자동 주소 할당 과정을 설명할 수 있게 됩니다.
+</Callout>
+
+## 응용 계층(Application Layer)의 역할
+
+> **쉽게 말하면:** 응용 계층은 05번 문서의 OSI 7계층으로, 사용자가 실제로 사용하는 프로그램(웹 브라우저, 이메일 클라이언트 등)에 네트워크 서비스를 제공하는 최상위 계층입니다.
+
+## DNS(Domain Name System, 도메인 이름 시스템)
+
+> **쉽게 말하면:** DNS는 사람이 기억하기 쉬운 도메인 이름(예: `google.com`)을, 09번 문서에서 배운 실제 통신에 필요한 IP 주소로 바꿔주는 "전화번호부"입니다.
+
+**동작 과정:**
+
+<Steps>
+### 1단계: 사용자가 도메인 이름 입력
+브라우저에 `www.example.com`을 입력합니다.
+
+### 2단계: DNS 서버에 질의
+컴퓨터는 미리 설정된 DNS 서버에게 "이 도메인의 IP 주소가 무엇인가요?"라고 물어봅니다.
+
+### 3단계: IP 주소 응답
+DNS 서버가 해당 도메인에 대응하는 IP 주소(예: `93.184.216.34`)를 알려줍니다.
+
+### 4단계: 실제 접속
+컴퓨터는 이제 이 IP 주소로 실제 웹 서버에 접속합니다.
+</Steps>
+
+<Callout type="info">
+  **10번 문서와의 연결:** DNS의 동작 원리는 08번 문서의 ARP(IP↔MAC 변환)와 매우 비슷한 "이름을 주소로 바꿔주는" 구조입니다. 다만 ARP는 같은 네트워크 안에서, DNS는 전 세계 인터넷을 대상으로 계층적인 서버 구조를 통해 동작한다는 규모의 차이가 있습니다.
+</Callout>
+
+## HTTP와 HTTPS
+
+> **쉽게 말하면:** HTTP는 웹 브라우저와 웹 서버가 웹페이지 데이터를 주고받는 약속(03번 문서의 프로토콜)이고, HTTPS는 그 통신 내용을 암호화(14번 문서에서 다룸)해 안전하게 만든 버전입니다.
+
+<Table>
+  <thead>
+    <tr><th>구분</th><th>포트 번호</th><th>암호화 여부</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>HTTP</td><td>80</td><td>암호화 없음(평문 전송)</td></tr>
+    <tr><td>HTTPS</td><td>443</td><td>SSL/TLS로 암호화(14번 문서에서 다룸)</td></tr>
+  </tbody>
+</Table>
+
+<Callout type="warning">
+  **자주 틀리는 점:** HTTP를 "웹페이지를 화면에 보여주는 프로그램"으로 오해하기 쉽지만, HTTP는 웹 브라우저(클라이언트)와 웹 서버가 데이터를 주고받는 **통신 규칙**일 뿐입니다. 실제로 그 데이터를 사람이 보기 좋게 그려주는 것은 브라우저의 렌더링 엔진이 담당하는 별도의 작업입니다.
+</Callout>
+
+## FTP(File Transfer Protocol, 파일 전송 프로토콜)
+
+> **쉽게 말하면:** FTP는 이름 그대로, 컴퓨터 사이에 파일을 전송하기 위해 특화된 프로토콜입니다.
+
+**특징:** FTP는 특이하게도 두 개의 연결(제어용 포트 21, 실제 데이터 전송용 포트 20)을 별도로 사용합니다. 제어 연결로 "어떤 파일을 보낼지" 명령을 주고받고, 데이터 연결로 실제 파일 내용을 전송합니다.
+
+## 이메일 프로토콜 — SMTP, POP3, IMAP
+
+<Table>
+  <thead>
+    <tr><th>프로토콜</th><th>역할</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>SMTP(Simple Mail Transfer Protocol)</td><td>이메일을 "보낼 때" 사용(발신자 → 메일 서버 → 수신자의 메일 서버)</td></tr>
+    <tr><td>POP3(Post Office Protocol 3)</td><td>이메일을 서버에서 내 기기로 "다운로드"하는 방식. 다운로드 후 보통 서버에서 삭제됨</td></tr>
+    <tr><td>IMAP(Internet Message Access Protocol)</td><td>이메일을 서버에 그대로 "둔 채로" 여러 기기에서 동기화해 확인하는 방식</td></tr>
+  </tbody>
+</Table>
+
+<Callout type="info">
+  **POP3와 IMAP의 실용적 차이:** 스마트폰과 PC 두 기기에서 모두 같은 메일함을 확인하고 싶다면 IMAP이 적합합니다(서버에 원본이 유지되어 모든 기기에서 동일하게 보임). 반면 하나의 기기에서만 메일을 확인하고 서버 용량을 절약하고 싶다면 POP3가 적합할 수 있습니다.
+</Callout>
+
+## DHCP(Dynamic Host Configuration Protocol, 동적 호스트 구성 프로토콜)
+
+> **쉽게 말하면:** DHCP는 컴퓨터가 네트워크에 새로 연결될 때, IP 주소를 사람이 수동으로 설정하지 않아도 자동으로 할당해주는 프로토콜입니다.
+
+**동작 과정**(DORA):
+
+<Steps>
+### 1단계: Discover(발견)
+새로 접속한 기기가 "IP 주소를 할당해줄 DHCP 서버가 있나요?"라고 네트워크에 브로드캐스트로 물어봅니다.
+
+### 2단계: Offer(제안)
+DHCP 서버가 "이 IP 주소를 사용하세요"라고 사용 가능한 주소를 제안합니다.
+
+### 3단계: Request(요청)
+기기가 "제안받은 그 주소를 사용하겠습니다"라고 요청합니다.
+
+### 4단계: Acknowledge(승인)
+서버가 최종적으로 주소 할당을 확정하며 승인합니다.
+</Steps>
+
+<Callout type="warning">
+  **자주 틀리는 점:** DHCP가 할당하는 IP 주소는 "영구히 그 기기의 것"이 아니라 **임대**(Lease) 개념입니다. 정해진 임대 기간이 지나면 다시 갱신을 요청해야 하며, 기기가 네트워크를 떠나면 그 주소는 다른 기기에 재할당될 수 있습니다. 이는 08번 문서에서 배운 MAC 주소(영구적, 변경 불가)와 근본적으로 다른 성격입니다.
+</Callout>
+
+## 핵심 정리
+
+- **DNS**: 도메인 이름 ↔ IP 주소 변환("인터넷 전화번호부").
+- **HTTP**(암호화 없음, 포트 80)/**HTTPS**(암호화, 포트 443): 웹 통신 프로토콜.
+- **FTP**: 파일 전송 전용, 제어(21)·데이터(20) 두 연결 사용.
+- **SMTP**(발신), **POP3**(다운로드 후 삭제), **IMAP**(서버 유지, 여러 기기 동기화): 이메일 프로토콜.
+- **DHCP**: IP 주소 자동 할당(DORA 과정). 임대 개념이라 영구적이지 않음.
+
+## 마무리 복습
+
+<Quiz
+  questionNumber={1}
+  question="DNS(Domain Name System)의 역할은?"
+  options={['①웹페이지를 화면에 그려준다', '②도메인 이름을 IP 주소로 변환해준다', '③파일을 압축한다', '④이메일을 암호화한다']}
+  correctAnswer={2}
+  explanation="DNS는 사람이 기억하기 쉬운 도메인 이름을 실제 통신에 필요한 IP 주소로 변환해주는 서비스입니다."
+  optionExplanations={['화면 렌더링은 브라우저의 역할입니다.', '맞습니다. 도메인 이름-IP 주소 변환입니다.', '압축과는 무관한 프로토콜입니다.', '이메일 암호화와는 무관한 프로토콜입니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="HTTPS가 HTTP와 다른 점은?"
+  options={['①HTTPS는 파일 전송 전용이다', '②HTTPS는 통신 내용을 암호화한다', '③HTTPS는 이메일 프로토콜이다', '④둘은 완전히 같은 프로토콜이다']}
+  correctAnswer={2}
+  explanation="HTTPS는 HTTP 통신을 SSL/TLS로 암호화해 안전하게 만든 버전입니다."
+  optionExplanations={['파일 전송 전용은 FTP입니다.', '맞습니다. 암호화가 핵심 차이입니다.', '이메일 프로토콜은 SMTP 등입니다.', '암호화 여부에서 중요한 차이가 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="이메일을 서버에 그대로 두고 여러 기기에서 동기화해 확인하는 프로토콜은?"
+  options={['①SMTP', '②POP3', '③IMAP', '④FTP']}
+  correctAnswer={3}
+  explanation="IMAP은 이메일을 서버에 유지한 채로 여러 기기에서 동기화해 확인할 수 있게 해주는 프로토콜입니다."
+  optionExplanations={['SMTP는 이메일을 보낼 때 사용하는 프로토콜입니다.', 'POP3는 다운로드 후 보통 서버에서 삭제하는 방식입니다.', '맞습니다. IMAP입니다.', 'FTP는 파일 전송 프로토콜입니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="DHCP의 IP 주소 할당 과정(DORA)을 순서대로 나열한 것은?"
+  options={['①Offer-Discover-Acknowledge-Request', '②Discover-Offer-Request-Acknowledge', '③Request-Discover-Offer-Acknowledge', '④Acknowledge-Offer-Discover-Request']}
+  correctAnswer={2}
+  explanation="DHCP는 Discover(발견)→Offer(제안)→Request(요청)→Acknowledge(승인) 순서로 진행됩니다."
+  optionExplanations={['순서가 올바르지 않습니다.', '맞습니다. Discover-Offer-Request-Acknowledge입니다.', '순서가 올바르지 않습니다.', '순서가 완전히 반대로 되어 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="DHCP로 할당된 IP 주소의 성격에 대한 올바른 설명은?"
+  options={['①MAC 주소처럼 영구적으로 고정된다', '②임대(Lease) 개념으로, 기간이 지나면 갱신하거나 다른 기기에 재할당될 수 있다', '③한 번 할당되면 절대 변경할 수 없다', '④DHCP는 IP 주소와 무관한 프로토콜이다']}
+  correctAnswer={2}
+  explanation="DHCP가 할당하는 IP 주소는 임대 개념으로, 정해진 기간이 지나면 갱신이 필요하고 기기가 떠나면 다른 기기에 재할당될 수 있습니다."
+  optionExplanations={['MAC 주소와 달리 DHCP IP는 영구적이지 않습니다.', '맞습니다. 임대 개념입니다.', '임대 기간이 지나면 변경될 수 있습니다.', 'DHCP는 바로 IP 주소를 자동 할당하는 프로토콜입니다.']}
+/>
