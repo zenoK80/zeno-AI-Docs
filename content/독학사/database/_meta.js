@@ -5,5 +5,8 @@ const meta = {
   '04_db-overview': '04. 데이터베이스 개요·시스템 — 3단계 스키마, 무결성',
   '05_er-model': '05. 개체-관계 모델 — ER 다이어그램, 테이블 변환',
   '06_relational-db': '06. 관계 데이터베이스 — 키 종류, 관계대수',
+  '07_sql-ddl-dml': '07. SQL DDL·DML — CREATE·ALTER·DROP, INSERT·UPDATE·DELETE',
+  '08_sql-advanced': '08. SQL 고급 — 조인, 서브쿼리, 뷰, 권한',
+  '09_query-processing': '09. 질의 처리와 최적화',
 }
 export default meta
