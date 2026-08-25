@@ -9,6 +9,8 @@ const meta = {
   '08_queue': '08. 큐 — FIFO, 원형 큐, 덱, 우선순위 큐',
   '09_tree-basics': '09. 트리 기초 — 용어, 이진 트리, 순회',
   '10_thread-binary-tree': '10. 스레드 이진 트리',
+  '11_heap-and-bst': '11. 히프와 이진 탐색 트리',
+  '12_b-tree': '12. m원 탐색 트리와 B-트리',
 }
 
 export default meta
