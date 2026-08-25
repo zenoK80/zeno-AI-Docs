@@ -8,5 +8,8 @@ const meta = {
   '07_activation-functions': '07. 활성화 함수 — Sigmoid·Tanh·ReLU·Softmax',
   '08_forward-pass': '08. 순전파 — 가중합, 행렬 연산, 출력층 해석',
   '09_loss-functions': '09. 손실 함수 — MSE, Cross Entropy',
+  '10_gradient-descent-and-backprop': '10. 경사하강법과 역전파',
+  '11_optimization': '11. 신경망 최적화 — SGD, Momentum, Adam',
+  '12_training-problems-and-regularization': '12. 학습 문제와 정규화 — 기울기소실, Dropout, BatchNorm',
 }
 export default meta
