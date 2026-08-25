@@ -61,7 +61,7 @@ const groups: SeriesGroup[] = [
         title: 'ECMAScript',
         description: 'JavaScript의 표준 문법과 실행 환경의 경계를 이해합니다.',
         href: '/javascript/ECMAscript/01_javascript-and-ecmascript',
-        documentCount: 22,
+        documentCount: 34,
         preview: 'code',
         accent: 'blue',
       },
