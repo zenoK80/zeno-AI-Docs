@@ -48,10 +48,15 @@ objA와 objB는 메모리의 같은 객체를 가리킵니다.
 
 ## 함수 인수로 전달할 때
 
-원시값은 복사본이 전달되고, 객체는 참조가 전달됩니다.
+원시값은 복사본이 전달되고, 객체는 참조가 전달됩니다. 두 함수의 동작 차이를 직접 실행해서 확인해보세요.
 
-```js
-function changePrimitive(x) {
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="원시값 vs 객체 전달 실습"
+  files={{
+    '/index.js': `function changePrimitive(x) {
   x = 100
 }
 function changeObject(obj) {
@@ -65,8 +70,9 @@ changePrimitive(num)
 changeObject(myObj)
 
 console.log(num)        // 1 (원시값은 복사본 변경)
-console.log(myObj.value) // 100 (객체는 참조 공유)
-```
+console.log(myObj.value) // 100 (객체는 참조 공유)`,
+  }}
+/>
 
 ## 객체 동등 비교
 

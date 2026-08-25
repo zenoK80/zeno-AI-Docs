@@ -74,13 +74,22 @@ console.log(greet('철수'))   // '안녕하세요, 철수님!'
 
 ## 나머지 매개변수 (Rest Parameter)
 
-```js
-function sum(...numbers) {
+인수를 몇 개 넘기든 배열로 모아 받습니다. 숫자를 더 추가해서 실행해보세요.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="나머지 매개변수 실습"
+  files={{
+    '/index.js': `function sum(...numbers) {
+  console.log(numbers)  // 배열로 모인 인수들
   return numbers.reduce((acc, n) => acc + n, 0)
 }
 
-console.log(sum(1, 2, 3, 4))  // 10
-```
+console.log(sum(1, 2, 3, 4))  // 10`,
+  }}
+/>
 
 ## arguments 객체
 

@@ -77,13 +77,18 @@ console.log(p.name)  // '민준'
 
 화살표 함수는 자체 `this`를 갖지 않습니다. **정의된 위치의 외부 스코프 this를 캡처**합니다.
 
-```js
-const timer = {
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="화살표 함수 vs 일반 함수의 this 실습"
+  files={{
+    '/index.js': `const timer = {
   name: '타이머',
   start() {
     // 화살표 함수: 외부 start 메서드의 this (timer 객체)
     setTimeout(() => {
-      console.log(this.name)  // '타이머'
+      console.log('화살표 함수:', this.name)  // '타이머'
     }, 100)
   },
 }
@@ -94,11 +99,13 @@ const timer2 = {
   name: '타이머2',
   start() {
     setTimeout(function() {
-      console.log(this.name)  // undefined (this가 window)
+      console.log('일반 함수:', this.name)  // undefined (this가 전역 또는 undefined)
     }, 100)
   },
 }
-```
+timer2.start()`,
+  }}
+/>
 
 ## this 바인딩 우선순위
 

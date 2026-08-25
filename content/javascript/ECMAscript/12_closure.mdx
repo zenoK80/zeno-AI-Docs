@@ -11,8 +11,13 @@ description: '클로저 개념과 활용 패턴, 메모리 주의사항을 실�
 
 **클로저**(closure) 는 함수가 정의될 때의 외부 스코프 변수를 기억하고, 그 함수가 실행될 때 해당 변수에 접근할 수 있는 메커니즘입니다.
 
-```js
-function makeCounter() {
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="클로저 카운터 실습 — counter()를 더 호출해보세요"
+  files={{
+    '/index.js': `function makeCounter() {
   let count = 0           // 외부 함수의 변수
 
   return function() {     // 내부 함수(클로저)
@@ -25,7 +30,11 @@ const counter = makeCounter()
 console.log(counter())  // 1
 console.log(counter())  // 2
 console.log(counter())  // 3
-```
+
+const counter2 = makeCounter()
+console.log(counter2()) // 1 (counter와 완전히 독립된 count를 가짐)`,
+  }}
+/>
 
 `makeCounter()`가 반환한 내부 함수는 `count`를 기억합니다. 외부에서 `count`에 직접 접근할 수는 없고 `counter()`를 통해서만 변경할 수 있습니다.
 

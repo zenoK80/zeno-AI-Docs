@@ -101,10 +101,15 @@ outer_fn()
 
 ## 렉시컬 스코프
 
-JavaScript는 함수가 **정의된 위치**를 기준으로 스코프를 결정합니다(렉시컬 스코프, 정적 스코프).
+JavaScript는 함수가 **정의된 위치**를 기준으로 스코프를 결정합니다(렉시컬 스코프, 정적 스코프). `print()`가 `run()` 안에서 호출되는데도 왜 'local'이 아닌 'global'이 출력되는지 직접 실행해서 확인해보세요.
 
-```js
-const x = 'global'
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="렉시컬 스코프 실습"
+  files={{
+    '/index.js': `const x = 'global'
 
 function print() {
   console.log(x)  // 정의 시점의 x를 참조
@@ -114,8 +119,9 @@ function run() {
   const x = 'local'
   print()         // 'global' 출력 (호출 위치가 아닌 정의 위치 기준)
 }
-run()
-```
+run()`,
+  }}
+/>
 
 ## 핵심 정리
 
