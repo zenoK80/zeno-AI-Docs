@@ -483,11 +483,10 @@
   --junction-x: -50%;
   --junction-y: -50%;
   position: absolute;
-  z-index: 30;
+  z-index: 5;
   width: 8px;
   height: 8px;
   background: var(--junction);
-  box-shadow: 0 0 0 3px var(--surface);
   opacity: 1;
   pointer-events: none;
   transform: translate(var(--junction-x), var(--junction-y)) rotate(45deg);
@@ -532,6 +531,7 @@
 }
 .featureRail {
   position: relative;
+  z-index: 3;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: min(var(--content-width), calc(100% - 64px));
@@ -677,6 +677,7 @@
 
 .group {
   position: relative;
+  z-index: 3;
 }
 
 .group::before {
@@ -999,6 +1000,7 @@
 
 .closing {
   position: relative;
+  z-index: 3;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(180px, 0.38fr) minmax(300px, 0.82fr);
   gap: clamp(48px, 8vw, 128px);
@@ -1140,6 +1142,7 @@
 
 .siteFooter {
   position: relative;
+  z-index: 3;
   display: grid;
   grid-template-columns: minmax(230px, 1fr) auto auto;
   gap: 32px;
