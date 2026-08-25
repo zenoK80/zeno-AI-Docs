@@ -15,5 +15,7 @@ const meta = {
   '14_clustering': '14. 비지도학습 — 군집화, K-Means, 계층적 군집',
   '15_dimension-reduction': '15. 차원 축소 — 차원의 저주, PCA 주성분',
   '16_model-evaluation': '16. 모델 평가 — 교차검증, 혼동행렬, 정밀도·재현율, ROC-AUC',
+  '17_regularization-and-ml-practice': '17. 과적합·정규화·실무 파이프라인',
+  '18_exam-practice': '18. 머신러닝 예상기출문제',
 }
 export default meta
