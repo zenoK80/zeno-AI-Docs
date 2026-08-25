@@ -12,5 +12,8 @@ const meta = {
   '11_decision-tree': '11. 의사결정나무 — 엔트로피, 정보이득, 가지치기',
   '12_ensemble': '12. 앙상블 학습 — 배깅, 부스팅, 랜덤 포레스트',
   '13_svm': '13. SVM — 결정 경계, 마진, 서포트 벡터, 커널 트릭',
+  '14_clustering': '14. 비지도학습 — 군집화, K-Means, 계층적 군집',
+  '15_dimension-reduction': '15. 차원 축소 — 차원의 저주, PCA 주성분',
+  '16_model-evaluation': '16. 모델 평가 — 교차검증, 혼동행렬, 정밀도·재현율, ROC-AUC',
 }
 export default meta
