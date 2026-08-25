@@ -81,8 +81,12 @@ function UserInfo() {
 
 ## 실전 예제 — 다크 모드
 
-```jsx
-import { createContext, useContext, useState } from 'react'
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="Context API 다크 모드 실습 — 버튼을 눌러보세요"
+  files={{
+    '/App.js': `import { createContext, useContext, useState } from 'react'
 
 const ThemeContext = createContext('light')
 
@@ -105,7 +109,7 @@ function Header() {
   const { theme, toggleTheme } = useContext(ThemeContext)
 
   return (
-    <header style={{ background: theme === 'dark' ? '#333' : '#fff' }}>
+    <header style={{ background: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000', padding: 10 }}>
       <button onClick={toggleTheme}>
         {theme === 'dark' ? '라이트 모드' : '다크 모드'}
       </button>
@@ -113,15 +117,16 @@ function Header() {
   )
 }
 
-function App() {
+export default function App() {
   return (
     <ThemeProvider>
       <Header />
       <main>본문</main>
     </ThemeProvider>
   )
-}
-```
+}`,
+  }}
+/>
 
 ---
 
