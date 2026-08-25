@@ -30,8 +30,13 @@ const multiLine = `첫 번째 줄
 
 배열이나 객체에서 값을 꺼내 변수에 바로 할당합니다.
 
-```js
-// 배열 구조 분해
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="구조 분해 할당 실습"
+  files={{
+    '/index.js': `// 배열 구조 분해
 const [first, second, ...rest] = [1, 2, 3, 4, 5]
 console.log(first)   // 1
 console.log(rest)    // [3, 4, 5]
@@ -46,8 +51,9 @@ console.log(name, age, job)  // '영희' 25 '미정'
 
 // 이름 변경
 const { name: userName } = { name: '홍길동' }
-console.log(userName)   // '홍길동'
-```
+console.log(userName)   // '홍길동'`,
+  }}
+/>
 
 ## 전개 연산자 (Spread Operator)
 

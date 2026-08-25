@@ -120,14 +120,28 @@ strs.sort()  // 유니코드 순 정렬
 
 ## 메서드 체이닝
 
-```js
+filter → map → sort를 이어붙여 데이터 파이프라인을 만들 수 있습니다. 조건이나 데이터를 바꿔가며 실행해보세요.
+
+<CodePlayground
+  template="vanilla"
+  activeFile="/index.js"
+  showConsole
+  label="배열 메서드 체이닝 실습"
+  files={{
+    '/index.js': `const people = [
+  { name: '철수', age: 20 },
+  { name: '영희', age: 25 },
+  { name: '민준', age: 20 },
+]
+
 const result = people
   .filter(p => p.age >= 21)
   .map(p => p.name)
   .sort()
 
-console.log(result)  // ['영희']
-```
+console.log(result)  // ['영희']`,
+  }}
+/>
 
 ## 핵심 정리
 
