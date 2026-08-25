@@ -11,7 +11,12 @@ description: 'Portals, forwardRef, useImperativeHandle, 성능 최적화 패턴�
 
 일반적으로 React 컴포넌트는 부모의 DOM 안에 렌더링됩니다. 하지만 **모달, 툴팁, 드롭다운** 같은 UI는 부모의 CSS(overflow: hidden, z-index 등)에 영향을 받으면 안 됩니다. Portal을 쓰면 DOM의 다른 위치에 렌더링할 수 있습니다.
 
-```jsx
+<CodePlayground
+  template="react"
+  activeFile="/App.js"
+  label="Portal 모달 실습 — 모달 열기 버튼을 눌러보세요"
+  files={{
+    '/App.js': `import { useState } from 'react'
 import { createPortal } from 'react-dom'
 
 function Modal({ isOpen, onClose, children }) {
@@ -19,8 +24,11 @@ function Modal({ isOpen, onClose, children }) {
 
   // document.body에 직접 렌더링
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    >
+      <div onClick={e => e.stopPropagation()} style={{ background: 'white', padding: 20, borderRadius: 8 }}>
         <button onClick={onClose}>닫기</button>
         {children}
       </div>
@@ -29,7 +37,7 @@ function Modal({ isOpen, onClose, children }) {
   )
 }
 
-function App() {
+export default function App() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -40,8 +48,9 @@ function App() {
       </Modal>
     </div>
   )
-}
-```
+}`,
+  }}
+/>
 
 Portal로 렌더링해도 React 이벤트 시스템과 Context는 정상 작동합니다.
 
