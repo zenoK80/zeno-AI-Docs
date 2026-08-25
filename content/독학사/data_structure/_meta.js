@@ -7,6 +7,8 @@ const meta = {
   '06_linked-list': '06. 연결 리스트 — 단순·이중·원형, 삽입·삭제',
   '07_stack': '07. 스택 — LIFO, 후위 표기식 계산',
   '08_queue': '08. 큐 — FIFO, 원형 큐, 덱, 우선순위 큐',
+  '09_tree-basics': '09. 트리 기초 — 용어, 이진 트리, 순회',
+  '10_thread-binary-tree': '10. 스레드 이진 트리',
 }
 
 export default meta
