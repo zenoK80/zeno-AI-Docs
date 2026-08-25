@@ -13,5 +13,9 @@ const meta = {
   '12_transport-layer': '12. 전송 계층 — 포트, TCP vs UDP, 3-way handshake',
   '13_application-layer': '13. 응용 계층 — DNS, HTTP·HTTPS, FTP, 이메일, DHCP',
   '14_network-security': '14. 네트워크 보안 — 암호화, 디지털서명, SSL/TLS, 방화벽·VPN',
+  '15_osi-and-data-link-question-types': '15. OSI·데이터 링크 기출 유형',
+  '16_ip-and-routing-question-types': '16. IP·라우팅 기출 유형',
+  '17_tcp-and-app-question-types': '17. TCP·응용 계층 기출 유형',
+  '18_exam-practice': '18. 컴퓨터네트워크 종합 모의고사',
 }
 export default meta

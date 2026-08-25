@@ -1,0 +1,143 @@
+---
+title: '15. OSI·데이터 링크 기출 유형'
+description: 'OSI 7계층과 데이터 링크 계층 관련 시험 대비 예상기출 문제 모음'
+---
+
+<Callout type="warning">
+  실제 기출 문제를 그대로 복제하지 않습니다. 공식 출제 범위를 바탕으로 재구성한 문제입니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="OSI 7계층을 최하위부터 순서대로 나열한 것은?"
+  options={['①물리-데이터링크-네트워크-전송-세션-표현-응용', '②응용-표현-세션-전송-네트워크-데이터링크-물리', '③전송-네트워크-데이터링크-물리-응용-표현-세션', '④물리-네트워크-데이터링크-전송-세션-표현-응용']}
+  correctAnswer={1}
+  explanation="OSI 7계층은 물리-데이터링크-네트워크-전송-세션-표현-응용 순서로 최하위부터 쌓입니다."
+  optionExplanations={['맞습니다. 최하위부터의 정확한 순서입니다.', '이는 최상위부터의 순서(반대)입니다.', '순서가 뒤섞여 있습니다.', '데이터링크와 네트워크의 순서가 바뀌었습니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="전송 계층에서 사용하는 데이터 단위(PDU)는?"
+  options={['①비트', '②프레임', '③패킷', '④세그먼트']}
+  correctAnswer={4}
+  explanation="전송 계층의 데이터 단위는 세그먼트(TCP) 또는 데이터그램(UDP)입니다."
+  optionExplanations={['비트는 물리 계층의 단위입니다.', '프레임은 데이터 링크 계층의 단위입니다.', '패킷은 네트워크 계층의 단위입니다.', '맞습니다. 세그먼트입니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="TCP/IP 모델의 '네트워크 접근 계층'이 통합하는 OSI 계층은?"
+  options={['①응용, 표현', '②물리, 데이터링크', '③네트워크, 전송', '④세션, 표현, 응용']}
+  correctAnswer={2}
+  explanation="TCP/IP의 네트워크 접근 계층은 OSI의 물리 계층과 데이터링크 계층(1, 2계층)을 통합한 것입니다."
+  optionExplanations={['이는 응용 계층과 관련된 OSI 계층입니다.', '맞습니다. OSI 1, 2계층입니다.', '이는 각각 인터넷 계층, 전송 계층에 대응합니다.', '이는 TCP/IP의 응용 계층에 통합됩니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="캡슐화(Encapsulation) 과정에서 헤더가 붙는 순서로 옳은 것은?"
+  options={['①MAC 헤더 → IP 헤더 → 포트 헤더', '②포트(전송) 헤더 → IP 헤더 → MAC 헤더', '③IP 헤더 → 포트 헤더 → MAC 헤더', '④헤더는 한 번만 붙는다']}
+  correctAnswer={2}
+  explanation="데이터는 전송 계층(포트)→네트워크 계층(IP)→데이터 링크 계층(MAC) 순서로 헤더가 겹겹이 붙습니다."
+  optionExplanations={['순서가 반대로 되어 있습니다.', '맞습니다. 전송→네트워크→데이터링크 순서입니다.', 'IP 헤더보다 전송 계층 헤더가 먼저 붙습니다.', '각 계층마다 헤더가 순서대로 추가됩니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="CRC(순환 중복 검사)가 수행하는 기능은?"
+  options={['①오류를 스스로 수정한다', '②전송 중 데이터가 훼손되었는지 검출한다', '③데이터를 압축한다', '④IP 주소를 할당한다']}
+  correctAnswer={2}
+  explanation="CRC는 전송된 데이터에 오류가 있는지 검출하는 기법이며, 오류를 스스로 수정하지는 못합니다."
+  optionExplanations={['CRC는 검출만 하며 수정 기능은 없습니다(해밍 코드가 수정 기능을 가짐).', '맞습니다. 오류 검출입니다.', '압축과는 무관한 기능입니다.', 'IP 주소 할당은 DHCP의 역할입니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="오류가 발생한 프레임만 선택적으로 재전송하는 ARQ 방식은?"
+  options={['①Stop-and-Wait ARQ', '②Go-Back-N ARQ', '③Selective-Repeat ARQ', '④Adaptive ARQ']}
+  correctAnswer={3}
+  explanation="Selective-Repeat ARQ는 오류가 발생한 프레임만 선택적으로 재전송하는 가장 효율적인 방식입니다."
+  optionExplanations={['Stop-and-Wait는 하나씩 확인하며 전송하는 가장 단순한 방식입니다.', 'Go-Back-N은 오류 프레임 이후 전체를 재전송합니다.', '맞습니다. Selective-Repeat입니다.', 'Adaptive ARQ는 이 문서에서 다루지 않은 별도 방식입니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="MAC 주소의 비트 수는?"
+  options={['①24비트', '②32비트', '③48비트', '④64비트']}
+  correctAnswer={3}
+  explanation="MAC 주소는 48비트이며, 앞 24비트는 제조사 식별, 뒤 24비트는 일련번호입니다."
+  optionExplanations={['이는 MAC 주소의 절반(제조사 식별 부분)에 해당합니다.', '32비트는 IPv4 주소의 크기입니다.', '맞습니다. 48비트입니다.', '64비트가 아닙니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="CSMA/CD에서 'Multiple Access'가 의미하는 것은?"
+  options={['①회선이 사용 중인지 감지하는 것', '②여러 장치가 하나의 공유 회선을 함께 사용하는 것', '③신호 충돌을 감지하는 것', '④암호화를 여러 번 반복하는 것']}
+  correctAnswer={2}
+  explanation="Multiple Access는 여러 장치가 하나의 공유 회선에 함께 접근해 사용하는 것을 의미합니다."
+  optionExplanations={['이는 Carrier Sense에 대한 설명입니다.', '맞습니다. 여러 장치의 공유 접근입니다.', '이는 Collision Detection에 대한 설명입니다.', '암호화와는 무관한 개념입니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="스위치가 MAC 주소 테이블에서 목적지를 찾지 못했을 때 취하는 동작은?"
+  options={['①프레임을 폐기한다', '②모든 포트로 전달(플러딩)한다', '③영구히 대기한다', '④무작위 포트로만 전달한다']}
+  correctAnswer={2}
+  explanation="목적지를 모를 때 스위치는 일단 모든 포트로 플러딩한 후, 응답을 통해 위치를 학습합니다."
+  optionExplanations={['폐기하지 않고 플러딩으로 처리합니다.', '맞습니다. 플러딩입니다.', '영구 대기가 아니라 즉시 플러딩합니다.', '무작위가 아니라 모든 포트입니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="물리 계층에서 담당하는 역할은?"
+  options={['①IP 주소를 이용한 라우팅', '②비트를 실제 전기·광·전파 신호로 변환', '③포트 번호를 이용한 응용 프로그램 구분', '④도메인 이름을 IP 주소로 변환']}
+  correctAnswer={2}
+  explanation="물리 계층은 비트(0/1)를 실제 전송 매체를 통해 흐를 수 있는 신호로 변환하는 최하위 계층입니다."
+  optionExplanations={['라우팅은 네트워크 계층의 역할입니다.', '맞습니다. 물리 신호 변환입니다.', '포트 구분은 전송 계층의 역할입니다.', '이는 응용 계층의 DNS 역할입니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="Go-Back-N ARQ에서 프레임 4번에 오류가 발생했다면 몇 번부터 재전송하는가?"
+  options={['①1번부터 전체', '②4번부터 이후 모든 프레임', '③4번만', '④재전송하지 않는다']}
+  correctAnswer={2}
+  explanation="Go-Back-N은 오류가 발생한 프레임(4번)부터 그 이후의 모든 프레임을 재전송합니다."
+  optionExplanations={['1번부터가 아니라 오류가 발생한 지점부터입니다.', '맞습니다. 4번부터 이후 전체입니다.', '4번만 재전송하는 것은 Selective-Repeat입니다.', '오류가 발생했으므로 재전송이 필요합니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="흐름제어(Flow Control)의 목적으로 옳은 것은?"
+  options={['①송신 속도를 무조건 최대로 높이기 위해', '②수신 측이 감당하지 못하는 양의 데이터가 전송되는 것을 방지하기 위해', '③암호화를 수행하기 위해', '④IP 주소를 할당하기 위해']}
+  correctAnswer={2}
+  explanation="흐름제어는 송신 측이 수신 측의 처리 능력을 넘어서는 데이터를 보내지 않도록 조절하는 것이 목적입니다."
+  optionExplanations={['오히려 수신 측 속도에 맞춰 조절합니다.', '맞습니다. 수신 측 보호가 목적입니다.', '암호화와는 무관한 기능입니다.', 'IP 주소 할당은 DHCP의 역할입니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="네트워크 계층에서 사용되는 대표 주소는?"
+  options={['①MAC 주소', '②IP 주소', '③포트 번호', '④도메인 이름']}
+  correctAnswer={2}
+  explanation="네트워크 계층(OSI 3계층)에서는 IP 주소를 사용해 서로 다른 네트워크 간 경로를 결정합니다."
+  optionExplanations={['MAC 주소는 데이터 링크 계층에서 사용됩니다.', '맞습니다. IP 주소입니다.', '포트 번호는 전송 계층에서 사용됩니다.', '도메인 이름은 응용 계층(DNS)에서 사용됩니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="이더넷 표준을 제정한 기관은?"
+  options={['①ISO', '②IEEE', '③IETF', '④W3C']}
+  correctAnswer={2}
+  explanation="이더넷(IEEE 802.3)은 IEEE(전기전자기술자협회)가 제정한 표준입니다."
+  optionExplanations={['ISO는 OSI 참조모델을 제정했습니다.', '맞습니다. IEEE입니다.', 'IETF는 TCP/IP, HTTP 등을 표준화합니다.', 'W3C는 웹 표준을 다루는 기관입니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="맨체스터 인코딩이 NRZ보다 유리한 점은?"
+  options={['①전선을 더 적게 사용한다', '②신호가 주기적으로 바뀌어 송수신 측의 타이밍 동기화에 유리하다', '③암호화 기능이 내장되어 있다', '④전송 속도가 항상 2배 빠르다']}
+  correctAnswer={2}
+  explanation="맨체스터 인코딩은 매 비트 구간 중간에 전압이 바뀌도록 설계되어, 타이밍 동기화에 유리합니다."
+  optionExplanations={['전선 사용량과는 무관한 특성입니다.', '맞습니다. 타이밍 동기화가 핵심 장점입니다.', '암호화 기능은 포함되어 있지 않습니다.', '속도가 항상 2배라는 것은 정확하지 않습니다.']}
+/>

@@ -1,0 +1,143 @@
+---
+title: '17. TCP·응용 계층 기출 유형'
+description: '전송 계층(TCP/UDP)과 응용 계층 프로토콜, 네트워크 보안 관련 시험 대비 예상기출 문제 모음'
+---
+
+<Callout type="warning">
+  실제 기출 문제를 그대로 복제하지 않습니다. 공식 출제 범위를 바탕으로 재구성한 문제입니다.
+</Callout>
+
+<Quiz
+  questionNumber={1}
+  question="포트 번호의 역할은?"
+  options={['①어느 국가로 보낼지 결정', '②컴퓨터 안에서 어느 응용 프로그램에게 전달할지 구분', '③케이블 종류를 결정', '④암호화 키를 생성']}
+  correctAnswer={2}
+  explanation="포트 번호는 도착한 데이터를 컴퓨터 안의 어느 응용 프로그램에게 전달할지 구분합니다."
+  optionExplanations={['국가·목적지 결정은 IP 주소의 역할입니다.', '맞습니다. 응용 프로그램 구분입니다.', '케이블 종류와는 무관합니다.', '암호화 키 생성과는 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={2}
+  question="TCP와 UDP 중 연결 지향(Connection-oriented) 프로토콜은?"
+  options={['①TCP', '②UDP', '③둘 다 아니다', '④둘 다 연결 지향이다']}
+  correctAnswer={1}
+  explanation="TCP는 3-way handshake로 연결을 수립하는 연결 지향 프로토콜입니다."
+  optionExplanations={['맞습니다. TCP입니다.', 'UDP는 비연결형 프로토콜입니다.', 'TCP는 연결 지향입니다.', 'UDP는 비연결형이라 이 설명은 틀렸습니다.']}
+/>
+
+<Quiz
+  questionNumber={3}
+  question="TCP의 3-way handshake 순서로 옳은 것은?"
+  options={['①SYN-SYN-ACK-ACK', '②ACK-SYN-SYN-ACK', '③SYN-ACK만으로 완료', '④ACK-ACK-SYN']}
+  correctAnswer={1}
+  explanation="3-way handshake는 클라이언트의 SYN → 서버의 SYN-ACK → 클라이언트의 ACK 순서로 진행됩니다."
+  optionExplanations={['맞습니다. SYN → SYN-ACK → ACK입니다.', '순서가 올바르지 않습니다.', '두 단계만으로는 완료되지 않으며 마지막 ACK가 필요합니다.', '순서가 올바르지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={4}
+  question="실시간 화상통화가 UDP를 선호하는 이유는?"
+  options={['①UDP가 데이터를 절대 잃어버리지 않기 때문에', '②재전송 대기로 인한 지연보다 약간의 손실을 감수하는 것이 실시간성에 유리하기 때문에', '③UDP만 인터넷에서 사용 가능하기 때문에', '④TCP는 화상통화를 지원하지 않기 때문에']}
+  correctAnswer={2}
+  explanation="화상통화는 지연에 민감하므로, 손실된 데이터의 재전송을 기다리지 않는 UDP가 더 적합합니다."
+  optionExplanations={['UDP는 오히려 전달을 보장하지 않는 프로토콜입니다.', '맞습니다. 지연 방지가 핵심 이유입니다.', 'TCP도 인터넷에서 널리 사용됩니다.', 'TCP도 기술적으로는 화상통화에 사용될 수 있으나 UDP가 더 적합합니다.']}
+/>
+
+<Quiz
+  questionNumber={5}
+  question="혼잡제어(Congestion Control)가 흐름제어(Flow Control)와 다른 점은?"
+  options={['①완전히 같은 개념이다', '②혼잡제어는 네트워크 전체의 상태를, 흐름제어는 개별 수신자의 처리 속도를 고려한다', '③혼잡제어는 물리 계층에서만 동작한다', '④흐름제어는 TCP와 무관하다']}
+  correctAnswer={2}
+  explanation="흐름제어는 수신자 한 명의 처리 능력을, 혼잡제어는 네트워크 전체의 혼잡 상태를 고려한다는 점에서 다릅니다."
+  optionExplanations={['서로 다른 목적을 가진 개념입니다.', '맞습니다. 개별 수신자 vs. 네트워크 전체입니다.', '혼잡제어는 전송 계층(TCP)에서 다뤄집니다.', 'TCP는 흐름제어 기능을 포함하고 있습니다.']}
+/>
+
+<Quiz
+  questionNumber={6}
+  question="DNS(Domain Name System)의 역할은?"
+  options={['①웹페이지를 렌더링한다', '②도메인 이름을 IP 주소로 변환한다', '③파일을 전송한다', '④이메일을 발송한다']}
+  correctAnswer={2}
+  explanation="DNS는 사람이 읽기 쉬운 도메인 이름을 실제 통신에 필요한 IP 주소로 변환하는 서비스입니다."
+  optionExplanations={['렌더링은 브라우저의 역할입니다.', '맞습니다. 도메인-IP 변환입니다.', '파일 전송은 FTP의 역할입니다.', '이메일 발송은 SMTP의 역할입니다.']}
+/>
+
+<Quiz
+  questionNumber={7}
+  question="HTTPS가 사용하는 포트 번호는?"
+  options={['①80', '②21', '③443', '④25']}
+  correctAnswer={3}
+  explanation="HTTPS는 443번 포트를 사용합니다."
+  optionExplanations={['80번은 HTTP(암호화 없음)의 포트입니다.', '21번은 FTP 제어 연결의 포트입니다.', '맞습니다. 443번입니다.', '25번은 SMTP의 포트입니다.']}
+/>
+
+<Quiz
+  questionNumber={8}
+  question="이메일을 서버에 그대로 두고 여러 기기에서 동기화하는 프로토콜은?"
+  options={['①SMTP', '②POP3', '③IMAP', '④FTP']}
+  correctAnswer={3}
+  explanation="IMAP은 이메일을 서버에 유지한 채 여러 기기에서 동기화해 확인하는 프로토콜입니다."
+  optionExplanations={['SMTP는 발신 프로토콜입니다.', 'POP3는 다운로드 후 서버에서 삭제하는 방식입니다.', '맞습니다. IMAP입니다.', 'FTP는 파일 전송 프로토콜입니다.']}
+/>
+
+<Quiz
+  questionNumber={9}
+  question="DHCP의 IP 주소 할당 과정에서 가장 먼저 일어나는 단계는?"
+  options={['①Acknowledge', '②Discover', '③Offer', '④Request']}
+  correctAnswer={2}
+  explanation="DHCP는 Discover(발견) 단계로 시작해 Offer-Request-Acknowledge 순서로 진행됩니다."
+  optionExplanations={['Acknowledge는 마지막 단계입니다.', '맞습니다. Discover가 첫 단계입니다.', 'Offer는 두 번째 단계입니다.', 'Request는 세 번째 단계입니다.']}
+/>
+
+<Quiz
+  questionNumber={10}
+  question="대칭키 암호화의 특징은?"
+  options={['①암호화 키와 복호화 키가 서로 다르다', '②암호화 키와 복호화 키가 서로 같다', '③키가 아예 필요 없다', '④항상 공개키보다 느리다']}
+  correctAnswer={2}
+  explanation="대칭키 암호화는 암호화와 복호화에 동일한 키를 사용합니다."
+  optionExplanations={['이는 공개키(비대칭키) 암호화에 대한 설명입니다.', '맞습니다. 같은 키를 사용합니다.', '암호화에는 반드시 키가 필요합니다.', '오히려 대칭키가 공개키보다 빠릅니다.']}
+/>
+
+<Quiz
+  questionNumber={11}
+  question="공개키 암호화에서 데이터 암호화에 사용하는 키는?"
+  options={['①보내는 사람의 개인키', '②받는 사람의 공개키', '③받는 사람의 개인키', '④보내는 사람의 공개키']}
+  correctAnswer={2}
+  explanation="보내는 사람은 받는 사람의 공개키로 암호화하며, 받는 사람의 개인키로만 복호화할 수 있습니다."
+  optionExplanations={['개인키는 서명이나 복호화에 사용됩니다.', '맞습니다. 받는 사람의 공개키입니다.', '개인키는 복호화에 사용됩니다(암호화가 아님).', '보내는 사람의 공개키는 이 과정에서 사용되지 않습니다.']}
+/>
+
+<Quiz
+  questionNumber={12}
+  question="디지털 서명에서 서명할 때 사용하는 키는?"
+  options={['①발신자의 공개키', '②발신자의 개인키', '③수신자의 공개키', '④수신자의 개인키']}
+  correctAnswer={2}
+  explanation="디지털 서명은 발신자가 자신의 개인키로 서명하며, 발신자의 공개키로 검증됩니다."
+  optionExplanations={['공개키는 서명 검증에 사용됩니다.', '맞습니다. 발신자의 개인키입니다.', '수신자의 키는 서명 과정과 무관합니다.', '수신자의 키는 서명 과정과 무관합니다.']}
+/>
+
+<Quiz
+  questionNumber={13}
+  question="SSL/TLS가 실제로 사용하는 암호화 방식은?"
+  options={['①대칭키만 단독 사용', '②공개키만 단독 사용', '③공개키로 대칭키를 교환한 후 대칭키로 데이터를 암호화하는 하이브리드 방식', '④암호화를 사용하지 않음']}
+  correctAnswer={3}
+  explanation="SSL/TLS는 공개키로 대칭키를 안전하게 교환한 뒤, 빠른 대칭키로 실제 데이터를 암호화하는 하이브리드 방식을 사용합니다."
+  optionExplanations={['대칭키만으로는 키 배송 문제가 해결되지 않습니다.', '공개키만 사용하면 속도가 느려 비효율적입니다.', '맞습니다. 하이브리드 방식입니다.', 'SSL/TLS는 암호화 통신을 위한 기술입니다.']}
+/>
+
+<Quiz
+  questionNumber={14}
+  question="방화벽(Firewall)의 역할은?"
+  options={['①모든 트래픽을 무조건 통과시킨다', '②정해진 규칙에 따라 허용된 트래픽만 통과시키고 나머지는 차단한다', '③데이터를 압축한다', '④IP 주소를 자동 할당한다']}
+  correctAnswer={2}
+  explanation="방화벽은 정해진 정책에 따라 허용된 트래픽만 통과시키고, 그 외는 차단하는 보안 장비입니다."
+  optionExplanations={['모두 통과시키면 방화벽의 의미가 없습니다.', '맞습니다. 정책 기반 필터링입니다.', '압축과는 무관한 기능입니다.', 'IP 자동 할당은 DHCP의 역할입니다.']}
+/>
+
+<Quiz
+  questionNumber={15}
+  question="VPN(가상 사설망)이 제공하는 핵심 기능은?"
+  options={['①인터넷 속도를 항상 두 배로 높인다', '②공용 네트워크에서도 암호화된 터널로 안전하게 통신할 수 있게 한다', '③방화벽을 완전히 비활성화한다', '④MAC 주소를 자동으로 변경한다']}
+  correctAnswer={2}
+  explanation="VPN은 공용 인터넷망을 사용하면서도 암호화된 터널을 통해 안전하게 통신할 수 있게 해줍니다."
+  optionExplanations={['속도 향상이 주된 목적이 아닙니다.', '맞습니다. 암호화된 터널 제공입니다.', '오히려 보안을 강화하는 기술입니다.', 'MAC 주소 변경과는 무관한 기술입니다.']}
+/>
