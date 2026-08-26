@@ -229,3 +229,9 @@ prevProps.count === nextProps.count     // 숫자는 값 비교
   explanation="useMemo는 콜백이 반환하는 값을 메모이제이션합니다. useCallback은 콜백 함수 자체를 메모이제이션합니다. useCallback(fn, deps)은 useMemo(() => fn, deps)와 동일합니다."
   optionExplanations={['기능적 차이가 있습니다.', '맞습니다. 값 vs 함수 메모이제이션이 차이입니다.', '비동기/동기와는 관련 없습니다.', '두 훅 모두 오래된 API입니다.']}
 />
+
+## 참고 자료
+
+- [React 공식 문서 - useMemo](https://react.dev/reference/react/useMemo)
+- [React 공식 문서 - useCallback](https://react.dev/reference/react/useCallback)
+- [React 공식 문서 - memo](https://react.dev/reference/react/memo)

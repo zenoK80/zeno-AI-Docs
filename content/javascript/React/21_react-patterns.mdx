@@ -244,3 +244,8 @@ function LikeButton({ postId, initialLiked, initialCount }) {
   explanation="Portal은 DOM 트리에서는 다른 위치에 렌더링되지만, React 컴포넌트 트리는 동일합니다. 따라서 Context, 이벤트 버블링 등 React 기능은 그대로 동작합니다."
   optionExplanations={['Portal은 DOM 위치만 다를 뿐, React 트리 내에 있습니다.', '맞습니다. React 트리 내에 있으므로 Context가 동작합니다.', '모든 Context가 동작합니다.', 'Provider를 다시 선언할 필요가 없습니다.']}
 />
+
+## 참고 자료
+
+- [React 공식 문서 - createPortal](https://react.dev/reference/react-dom/createPortal)
+- [React 공식 문서 - forwardRef](https://react.dev/reference/react/forwardRef)

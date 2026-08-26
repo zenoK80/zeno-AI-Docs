@@ -292,3 +292,8 @@ function PostList() {
   explanation="useEffect의 콜백은 컴포넌트가 렌더링되어 실제 DOM에 반영되고, 브라우저가 화면을 그린 뒤에 비동기적으로 실행됩니다. 화면이 그려지기 전에 동기적으로 실행해야 한다면 useLayoutEffect를 사용합니다."
   optionExplanations={['컴포넌트 함수 호출 이전이 아닌 이후입니다.', '맞습니다. paint 이후 비동기로 실행됩니다.', 'JSX 반환은 렌더링 단계이며 이펙트는 그 이후입니다.', '이벤트 핸들러는 사용자 상호작용 시 실행되며 별개입니다.']}
 />
+
+## 참고 자료
+
+- [React 공식 문서 - useEffect](https://react.dev/reference/react/useEffect)
+- [React 공식 문서 - Effect가 필요하지 않은 경우](https://react.dev/learn/you-might-not-need-an-effect)

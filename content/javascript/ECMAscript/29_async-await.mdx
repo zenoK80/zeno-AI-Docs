@@ -200,3 +200,8 @@ const loadUserData = async (id) => {
   explanation="서로 의존하지 않는 작업을 순서대로 await하면 각 작업의 시간이 합산되어 느려집니다. Promise.all로 동시에 시작하면 가장 오래 걸리는 작업 시간만 소요됩니다."
   optionExplanations={['병렬 처리보다 느립니다.', '맞습니다. 불필요한 순차 실행은 비효율적입니다.', '문법적으로는 유효합니다.', 'b()도 정상적으로 실행됩니다.']}
 />
+
+## 참고 자료
+
+- [MDN - async function](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Statements/async_function)
+- [MDN - await](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Operators/await)

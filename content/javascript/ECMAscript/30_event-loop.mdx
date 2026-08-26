@@ -191,3 +191,8 @@ console.log('D')
   explanation="동기 코드(A, D)가 먼저, 그다음 마이크로태스크(C, Promise.then), 마지막으로 태스크 큐(B, setTimeout) 순서로 실행됩니다."
   optionExplanations={['setTimeout이 동기 코드보다 먼저 실행되지 않습니다.', '맞습니다. 동기 → 마이크로태스크 → 태스크 순서입니다.', 'setTimeout(B)이 Promise(C)보다 먼저 실행되지 않습니다.', 'D보다 C가 먼저 출력되지 않습니다.']}
 />
+
+## 참고 자료
+
+- [MDN - The event loop](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop)
+- [Jake Archibald - In The Loop (JSConf.Asia)](https://www.youtube.com/watch?v=cCOL7MC4Pl0)
