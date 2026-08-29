@@ -52,15 +52,30 @@ MDX 작성 시 지켜야 하는 문법 금지 규칙은 [prompts/05_최종완성
 | 라이브러리 | 래퍼 | 적합한 상황 |
 |-----------|------|-------------|
 | KaTeX | (내장, 래퍼 없음) | 수학·통계 공식 |
+| Mermaid | (내장, ` ```mermaid ` 코드펜스) | 흐름도·시퀀스·클래스·ER 다이어그램 등 정적 구조 표현 |
 | Recharts | `data-bar-chart.tsx` | 데이터 비교·분포 차트 |
 | JSXGraph | `set-diagram.tsx` | 함수·벡터·도형 직접 조작 |
 | React Flow (`@xyflow/react`) | `concept-flow.tsx` | 사용자가 노드를 움직여야 의미가 있을 때만 |
 | Sandpack (`@codesandbox/sandpack-react`) | `code-playground.tsx` | JS·React 코드 실습 |
 | gsap | `home-landing.tsx` | 홈 랜딩 애니메이션 전용 — 학습 문서에서 사용 금지 |
 
+**Mermaid 사용법** (2026-08-29 검증 완료 — nextra 4 내장, 별도 설치·import 불필요):
+
+````mdx
+```mermaid
+graph TD
+  A[시작] --> B{조건}
+  B -->|예| C[실행]
+  B -->|아니오| D[종료]
+```
+````
+
+- 클라이언트에서 렌더링되며 다크 모드를 자동으로 따라간다.
+- 과거 "mermaid가 조용히 사라진다"는 기록이 있었으나, 이는 `_meta.js`가 깨진 상태에서 테스트한 오진으로 확인됨. 정상 작동한다.
+- 역할 구분: **정적 구조·흐름 = Mermaid**, **사용자가 노드를 조작해야 의미 있는 흐름 = ConceptFlow**.
+
 **주의:**
 
-- **Mermaid는 이 프로젝트에서 작동하지 않습니다.** ` ```mermaid ` 코드펜스는 빌드 에러 없이 내용이 통째로 사라지고, `<Mermaid>` 컴포넌트도 없습니다. 흐름·관계·계층은 `Table`, `Steps`, `ConceptFlow` 또는 산문으로 표현합니다.
 - 모든 시각화를 한 문서에 억지로 넣지 않습니다. 이해에 실질적으로 도움이 될 때만 사용합니다.
 - `better-react-mathjax`는 사용처가 없어 제거되었습니다. 수식은 KaTeX만 사용합니다.
 
