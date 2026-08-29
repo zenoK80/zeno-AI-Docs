@@ -1,97 +1,65 @@
 # Zeno AI Docs
 
-Claude Code와 명세 주도 문서화(Spec-Driven Documentation)를 활용해 만드는 개인 학습 문서입니다.
+**깊고 자세하게 배우는 학습 문서 사이트** — Next.js + Nextra 기반.
+컨셉은 "무조건 깊게(DEEP)": 문서 길이·목차 편수에 제한 없이, 초보자가 읽어도 그 자리에서 전문가가 되는 것을 목표로 한다.
 
----
+문서는 사람이 일일이 쓰지 않는다. **AI 5개(Grok·Perplexity·Claude·Gemini·GPT)가 단계를 나눠 맡는 파이프라인**이 과목 하나를 통째로 만들어낸다.
 
-## How It Works
+## 문서 제작 파이프라인 (5단계)
 
-- **Claude Code 단일 작업 흐름**: Claude Code가 학습 과목과 웹 기술 문서를 일관된 기준으로 작성하고 검토합니다.
-- **분야별 작업 규칙**: `study.md`와 `skill.md`에 문서 형식, 폴더 구조, 시각화와 실습 규칙을 기록합니다. (Instruction-Driven Development)
-- **과목별 계획 기반 작성**: `plan-study/`와 `plan-skill/`의 범위와 목차를 먼저 읽고 MDX 문서를 만듭니다. (Plan-Driven Content)
-- **문서도 코드처럼 관리**: 문서, 메뉴 설정, 작업 규칙을 Git으로 함께 기록하고 변경 이력을 남깁니다. (Docs as Code)
-- **자동 빌드와 배포**: GitHub에 푸시하면 GitHub Actions가 사이트를 빌드하고 GitHub Pages에 배포합니다. (CI/CD)
-- **충분한 학습 흐름**: MDX 문서에 핵심 개념, 시각 자료, 영상, 퀴즈·실습을 함께 구성해 읽고 바로 확인할 수 있게 합니다. (본문 10~15분 분량)
+| 단계 | 담당 AI | 하는 일 | 산출물 |
+|------|---------|---------|--------|
+| 1 학습방향 | Grok | 과목 컨셉 정의 (대상·목표·범위·깊이) | `prompts/plan/[과목]/01_학습방향.md` |
+| 2 목차구성 | Perplexity | 웹 검색으로 자료 조사 + 목차 설계 | `.../02_목차.md` |
+| 3 본문작성 | Claude | 편별 **완성 MDX**를 직접 작성 | `.../03_초안/NN.mdx` |
+| 4 검수 | Gemini | 사실 확인·계산 검산·퀴즈 정답 검증 | `.../04_검수.md` |
+| 5 보강·완성 | GPT | 검수 반영 + 내용 보강 → content 배치 + 빌드 | `content/[경로]/NN.mdx` |
 
----
+각 단계의 상세 지시문은 `prompts/01~05_*.md`, MDX 작성 규칙은 `prompts/00_MDX규칙.md`에 있다.
 
-## 디자인 방향
+## 파이프라인 실행 방법
 
-홈 화면은 **Minimal Bento Grid**를 지향합니다. 중앙 프레임 안에 얇은 선과 흑백 카드로 정보를 나누고 실제 학습 흐름을 미리 보여줍니다.
+### 방법 A — API 자동 실행 (bat 더블클릭)
 
-- **Bento Grid**: 과목과 시리즈를 규칙적인 2열 카드로 그룹화
-- **Technical Lines**: 얇은 가이드선과 구분선으로 화면 구조를 표현
-- **Neutral Palette**: 흰색·회색·검정을 중심으로 사용하고 Zeno 보라색은 활성 상태에만 제한
-- **Functional Preview**: 코드, 브라우저, 수식과 차트를 장식이 아닌 학습 미리보기로 사용
-- **Motion & Media**: 첫 화면은 짧은 배경 영상으로 학습 분위기를 보여 주고, 기술 로고 애니메이션은 푸터 최하단에만 배치해 본문 집중을 방해하지 않음
-- **Grid Junctions**: 가이드선이 만나는 핵심 지점에는 테마별 보라색 마름모 포인트를 사용
-- **Typography**: 한글은 Pretendard, 영문과 숫자는 Montserrat 사용
+`.env.local`의 API 키로 각 단계 담당 모델을 직접 호출한다. 관련 파일은 전부 **`실행/` 폴더**에 있다.
 
-참고 방향: [Cal.com](https://cal.com/), [Laravel](https://laravel.com/)
+1. `실행/작업지시.md`에 과목·주제·경로·모델을 적는다
+2. `실행/` 폴더에서 원하는 단계의 bat을 더블클릭: `1단계_학습방향.bat` … `5단계_완성.bat`, 전부는 `전체_1부터5.bat`
+3. 비용은 호출마다 `costs/`에 자동 기록 — `실행/비용보고서.bat`으로 월별/과목별/단계별 집계
 
----
+### 방법 B — AI 에이전트에게 시키기 (Claude Code·Codex)
 
-## Structure
+에이전트에게 "react_1 3단계 해줘"라고 말하면, 에이전트가 그 단계의 지시문(`prompts/0N_*.md`)을 자기 지시로 삼아 **직접 그 단계의 AI 역할을 수행**한다. API 크레딧 없이 구독 요금 안에서 처리된다. 규칙은 [AGENTS.md](AGENTS.md)의 "방법 B" 참고.
 
-- `content/`: 학습 문서(MDX)와 메뉴 설정
-- `study.md`: 독학사·시험·자격 학습 문서 지침
-- `skill.md`: JavaScript·React 등 웹 기술 문서 지침
-- `plan-study/`: 학습 과목별 범위와 목차
-- `plan-skill/`: 웹 기술별 범위와 목차
-- `CLAUDE.md`: MDX 작성 규칙, 목차 설계 원칙, 컴포넌트 사용법 등 Claude Code 작업 지침
-- `AGENTS.md`: 요청한 과목에 맞는 지침을 AI가 자동으로 찾게 하는 안내 파일
+### 하이브리드 (추천)
 
----
+A와 B는 **산출물 위치·파일명이 완전히 같아서 단계마다 섞어 쓸 수 있다.** 예:
 
-## 핵심 패키지
+- 1·2단계는 bat으로 빠르게 (Grok 검색·Perplexity 조사) → 3단계는 에이전트에게 (비용 큰 구간을 무료로) → 4단계는 bat으로 (다른 모델의 눈) → 5단계 보강은 상황 따라
+- 품질 확인도 하이브리드: 3단계를 bat으로 돌리기 전에 에이전트에게 1편만 시켜 기준을 잡는 식
 
-- Next.js: React 기반 웹사이트 제작과 정적 페이지 빌드
-- React: 컴포넌트 기반 사용자 인터페이스 구성
-- Nextra: MDX 문서를 Next.js 문서 사이트로 변환
-- Nextra Docs Theme: 문서 레이아웃, 사이드바, 목차와 검색 UI 제공
-- Pagefind: 정적 배포 사이트의 문서 검색 색인 생성
-- Tailwind CSS: 프로젝트 스타일 작성과 빌드 처리
-- TypeScript: JavaScript 코드의 타입 검사
-- ESLint: 코드 오류와 작성 규칙 검사
+자세한 사용법·옵션·트러블슈팅: [guide/run-generate-doc.md](guide/run-generate-doc.md)
 
----
+## 폴더 구조
 
-## 추가 패키지
+```
+├── AGENTS.md          # AI 에이전트용 안내판 (문서 지도 + 제작 흐름 + 공통 규칙)
+├── 실행/              # 파이프라인 실행 폴더: 작업지시.md + 단계별 bat + 비용보고서.bat
+├── guide/             # 사람이 보는 가이드 (기술 스택, 메뉴 구조, 실행법, 코드 해설)
+├── prompts/           # AI 지시문 (00 MDX규칙, 01~05 단계별) + plan/ 중간 산출물
+├── scripts/           # 파이프라인 실행 코드 (run.js, lib/, steps/, cost-report.js)
+├── content/           # 사이트에 올라가는 최종 MDX (폴더 구조 = 메뉴 구조, 폴더명은 react_1처럼 소문자+언더스코어)
+├── app/               # Next.js 앱 (전역 컴포넌트: Quiz, CodePlayground 등)
+└── costs/             # API 비용 자동 기록 — 커밋 안 됨
+```
 
-- Mermaid: MDX에서 흐름도, 순서도, 상태도와 관계도 작성 (Nextra의 하위 패키지)
-- Recharts: 통계 자료를 막대·선·산점도 등 React 차트로 표현
-- JSXGraph: 함수, 벡터, 도형과 미적분을 직접 조작하는 수학 그래프로 표현
-- React Flow (`@xyflow/react`): 노드와 연결선을 움직일 수 있는 상호작용 흐름도 제작
-- MathJax (`better-react-mathjax`): LaTeX 문법으로 수학·통계 수식을 접근성 있게 표시
-- Sandpack (`@codesandbox/sandpack-react`): 문서 안에서 JavaScript·React 코드를 편집하고 실행 결과를 바로 확인
-- Montserrat (`@fontsource/montserrat`): 사이트의 영문과 숫자에 사용하는 산세리프 웹폰트
+홈 화면의 과목 카드·문서 수는 `content/`를 스캔해 **자동 생성**된다 (`scripts/gen-home-data.js`, dev/build 시작 시 갱신) — 손으로 수정하지 않는다. 카드 설명을 직접 정하고 싶으면 `app/components/home-overrides.json`에 과목 폴더명 키로 한 줄.
 
-설치 패키지는 필요한 시각화·실습 컴포넌트를 `app/components/`에 만든 뒤 MDX에서 재사용합니다.
+## 개발
 
----
+```bash
+npm run dev     # 개발 서버 (localhost:3000)
+npm run build   # 정적 빌드 + Pagefind 검색 인덱스
+```
 
-## Nextra 컴포넌트
-- Callout: 중요한 설명·주의사항
-- Table: 비교표
-- Tabs: 탭 전환
-- Steps: 단계별 과정
-- Collapse: 접었다 펼치는 설명
-- Cards: 문서 링크 카드
-- FileTree: 폴더 구조
-- Playground: MDX·JSX 예제를 클라이언트에서 동적으로 렌더링 (일반 JavaScript 실행기는 아님)
-- ImageZoom: 이미지 확대
-- Button, Banner, Popup, Select, Bleed
-- Search: 검색
-
----
-
-## 커스텀 컴포넌트
-- Quiz: 선택하면 정답과 해설이 표시되는 퀴즈
-- CodePlayground: Sandpack 기반 JavaScript·React 코드 편집 및 실행 실습
-- DocsTabs: 프로젝트에 맞게 만든 탭
-- DocsBreadcrumb: 상단 경로 표시
-- DocsNavbar: 커스텀 헤더와 드롭다운
-- OneDriveVideo: 문서 상단에 OneDrive 학습 영상을 iframe으로 표시
-- AiStudyAssistant: 우측 하단에서 열리는 학습 도우미 안내 버튼 (현재 대화 기능은 준비 중)
-
----
+기술 스택: Next.js 15, Nextra 4, React 19, TypeScript, Tailwind CSS 4, KaTeX·Mermaid·Recharts·JSXGraph·React Flow·Sandpack — 상세는 [guide/tech-stack.md](guide/tech-stack.md)

@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-08-29T22:49:06.999Z",
+  "groupCount": 2,
+  "seriesCount": 5,
+  "groups": [
+    {
+      "title": "JavaScript",
+      "description": "2개 시리즈 · 문서 65편",
+      "order": "01",
+      "series": [
+        {
+          "title": "ECMAScript",
+          "description": "JavaScript와 ECMAScript의 관계에서 출발해, 표준·구현·엔진을 구분하고 명세 문서를 직접 읽어내는 최소 문법을 익힌다",
+          "href": "/javascript/ECMAscript/01_ecmascript-overview",
+          "documentCount": 35,
+          "preview": "code",
+          "accent": "blue"
+        },
+        {
+          "title": "Web APIs",
+          "description": "자바스크립트 엔진이 할 수 있는 일과 브라우저가 빌려주는 일의 경계를 나누고, 이벤트 루프·메인 스레드·origin이라는 플랫폼의 세 축을 지도로 그린다",
+          "href": "/javascript/web_apis/01_web-platform-basics",
+          "documentCount": 30,
+          "preview": "browser",
+          "accent": "green"
+        }
+      ]
+    },
+    {
+      "title": "React",
+      "description": "3개 시리즈 · 문서 46편",
+      "order": "02",
+      "series": [
+        {
+          "title": "React 기초",
+          "description": "명령형 DOM 조작의 고통에서 출발해, 선언적 UI와 컴포넌트 모델이라는 React의 핵심 사고방식을 원리부터 이해한다",
+          "href": "/react/react_1/01_react-as-a-ui-library",
+          "documentCount": 15,
+          "preview": "code",
+          "accent": "amber"
+        },
+        {
+          "title": "React 중급",
+          "description": "상속이 아니라 합성 — children과 슬롯으로 컴포넌트를 조립하는 React의 설계 철학을 원리부터 세운다",
+          "href": "/react/react_2/01_component-composition-basics",
+          "documentCount": 16,
+          "preview": "code",
+          "accent": "red"
+        },
+        {
+          "title": "React 실무",
+          "description": "내 메모리 안의 상태와 서버에 사는 상태는 성격이 완전히 다르다 — 요청-응답 라이프사이클과 캐시 개념으로 이 과목 전체의 토대를 세운다",
+          "href": "/react/react_3/01_server-vs-client-state",
+          "documentCount": 15,
+          "preview": "code",
+          "accent": "blue"
+        }
+      ]
+    }
+  ]
+}

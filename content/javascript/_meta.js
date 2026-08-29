@@ -1,18 +1,10 @@
 const meta = {
-  WebAPIs: {
-    title: 'Web APIs',
-    type: 'page',
-  },
   ECMAscript: {
     title: 'ECMAScript',
     type: 'page',
   },
-  React: {
-    title: 'React',
-    type: 'page',
-  },
-  TypeScript: {
-    title: 'TypeScript',
+  web_apis: {
+    title: 'Web APIs',
     type: 'page',
   },
 }

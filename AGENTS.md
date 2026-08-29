@@ -10,12 +10,13 @@
 |------|------|
 | [guide/tech-stack.md](guide/tech-stack.md) | 프레임워크, 전역 컴포넌트, 시각화 라이브러리와 래퍼 매핑, 실행·빌드 명령어 |
 | [guide/menu-structure.md](guide/menu-structure.md) | content 폴더 구조 = 메뉴 구조 원리, `_meta.js` 작성법, 문서·과목·카테고리 추가/삭제 절차 |
-| [guide/build-generate-doc.md](guide/build-generate-doc.md) | 파이프라인 자동 실행 스크립트(scripts/) 직접 구현 가이드 |
+| [guide/run-generate-doc.md](guide/run-generate-doc.md) | 파이프라인 실행 가이드 — generate-doc.js 호출 방법·옵션·트러블슈팅 |
+| [guide/build-generate-doc.md](guide/build-generate-doc.md) | 스크립트 코드 해설 — 각 파일이 무슨 일을 하는지 |
 | [prompts/01_학습방향.md](prompts/01_학습방향.md) | 1단계: 과목 컨셉 정의 (Grok 담당) |
 | [prompts/02_목차구성.md](prompts/02_목차구성.md) | 2단계: 자료 조사 + 목차 설계 (Perplexity 담당) |
-| [prompts/03_초안작성.md](prompts/03_초안작성.md) | 3단계: 순수 마크다운 초안 작성 + 글 품질 규칙 (GPT 담당) |
+| [prompts/03_초안작성.md](prompts/03_초안작성.md) | 3단계: 완성 MDX 본문 작성 + 글 품질 규칙 (Claude 담당) |
 | [prompts/04_검수.md](prompts/04_검수.md) | 4단계: 사실 확인·검산·퀴즈 검증 (Gemini 담당) |
-| [prompts/05_최종완성.md](prompts/05_최종완성.md) | 5단계: MDX 변환·배치·빌드·커밋 + MDX 금지 규칙 (Claude 담당) |
+| [prompts/05_최종완성.md](prompts/05_최종완성.md) | MDX 금지 규칙 전문(3단계 작성 시에도 적용) + 검수 반영·배치·빌드·커밋 지침 |
 
 ## 과목 제작 흐름 (5단계)
 
@@ -25,20 +26,32 @@
 
 1. **학습 방향** (Grok) — 과목 컨셉 정의 → `prompts/plan/[과목]/01_학습방향.md`
 2. **목차 구성** (Perplexity) — 자료 조사 + 목차 설계 → `prompts/plan/[과목]/02_목차.md`
-3. **초안 작성** (GPT) — 편별 순수 마크다운 초안 → `prompts/plan/[과목]/03_초안/NN_파일명.md`
+3. **본문 작성** (Claude API) — 편별 **완성 MDX**를 직접 작성 → `prompts/plan/[과목]/03_초안/NN_파일명.mdx`
 4. **검수** (Gemini) — 사실 확인·검산·퀴즈 정답 검증 → `prompts/plan/[과목]/04_검수.md`
-5. **최종 완성** (Claude) — 검수 반영 + MDX 변환 + content 배치 + 빌드 확인 + 커밋
+5. **보강·완성** (GPT) — 편별 검수 반영 + 내용·섹션 보강 → content 배치 + `_meta.js` 생성 + 빌드. 메뉴 연결·커밋은 Claude Code가 수행
 
-전 단계를 API로 자동 실행할 수 있다 (키는 `.env.local`, 단계별 실행·일괄 실행·모델 선택 지원). 스크립트 구현 가이드는 [guide/build-generate-doc.md](guide/build-generate-doc.md):
+전 단계를 API로 자동 실행할 수 있다 (키는 `.env.local`). 실행 방법 2가지 — 자세한 건 [guide/run-generate-doc.md](guide/run-generate-doc.md):
 
-```bash
-node scripts/generate-doc.js --subject <과목폴더명> --step <N | N-M>
-```
+- **쉬운 방법**: `실행/작업지시.md`에 과목·주제 작성 → `실행/` 폴더의 원하는 단계 bat 더블클릭 (`1단계_학습방향.bat` … `5단계_완성.bat`, 전부는 `전체_1부터5.bat`)
+- 터미널: `node scripts/generate-doc.js --subject <과목> --step <N | N-M>`
+
+## 단계를 실행하는 두 가지 방법
+
+**방법 A — API 자동 실행**: 위의 bat/스크립트 방식. `.env.local`의 키로 외부 모델을 호출한다.
+
+**방법 B — AI 에이전트(Claude Code, Codex 등)에게 직접 시키기**: 사용자가 "react_1 3단계 해줘"라고 말하면, 에이전트는 API 스크립트를 돌리는 게 아니라 **자신이 그 단계의 담당 AI 역할을 수행**한다. 규칙:
+
+1. 해당 단계의 지시문 `prompts/0N_*.md`를 읽고 **그 지시문이 곧 나에 대한 지시**라고 간주한다. MDX를 생성·수정하는 단계(3·5)는 `prompts/00_MDX규칙.md`도 함께 적용한다.
+2. 입력·산출물의 **위치와 파일명은 스크립트와 완전히 동일하게** 한다 (`prompts/plan/[과목]/01_학습방향.md`, `02_목차.md`, `03_초안/NN_파일명.mdx`, `04_검수.md`, content 배치 경로). 그래야 방법 A와 B를 단계마다 섞어 써도 파이프라인이 이어진다.
+3. 과목명·주제·배치 경로는 `실행/작업지시.md`를 읽어 따른다.
+4. 이미 있는 산출물은 사용자가 시키지 않는 한 덮어쓰지 않는다.
+5. 편수가 많은 3·5단계는 한 번에 다 쓰지 말고, 1편을 먼저 완성해 사용자 품질 확인을 받은 뒤 진행한다. 사용자가 편을 지정하면("10번만", "1~4편", "전부") 그 편들만 작업하고, 지정된 편은 이미 있어도 다시 만든다.
 
 ## 공통 규칙
 
 - **컨셉**: 무조건 깊고 자세히(DEEP). 문서 길이·목차 편수에 제한을 두지 않는다 — 초보자가 읽어도 그 자리에서 전문가가 되게.
 - **파일명**: `NN_kebab-case.mdx` (NN은 두 자리 숫자: 01, 02, … 10, 11, …)
+- **과목·카테고리 폴더명**: `react_1`처럼 **영문 소문자+언더스코어(_)**. 하이픈(-)은 `_meta.js` 키에서 문법 오류를 일으키므로 금지 (파일명의 kebab-case와 헷갈리지 말 것 — 하이픈은 파일명에만)
 - **frontmatter**: `title`, `description` 두 개만 사용
 - **참고 자료**: 모든 MDX 파일은 예외 없이 맨 아래에 `## 참고 자료` 섹션을 두고, 실제 참고한 공식 문서·1차 출처만 링크
 - **content 파일과 `_meta.js`는 항상 세트**: 문서를 추가·삭제하면 반드시 해당 폴더의 `_meta.js`도 함께 수정 (자세한 절차는 guide/menu-structure.md)

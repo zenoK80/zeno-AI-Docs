@@ -713,3 +713,11 @@ html.dark .docs-navbar-panel-inner {
     height: 34px;
   }
 }
+/* 본문 링크: nextra 기본(항상 밑줄, 호버 시 제거)을 반대로 — 평소 밑줄 없음, 호버 시 밑줄 */
+main a.x\:underline {
+  text-decoration: none;
+}
+
+main a.x\:underline:hover {
+  text-decoration: underline;
+}

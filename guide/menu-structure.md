@@ -15,8 +15,9 @@ content/
         └── NN_kebab-case.mdx ← 개별 문서
 ```
 
-- URL: `content/React/react/04_jsx.mdx` → `/React/react/04_jsx`
+- URL: `content/react/react_1/04_jsx.mdx` → `/react/react_1/04_jsx`
 - **파일과 `_meta.js` 항목은 항상 세트입니다.** 파일만 만들면 메뉴에 나타나지 않거나 정렬이 깨지고, `_meta.js`에만 적으면 빌드가 깨집니다.
+- **폴더명 규칙**: 과목·카테고리 폴더는 `react_1`처럼 **소문자+언더스코어(_)**만 사용. 하이픈(-)이 들어가면 `_meta.js`에서 키를 따옴표로 감싸야 하고, 빠뜨리면 문법 오류로 사이트 전체가 깨집니다 (실제 사고 사례 있음). 하이픈은 **파일명**(`01_react-as-a-ui-library.mdx`)에만 씁니다.
 
 ## `_meta.js` 2가지 형식
 
@@ -94,3 +95,12 @@ export default meta
 과목 절차와 동일하되, 최상위 `content/_meta.js`에 `type: 'menu'` 블록 자체를 추가·삭제합니다.
 
 **공통:** 어떤 변경이든 마지막에 `npm run build`가 통과하는지 확인하고, 새 경로로 브라우저 접속까지 확인합니다.
+
+## 홈 화면 자동 연동
+
+홈의 과목 카드는 손으로 만들지 않습니다 — `scripts/gen-home-data.js`가 `content/`를 스캔해 자동 생성합니다 (`npm run dev`/`build` 시작 시와 5단계 실행 시 갱신).
+
+- **카드 제목**: 카테고리 `_meta.js` → 최상위 `_meta.js` 메뉴 항목 → 폴더명 순으로 가져옴
+- **문서 수·시작 링크**: 폴더의 .mdx 개수와 첫 문서로 자동 계산
+- **카드 설명**: ① `app/components/home-overrides.json`에 과목 폴더명 키로 적으면 그 문구 (직접 지정) ② 없으면 첫 문서의 frontmatter description ③ 그것도 없으면 기본 문구. ※ `content/` 안에 .txt 등 잡파일을 두면 빌드가 깨지므로 오버라이드는 반드시 이 json에.
+- 과목 폴더를 지우면 카드도 다음 갱신 때 자동으로 사라집니다.
