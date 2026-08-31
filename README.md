@@ -37,11 +37,3 @@ scripts/    파이프라인 실행기, MDX 검사기, 홈 데이터 생성기
 
 홈 카드와 문서 수는 `content/`를 스캔해 자동 생성됩니다. MDX는 `node scripts/check-mdx.js content`로 검사하고 `fix-mdx.js`로 교정합니다. 볼드 안 괄호처럼 빌드는 통과하는데 화면만 깨지는 함정이 있어서 만들었습니다.
 
-## 개발
-
-```bash
-npm run dev     # localhost:3000
-npm run build   # 정적 빌드 + Pagefind 검색 인덱스
-```
-
-Next.js 15 · Nextra 4 · React 19 · TypeScript · Tailwind 4. 수식·그림·실행기는 KaTeX, Mermaid, Recharts, Sandpack. main에 push하면 GitHub Actions가 Pages로 배포합니다.
