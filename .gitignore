@@ -12,6 +12,7 @@
 
 # claude
 .claude/
+/prompts
 
 # testing
 /coverage

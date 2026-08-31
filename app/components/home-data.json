@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-31T16:22:13.909Z",
-  "groupCount": 2,
-  "seriesCount": 5,
+  "generatedAt": "2026-08-31T19:28:05.513Z",
+  "groupCount": 3,
+  "seriesCount": 9,
   "groups": [
     {
       "title": "JavaScript",
@@ -53,6 +53,45 @@
           "href": "/react/react_3/01_server-vs-client-state",
           "documentCount": 15,
           "preview": "code",
+          "accent": "blue"
+        }
+      ]
+    },
+    {
+      "title": "자격증",
+      "description": "4개 시리즈 · 문서 88편",
+      "order": "03",
+      "series": [
+        {
+          "title": "PC정비사 2급 실기",
+          "description": "80분 18문항이라는 실기 시험의 실제 얼굴을 문항 유형별로 해부하고, 채점자가 무엇을 보고 점수를 주는지를 기준으로 시간 배분과 수행 태도를 설계한다",
+          "href": "/자격증/PC정비사_2급_실기/01_pc-exam-roadmap",
+          "documentCount": 17,
+          "preview": "code",
+          "accent": "green"
+        },
+        {
+          "title": "네트워크관리사 2급 실기",
+          "description": "실기 18문제가 요구하는 최소 개념 — OSI 계층·TCP/IP·IP 주소·서브넷 마스크·게이트웨이·DNS를 시험 화면의 입력칸과 직접 연결해 이해한다",
+          "href": "/자격증/네트워크관리사_2급_실기/01_network-basics-for-practical-use",
+          "documentCount": 13,
+          "preview": "browser",
+          "accent": "amber"
+        },
+        {
+          "title": "리눅스마스터 1급 1차",
+          "description": "리눅스마스터 1급 1차 필기의 문항 수·시간·과락 규칙과 3개 과목 출제 영역을 정확히 파악하고, 실제 기출이 어떤 형식으로 묻는지를 유형별로 분해해 학습 전략을 세운다",
+          "href": "/자격증/리눅스마스터_1급_1차/01_exam-overview",
+          "documentCount": 31,
+          "preview": "code",
+          "accent": "red"
+        },
+        {
+          "title": "빅데이터분석기사 필기",
+          "description": "필기 4과목 구성, 80문항 120분이라는 시험 형식, 과목당 40점·평균 60점이라는 합격 규칙이 실제 공부 순서를 어떻게 바꾸는지까지 계산으로 확인한다",
+          "href": "/자격증/빅데이터분석기사_필기/01_exam-overview",
+          "documentCount": 27,
+          "preview": "chart",
           "accent": "blue"
         }
       ]

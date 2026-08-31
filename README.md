@@ -40,7 +40,7 @@ Claude Code나 Codex Agent로 정리된 md를 보고 단계별 작업을 진행�
 
 ```
 content/    사이트에 올라가는 MDX. 폴더 구조가 곧 메뉴 구조
-prompts/    단계별 AI 지시문 + MDX 문법 규칙
+prompts/    단계별 AI 지시문 + MDX 문법 규칙 (로컬 전용, 저장소 미포함)
 scripts/    파이프라인 실행기, MDX 검사기, 홈 데이터 생성기
 실행/       작업지시서와 단계별 bat
 ```

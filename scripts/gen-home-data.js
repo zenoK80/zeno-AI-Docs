@@ -41,11 +41,12 @@ function metaTitles(metaPath) {
   const titles = {}
   if (!fs.existsSync(metaPath)) return titles
   const text = fs.readFileSync(metaPath, 'utf8')
-  for (const m of text.matchAll(/['"]?([\w.-]+)['"]?\s*:\s*['"]([^'"]+)['"]\s*,/g)) {
+  // 키에 한글이 올 수 있으므로 \w 대신 유니코드 문자 속성을 쓴다 (\w는 ASCII만 매칭)
+  for (const m of text.matchAll(/['"]?([\p{L}\p{N}_.-]+)['"]?\s*:\s*['"]([^'"]+)['"]\s*,/gu)) {
     titles[m[1]] = m[2]
   }
   // "{ title: '...' }" 형: title이 객체의 첫 속성일 때만 짝으로 인정 (중첩 객체 오인 방지)
-  for (const m of text.matchAll(/['"]?([\w.-]+)['"]?\s*:\s*\{\s*title\s*:\s*['"]([^'"]+)['"]/g)) {
+  for (const m of text.matchAll(/['"]?([\p{L}\p{N}_.-]+)['"]?\s*:\s*\{\s*title\s*:\s*['"]([^'"]+)['"]/gu)) {
     titles[m[1]] = m[2]
   }
   return titles
