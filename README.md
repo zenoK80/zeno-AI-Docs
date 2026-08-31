@@ -44,7 +44,3 @@ prompts/    단계별 AI 지시문 + MDX 문법 규칙
 scripts/    파이프라인 실행기, MDX 검사기, 홈 데이터 생성기
 실행/       작업지시서와 단계별 bat
 ```
-
-홈 카드와 문서 수는 `content/`를 스캔해 자동 생성됩니다.
-MDX는 `node scripts/check-mdx.js content`로 검사하고 `fix-mdx.js`로 교정합니다.
-볼드 안 괄호처럼 빌드는 통과하는데 화면만 깨지는 함정이 있어서 만들었습니다.

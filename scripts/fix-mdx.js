@@ -4,10 +4,11 @@
 //    사람 판단이 필요한 항목(내용 수정)은 건드리지 않고 check-mdx.js 가 계속 보고한다.
 // 2. 사용법: node scripts/fix-mdx.js [경로...]   (--dry 를 붙이면 미리보기만)
 // 3. 교정 대상 3가지
-//    ① 볼드 안 괄호        **A(B)C**   → **A**(B)**C**   (볼드 유지, 괄호만 밖으로)
-//    ② 볼드 끝 문장부호+글자 **"X"**이기 → "**X**"이기   (따옴표를 볼드 밖으로)
-//                          **X.**이기   → **X**.이기
-//    ③ JSX prop 안 꺾쇠     question="a => b" → question="a =&gt; b"
+//    ① 볼드 끝 문장부호+글자 **"X"**이기 → "**X**"이기   (따옴표를 볼드 밖으로)
+//                           **X.**이기   → **X**.이기
+//    ② JSX prop 안 꺾쇠      question="a => b" → question="a =&gt; b"
+//    ※ "볼드 안 괄호"는 실측 결과 정상 렌더링이라 교정 대상이 아니다
+//       (insight/01_mdx-볼드-렌더링-깨짐.md)
 //----------------------------------------------------------------------------------
 const fs = require('fs')
 const path = require('path')
@@ -44,35 +45,7 @@ function fixLine(line) {
   const notes = []
   let out = line
 
-  // ① 볼드 안 괄호: **A(B)C** → **A**(B)**C**
-  //    볼드 조각(홀수 인덱스) 안에 괄호가 있으면 괄호 부분만 볼드 밖으로 빼낸다
-  {
-    const parts = out.split('**')
-    if (parts.length >= 3) {
-      let changed = false
-      for (let i = 1; i < parts.length - 1; i += 2) {
-        if (!/[()]/.test(parts[i])) continue
-        // (내용) 단위를 볼드 밖으로: A(B)C → A**(B)**C  (조각 안에서만 치환)
-        const replaced = parts[i].replace(/\(([^()]*)\)/g, (m) => `**${m}**`)
-        // 조각 시작/끝에 붙은 ** 중복 정리
-        parts[i] = replaced.replace(/^\*\*/, '').replace(/\*\*$/, '')
-        if (parts[i] !== replaced) {
-          // 시작/끝이 통째로 괄호였던 경우 → 볼드 자체가 사라지므로 원복
-          parts[i] = replaced
-        }
-        changed = true
-      }
-      if (changed) {
-        const next = parts.join('**').replace(/\*\*\*\*/g, '')
-        if (next !== out) {
-          notes.push('볼드 안 괄호')
-          out = next
-        }
-      }
-    }
-  }
-
-  // ② 볼드 끝 문장부호 + 바로 글자
+  // ① 볼드 끝 문장부호 + 바로 글자
   {
     const parts = out.split('**')
     let changed = false
@@ -102,7 +75,7 @@ function fixLine(line) {
     }
   }
 
-  // ③ JSX prop 안 꺾쇠 → HTML entity
+  // ② JSX prop 안 꺾쇠 → HTML entity
   {
     const next = out.replace(
       /(question|explanation|label|title|description)="([^"]*)"/g,
