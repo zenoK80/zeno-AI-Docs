@@ -64,6 +64,20 @@ const meta = {
       },
     },
   },
+  독학사: {
+    title: '독학사',
+    type: 'menu',
+    items: {
+      '1단계_일반수학': {
+        title: '1단계 일반수학',
+        href: '/독학사/1단계_일반수학/01_math-language',
+      },
+      '1단계_기초통계학': {
+        title: '1단계 기초통계학',
+        href: '/독학사/1단계_기초통계학/01_exam-overview',
+      },
+    },
+  },
 }
 
 export default meta

@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-31T19:28:05.513Z",
-  "groupCount": 3,
-  "seriesCount": 9,
+  "generatedAt": "2026-09-03T14:11:21.349Z",
+  "groupCount": 4,
+  "seriesCount": 11,
   "groups": [
     {
       "title": "JavaScript",
@@ -58,9 +58,32 @@
       ]
     },
     {
+      "title": "독학사",
+      "description": "2개 시리즈 · 문서 50편",
+      "order": "03",
+      "series": [
+        {
+          "title": "1단계 기초통계학",
+          "description": "독학사 제도와 기초통계학 출제범위, 시험 운영 방식을 파악하고 합격까지의 학습 전략을 세운다.",
+          "href": "/독학사/1단계_기초통계학/01_exam-overview",
+          "documentCount": 24,
+          "preview": "chart",
+          "accent": "green"
+        },
+        {
+          "title": "1단계 일반수학",
+          "description": "집합 기호, 논리 기호, 조건문·역·대우, 참·거짓을 판단하는 법을 처음부터 정리한다",
+          "href": "/독학사/1단계_일반수학/01_math-language",
+          "documentCount": 26,
+          "preview": "sets",
+          "accent": "amber"
+        }
+      ]
+    },
+    {
       "title": "자격증",
       "description": "4개 시리즈 · 문서 88편",
-      "order": "03",
+      "order": "04",
       "series": [
         {
           "title": "PC정비사 2급 실기",
@@ -68,7 +91,7 @@
           "href": "/자격증/PC정비사_2급_실기/01_pc-exam-roadmap",
           "documentCount": 17,
           "preview": "code",
-          "accent": "green"
+          "accent": "red"
         },
         {
           "title": "네트워크관리사 2급 실기",
@@ -76,7 +99,7 @@
           "href": "/자격증/네트워크관리사_2급_실기/01_network-basics-for-practical-use",
           "documentCount": 13,
           "preview": "browser",
-          "accent": "amber"
+          "accent": "blue"
         },
         {
           "title": "리눅스마스터 1급 1차",
@@ -84,7 +107,7 @@
           "href": "/자격증/리눅스마스터_1급_1차/01_exam-overview",
           "documentCount": 31,
           "preview": "code",
-          "accent": "red"
+          "accent": "green"
         },
         {
           "title": "빅데이터분석기사 필기",
@@ -92,7 +115,7 @@
           "href": "/자격증/빅데이터분석기사_필기/01_exam-overview",
           "documentCount": 27,
           "preview": "chart",
-          "accent": "blue"
+          "accent": "amber"
         }
       ]
     }
