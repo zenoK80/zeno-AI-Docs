@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T14:11:21.349Z",
+  "generatedAt": "2026-09-05T02:38:45.759Z",
   "groupCount": 4,
   "seriesCount": 11,
   "groups": [
@@ -82,7 +82,7 @@
     },
     {
       "title": "자격증",
-      "description": "4개 시리즈 · 문서 88편",
+      "description": "4개 시리즈 · 문서 58편",
       "order": "04",
       "series": [
         {
@@ -102,10 +102,10 @@
           "accent": "blue"
         },
         {
-          "title": "리눅스마스터 1급 1차",
-          "description": "리눅스마스터 1급 1차 필기의 문항 수·시간·과락 규칙과 3개 과목 출제 영역을 정확히 파악하고, 실제 기출이 어떤 형식으로 묻는지를 유형별로 분해해 학습 전략을 세운다",
-          "href": "/자격증/리눅스마스터_1급_1차/01_exam-overview",
-          "documentCount": 31,
+          "title": "리눅스마스터 2급 1차",
+          "description": "2급과 1급의 범위 차이, 1차(필기) 2과목 구성, 합격 기준을 먼저 잡고 공부 순서를 정한다",
+          "href": "/자격증/리눅스마스터_2급_1차/01_exam-overview",
+          "documentCount": 1,
           "preview": "code",
           "accent": "green"
         },
