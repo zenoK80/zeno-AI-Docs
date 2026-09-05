@@ -54,6 +54,14 @@ const meta = {
         title: '리눅스마스터 2급 1차',
         href: '/자격증/리눅스마스터_2급_1차/01_exam-overview',
       },
+      SQLD: {
+        title: 'SQLD',
+        href: '/자격증/SQLD/01_sql-and-database-basics',
+      },
+      ADSP: {
+        title: 'ADsP',
+        href: '/자격증/ADSP/01_adsp-exam-and-r-setup',
+      },
       네트워크관리사_2급_실기: {
         title: '네트워크관리사 2급 실기',
         href: '/자격증/네트워크관리사_2급_실기/01_network-basics-for-practical-use',

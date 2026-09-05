@@ -15,6 +15,14 @@ const meta = {
     title: 'PC정비사 2급 실기',
     type: 'page',
   },
+  SQLD: {
+    title: 'SQLD',
+    type: 'page',
+  },
+  ADSP: {
+    title: 'ADsP',
+    type: 'page',
+  },
 }
 
 export default meta
