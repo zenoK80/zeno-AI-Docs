@@ -15,6 +15,7 @@
 | [guide/menu-structure.md](guide/menu-structure.md) | content 폴더 구조 = 메뉴 구조 원리, `_meta.js` 작성법, 문서·과목·카테고리 추가/삭제 절차 |
 | [guide/run-generate-doc.md](guide/run-generate-doc.md) | 파이프라인 실행 가이드 — generate-doc.js 호출 방법·옵션·트러블슈팅 |
 | [guide/build-generate-doc.md](guide/build-generate-doc.md) | 스크립트 코드 해설 — 각 파일이 무슨 일을 하는지 |
+| [guide/deploy-github-pages.md](guide/deploy-github-pages.md) | 자동 배포 해부 — YAML 문법, `.github/workflows/` 규칙, deploy.yml 한 줄씩 해설, 직접 만드는 절차 |
 | `prompts/01_학습방향.md` | 1단계: 과목 컨셉 정의 (Grok 담당) |
 | `prompts/02_목차구성.md` | 2단계: 자료 조사 + 목차 설계 (Perplexity 담당) |
 | `prompts/03_초안작성.md` | 3단계: 완성 MDX 본문 작성 + 글 품질 규칙 (Claude 담당) |
