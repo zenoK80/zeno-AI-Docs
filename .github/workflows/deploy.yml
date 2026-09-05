@@ -26,7 +26,12 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      # 문서가 300편을 넘으면서 Node 기본 힙 상한(약 4GB)에 걸려 빌드가 OOM으로 죽었다.
+      # 러너 메모리는 16GB이므로 상한만 올려 준다.
       - run: npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
       - uses: actions/upload-pages-artifact@v3
         with:
