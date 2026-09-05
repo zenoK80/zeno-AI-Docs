@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T02:38:45.759Z",
+  "generatedAt": "2026-09-05T03:42:50.423Z",
   "groupCount": 4,
   "seriesCount": 11,
   "groups": [
@@ -103,7 +103,7 @@
         },
         {
           "title": "리눅스마스터 2급 1차",
-          "description": "2급과 1급의 범위 차이, 1차(필기) 2과목 구성, 합격 기준을 먼저 잡고 공부 순서를 정한다",
+          "description": "2급과 1급의 범위 차이, 1차 온라인시험의 3과목 구성과 합격 기준을 먼저 잡고 공부 순서를 정한다",
           "href": "/자격증/리눅스마스터_2급_1차/01_exam-overview",
           "documentCount": 1,
           "preview": "code",
