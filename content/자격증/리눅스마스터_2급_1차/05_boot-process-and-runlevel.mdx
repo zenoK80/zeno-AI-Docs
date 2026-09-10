@@ -112,7 +112,7 @@ systemctl set-default graphical.target
 ## 직접 해보기
 
 <Callout type="info">
-  **이 실습은 일반 `rocky` 컨테이너로는 안 됩니다.** 일반 컨테이너는 부팅 과정 없이 셸 하나만 바로 띄우기 때문에 systemd 자체가 켜져 있지 않아 `systemctl`이 실패합니다. 31편에서 만든 **`rocky-init` 컨테이너**(`-ubi-init` 태그, `--privileged`로 실행)로 들어가야 합니다. 아직 안 만들었다면 31편 6장을 먼저 보세요.
+  **이 실습은 일반 `rocky` 컨테이너로는 안 됩니다.** 일반 컨테이너는 부팅 과정 없이 셸 하나만 바로 띄우기 때문에 systemd 자체가 켜져 있지 않아 `systemctl`이 실패합니다. 00편에서 만든 **`rocky-init` 컨테이너**(`-ubi-init` 태그, `--privileged`로 실행)로 들어가야 합니다. 아직 안 만들었다면 00편 6장을 먼저 보세요.
 </Callout>
 
 `rocky-init` 컨테이너 안에서 지금 기본 타깃이 무엇인지, 어떤 타깃들이 존재하는지, 지금 런레벨이 몇인지 차례로 확인합니다.

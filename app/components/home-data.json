@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10T12:09:26.921Z",
+  "generatedAt": "2026-09-10T13:30:18.087Z",
   "groupCount": 4,
   "seriesCount": 13,
   "groups": [
@@ -103,8 +103,8 @@
         },
         {
           "title": "SQLD",
-          "description": "데이터베이스와 DBMS가 왜 필요한지부터, 관계형 모델의 테이블 구조, SQL이 하는 일, SQLD 시험의 과목·문항 구성까지 최소 배경을 잡는다",
-          "href": "/자격증/SQLD/01_sql-and-database-basics",
+          "description": "Docker로 Oracle Database Free를 띄우고 DBeaver로 접속해 공통 실습 데이터 seed.sql을 적재하는 법을 처음부터 끝까지 안내한다",
+          "href": "/자격증/SQLD/00_practice-environment",
           "documentCount": 31,
           "preview": "sql",
           "accent": "green"
@@ -119,8 +119,8 @@
         },
         {
           "title": "리눅스마스터 2급 1차",
-          "description": "2급과 1급의 범위 차이, 1차 온라인시험의 3과목 구성과 합격 기준을 먼저 잡고 공부 순서를 정한다",
-          "href": "/자격증/리눅스마스터_2급_1차/01_exam-overview",
+          "description": "Windows·macOS에 Docker Desktop을 설치하고 Rocky Linux 컨테이너로 리눅스 실습 환경을 만든다",
+          "href": "/자격증/리눅스마스터_2급_1차/00_practice-environment",
           "documentCount": 31,
           "preview": "code",
           "accent": "red"

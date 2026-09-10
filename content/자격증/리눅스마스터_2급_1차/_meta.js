@@ -1,4 +1,5 @@
 const meta = {
+  '00_practice-environment': '00. 부록: 실습 환경 만들기 (Docker + Rocky Linux)',
   '01_exam-overview': '01. 리눅스마스터 2급 1차 시험 개요',
   '02_linux-and-licenses': '02. 리눅스란 무엇인가와 오픈소스 라이선스',
   '03_distributions-and-selection': '03. 배포판의 종류와 선택 기준',
