@@ -124,6 +124,41 @@ INSERT INTO 사원 (이름) VALUES ('김민준');
 
 > **자주 틀리는 점:** 시험 자체는 Oracle 기준으로 출제되므로 `LIMIT`이나 `IFNULL`, `STR_TO_DATE`, `CONCAT`, `AUTO_INCREMENT`를 Oracle 문법 문제의 보기로 섞어 놓고 "이 중 Oracle에서 사용할 수 없는 것은?"처럼 묻는 함정이 나올 수 있다. 표의 왼쪽(Oracle) 칼럼이 시험에서 실제로 쓰이는 문법이고, 오른쪽(MySQL) 칼럼은 실무 참고용이라는 우선순위를 명확히 기억해야 한다.
 
+## 직접 해보기 1: Oracle 전용 문법이 실제로 동작하는지 확인
+
+<Callout type="info">
+  31편에서 만든 환경에서 진행합니다. 아직 안 만들었다면 31편을 먼저 보세요.
+</Callout>
+
+이 편의 대조표에 나온 Oracle 전용 문법 네 가지를 `DUAL`로 하나씩 직접 실행해 본다.
+
+```sql
+SELECT SYSDATE FROM DUAL;
+SELECT NVL(NULL, '기본값') FROM DUAL;
+SELECT DECODE(1, 1, '일치', '불일치') FROM DUAL;
+SELECT ROWNUM FROM DUAL;
+```
+
+**무엇을 보아야 하나**: 네 문장 모두 오류 없이 값 하나씩을 돌려주는지 확인한다. `DUAL`은 행이 딱 하나뿐인 테이블이라 `ROWNUM`도 항상 1만 나온다는 점도 함께 눈여겨본다.
+
+> **왜 이걸 해보나:** 위 표에서 본 것처럼 `SYSDATE`·`NVL`·`DECODE`·`ROWNUM`·`DUAL`은 MySQL과 SQLite에는 아예 존재하지 않는다. 다른 DBMS로 연습했다면 이 네 문장 중 어느 것도 실행해 볼 수 없었을 것이다. Oracle 환경에서만 이 실습이 가능하다는 사실이 곧 "다른 DBMS로 연습하면 안 되는" 이유다.
+
+## 직접 해보기 2: 표준 문법과 Oracle 전용 문법 비교
+
+같은 목적(상위 2명 조회)을 표준 문법과 Oracle 전용 문법으로 각각 실행해 결과를 맞춰 본다.
+
+```sql
+-- 표준 SQL: FETCH FIRST
+SELECT * FROM 사원 ORDER BY 급여 DESC FETCH FIRST 2 ROWS ONLY;
+
+-- Oracle 전용: ROWNUM (정렬 후 값에 적용하려면 인라인뷰로 감싸야 한다)
+SELECT * FROM (SELECT * FROM 사원 ORDER BY 급여 DESC) WHERE ROWNUM <= 2;
+```
+
+**무엇을 보아야 하나**: 두 쿼리가 같은 2행을 돌려주는지 확인한다. 그리고 `ROWNUM` 쪽만 인라인뷰(서브쿼리)로 한 번 감싸야 했다는 차이를 실제 코드 모양으로 비교해 본다.
+
+> **왜 이걸 해보나:** `WHERE ROWNUM <= 2`를 인라인뷰 없이 `ORDER BY`와 나란히 쓰면 정렬 전 순서에서 잘려나가 원하는 결과가 안 나온다는 것이 22·25편의 단골 함정이다. 두 방식을 나란히 실행해 보면 왜 `ROWNUM`에는 인라인뷰가 필요하고 `FETCH FIRST`에는 필요 없는지가 훨씬 분명해진다.
+
 ## 핵심 정리
 
 - 상위 N개 추출은 Oracle이 ROWNUM(인라인뷰 필요) 또는 FETCH FIRST를, MySQL이 더 단순한 LIMIT을 쓴다.

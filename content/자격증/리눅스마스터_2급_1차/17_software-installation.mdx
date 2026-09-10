@@ -136,6 +136,38 @@ yum(Yellowdog Updater, Modified)은 레드햇 계열에서 오래 쓰인 고수�
 
 SUSE 계열은 저수준 파일 형식은 레드햇과 같은 rpm을 쓰면서도, 고수준 도구는 별도로 자체 개발한 zypper·YaST를 쓴다는 점이 시험에서 종종 함정으로 등장한다. "저수준 형식이 같다고 고수준 도구까지 같지는 않다"는 점을 함께 기억해 둔다.
 
+## 직접 해보기
+
+<Callout type="info">
+  31편에서 만든 `rocky`와 `ubuntu` 컨테이너 양쪽에서 진행합니다. 아직 안 만들었다면 31편을 먼저 보세요.
+</Callout>
+
+먼저 `rocky` 컨테이너(`docker start rocky` → `docker exec -it rocky bash`)에서 확인합니다.
+
+```bash
+rpm -qa | wc -l
+rpm -qf /bin/ls
+rpm -ql bash | head
+```
+
+`-qa`(query all)는 설치된 패키지 전체 목록, `-qf`(query file)는 이 파일이 어느 패키지 소속인지, `-ql`(query list)은 그 패키지가 설치한 파일 목록이다.
+
+**무엇을 보아야 하나**: `-qf`는 파일 하나를 넣으면 패키지 이름 하나가 나오고, `-ql`은 패키지 이름 하나를 넣으면 파일 목록이 줄줄이 나온다. 방향이 반대라는 것을 손으로 확인한다.
+
+이제 `ubuntu` 컨테이너(`docker start ubuntu` → `docker exec -it ubuntu bash`)에서 같은 성격의 작업을 데비안 계열 명령으로 반복합니다.
+
+```bash
+dpkg -l | wc -l
+dpkg -S /bin/ls
+apt list --installed | head
+```
+
+`dpkg -l`은 설치된 패키지 전체 목록, `-S`(search)는 이 파일이 어느 패키지 소속인지 찾는다.
+
+**무엇을 보아야 하나**: `rpm -qf` ↔ `dpkg -S`, `rpm -qa` ↔ `dpkg -l`이 같은 역할을 한다는 대응 관계를 확인한다. 또한 두 컨테이너 모두에서 `rpm`이나 `dpkg`만으로는 의존성이 자동으로 채워지지 않는다는 점(저수준 도구의 한계)이 실제로 어떤 오류로 나타나는지 살펴본다.
+
+> **왜 이걸 해보나:** `-qf`(파일→패키지)와 `-ql`(패키지→파일)의 방향을 헷갈리는 문제가 기출 단골이다. 직접 쳐서 어느 쪽이 무엇을 받는지 손에 익혀 두면 시험장에서 헷갈리지 않는다.
+
 ## 핵심 정리
 
 - 소스 설치는 **`./configure`(환경 점검, Makefile 생성) → `make`(컴파일) → `make install`(설치)** 순서로 진행된다. Makefile을 만드는 것은 configure다.

@@ -187,6 +187,48 @@ EMP와 DEPT에 이름이 같은 컬럼이 DEPT_ID 하나뿐이라면 위 USING �
 
 **USING과 NATURAL JOIN은 ON과 함께 쓸 수 없다.** `NATURAL JOIN ... ON ...`처럼 두 방식을 동시에 쓰면 조인 조건을 지정하는 방법이 중복 지정되어 구문 오류가 발생한다. 조인 조건 지정 방법(ON, USING, NATURAL)은 셋 중 하나만 골라 쓴다는 원칙을 기억해두자.
 
+## 직접 해보기
+
+<Callout type="info">
+  31편에서 만든 환경에서 진행합니다. 아직 준비하지 않았다면 31편을 먼저 보세요.
+</Callout>
+
+### 직접 해보기 1: 조인 종류마다 행 수가 몇 개로 달라지는지 직접 세어보기
+
+같은 EMP·DEPT 두 테이블에 조인 종류만 바꿔가며 COUNT(*)로 결과 행 수를 비교한다. 실행하기 전에 본문 설명을 떠올리며 각 줄이 몇 행을 낼지 먼저 예상해보자.
+
+```sql
+SELECT COUNT(*) FROM EMP E INNER JOIN DEPT D ON E.DEPT_ID = D.DEPT_ID;
+SELECT COUNT(*) FROM EMP E LEFT OUTER JOIN DEPT D ON E.DEPT_ID = D.DEPT_ID;
+SELECT COUNT(*) FROM EMP E RIGHT OUTER JOIN DEPT D ON E.DEPT_ID = D.DEPT_ID;
+SELECT COUNT(*) FROM EMP E FULL OUTER JOIN DEPT D ON E.DEPT_ID = D.DEPT_ID;
+SELECT COUNT(*) FROM EMP E CROSS JOIN DEPT D;
+```
+
+**무엇을 보아야 하나**: 다섯 숫자가 서로 다르게 나오는지, 그리고 INNER JOIN이 가장 작고 CROSS JOIN이 가장 크다는 크기 순서가 본문에서 설명한 계산과 맞아떨어지는지 확인한다.
+
+> **왜 이걸 해보나:** 기출은 "이 두 테이블을 이 조인으로 합치면 몇 행이 나오는가"를 직접 계산하게 만든다. 다섯 조인을 한 번에 돌려 숫자로 비교해두면 공식을 외우지 않아도 감으로 맞힐 수 있게 된다.
+
+### 직접 해보기 2: NULL은 조인 조건에서 매칭되지 않는 것 확인하기
+
+최지우(EMP_ID 4)는 DEPT_ID가 NULL이다. 이 사원이 INNER JOIN 결과에 나오는지 직접 확인해본다.
+
+```sql
+SELECT * FROM EMP WHERE EMP_ID = 4;
+```
+
+```sql
+-- 예상: 위 쿼리에서 최지우가 분명히 존재하는데, 이 쿼리에는 몇 행이 나올까?
+SELECT E.NAME, D.DNAME
+FROM EMP E
+INNER JOIN DEPT D ON E.DEPT_ID = D.DEPT_ID
+WHERE E.EMP_ID = 4;
+```
+
+**무엇을 보아야 하나**: 첫 쿼리는 최지우 행이 분명히 존재함을 보여준다. 두 번째 쿼리는 DEPT_ID가 NULL이라 어떤 부서와도 비교 자체가 성립하지 않아 결과가 어떻게 되는지 본다.
+
+> **왜 이걸 해보나:** "NULL은 NULL끼리도 매칭되지 않는다"는 규칙을 글로만 읽으면 잘 와닿지 않는다. 분명히 존재하는 행이 조인 결과에서 통째로 사라지는 것을 직접 보면 이 규칙이 확실히 남는다.
+
 ## 자주 틀리는 점
 
 - **FULL OUTER JOIN 결과 건수를 단순히 "왼쪽 행 수 + 오른쪽 행 수"로 계산하는 실수**가 잦다. 매칭된 행은 한 번만 세어야 하므로, "매칭 건수 + 양쪽 미매칭 건수"로 계산해야 한다.

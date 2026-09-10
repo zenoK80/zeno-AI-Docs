@@ -171,6 +171,37 @@ WHEN NOT MATCHED THEN
 
 반대로 10편에서 다룬 DDL은 실행되는 순간 자동으로 커밋됩니다. 그래서 "DELETE는 되돌릴 수 있지만 TRUNCATE는 되돌릴 수 없다"는 차이가 생기는 것입니다. COMMIT과 ROLLBACK이 정확히 무엇을 확정하고 취소하는지, 그리고 SAVEPOINT로 일부만 되돌리는 방법은 다음 12편에서 이어서 다룹니다.
 
+## 직접 해보기
+
+<Callout type="info">
+  31편에서 만든 실습 환경(Docker + Oracle + DBeaver)에서 진행합니다. 아직 만들지 않았다면 31편을 먼저 보세요.
+</Callout>
+
+**seed의 원본 `사원` 테이블은 절대 건드리지 않는다.** 원본이 바뀌면 다른 편의 예제가 이 문서와 다른 결과를 낸다. 대신 아래처럼 복제본을 만들어 그 위에서만 INSERT·UPDATE·DELETE를 연습한다.
+
+```sql
+CREATE TABLE 연습 AS SELECT * FROM 사원;
+
+INSERT INTO 연습 (사원번호, 사원명, 커미션) VALUES (200, '신입사원', NULL);
+SELECT * FROM 연습 WHERE 사원번호 = 200;
+
+UPDATE 연습 SET 커미션 = 999 WHERE 사원번호 = 100;
+SELECT * FROM 연습 WHERE 사원번호 = 100;
+
+DELETE FROM 연습 WHERE 사원번호 = 103;
+SELECT * FROM 연습;
+```
+
+**무엇을 보아야 하나**: 각 문장 실행 직후의 SELECT 결과가 방금 실행한 INSERT·UPDATE·DELETE와 정확히 일치하는지 확인한다. 마지막 `SELECT * FROM 연습;`에는 몇 행이 남아야 하는지 미리 계산해 보고 맞춰 본다.
+
+> **왜 이걸 해보나:** DML은 결과를 눈으로 확인하지 않으면 "됐겠지" 하고 넘어가기 쉽다. 매번 SELECT로 확인하는 습관이 실무에서 실수를 줄인다.
+
+실습이 끝나면 복제본을 정리한다.
+
+```sql
+DROP TABLE 연습;
+```
+
 ## 핵심 정리
 
 - INSERT는 새 행을 추가한다. 컬럼을 명시하는 방식이 순서·개수 오류를 막아 더 안전하며, 서브쿼리로 여러 행을 한 번에 옮길 수도 있다

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T16:16:56.864Z",
+  "generatedAt": "2026-09-10T12:09:26.921Z",
   "groupCount": 4,
   "seriesCount": 13,
   "groups": [
@@ -82,7 +82,7 @@
     },
     {
       "title": "자격증",
-      "description": "6개 시리즈 · 문서 152편",
+      "description": "6개 시리즈 · 문서 154편",
       "order": "04",
       "series": [
         {
@@ -105,7 +105,7 @@
           "title": "SQLD",
           "description": "데이터베이스와 DBMS가 왜 필요한지부터, 관계형 모델의 테이블 구조, SQL이 하는 일, SQLD 시험의 과목·문항 구성까지 최소 배경을 잡는다",
           "href": "/자격증/SQLD/01_sql-and-database-basics",
-          "documentCount": 30,
+          "documentCount": 31,
           "preview": "sql",
           "accent": "green"
         },
@@ -121,7 +121,7 @@
           "title": "리눅스마스터 2급 1차",
           "description": "2급과 1급의 범위 차이, 1차 온라인시험의 3과목 구성과 합격 기준을 먼저 잡고 공부 순서를 정한다",
           "href": "/자격증/리눅스마스터_2급_1차/01_exam-overview",
-          "documentCount": 30,
+          "documentCount": 31,
           "preview": "code",
           "accent": "red"
         },

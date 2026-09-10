@@ -132,6 +132,25 @@ example.com.  300  IN  MX  10 mail.example.com.
 
 > **자주 틀리는 점:** "메일을 발신하는 프로토콜"과 "메일을 수신하는 프로토콜"을 헷갈려 SMTP 자리에 POP3나 IMAP을 넣는 오답이 흔하다. SMTP는 오직 발신(그리고 서버 간 전달)만 담당하며, 사용자가 자기 메일함을 열어 보는 것은 POP3나 IMAP의 역할이다.
 
+## 직접 해보기
+
+<Callout type="info">
+  31편에서 만든 Rocky Linux 컨테이너에서 진행합니다. `ping`·`ss`·`nslookup`이 없다는 메시지가 뜨면 `dnf install -y iputils bind-utils iproute`로 설치한 뒤 다시 시도한다.
+</Callout>
+
+앞에서 익힌 명령과 잘 알려진 포트 번호를 직접 실행해 확인한다.
+
+```bash
+ping -c 3 8.8.8.8
+ss -tuln
+nslookup example.com
+cat /etc/services | grep -E '^(ssh|http|https|ftp) '
+```
+
+**무엇을 보아야 하나**: `ping -c 3`은 3번만 보내고 멈추며, 각 줄의 `time`(왕복 시간)을 확인한다. `ss -tuln`의 `Local Address:Port` 열에서 지금 열려 있는 포트 번호를 확인한다(`-u`는 UDP까지 포함, `-n`은 이름 대신 숫자 그대로 보여 줌). `nslookup`은 `Address` 줄에서 IP가 나오는지 본다. 마지막 줄에서는 `ssh 22`, `http 80`, `https 443`, `ftp 21`처럼 서비스 이름 옆 숫자가 앞서 외운 포트 번호와 일치하는지 확인한다.
+
+> **왜 이걸 해보나:** 잘 알려진 포트 번호는 그냥 암기표가 아니라 `/etc/services`라는 실제 파일에 정의돼 있는 값이라는 것을 확인해 두면, "이 포트 번호는 어디서 정해진 것인가"를 묻는 응용 문제에도 흔들리지 않는다.
+
 ## 핵심 정리
 
 - 포트는 한 컴퓨터 안에서 여러 서비스(프로그램)를 구분하는 번호이며, 잘 알려진 포트는 FTP(20/21)·SSH(22)·Telnet(23)·SMTP(25)·DNS(53)·HTTP(80)·POP3(110)·IMAP(143)·HTTPS(443)를 정확히 암기해야 한다.

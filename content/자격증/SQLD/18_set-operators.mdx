@@ -152,6 +152,56 @@ SELECT NAME FROM EMP WHERE DEPT_ID = 20;
 
 이 표에서 가장 중요하게 봐야 할 두 축은 "중복을 제거하는가"와 "순서가 결과에 영향을 주는가"다. UNION ALL만 유일하게 중복을 제거하지 않아 처리 비용이 낮고, MINUS(EXCEPT)만 유일하게 두 SELECT의 순서를 바꾸면 결과가 달라진다.
 
+## 직접 해보기
+
+<Callout type="info">
+  31편에서 만든 실습 환경(Docker + Oracle + DBeaver)에서 진행합니다. 아직 안 만들었다면 31편을 먼저 보세요. 이 편 예제는 seed.sql의 EMP 테이블을 그대로 씁니다.
+</Callout>
+
+UNION과 UNION ALL이 실제로 몇 행을 돌려주는지 COUNT(*)로 직접 세어본다.
+
+```sql
+SELECT COUNT(*) FROM (
+  SELECT NAME FROM EMP WHERE DEPT_ID = 20
+  UNION
+  SELECT NAME FROM EMP WHERE SALARY >= 4000
+);
+
+SELECT COUNT(*) FROM (
+  SELECT NAME FROM EMP WHERE DEPT_ID = 20
+  UNION ALL
+  SELECT NAME FROM EMP WHERE SALARY >= 4000
+);
+```
+
+**무엇을 보아야 하나**: 두 COUNT(*) 값이 서로 다르게 나오는지, 그 차이가 정확히 중복된 행(이서연) 개수만큼인지 확인한다.
+
+> **왜 이걸 해보나:** UNION과 UNION ALL의 결과 건수를 암산으로 헷갈리는 것이 이 편 기출의 단골 함정이다. 직접 세어보면 계산 공식이 몸에 남는다.
+
+## 직접 해보기 2
+
+MINUS는 순서를 바꾸면 결과가 달라진다. 두 방향을 나란히 실행해 비교한다.
+
+```sql
+SELECT NAME FROM EMP WHERE DEPT_ID = 20
+MINUS
+SELECT NAME FROM EMP WHERE SALARY >= 4000;
+
+SELECT NAME FROM EMP WHERE SALARY >= 4000
+MINUS
+SELECT NAME FROM EMP WHERE DEPT_ID = 20;
+```
+
+**무엇을 보아야 하나**: 두 결과가 서로 다른 이름을 돌려주는지 확인한다. 여유가 있다면 아래처럼 컬럼 개수를 일부러 다르게 맞춰 INTERSECT를 실행해 어떤 오류가 나는지도 확인해보자.
+
+```sql
+SELECT NAME, SALARY FROM EMP WHERE DEPT_ID = 20
+INTERSECT
+SELECT NAME FROM EMP WHERE SALARY >= 4000;
+```
+
+> **왜 이걸 해보나:** "A MINUS B와 B MINUS A는 같다"는 착각, 그리고 집합 연산자에 컬럼 개수가 다른 SELECT를 섞는 실수는 둘 다 이 편 기출의 반복 함정이다.
+
 ## 자주 틀리는 점
 
 - **UNION과 UNION ALL의 결과 건수를 헷갈리는 경우**가 가장 많다. 중복된 행이 몇 개인지 먼저 세어보고, UNION은 그 중복분을 제외한 건수, UNION ALL은 단순히 두 결과 행 수를 더한 건수라고 계산하면 정확하다.

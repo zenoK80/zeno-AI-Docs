@@ -272,6 +272,35 @@ lrwxrwxrwx 1 posein posein 8 3월  11 09:40 심볼릭.txt -> 원본.txt
 
 경로와 파일을 조작하는 명령을 배웠으니, 다음 08편에서는 그 파일들의 **내용**을 들여다보고 검색하는 명령(`cat`·`grep`·`find` 등)을 이어서 다룬다.
 
+## 직접 해보기
+
+<Callout type="info">
+  31편에서 만든 `rocky` 컨테이너에서 진행합니다. 아직 안 만들었다면 31편을 먼저 보세요.
+</Callout>
+
+파일 하나를 만들고 하드링크·심볼릭 링크를 각각 만든 뒤, inode 번호와 10자리 권한 문자열을 비교합니다.
+
+```bash
+cd /root && echo hello > original.txt
+ln original.txt hardlink.txt
+ln -s original.txt symlink.txt
+ls -li original.txt hardlink.txt symlink.txt
+```
+
+**무엇을 보아야 하나**: `ls -li`의 맨 앞 숫자(inode 번호)가 `original.txt`와 `hardlink.txt`는 같고 `symlink.txt`만 다른지 확인합니다. 10자리 권한 문자열의 첫 글자도 `symlink.txt`만 `l`로 시작하고 `-> original.txt`가 붙는지 봅니다.
+
+이제 원본을 지우고 양쪽이 어떻게 되는지 봅니다.
+
+```bash
+rm original.txt
+cat hardlink.txt
+cat symlink.txt
+```
+
+**무엇을 보아야 하나**: `cat hardlink.txt`는 내용(`hello`)이 그대로 나오는데, `cat symlink.txt`는 "그런 파일이나 디렉터리가 없다"는 오류가 나는지 확인합니다.
+
+> **왜 이걸 해보나:** 원본 삭제 시 하드링크는 살아남고 심볼릭 링크는 깨진다는, 이 편에서 가장 자주 출제되는 함정을 직접 눈으로 확인하는 실습입니다.
+
 ## 핵심 정리
 
 - 절대경로는 `/`에서 시작해 어디서나 같은 대상을 가리키고, 상대경로는 현재 위치 기준이며 `.`·`..`·`~`·`-`를 함께 쓴다.

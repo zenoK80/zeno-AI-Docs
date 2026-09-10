@@ -177,6 +177,70 @@ ROLLBACK TO sv1;
 | 1 | 100 | 5000 |
 | 2 | 101 | 12000 |
 
+## 직접 해보기
+
+<Callout type="info">
+  31편에서 만든 Docker + Oracle 실습 환경에서 진행합니다. 아직 안 만들었다면 31편을 먼저 보세요. seed.sql이 만든 표는 건드리지 않고, 아래에서 새로 만드는 실습 전용 표에서만 진행합니다.
+</Callout>
+
+### 직접 해보기 1 — ROLLBACK과 COMMIT 이후 ROLLBACK을 비교한다
+
+실습 전용 표를 하나 만들고, COMMIT 전과 후에 ROLLBACK이 다르게 동작하는지 직접 비교합니다.
+
+```sql
+CREATE TABLE 연습재고 (수량 NUMBER);
+INSERT INTO 연습재고 VALUES (100);
+ROLLBACK;
+SELECT * FROM 연습재고;
+```
+
+**무엇을 보아야 하나**: SELECT 결과가 몇 건인지 보세요. 방금 넣은 100이 남아 있는지, 사라졌는지가 핵심입니다.
+
+이어서 COMMIT을 끼워 넣고 같은 순서를 반복합니다.
+
+```sql
+INSERT INTO 연습재고 VALUES (200);
+COMMIT;
+ROLLBACK;
+SELECT * FROM 연습재고;
+```
+
+**무엇을 보아야 하나**: 이번에는 ROLLBACK 뒤에도 200이 남아 있는지 확인하세요. 앞의 실습과 결과가 왜 달라지는지 COMMIT 시점을 기준으로 설명해 보세요.
+
+> **왜 이걸 해보나:** "COMMIT된 내용도 ROLLBACK으로 되돌릴 수 있다"는 문장이 옳은 설명처럼 오답 선택지에 등장합니다. 직접 눈으로 두 결과의 차이를 보면 이 함정에 흔들리지 않습니다.
+
+### 직접 해보기 2 — SAVEPOINT 여러 개를 찍고 중간 지점으로 롤백한다
+
+같은 표에서 저장점을 여러 개 찍은 뒤 중간 저장점으로 되돌아가면, 그보다 나중에 찍은 저장점이 어떻게 되는지 직접 확인합니다.
+
+```sql
+DELETE FROM 연습재고;
+INSERT INTO 연습재고 VALUES (1);
+SAVEPOINT sv1;
+INSERT INTO 연습재고 VALUES (2);
+SAVEPOINT sv2;
+INSERT INTO 연습재고 VALUES (3);
+```
+
+**무엇을 보아야 하나**: 여기까지 실행한 뒤 `ROLLBACK TO sv1;`을 실행하고 `SELECT * FROM 연습재고;`로 몇 건이 남는지 확인하세요. 그다음 `ROLLBACK TO sv2;`를 시도했을 때 어떤 메시지가 나오는지도 확인하세요.
+
+> **왜 이걸 해보나:** 중간 저장점으로 롤백하면 그 뒤에 찍힌 저장점까지 함께 무효화된다는 규칙은 말로만 들으면 헷갈립니다. sv2가 실제로 "없는 저장점"이 되어 오류가 나는 것을 직접 봐야 확실히 기억에 남습니다.
+
+### 직접 해보기 3 — DDL을 실행하면 자동 커밋되어 ROLLBACK이 안 먹는다
+
+가장 많이 틀리는 함정입니다. INSERT 뒤에 DDL(CREATE TABLE)을 끼워 넣고 ROLLBACK을 해도 INSERT가 취소되지 않는 것을 직접 확인합니다.
+
+```sql
+INSERT INTO 연습재고 VALUES (999);
+CREATE TABLE 연습DDL테스트 (번호 NUMBER);
+ROLLBACK;
+SELECT * FROM 연습재고;
+```
+
+**무엇을 보아야 하나**: ROLLBACK을 실행했는데도 999가 사라지지 않고 그대로 남아 있는지 확인하세요.
+
+> **왜 이걸 해보나:** "DDL 실행 전의 DML도 ROLLBACK으로 되돌릴 수 있다"고 착각하면 시험장에서 바로 틀립니다. 999가 살아남는 것을 직접 보면 이 규칙이 몸에 붙습니다.
+
 ## 핵심 정리
 
 - 트랜잭션은 첫 DML 실행으로 묵시적으로 시작되며, COMMIT·ROLLBACK·DDL 실행(자동 커밋) 중 하나로 끝난다
